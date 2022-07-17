@@ -105,3 +105,32 @@ article.descripcion div p {
     flex: 0;
     margin-top: auto;
 }
+
+@media (max-width:800px){
+    nav.menu {
+        flex-wrap: wrap;
+    }
+
+    .menu a {
+        flex-basis: 33%;
+        flex-grow: 1;
+    }
+
+    .contienefoto {
+        width: 60%;
+        margin-right: auto;
+        text-align: center;
+    }
+
+    article.descripcion {
+        flex-direction: column;
+    }
+    
+    article.descripcion div p {
+        color: white;
+        line-height: 1.5rem;
+        flex: 1;
+        font-size: smaller;
+        text-align: center;
+    }
+}
