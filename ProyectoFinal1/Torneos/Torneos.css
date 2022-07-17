@@ -1,0 +1,27 @@
+div.accordion.campeonatos#accordionExample button.accordion-button {
+    background-color: rgb(9, 5, 48);
+    color: rgb(240, 198, 198);
+    font-family: cursive;
+    border: none;
+}
+
+.accordion-item {
+    border:var(--bs-accordion-border-width) solid rgb(25, 20, 73);
+}
+
+div.accordion-body {
+    background-color: rgb(9, 5, 48);
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 2rem;
+}
+
+div.accordion-body li {
+    margin-top: 1rem;
+}
+
+div.accordion-body a {
+    text-decoration: none;
+    color: orange;
+    font-weight: bold;
+}
