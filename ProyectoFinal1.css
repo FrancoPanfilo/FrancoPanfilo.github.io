@@ -45,7 +45,12 @@ nav.menu {
     border-radius: 1rem;
     background-color: rgb(9, 5, 48);
     height: fit-content;
-    flex: 1;
+    flex-basis:90%
+}
+
+.logo {
+    width:10%;
+    min-width: 70px;
 }
 
 .menu a {
@@ -113,15 +118,13 @@ article.descripcion div p {
 
     .menu a {
         flex-basis: 33%;
-        flex-grow: 1;
+        flex-grow: 5;
     }
-
-    .contienefoto {
-        width: 60%;
-        margin-right: auto;
+    
+    .contienefoto{
+        width: 65%;
         text-align: center;
     }
-
     article.descripcion {
         flex-direction: column;
     }
