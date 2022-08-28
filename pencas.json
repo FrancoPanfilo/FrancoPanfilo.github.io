@@ -1,0 +1,1519 @@
+{
+    "pencas": [
+        {
+            "identificador": "Penca Mundial - Grupo A",
+            "fixture": [
+                {
+                    "team1": "Senegal",
+                    "goles1": "-",
+                    "team2": "Holanda",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Catar",
+                    "goles1": "-",
+                    "team2": "Ecuador",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Catar",
+                    "goles1": "-",
+                    "team2": "Senegal",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Holanda",
+                    "goles1": "-",
+                    "team2": "Ecuador",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Ecuador",
+                    "goles1": "-",
+                    "team2": "Senegal",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Holanda",
+                    "goles1": "-",
+                    "team2": "Catar",
+                    "goles2": "-"
+                }
+            ],
+            "resultados": [
+                {
+                    "team1": "Senegal",
+                    "goles1": "-",
+                    "team2": "Holanda",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Catar",
+                    "goles1": "-",
+                    "team2": "Ecuador",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Catar",
+                    "goles1": "-",
+                    "team2": "Senegal",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Holanda",
+                    "goles1": "-",
+                    "team2": "Ecuador",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Ecuador",
+                    "goles1": "-",
+                    "team2": "Senegal",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Holanda",
+                    "goles1": "-",
+                    "team2": "Catar",
+                    "goles2": "-"
+                }
+            ],
+            "usuarios": [
+                "invitado",
+                "paco1",
+                "aa",
+                "paco",
+                "aaaa",
+                "aaaaa",
+                "saaaaa"
+            ],
+            "creador": "FrancoPanfilo",
+            "listaPencas": [
+                {
+                    "identificador": "Penca Mundial - Grupo A",
+                    "usuario": "paco1",
+                    "fixture": [
+                        {
+                            "team1": "Senegal",
+                            "goles1": "-",
+                            "team2": "Holanda",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Ecuador",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Catar",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo A",
+                    "usuario": "aa",
+                    "fixture": [
+                        {
+                            "team1": "Senegal",
+                            "goles1": "-",
+                            "team2": "Holanda",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Ecuador",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Catar",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo A",
+                    "usuario": "paco",
+                    "fixture": [
+                        {
+                            "team1": "Senegal",
+                            "goles1": "-",
+                            "team2": "Holanda",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Ecuador",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Catar",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo A",
+                    "usuario": "aaaa",
+                    "fixture": [
+                        {
+                            "team1": "Senegal",
+                            "goles1": "-",
+                            "team2": "Holanda",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Ecuador",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Catar",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo A",
+                    "usuario": "aaaaa",
+                    "fixture": [
+                        {
+                            "team1": "Senegal",
+                            "goles1": "-",
+                            "team2": "Holanda",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Ecuador",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Catar",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo A",
+                    "usuario": "saaaaa",
+                    "fixture": [
+                        {
+                            "team1": "Senegal",
+                            "goles1": "-",
+                            "team2": "Holanda",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Catar",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Ecuador",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Ecuador",
+                            "goles1": "-",
+                            "team2": "Senegal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Holanda",
+                            "goles1": "-",
+                            "team2": "Catar",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                }
+            ]
+        },
+        {
+            "identificador": "Penca Mundial - Grupo B",
+            "fixture": [
+                {
+                    "team1": "Inglaterra",
+                    "goles1": "-",
+                    "team2": "Iran",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Estados Unidos",
+                    "goles1": "-",
+                    "team2": "Gales",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Gales",
+                    "goles1": "-",
+                    "team2": "Iran",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Inglaterra",
+                    "goles1": "-",
+                    "team2": "Estados Unidos",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Iran",
+                    "goles1": "-",
+                    "team2": "Estados Unidos",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Gales",
+                    "goles1": "-",
+                    "team2": "Inglaterra",
+                    "goles2": "-"
+                }
+            ],
+            "resultados": [
+                {
+                    "team1": "Inglaterra",
+                    "goles1": "-",
+                    "team2": "Iran",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Estados Unidos",
+                    "goles1": "-",
+                    "team2": "Gales",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Gales",
+                    "goles1": "-",
+                    "team2": "Iran",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Inglaterra",
+                    "goles1": "-",
+                    "team2": "Estados Unidos",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Iran",
+                    "goles1": "-",
+                    "team2": "Estados Unidos",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Gales",
+                    "goles1": "-",
+                    "team2": "Inglaterra",
+                    "goles2": "-"
+                }
+            ],
+            "usuarios": [
+                "invitado",
+                "paco1",
+                "aa",
+                "paco",
+                "aaaa",
+                "saaaaa"
+            ],
+            "creador": "FrancoPanfilo",
+            "listaPencas": [
+                {
+                    "identificador": "Penca Mundial - Grupo B",
+                    "usuario": "paco1",
+                    "fixture": [
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Estados Unidos",
+                            "goles1": "-",
+                            "team2": "Gales",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Iran",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Inglaterra",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo B",
+                    "usuario": "aa",
+                    "fixture": [
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Estados Unidos",
+                            "goles1": "-",
+                            "team2": "Gales",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Iran",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Inglaterra",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo B",
+                    "usuario": "paco",
+                    "fixture": [
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Estados Unidos",
+                            "goles1": "-",
+                            "team2": "Gales",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Iran",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Inglaterra",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo B",
+                    "usuario": "aaaa",
+                    "fixture": [
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Estados Unidos",
+                            "goles1": "-",
+                            "team2": "Gales",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Iran",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Inglaterra",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo B",
+                    "usuario": "saaaaa",
+                    "fixture": [
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Estados Unidos",
+                            "goles1": "-",
+                            "team2": "Gales",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Iran",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Inglaterra",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Iran",
+                            "goles1": "-",
+                            "team2": "Estados Unidos",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Gales",
+                            "goles1": "-",
+                            "team2": "Inglaterra",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                }
+            ]
+        },
+        {
+            "identificador": "Penca Mundial - Grupo C",
+            "fixture": [
+                {
+                    "team1": "Argentina",
+                    "goles1": "-",
+                    "team2": "Arabia Saudita",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Mexico",
+                    "goles1": "-",
+                    "team2": "Polonia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Polonia",
+                    "goles1": "-",
+                    "team2": "Arabia Saudita",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Argentina",
+                    "goles1": "-",
+                    "team2": "Mexico",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Polonia",
+                    "goles1": "-",
+                    "team2": "Argentina",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Arabia Saudita",
+                    "goles1": "-",
+                    "team2": "Mexico",
+                    "goles2": "-"
+                }
+            ],
+            "resultados": [
+                {
+                    "team1": "Argentina",
+                    "goles1": "-",
+                    "team2": "Arabia Saudita",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Mexico",
+                    "goles1": "-",
+                    "team2": "Polonia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Polonia",
+                    "goles1": "-",
+                    "team2": "Arabia Saudita",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Argentina",
+                    "goles1": "-",
+                    "team2": "Mexico",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Polonia",
+                    "goles1": "-",
+                    "team2": "Argentina",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Arabia Saudita",
+                    "goles1": "-",
+                    "team2": "Mexico",
+                    "goles2": "-"
+                }
+            ],
+            "usuarios": [
+                "invitado",
+                "paco1",
+                "aa",
+                "paco",
+                "saaaaa"
+            ],
+            "creador": "FrancoPanfilo",
+            "listaPencas": [
+                {
+                    "identificador": "Penca Mundial - Grupo C",
+                    "usuario": "paco1",
+                    "fixture": [
+                        {
+                            "team1": "Argentina",
+                            "goles1": "-",
+                            "team2": "Arabia Saudita",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Mexico",
+                            "goles1": "-",
+                            "team2": "Polonia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Polonia",
+                            "goles1": "-",
+                            "team2": "Arabia Saudita",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Argentina",
+                            "goles1": "-",
+                            "team2": "Mexico",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Polonia",
+                            "goles1": "-",
+                            "team2": "Argentina",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Arabia Saudita",
+                            "goles1": "-",
+                            "team2": "Mexico",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo C",
+                    "usuario": "aa",
+                    "fixture": [
+                        {
+                            "team1": "Argentina",
+                            "goles1": "-",
+                            "team2": "Arabia Saudita",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Mexico",
+                            "goles1": "-",
+                            "team2": "Polonia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Polonia",
+                            "goles1": "-",
+                            "team2": "Arabia Saudita",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Argentina",
+                            "goles1": "-",
+                            "team2": "Mexico",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Polonia",
+                            "goles1": "-",
+                            "team2": "Argentina",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Arabia Saudita",
+                            "goles1": "-",
+                            "team2": "Mexico",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo C",
+                    "usuario": "paco",
+                    "fixture": [
+                        {
+                            "team1": "Argentina",
+                            "goles1": "-",
+                            "team2": "Arabia Saudita",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Mexico",
+                            "goles1": "-",
+                            "team2": "Polonia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Polonia",
+                            "goles1": "-",
+                            "team2": "Arabia Saudita",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Argentina",
+                            "goles1": "-",
+                            "team2": "Mexico",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Polonia",
+                            "goles1": "-",
+                            "team2": "Argentina",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Arabia Saudita",
+                            "goles1": "-",
+                            "team2": "Mexico",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                },
+                {
+                    "identificador": "Penca Mundial - Grupo C",
+                    "usuario": "saaaaa",
+                    "fixture": [
+                        {
+                            "team1": "Argentina",
+                            "goles1": "-",
+                            "team2": "Arabia Saudita",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Mexico",
+                            "goles1": "-",
+                            "team2": "Polonia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Polonia",
+                            "goles1": "-",
+                            "team2": "Arabia Saudita",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Argentina",
+                            "goles1": "-",
+                            "team2": "Mexico",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Polonia",
+                            "goles1": "-",
+                            "team2": "Argentina",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Arabia Saudita",
+                            "goles1": "-",
+                            "team2": "Mexico",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                }
+            ]
+        },
+        {
+            "identificador": "Penca Mundial - Grupo D",
+            "fixture": [
+                {
+                    "team1": "Dinamarca",
+                    "goles1": "-",
+                    "team2": "Tunez",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Francia",
+                    "goles1": "-",
+                    "team2": "Australia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Tunez",
+                    "goles1": "-",
+                    "team2": "Australia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Francia",
+                    "goles1": "-",
+                    "team2": "Dinamarca",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Tunez",
+                    "goles1": "-",
+                    "team2": "Francia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Australia",
+                    "goles1": "-",
+                    "team2": "Dinamarca",
+                    "goles2": "-"
+                }
+            ],
+            "resultados": [
+                {
+                    "team1": "Dinamarca",
+                    "goles1": "-",
+                    "team2": "Tunez",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Francia",
+                    "goles1": "-",
+                    "team2": "Australia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Tunez",
+                    "goles1": "-",
+                    "team2": "Australia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Francia",
+                    "goles1": "-",
+                    "team2": "Dinamarca",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Tunez",
+                    "goles1": "-",
+                    "team2": "Francia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Australia",
+                    "goles1": "-",
+                    "team2": "Dinamarca",
+                    "goles2": "-"
+                }
+            ],
+            "usuarios": [
+                "invitado",
+                "saaaaa"
+            ],
+            "creador": "FrancoPanfilo",
+            "listaPencas": [
+                {
+                    "identificador": "Penca Mundial - Grupo D",
+                    "usuario": "saaaaa",
+                    "fixture": [
+                        {
+                            "team1": "Dinamarca",
+                            "goles1": "-",
+                            "team2": "Tunez",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Francia",
+                            "goles1": "-",
+                            "team2": "Australia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Tunez",
+                            "goles1": "-",
+                            "team2": "Australia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Francia",
+                            "goles1": "-",
+                            "team2": "Dinamarca",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Tunez",
+                            "goles1": "-",
+                            "team2": "Francia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Australia",
+                            "goles1": "-",
+                            "team2": "Dinamarca",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                }
+            ]
+        },
+        {
+            "identificador": "Penca Mundial - Grupo E",
+            "fixture": [
+                {
+                    "team1": "Alemania",
+                    "goles1": "-",
+                    "team2": "Japon",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "España",
+                    "goles1": "-",
+                    "team2": "Costa Rica",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Japon",
+                    "goles1": "-",
+                    "team2": "Costa Rica",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "España",
+                    "goles1": "-",
+                    "team2": "Alemania",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Japon",
+                    "goles1": "-",
+                    "team2": "España",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Costa Rica",
+                    "goles1": "-",
+                    "team2": "Alemania",
+                    "goles2": "-"
+                }
+            ],
+            "resultados": [
+                {
+                    "team1": "Alemania",
+                    "goles1": "-",
+                    "team2": "Japon",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "España",
+                    "goles1": "-",
+                    "team2": "Costa Rica",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Japon",
+                    "goles1": "-",
+                    "team2": "Costa Rica",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "España",
+                    "goles1": "-",
+                    "team2": "Alemania",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Japon",
+                    "goles1": "-",
+                    "team2": "España",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Costa Rica",
+                    "goles1": "-",
+                    "team2": "Alemania",
+                    "goles2": "-"
+                }
+            ],
+            "usuarios": [
+                "invitado",
+                "saaaaa"
+            ],
+            "creador": "FrancoPanfilo",
+            "listaPencas": [
+                {
+                    "identificador": "Penca Mundial - Grupo E",
+                    "usuario": "saaaaa",
+                    "fixture": [
+                        {
+                            "team1": "Alemania",
+                            "goles1": "-",
+                            "team2": "Japon",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "España",
+                            "goles1": "-",
+                            "team2": "Costa Rica",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Japon",
+                            "goles1": "-",
+                            "team2": "Costa Rica",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "España",
+                            "goles1": "-",
+                            "team2": "Alemania",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Japon",
+                            "goles1": "-",
+                            "team2": "España",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Costa Rica",
+                            "goles1": "-",
+                            "team2": "Alemania",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                }
+            ]
+        },
+        {
+            "identificador": "Penca Mundial - Grupo F",
+            "fixture": [
+                {
+                    "team1": "Marruecos",
+                    "goles1": "-",
+                    "team2": "Croacia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Belgica",
+                    "goles1": "-",
+                    "team2": "Canada",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Belgica",
+                    "goles1": "-",
+                    "team2": "Marruecos",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Croacia",
+                    "goles1": "-",
+                    "team2": "Canada",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Croacia",
+                    "goles1": "-",
+                    "team2": "Belgica",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Canada",
+                    "goles1": "-",
+                    "team2": "Marruecos",
+                    "goles2": "-"
+                }
+            ],
+            "resultados": [
+                {
+                    "team1": "Marruecos",
+                    "goles1": "-",
+                    "team2": "Croacia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Belgica",
+                    "goles1": "-",
+                    "team2": "Canada",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Belgica",
+                    "goles1": "-",
+                    "team2": "Marruecos",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Croacia",
+                    "goles1": "-",
+                    "team2": "Canada",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Croacia",
+                    "goles1": "-",
+                    "team2": "Belgica",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Canada",
+                    "goles1": "-",
+                    "team2": "Marruecos",
+                    "goles2": "-"
+                }
+            ],
+            "usuarios": [
+                "invitado"
+            ],
+            "creador": "FrancoPanfilo",
+            "listaPencas": []
+        },
+        {
+            "identificador": "Penca Mundial - Grupo G",
+            "fixture": [
+                {
+                    "team1": "Suiza",
+                    "goles1": "-",
+                    "team2": "Camerun",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Brasil",
+                    "goles1": "-",
+                    "team2": "Serbia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Camerun",
+                    "goles1": "-",
+                    "team2": "Serbia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Brasil",
+                    "goles1": "-",
+                    "team2": "Suiza",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Serbia",
+                    "goles1": "-",
+                    "team2": "Suiza",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Camerun",
+                    "goles1": "-",
+                    "team2": "Brasil",
+                    "goles2": "-"
+                }
+            ],
+            "resultados": [
+                {
+                    "team1": "Suiza",
+                    "goles1": "-",
+                    "team2": "Camerun",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Brasil",
+                    "goles1": "-",
+                    "team2": "Serbia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Camerun",
+                    "goles1": "-",
+                    "team2": "Serbia",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Brasil",
+                    "goles1": "-",
+                    "team2": "Suiza",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Serbia",
+                    "goles1": "-",
+                    "team2": "Suiza",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Camerun",
+                    "goles1": "-",
+                    "team2": "Brasil",
+                    "goles2": "-"
+                }
+            ],
+            "usuarios": [
+                "invitado",
+                "saaaaa"
+            ],
+            "creador": "FrancoPanfilo",
+            "listaPencas": [
+                {
+                    "identificador": "Penca Mundial - Grupo G",
+                    "usuario": "saaaaa",
+                    "fixture": [
+                        {
+                            "team1": "Suiza",
+                            "goles1": "-",
+                            "team2": "Camerun",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Brasil",
+                            "goles1": "-",
+                            "team2": "Serbia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Camerun",
+                            "goles1": "-",
+                            "team2": "Serbia",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Brasil",
+                            "goles1": "-",
+                            "team2": "Suiza",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Serbia",
+                            "goles1": "-",
+                            "team2": "Suiza",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Camerun",
+                            "goles1": "-",
+                            "team2": "Brasil",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                }
+            ]
+        },
+        {
+            "identificador": "Penca Mundial - Grupo H",
+            "fixture": [
+                {
+                    "team1": "Uruguay",
+                    "goles1": "-",
+                    "team2": "Corea del Sur",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Portugal",
+                    "goles1": "-",
+                    "team2": "Ghana",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Corea del Sur",
+                    "goles1": "-",
+                    "team2": "Ghana",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Portugal",
+                    "goles1": "-",
+                    "team2": "Uruguay",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Corea del Sur",
+                    "goles1": "-",
+                    "team2": "Portugal",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Ghana",
+                    "goles1": "-",
+                    "team2": "Uruguay",
+                    "goles2": "-"
+                }
+            ],
+            "resultados": [
+                {
+                    "team1": "Uruguay",
+                    "goles1": "-",
+                    "team2": "Corea del Sur",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Portugal",
+                    "goles1": "-",
+                    "team2": "Ghana",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Corea del Sur",
+                    "goles1": "-",
+                    "team2": "Ghana",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Portugal",
+                    "goles1": "-",
+                    "team2": "Uruguay",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Corea del Sur",
+                    "goles1": "-",
+                    "team2": "Portugal",
+                    "goles2": "-"
+                },
+                {
+                    "team1": "Ghana",
+                    "goles1": "-",
+                    "team2": "Uruguay",
+                    "goles2": "-"
+                }
+            ],
+            "usuarios": [
+                "invitado",
+                "saaaaa"
+            ],
+            "creador": "FrancoPanfilo",
+            "listaPencas": [
+                {
+                    "identificador": "Penca Mundial - Grupo H",
+                    "usuario": "saaaaa",
+                    "fixture": [
+                        {
+                            "team1": "Uruguay",
+                            "goles1": "-",
+                            "team2": "Corea del Sur",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Portugal",
+                            "goles1": "-",
+                            "team2": "Ghana",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Corea del Sur",
+                            "goles1": "-",
+                            "team2": "Ghana",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Portugal",
+                            "goles1": "-",
+                            "team2": "Uruguay",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Corea del Sur",
+                            "goles1": "-",
+                            "team2": "Portugal",
+                            "goles2": "-"
+                        },
+                        {
+                            "team1": "Ghana",
+                            "goles1": "-",
+                            "team2": "Uruguay",
+                            "goles2": "-"
+                        }
+                    ],
+                    "puntos": 0
+                }
+            ]
+        }
+    ]
+}
