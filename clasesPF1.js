@@ -16,8 +16,8 @@ class Penca {
             this.fixture = [],
             this.resultados = [],
             this.usuarios = ["invitado"],
-        this.creador = creador,
-        this.listaPencas = []
+            this.creador = creador,
+            this.listaPencas = []
     }
     IngresarPartido(a, b) {
         let partido = new Partidos

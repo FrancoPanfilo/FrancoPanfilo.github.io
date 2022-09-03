@@ -234,6 +234,15 @@ footer div a{
     height: fit-content;
 }
 
+.inputs{
+    background-color: rgb(255, 255, 255);
+    border: none;
+    color: rgb(3, 1, 37);
+    text-align: center;
+    border-radius: 0.5rem;
+    width: 30%;
+}
+
 @media (max-width:1100px){
     div .titulo{
         font-size: 4vh;
@@ -245,6 +254,9 @@ footer div a{
     .verficacion .btn {
         margin-left:0.3rem;
     }
+    .letraFixture td,.letraFixture td .btn{
+        font-size: 1.6vh;
+    }
 }
 
 @media (max-width:800px){
@@ -253,6 +265,10 @@ footer div a{
     }
 
     div .navs {
+        font-size: 1.5vh;
+    }
+
+    .letraFixture td,.letraFixture td .btn{
         font-size: 1.5vh;
     }
 
@@ -271,6 +287,7 @@ footer div a{
     a div p{
         font-size: 1.2vh;
     }
+
 }   
 
 @media (max-width:650px){
@@ -294,6 +311,10 @@ footer div a{
     div .navs {
         font-size: 1.7vh;
     }
+    
+    .letraFixture td,.letraFixture td .btn{
+        font-size: 1.4vh;
+    }
 }
 
 @media (max-width:450px){
@@ -307,5 +328,9 @@ footer div a{
 
     .descripcion p{
         font-size: 0.8vh;
+    }
+    
+    .letraFixture td,.letraFixture td .btn{
+        font-size: 1.2vh;
     }
 }

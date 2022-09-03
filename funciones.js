@@ -28,27 +28,27 @@ function puntoss(a1, b1, a2, b2) {
 
 
 function conteoPuntos(penca) {
-for (let m = 0; m < penca.listaPencas.length; m++) {
-    let contador=0
-    for (let i = 0; i < penca.fixture.length; i++) {
-        contador = contador + puntoss(penca.resultados[i].goles1, penca.resultados[i].goles2, penca.listaPencas[m].fixture[i].goles1, penca.listaPencas[m].fixture[i].goles2)
-    }
-    let usuario= penca.listaPencas[m].usuario
-    let listaUsuarios= JSON.parse(localStorage.getItem("Servidor Usuarios"))
-    for (let i=0 ;i<listaUsuarios.usuarios.length;i++){
-        if (usuario == listaUsuarios.usuarios[i].id){
-            usuario=listaUsuarios.usuarios[i]
-            for (let p=0 ; p<usuario.pencasActivas.length;p++){
-                if (usuario.pencasActivas[p].identificador==penca.listaPencas[m].identificador){
-                    usuario.pencasActivas[p]=penca.listaPencas[m]
-                    listaUsuarios.usuarios[i]=usuario
-                    localStorage.setItem("Servidor Pencas",listaUsuarios)
+    for (let m = 0; m < penca.listaPencas.length; m++) {
+        let contador = 0
+        for (let i = 0; i < penca.fixture.length; i++) {
+            contador = contador + puntoss(penca.resultados[i].goles1, penca.resultados[i].goles2, penca.listaPencas[m].fixture[i].goles1, penca.listaPencas[m].fixture[i].goles2)
+        }
+        let usuario = penca.listaPencas[m].usuario
+        let listaUsuarios = JSON.parse(localStorage.getItem("Servidor Usuarios"))
+        for (let i = 0; i < listaUsuarios.usuarios.length; i++) {
+            if (usuario == listaUsuarios.usuarios[i].id) {
+                usuario = listaUsuarios.usuarios[i]
+                for (let p = 0; p < usuario.pencasActivas.length; p++) {
+                    if (usuario.pencasActivas[p].identificador == penca.listaPencas[m].identificador) {
+                        usuario.pencasActivas[p] = penca.listaPencas[m]
+                        listaUsuarios.usuarios[i] = usuario
+                        localStorage.setItem("Servidor Pencas", listaUsuarios)
+                    }
                 }
             }
         }
+        penca.listaPencas[m].puntos = contador
     }
-    penca.listaPencas[m].puntos=contador
-}
 }
 
 function unirsePenca(penca, usuarioo) {

@@ -330,6 +330,7 @@ for (let i = 0; i < misPencas.length; i++) {
                                                                 <td>${users.team2}<img src="${banderaPais(users.team2)}"></td>
                                                             </tr>`
             //   agregarElemento.setAttribute("id",`${i}filaTabla${indice}`)
+            agregarElemento.className = "letraFixture"
             Resultados.appendChild(agregarElemento)
             indice++
         })
@@ -369,6 +370,8 @@ for (let i = 0; i < misPencas.length; i++) {
                                         <td>${users.team2}<img src="${banderaPais(users.team2)}"></td>
                                         <td ><button type="button" class="btn" id="${i}botonPrediccion${indice}">Hacer Prediccion</button><p id="${i}puntosPartido${indice}"></p></td>
                                     </tr>`
+            agregarElemento.className = "letraFixture"
+
             agregarElemento.setAttribute("id", `${i}filaTabla${indice}`)
             tablaFixture.appendChild(agregarElemento)
 
@@ -404,6 +407,8 @@ for (let i = 0; i < misPencas.length; i++) {
                                         <td>${users.team2}<img src="${banderaPais(users.team2)}"></td>
                                         <td ><button type="button" class="btn" id="${i}botonGuardar${indice2}">Guardar Prediccion</button></td>
                                         `
+                partidoACambiar.className = "letraFixture"
+
                 let botonGuardar = document.getElementById(`${i}botonGuardar${indice2}`)
                 botonGuardar.addEventListener("click", () => {
                     let inputGoles1 = document.getElementById(`${i}inputGoles1${indice2}`).value;
@@ -424,6 +429,7 @@ for (let i = 0; i < misPencas.length; i++) {
                                                 <td>${users.team2}<img src="${banderaPais(users.team2)}"></td>
                                                 <td ><button type="button" class="btn" id="${i}botonPrediccion${indice2}">Hacer Prediccion</button></td>
                                             </tr>`
+                    partidoACambiar.className = "letraFixture"
                     let click = document.getElementById(`mipenca${i}`)
                     // con esto redrescamos el modal
                     click.click()

@@ -1,10 +1,11 @@
-.sel{
+.sel {
     margin-top: 2rem;
     display: flex;
     justify-content: space-between;
     width: 60%;
 }
-#Fixture{
+
+#Fixture {
     width: 95%;
     margin-top: 1.5rem;
     line-height: 3.5rem;
@@ -17,12 +18,10 @@
     width: 10%;
 }
 
-tr img{
+tr img {
     height: 1rem;
 }
 
-@media (max-width:650px){
-    #Fixture{
-        width: 100%;
-    }
+#Fixture thead tr th:nth-child(3),#Fixture thead tr th:nth-child(5) {
+    width: 10%;
 }
