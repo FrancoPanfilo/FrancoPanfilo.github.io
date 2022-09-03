@@ -1,0 +1,8 @@
+.table {
+    width:80%;
+}
+@media (max-width:650px){
+    .table{
+        width: 100%;
+    }
+}

@@ -1,0 +1,311 @@
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+html {
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height:100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #262421;
+    font-family: "Montserrat",sans-serif;
+}
+main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+div.cabeza {
+    width: 95%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding:0.7rem 1rem;
+    border-radius: 1rem;
+    background-color: #1d1d1a;
+}
+
+.Esconder{
+    display:none;
+}
+
+.Mostrar{
+    display: flex;
+}
+
+#sesionIniciada{
+    justify-content: center;
+    align-items: center;
+}
+
+#btn-abrir-modal2{
+    margin-left: 0.5rem;
+}
+
+.btn {
+    background-color: green;
+    border: none;
+}
+
+.btn:hover{
+    background-color: green;
+}
+
+.cancelar{
+    background-color: rgb(255, 0, 0);
+}
+
+.cancelar:hover{
+    background-color: red;
+}
+
+.Yfoto {
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+}
+
+div .titulo a {
+    color: rgb(211, 148, 31);
+    width: fit-content;
+    height: fit-content;
+    line-height: 100%;
+    margin: 0;
+    font-size: 5vw;
+    text-decoration: none;
+}
+
+div .navs {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-grow: 1.5;
+    color: white;
+    font-family: "Montserrat",sans-serif;
+    font-size: 3vh;
+}
+
+div.verficacion {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: right;
+    margin-left:0.5rem;
+}
+
+div img {
+    height: 1rem;
+    align-self: flex-end;
+    
+}
+
+div nav a.enlace {
+    color: white;
+    text-decoration: none;
+}
+
+div nav a.enlace:hover {
+    color: white;
+    font-weight: bolder;
+}
+
+#enlaceMedio{
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+.cuerpo {
+    width: 70%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 3rem;
+    border-radius: 1rem;
+    margin-bottom: 3rem;
+}
+
+.opcion {
+    flex-grow: 1;
+    flex-basis: 50%;
+    position: relative;
+    text-align: center;
+    opacity: 1;
+}
+
+.mispencas{
+    flex-basis: 65%;
+    flex-grow: 0;
+}
+
+.administrarPencas{
+    flex-basis: 65%;
+    flex-grow: 0;
+    position: relative;
+    text-align: center;
+    opacity: 1;
+    border-radius:1rem 1rem 0 0 ;
+}
+
+.administrarPencas img{
+    width: auto;
+    height: 100%;
+  }
+
+.descripcion {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0rem;
+    left: 0rem;
+    color: rgb(255, 242, 242);
+    opacity: 1.0;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.descripcion:hover {
+    background-color: rgba(0, 0, 0, 0.454);
+}
+
+.opcion img{
+    width: auto;
+    height: 100%;
+  }
+
+.foto:hover {
+    transition: 0.3s;
+    filter: brightness(50%);
+}
+
+.opcion:hover{
+    cursor: pointer;
+}
+
+footer div a{
+    color: white;
+}
+@supports(object-fit: cover){
+    .opcion img{
+      width: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }
+    .administrarPencas img{
+        width: 100%;
+        object-fit: cover;
+        object-position: center center;
+      }
+  }
+
+.opcion:first-child, #ft1, #f1{
+    border-radius: 1rem 0rem 0rem 1rem;
+}
+
+.opcion:nth-child(2), #ft2, #f2{
+    border-radius: 0rem 1rem 1rem 0rem;
+}
+
+.opcion:last-child, #ft3, #f3{
+    border-radius: 0 0 1rem 1rem;
+}
+ #ft4, #f4{
+    border-radius: 1rem 1rem 0 0;
+}
+
+.pie {
+    background-color: #1d1d1a;
+    width: 100%;
+    border-top: 0.13rem orange solid;
+    align-self: flex-end;
+    flex: 0;
+    margin-top: auto;
+}
+
+.btn{
+    height: fit-content;
+}
+
+@media (max-width:1100px){
+    div .titulo{
+        font-size: 4vh;
+    }
+
+    div .navs {
+        font-size: 2vh;
+    }
+    .verficacion .btn {
+        margin-left:0.3rem;
+    }
+}
+
+@media (max-width:800px){
+    div .titulo{
+        font-size: 3vh;
+    }
+
+    div .navs {
+        font-size: 1.5vh;
+    }
+
+    div.cabeza, main{
+        width: 100%;
+        border-radius: 0;
+    }
+
+    #cerrarSesion ,#btn-abrir-modal{
+        font-size: 2.0vh;
+    }
+
+    a div h1{
+        font-size: 2.2vh;
+    }
+    a div p{
+        font-size: 1.2vh;
+    }
+}   
+
+@media (max-width:650px){
+    div.cabeza {
+        flex-wrap: wrap;
+    }
+    
+    div.cabeza .Yfoto{
+        justify-content: center;
+        margin-bottom: 1rem;
+        flex-basis:100%
+    }
+
+    .descripcion h1{
+        font-size: 2.0vh;
+    }
+
+    .descripcion p{
+        font-size: 1.0vh;
+    }
+    div .navs {
+        font-size: 1.7vh;
+    }
+}
+
+@media (max-width:450px){
+    .verficacion .btn ,#cerrarSesion{
+        font-size: 1.5vh !important;
+    }
+
+    .descripcion h1{
+        font-size: 1.7vh;
+    }
+
+    .descripcion p{
+        font-size: 0.8vh;
+    }
+}

@@ -1,0 +1,28 @@
+.sel{
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    width: 60%;
+}
+#Fixture{
+    width: 95%;
+    margin-top: 1.5rem;
+    line-height: 3.5rem;
+    background-color: #1d1d1a;
+    text-align: center;
+}
+
+
+#Fixture th:last-child {
+    width: 10%;
+}
+
+tr img{
+    height: 1rem;
+}
+
+@media (max-width:650px){
+    #Fixture{
+        width: 100%;
+    }
+}

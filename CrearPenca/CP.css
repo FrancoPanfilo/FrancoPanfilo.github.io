@@ -1,0 +1,81 @@
+
+main{
+    height: 80%;
+}
+
+#idMostrar{
+    margin-top: 1.5rem;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+}
+.formulario{
+    display: flex;
+    flex-direction: column;
+    width: 88%;
+    justify-content: space-around;
+    align-content: center;
+}
+.formulario .dato input{
+    width: 100%;
+}
+
+.formulario input{
+    width: 50%;
+    margin: auto;
+}
+.idPenca{
+    text-align: center;
+    display: flex;
+}
+
+.margen{
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+.formulario label{
+    color: white;
+}
+
+.formulario .fila{
+    margin-bottom: 2rem;
+}
+
+.partidos{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#Fixture{
+    width:80%;
+    background-color: rgb(5, 5, 79);
+    text-align: center;
+    line-height: 2.5rem;
+}
+#Fixture th{
+    width:20%;
+}
+#Fixture th:first-child{
+    width:2%;
+}
+
+#Fixture th:nth-child(2){
+    width:18%;
+}
+#Fixture th:nth-child(2) , td:nth-child(2){
+    text-align: right;
+}
+#Fixture th:nth-child(6) , td:nth-child(6){
+    text-align: left;
+}
+h3{
+    color:white;
+}
+
+#tituloTabla{
+    width: 80%;
+    background-color: rgb(0, 0, 32);
+    margin-top: 1rem;
+    text-align: center;
+}

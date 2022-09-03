@@ -1,0 +1,71 @@
+.table {
+    width:80%;
+}
+@media (max-width:650px){
+    .table{
+        width: 100%;
+    }
+}
+.tablaPantalla{
+    width: 100%;
+    background-color: rgb(0, 0, 47);
+    text-align:center;
+}
+
+.tablaPantalla tr{
+    line-height: 65px;
+}
+
+.tablaPantalla.mipenca thead tr th:last-child {
+    width: 15%;
+}
+.tablaPantalla.mipenca thead tr th:nth-child(3),.tablaPantalla.mipenca thead tr th:nth-child(5) {
+    width: 10%;
+}
+
+.verPenca, .verPenca:hover{
+    width: 88%;
+    position: fixed;
+    margin-top: 5.5rem;
+    border: none;
+    background-color:rgb(5, 5, 79) !important;
+    color: white;
+    border-radius: 1rem;
+    border: none;
+}
+
+dialog::backdrop{
+    backdrop-filter: blur(2px);
+}
+
+dialog.verPenca div div:hover{
+    cursor: pointer;
+}
+
+.opciones{
+    display: flex;
+}
+ .opciones div {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+ }
+
+#pantalla{
+    flex-grow: 1;
+}
+
+.botones{
+    display: flex;
+    justify-content: right;
+}
+
+.inputs{
+    background-color: rgb(255, 255, 255);
+    border: none;
+    color: rgb(3, 1, 37);
+    text-align: center;
+    border-radius: 0.5rem;
+    width: 30%;
+}
+
