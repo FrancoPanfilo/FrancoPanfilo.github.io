@@ -4,6 +4,7 @@ if (servidorUsuarios == null) {
     servidorUsuarios = new ServidorUsuarios
     servidorUsuarios.usuarios = []
     let admin = new Usuarios("FrancoPanfilo","")
+    servidorUsuarios.usuarios.push(admin)
     localStorage.setItem("Servidor Usuarios", JSON.stringify(servidorUsuarios))
 }
 
