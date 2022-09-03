@@ -11,6 +11,7 @@ for (let i = 0; i < servidor.pencas.length; i++) {
                                     <td>${servidor.pencas[i].usuarios.length - 1}</td>
                                     <td><button id="boton${i}" type="button" class="btn">Unirme</button></td>
                                 </tr>`
+    agregarElemento.className = "letraFixture"
     // verifico que la penca no este activa
     let user = JSON.parse(localStorage.getItem("Usuario"))
     for (let n = 0; n < user.pencasActivas.length; n++) {

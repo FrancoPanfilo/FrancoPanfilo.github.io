@@ -13,7 +13,7 @@
 }
 
 .tablaPantalla tr{
-    line-height: 65px;
+    height: 65px;
 }
 
 .tablaPantalla.mipenca thead tr th:last-child {
@@ -58,6 +58,25 @@ dialog.verPenca div div:hover{
 .botones{
     display: flex;
     justify-content: right;
+}
+
+
+@media (max-width:800px){
+    .letraMiPenca td,.letraMiPenca td .btn{
+        font-size: 1.2vh;
+    }
+}   
+
+@media (max-width:650px){
+    .letraMiPenca td,.letraMiPenca td .btn{
+        font-size: 0.8vh;
+    }
+}
+
+@media (max-width:450px){
+    .letraMiPenca td,.letraMiPenca td .btn{
+        font-size: 0.6vh;
+    }
 }
 
 

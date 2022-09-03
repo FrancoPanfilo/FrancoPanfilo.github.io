@@ -315,12 +315,14 @@ footer div a{
     .letraFixture td,.letraFixture td .btn{
         font-size: 1.4vh;
     }
+
+    .cabeza .btn, #cerrarSesion{
+        font-size: 1.4vh;
+        padding: 2px;
+    }
 }
 
 @media (max-width:450px){
-    .verficacion .btn ,#cerrarSesion{
-        font-size: 1.5vh !important;
-    }
 
     .descripcion h1{
         font-size: 1.7vh;

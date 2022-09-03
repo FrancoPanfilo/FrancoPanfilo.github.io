@@ -249,7 +249,6 @@ for (let i = 0; i < misPencas.length; i++) {
         <th scope="col">Puesto</th>
         <th scope="col">Participante</th>
         <th scope="col">Puntos</th>
-        <th scope="col">Ver Predicciones</th>
       </tr>
     </thead>
         <tbody>
@@ -274,9 +273,9 @@ for (let i = 0; i < misPencas.length; i++) {
                                         <td>${indice}</td>
                                         <td>${users.usuario}</td>
                                         <td>${users.puntos}</td>
-                                        <td><button type="button" class="btn" id="${i}botonVer${indice}">Ver Predicciones</button></td>
                                     </tr>`
             //agregarElemento.setAttribute("id",`Puestos${indice}`)
+            agregarElemento.className = "letraFixture"
             Resultados.appendChild(agregarElemento)
             indice++
         })
@@ -368,9 +367,9 @@ for (let i = 0; i < misPencas.length; i++) {
                                         <td>VS</td>
                                         <td>${users.goles2}</td>
                                         <td>${users.team2}<img src="${banderaPais(users.team2)}"></td>
-                                        <td ><button type="button" class="btn" id="${i}botonPrediccion${indice}">Hacer Prediccion</button><p id="${i}puntosPartido${indice}"></p></td>
+                                        <td ><button type="button" class="btn" id="${i}botonPrediccion${indice}">Penquear</button><p id="${i}puntosPartido${indice}"></p></td>
                                     </tr>`
-            agregarElemento.className = "letraFixture"
+            agregarElemento.className = "letraMiPenca"
 
             agregarElemento.setAttribute("id", `${i}filaTabla${indice}`)
             tablaFixture.appendChild(agregarElemento)
@@ -405,9 +404,9 @@ for (let i = 0; i < misPencas.length; i++) {
                                         <td>VS</td>
                                         <td><input class="inputs" placeholder="${users.goles2}" id="${i}inputGoles2${indice2}"></td>
                                         <td>${users.team2}<img src="${banderaPais(users.team2)}"></td>
-                                        <td ><button type="button" class="btn" id="${i}botonGuardar${indice2}">Guardar Prediccion</button></td>
+                                        <td ><button type="button" class="btn" id="${i}botonGuardar${indice2}">Guardar</button></td>
                                         `
-                partidoACambiar.className = "letraFixture"
+                partidoACambiar.className = "letraMiPenca"
 
                 let botonGuardar = document.getElementById(`${i}botonGuardar${indice2}`)
                 botonGuardar.addEventListener("click", () => {
@@ -427,9 +426,9 @@ for (let i = 0; i < misPencas.length; i++) {
                                                 <td>VS</td>
                                                 <td>${users.goles2}</td>
                                                 <td>${users.team2}<img src="${banderaPais(users.team2)}"></td>
-                                                <td ><button type="button" class="btn" id="${i}botonPrediccion${indice2}">Hacer Prediccion</button></td>
+                                                <td ><button type="button" class="btn" id="${i}botonPrediccion${indice2}">Penquear</button></td>
                                             </tr>`
-                    partidoACambiar.className = "letraFixture"
+                    partidoACambiar.className = "letraMiPenca"
                     let click = document.getElementById(`mipenca${i}`)
                     // con esto redrescamos el modal
                     click.click()

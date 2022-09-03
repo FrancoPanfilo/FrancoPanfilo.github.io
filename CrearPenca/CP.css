@@ -79,3 +79,26 @@ h3{
     margin-top: 1rem;
     text-align: center;
 }
+
+.aju{
+    align-self: flex-end;
+}
+@media (max-width:800px){
+    label{
+        font-size: 2vh;
+    }
+}   
+
+@media (max-width:650px){
+    label{
+        font-size: 1.5vh;
+    }
+}
+
+@media (max-width:450px){
+    label{
+        font-size: 1vh;
+    }
+}
+
+
