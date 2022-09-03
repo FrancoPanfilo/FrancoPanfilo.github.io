@@ -134,8 +134,8 @@ for (let i = 0; i < misPencas.length; i++) {
                                     <td>${misPencas[i].identificador}</td>
                                     <td>${misPencas[i].fixture.length}</td>
                                     <td>${misPencas[i].puntos}</td>
-                                    <td><button id="abandonar${i}" type="button" class="btn cancelar" >Abandonar</button></td>
-                                    <td><button id="abrirPenca${i}" type="button" class="btn" >Ver Penca</button></td>
+                                    <td><button id="abandonar${i}" type="button" class="btn cancelar" >Salir</button></td>
+                                    <td><button id="abrirPenca${i}" type="button" class="btn" >Ver</button></td>
                                 </tr>
                                 
                                 <dialog id="modalPenca${i}" class="verPenca">
@@ -153,10 +153,6 @@ for (let i = 0; i < misPencas.length; i++) {
 
     agregarElemento.setAttribute("id", `filaDePencas${i}`)
     tabla.appendChild(agregarElemento)
-
-
-    // la primera penca se borra bien , la segunda borra el elemento siguiente , el tercer el 5to , el 4to el 6to. Esto se debe a que l aumenta , pero la posicion de la penca en la tabla no cambia, 
-    // la solucion es agregar un contador que equilibre esa diferencia mientras la pagina no se recargue, es una solucion provisorua pero funcional que permite no tener que recargar la pagina cada vez que borramos una penca
 
 
     let elboton = document.getElementById(`abandonar${i}`)
