@@ -287,6 +287,11 @@ footer div a{
     a div p{
         font-size: 1.2vh;
     }
+    #btn-abrir-modal, #cerrarSesion,#btn-abrir-modal2{
+        font-size: 1.8vh;
+        padding: 2px;
+        height: fit-content;
+    }
 
 }   
 
@@ -316,9 +321,10 @@ footer div a{
         font-size: 1.4vh;
     }
 
-    .cabeza .btn, #cerrarSesion{
+    #btn-abrir-modal, #cerrarSesion,#btn-abrir-modal2{
         font-size: 1.4vh;
         padding: 2px;
+        height: fit-content;
     }
 }
 

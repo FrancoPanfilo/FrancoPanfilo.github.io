@@ -108,3 +108,13 @@ function banderaPais(pais) {
     }
     return url
 }
+
+function partidoExiste(penca,t1,t2){
+    let condicion=false
+    for (let i=0 ; i<penca.fixture.length;i++){
+        if ((penca.fixture[i].team1==t1)&&(penca.fixture[i].team2==t2)){
+            condicion=true
+        }
+    }
+    return condicion
+}

@@ -57,7 +57,6 @@ botonFijar.addEventListener("click", () => {
         identificador.value = ""
     }
 })
-
 // Agregar partido
 crearPartido.addEventListener("click", () => {
     if (idDisponible) {
@@ -77,6 +76,11 @@ crearPartido.addEventListener("click", () => {
             Swal.fire({
                 icon: 'error',
                 text: "Los equipos no pueden ser iguales"
+            })
+        } else if(partidoExiste(nuevaPenca,team1,team2)){
+            Swal.fire({
+                icon: 'error',
+                text: "Partido ya ingresado"
             })
         } else {
             nuevaPenca.IngresarPartido(team1, team2)
