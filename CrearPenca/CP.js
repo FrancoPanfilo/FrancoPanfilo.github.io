@@ -20,41 +20,53 @@ let tabla = document.getElementById("Fixture")
 let titulo = document.getElementById("tituloTabla")
 
 botonFijar.addEventListener("click", () => {
-    let i = 0
-    idDisponible = true
-    while ((i < pencasExistentes.pencas.length) && (idDisponible == true)) {
-        let id = identificador.value
-        if ((pencasExistentes.pencas[i].identificador == id) || (id == "")||(id.length>25)) {
-            idDisponible = false
-        }
-        i++
-    }
-    if (idDisponible == true) {
-        let idPenca = identificador.value
-        let idMostrar = document.getElementById("idMostrar")
-        idMostrar.innerHTML = `<br><h3>${idPenca}</h3>`
-        botonFijar.className = "Esconder"
-        nuevaPenca = new Penca(idPenca, (JSON.parse(localStorage.getItem("Usuario"))).id)
-        titulo.innerHTML = `<h3>${idPenca}</h3>`
+    let userr = JSON.parse(localStorage.getItem("Usuario"))
+    console.log(userr);
+    if (userr.id == "invitado") {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Antes tienes que Registrarte!',
+            footer: '<a href="">Registrarme</a>'
+        })
     } else {
-        if (identificador.value == "") {
-            Swal.fire({
-                icon: 'error',
-                text: "Ingrese un identificador para su penca"
-            })
+        let i = 0
+        idDisponible = true
+        while ((i < pencasExistentes.pencas.length) && (idDisponible == true)) {
+            let id = identificador.value
+            if ((pencasExistentes.pencas[i].identificador == id) || (id == "") || (id.length > 25)) {
+                idDisponible = false
+            }
+            i++
+        }
+        if (idDisponible == true) {
+            let idPenca = identificador.value
+            let idMostrar = document.getElementById("idMostrar")
+            idMostrar.innerHTML = `<br><h3>${idPenca}</h3>`
+            botonFijar.className = "Esconder"
+            nuevaPenca = new Penca(idPenca, (JSON.parse(localStorage.getItem("Usuario"))).id)
+            titulo.innerHTML = `<h3>${idPenca}</h3>`
         } else {
-            if (identificador.value.length>25){
+            if (identificador.value == "") {
                 Swal.fire({
                     icon: 'error',
-                    text: "Maximo 24 caracteres"
+                    text: "Ingrese un identificador para su penca"
                 })
-            }else{
-            Swal.fire({
-                icon: 'error',
-                text: "Identificador en uso"
-            })}
+            } else {
+                if (identificador.value.length > 25) {
+                    Swal.fire({
+                        icon: 'error',
+                        text: "Maximo 24 caracteres"
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: "Identificador en uso"
+                    })
+                }
+            }
+            identificador.value = ""
         }
-        identificador.value = ""
     }
 })
 // Agregar partido
@@ -67,17 +79,17 @@ crearPartido.addEventListener("click", () => {
                 icon: 'error',
                 text: "Ingrese el nombre de los equipos"
             })
-        } else if ((team1.length>17) || (team2.length>17)) {
+        } else if ((team1.length > 17) || (team2.length > 17)) {
             Swal.fire({
                 icon: 'error',
                 text: "Maximo 17 caracteres"
             })
-         }else if (team2 == team1) {
+        } else if (team2 == team1) {
             Swal.fire({
                 icon: 'error',
                 text: "Los equipos no pueden ser iguales"
             })
-        } else if(partidoExiste(nuevaPenca,team1,team2)){
+        } else if (partidoExiste(nuevaPenca, team1, team2)) {
             Swal.fire({
                 icon: 'error',
                 text: "Partido ya ingresado"

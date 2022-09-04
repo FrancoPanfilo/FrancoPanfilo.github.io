@@ -42,7 +42,7 @@ function conteoPuntos(penca) {
                     if (usuario.pencasActivas[p].identificador == penca.listaPencas[m].identificador) {
                         usuario.pencasActivas[p] = penca.listaPencas[m]
                         listaUsuarios.usuarios[i] = usuario
-                        localStorage.setItem("Servidor Pencas", listaUsuarios)
+                        localStorage.setItem("Servidor Usuarios", JSON.stringify(listaUsuarios))
                     }
                 }
             }

@@ -157,6 +157,9 @@ for (let i = 0; i < misPencas.length; i++) {
         }
         let Resultados = document.getElementById(`Puestos${i}`)
         let indice = 1
+        resultados.sort((a, b) => {
+            return b.puntos - a.puntos;
+        })
         resultados.forEach((users) => {
             let agregarElemento = document.createElement("tr")
             agregarElemento.innerHTML = `<tr>
