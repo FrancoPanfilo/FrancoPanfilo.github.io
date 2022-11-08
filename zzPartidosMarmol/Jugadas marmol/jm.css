@@ -1,0 +1,92 @@
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(58, 0, 0);
+}
+body{
+    background-color: rgb(58, 0, 0);
+}
+
+nav{
+    display: flex;
+    width: 100%; 
+    margin-bottom: 2rem;
+    padding: 1rem;
+}
+.pestaña{
+    color: yellow;
+    flex-grow: 1;
+    text-align: center;
+    text-decoration: none;
+    background-color: rgb(78, 6, 6);
+}
+a:hover{
+    color: yellow;
+}
+.formulario {
+    display: flex;
+    width: 90%;
+    color: wheat;
+}
+
+.formulario .btn{
+    background-color: green;
+    border: none;
+}
+
+.col{
+    margin-left:1rem;
+}
+
+#tituloTabla{
+    background-color: rgb(0, 0, 34);
+    color: beige;
+    text-align: center;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.tablaPantalla{
+    width: 100%;
+    background-color: blue;
+}
+
+#GuardarPartido{
+    width: 30%;
+    margin: 1rem 0;
+    background-color: rgb(3, 77, 3);
+    border: none;
+}
+
+#pantalla {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+#video {
+    flex-basis: 70%;
+}
+
+#estadisticas{
+    flex-basis: 30%;
+    background-color: black;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.iconoCont{
+    flex-basis: 50%;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+}
+.iconoCont img{
+    height:5vh;
+}
+
+.iconoCont img:hover{
+    height:7vh;
+    cursor:pointer;
+}

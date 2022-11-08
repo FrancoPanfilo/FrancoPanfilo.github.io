@@ -1,0 +1,15 @@
+.cabeza{
+    display: flex;
+    align-items: center;
+}
+
+select{
+    height: 3rem;
+    margin-right: 1rem;
+}
+
+.btn{
+    background-color: green;
+    border: none;
+    width: 25%;
+}
