@@ -63,7 +63,7 @@ let crearJugada = document.getElementById("crearJugada");
 
 let NOhayRival = true;
 
-let partido;
+/* let partido;
 botonRival.addEventListener("click", () => {
   if (rival.value == "") {
     alert("ingrese un rival");
@@ -73,9 +73,9 @@ botonRival.addEventListener("click", () => {
     mostrarId.innerHTML = `<h3>${rival.value}</h3>`;
     NOhayRival = false;
   }
-});
+}); */
 
-let u = 0;
+/* let u = 0;
 crearJugada.addEventListener("click", () => {
   if (NOhayRival) {
     alert("Ingrese el rival");
@@ -105,7 +105,7 @@ crearJugada.addEventListener("click", () => {
     exitosa.checked = false;
     sinExito.checked = false;
   }
-});
+}); */
 
 let guardarPartido = JSON.parse(localStorage.getItem("Partidos Marmol"));
 let guardar = document.getElementById("GuardarPartido");
@@ -147,6 +147,19 @@ fijarVideo.addEventListener("click", () => {
         </div>
         </div>
   `;
+  setTimeout(() => {
+    let pantallaCompleta = document.getElementsByClassName(
+      "ytp-fullscreen-button"
+    );
+    console.log(pantallaCompleta);
+    pantallaCompleta.addEventListener("click", () => {
+      let botonesFS = document.getElementsByClassName(
+        "annotation annotation-type-custom iv-branding"
+      );
+      console.log(botonesFS);
+    });
+  }, 7000);
+
   let GF = document.getElementById("golAFavor");
   let GC = document.getElementById("golEnContra");
   let TF = document.getElementById("tiroErradoAFavor");
