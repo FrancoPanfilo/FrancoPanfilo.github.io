@@ -7,8 +7,8 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #0e084c; /* Azul oscuro */
-  color: #ecf0f1; /* Blanco para el texto */
+  background-color: #0e084c;
+  color: #ecf0f1;
 }
 
 #container {
@@ -21,7 +21,7 @@ body {
 }
 
 #header {
-  background-color: #18135c; /* Azul oscuro más claro para el encabezado */
+  background-color: #18135c;
   padding: 20px;
   text-align: center;
   width: 100%;
@@ -29,17 +29,16 @@ body {
 
 #main-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column; /* Cambio a columna en dispositivos móviles */
   align-items: center;
   padding: 20px;
   width: 100%;
-  height: 60vh; /* Ajusta la altura del contenedor según sea necesario */
 }
 
 #text-box {
   width: 80%;
-  height: 60vh;
-  border: 2px solid #233b70; /* Azul más claro */
+  height: auto; /* Cambio a altura automática */
+  border: 2px solid #233b70;
   padding: 20px;
   box-sizing: border-box;
   background-color: #fff;
@@ -52,7 +51,7 @@ body {
   padding: 10px;
   margin-bottom: 10px;
   box-sizing: border-box;
-  border: 1px solid #233b70; /* Azul más claro */
+  border: 1px solid #233b70;
   border-radius: 4px;
   font-size: 18px;
 }
@@ -61,23 +60,43 @@ body {
 #confirmation-button button {
   padding: 12px;
   cursor: pointer;
-  background-color: #17214d; /* Azul más oscuro */
+  background-color: #17214d;
   color: #fff;
   border: none;
   border-radius: 6px;
   font-size: 18px;
   width: 100%;
+  margin-top: 10px; /* Añadido espacio en la parte superior */
 }
 
 #verify-button:hover,
 #confirmation-button button:hover {
-  background-color: #1f2a5f; /* Azul oscuro más claro al pasar el ratón sobre los botones */
+  background-color: #1f2a5f;
 }
 
-.oculto {
+.oculto,
+.noOculto {
   display: none;
 }
 
-.noOculto {
-  display: block;
+#map-container {
+  width: 80%;
+  height: 60vh;
+  margin-top: 20px;
+  overflow: hidden;
+  background-color: #0e084c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+}
+
+#map-container.oculto {
+  display: none;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  border: none;
 }

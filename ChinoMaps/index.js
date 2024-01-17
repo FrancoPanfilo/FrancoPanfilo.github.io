@@ -1,21 +1,35 @@
 let map;
 
 function initMap() {
-  // Configura las coordenadas iniciales del mapa
-  const initialLatLng = { lat: 0, lng: 0 };
-
-  // Crea un nuevo mapa centrado en las coordenadas iniciales
-  map = new google.maps.Map(document.getElementById("main-container"), {
-    center: initialLatLng,
-    zoom: 15, // Ajusta el nivel de zoom según sea necesario
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 0, lng: 0 },
+    zoom: 2,
   });
 }
 
 function showConfirmationButton() {
-  // Llama a la función para inicializar el mapa al presionar el botón
-  initMap();
+  const addressInput = document.getElementById("address-input");
+  const address = addressInput.value;
 
-  var confirmationButton = document.getElementById("confirmation-button");
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: address }, function (results, status) {
+    if (status === "OK" && results[0]) {
+      map.setCenter(results[0].geometry.location);
+      map.setZoom(15);
+
+      const marker = new google.maps.Marker({
+        map: map,
+        position: results[0].geometry.location,
+        title: "Ubicación",
+      });
+
+      document.getElementById("map-container").classList.remove("oculto");
+    } else {
+      alert("No se pudo geocodificar la dirección.");
+    }
+  });
+
+  const confirmationButton = document.getElementById("confirmation-button");
   confirmationButton.classList.remove("oculto");
   confirmationButton.classList.add("noOculto");
 }
