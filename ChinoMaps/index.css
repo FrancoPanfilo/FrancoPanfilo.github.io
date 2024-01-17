@@ -1,0 +1,83 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #0e084c; /* Azul oscuro */
+  color: #ecf0f1; /* Blanco para el texto */
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  margin: 0 auto;
+}
+
+#header {
+  background-color: #18135c; /* Azul oscuro más claro para el encabezado */
+  padding: 20px;
+  text-align: center;
+  width: 100%;
+}
+
+#main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  height: 60vh; /* Ajusta la altura del contenedor según sea necesario */
+}
+
+#text-box {
+  width: 80%;
+  height: 60vh;
+  border: 2px solid #233b70; /* Azul más claro */
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#address-input {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border: 1px solid #233b70; /* Azul más claro */
+  border-radius: 4px;
+  font-size: 18px;
+}
+
+#verify-button,
+#confirmation-button button {
+  padding: 12px;
+  cursor: pointer;
+  background-color: #17214d; /* Azul más oscuro */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  width: 100%;
+}
+
+#verify-button:hover,
+#confirmation-button button:hover {
+  background-color: #1f2a5f; /* Azul oscuro más claro al pasar el ratón sobre los botones */
+}
+
+.oculto {
+  display: none;
+}
+
+.noOculto {
+  display: block;
+}

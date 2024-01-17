@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ejemplo Cuadro de Texto</title>
+    <script src="index.js" defer></script>
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=TU_CLAVE_DE_API&libraries=places&callback=initMap"
+    ></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <h1>Ingrese una dirección</h1>
+      </div>
+      <div id="main-container">
+        <div id="text-box">
+          <input
+            type="text"
+            id="address-input"
+            placeholder="Ingrese su dirección"
+          />
+          <button id="verify-button" onclick="showConfirmationButton()">
+            Verificar
+          </button>
+        </div>
+      </div>
+      <div id="confirmation-button" class="oculto" onclick="confirmAction()">
+        <button>Confirmar</button>
+      </div>
+    </div>
+  </body>
+</html>
