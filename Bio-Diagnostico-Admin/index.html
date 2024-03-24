@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Listado de Datos</title>
+    <link rel="stylesheet" href="index.css" />
+    <script defer type="module" src="index.js"></script>
+    <style></style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Listado de Datos</h1>
+      <table id="tablaDatos">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Justificacion</th>
+            <th>Fecha de Inicio</th>
+            <th>Fecha Final</th>
+            <th>Borrar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Aquí se agregarán las filas con JavaScript -->
+        </tbody>
+      </table>
+      <form id="formulario">
+        <label for="nombre">Nombre:</label>
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          required
+          autocomplete="off"
+        /><br />
+        <label for="apellido">Tipo:</label>
+        <select id="apellido" name="apellido" required>
+          <option value="Reglamentaria">Reglamentaria</option>
+          <option value="Estudio">Estudio</option>
+          <option value="Maternal">Maternal</option>
+          <option value="Kick off">Kick off</option>
+          <option value="Otro">Otro</option></select
+        ><br />
+        <label for="inicio">Fecha de Inicio:</label>
+        <input type="date" id="inicio" name="inicio" required /><br />
+        <label for="final">Fecha Final:</label>
+        <input type="date" id="final" name="final" required /><br />
+        <button type="submit">Agregar</button>
+      </form>
+    </div>
+  </body>
+</html>
