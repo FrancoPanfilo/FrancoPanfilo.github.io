@@ -64,6 +64,7 @@ function agregarFila(doc) {
 function confirmarEliminar(docId) {
   if (confirm("¿Estás seguro de que quieres eliminar esta fila?")) {
     eliminarFila(docId);
+    actualizarTabla();
   }
 }
 
@@ -83,7 +84,7 @@ async function eliminarFila(docId) {
 const formulario = document.querySelector("#formulario");
 function formatearFecha(fecha) {
   const fechaObj = new Date(fecha);
-  const dia = fechaObj.getDate();
+  const dia = fechaObj.getDate() + 1;
   const mes = fechaObj.getMonth() + 1; // Los meses en JavaScript se cuentan desde 0, por lo que se suma 1
   const año = fechaObj.getFullYear();
 
@@ -94,7 +95,10 @@ formulario.addEventListener("submit", async (e) => {
 
   const nombre = formulario.nombre.value;
   const justificacion = formulario.apellido.value;
+  console.log(formulario.inicio.value);
   const inicio = formatearFecha(formulario.inicio.value);
+  console.log(inicio);
+
   const final = formatearFecha(formulario.final.value);
 
   try {
@@ -109,6 +113,7 @@ formulario.addEventListener("submit", async (e) => {
 
     // Limpiar el formulario después de agregar el documento
     formulario.reset();
+    actualizarTabla();
   } catch (error) {
     console.error("Error al agregar el documento: ", error);
   }
@@ -116,12 +121,37 @@ formulario.addEventListener("submit", async (e) => {
 
 // Obtener todos los documentos de la colección y agregarlos a la tabla
 const tablaBody = document.querySelector("#tablaDatos tbody");
-getDocs(casasRef)
-  .then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-      agregarFila({ id: doc.id, ...doc.data() });
+function actualizarTabla() {
+  // Obtener el cuerpo de la tabla
+  const tablaBody = document.querySelector("#tablaDatos tbody");
+
+  getDocs(casasRef)
+    .then((querySnapshot) => {
+      // Crear un array para almacenar los datos de las filas
+      const datosFilas = [];
+
+      querySnapshot.forEach((doc) => {
+        datosFilas.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Ordenar el array de datos por fecha de inicio
+      datosFilas.sort((a, b) => {
+        const fechaInicioA = new Date(a.Inicio.split("/").reverse().join("/"));
+        const fechaInicioB = new Date(b.Inicio.split("/").reverse().join("/"));
+        return fechaInicioA - fechaInicioB;
+      });
+
+      // Limpiar la tabla
+      tablaBody.innerHTML = "";
+
+      // Agregar las filas ordenadas a la tabla
+      datosFilas.forEach((fila) => {
+        agregarFila(fila);
+      });
+    })
+    .catch((error) => {
+      console.log("Error obteniendo documentos: ", error);
     });
-  })
-  .catch((error) => {
-    console.log("Error obteniendo documentos: ", error);
-  });
+}
+
+actualizarTabla();
