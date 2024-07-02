@@ -13,6 +13,87 @@
   </head>
   <body>
     <div id="container">
+      <div id="miTabla">
+        <script type="module" defer>
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+          import {
+            doc,
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs,
+            deleteDoc,
+          } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+          const firebaseConfig = {
+            apiKey: "AIzaSyCuPx9ysr0pmqITB0wAAWHtdSu5Xn3phVE",
+            authDomain: "viajes-40b4f.firebaseapp.com",
+            projectId: "viajes-40b4f",
+            storageBucket: "viajes-40b4f.appspot.com",
+            messagingSenderId: "936557590711",
+            appId: "1:936557590711:web:fe564b2430b47b82d43532",
+          };
+          const app = initializeApp(firebaseConfig);
+          const db = getFirestore(app);
+          const casasRef = collection(db, "Licencias");
+          function agregarFila(doc) {
+            const fila = document.createElement("tr");
+            const nombreCell = document.createElement("td");
+            nombreCell.textContent = doc.Nombre;
+            fila.appendChild(nombreCell);
+            const apellidoCell = document.createElement("td");
+            apellidoCell.textContent = doc.Justificacion;
+            fila.appendChild(apellidoCell);
+            const inicioCell = document.createElement("td");
+            inicioCell.textContent = doc.Inicio;
+            fila.appendChild(inicioCell);
+            const finalCell = document.createElement("td");
+            finalCell.textContent = doc.Final;
+            fila.appendChild(finalCell);
+            tablaBody.appendChild(fila);
+          }
+          const tablaBody = document.querySelector("#tablaDatos tbody");
+          function actualizarTabla() {
+            const tablaBody = document.querySelector("#tablaDatos tbody");
+            getDocs(casasRef)
+              .then((querySnapshot) => {
+                const datosFilas = [];
+                querySnapshot.forEach((doc) => {
+                  datosFilas.push({ id: doc.id, ...doc.data() });
+                });
+                datosFilas.sort((a, b) => {
+                  const fechaInicioA = new Date(
+                    a.Inicio.split("/").reverse().join("/")
+                  );
+                  const fechaInicioB = new Date(
+                    b.Inicio.split("/").reverse().join("/")
+                  );
+                  return fechaInicioA - fechaInicioB;
+                });
+                tablaBody.innerHTML = "";
+                datosFilas.forEach((fila) => {
+                  agregarFila(fila);
+                });
+              })
+              .catch((error) => {
+                console.log("Error obteniendo documentos:", error);
+              });
+          }
+          actualizarTabla();
+        </script>
+        <table id="tablaDatos">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Fecha de Inicio</th>
+              <th>Fecha Final</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Aquí se insertarán las filas de la tabla -->
+          </tbody>
+        </table>
+      </div>
       <div id="header">
         <h1>Ingrese una dirección</h1>
       </div>

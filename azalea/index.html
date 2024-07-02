@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tabla de Datos de Golf</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Datos de Golf</h1>
+      <input type="file" id="fileInput" accept=".xlsx" />
+      <button class="btn" onclick="loadFile()">Cargar Datos</button>
+      <div class="table-container">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th
+                id="clubCell"
+                rowspan="2"
+                contenteditable="true"
+                class="club-name"
+              >
+                Palo
+              </th>
+              <th>Ball speed</th>
+              <th>Launch angle</th>
+              <th>Side angle</th>
+              <th>Backspin</th>
+              <th>Sidespin</th>
+              <th>Descent angle</th>
+              <th>Offline</th>
+              <th>Peak</th>
+              <th>Carry</th>
+              <th>Total</th>
+            </tr>
+            <tr>
+              <th>MPH</th>
+              <th>°</th>
+              <th>°</th>
+              <th>RPM</th>
+              <th>RPM</th>
+              <th>°</th>
+              <th>YDS</th>
+              <th>FT</th>
+              <th>YDS</th>
+              <th>YDS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Los datos serán insertados aquí -->
+          </tbody>
+        </table>
+      </div>
+      <button class="btn" onclick="downloadTableAsImage()">Confirmar</button>
+      <button class="btn" onclick="generatePDF()">Generar PDF</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
