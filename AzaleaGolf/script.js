@@ -23,56 +23,80 @@ const firebaseConfig = {
   measurementId: "G-MX1L41XYVE",
 };
 
+const mobileNav = document.querySelector(".hamburger");
+const navbar = document.querySelector(".menubar");
+
+const toggleNav = () => {
+  navbar.classList.toggle("active");
+  mobileNav.classList.toggle("hamburger-active");
+};
+mobileNav.addEventListener("click", () => toggleNav());
+
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const reservationForm = document.getElementById("reservation-form");
+  const clientInput = document.getElementById("client-input");
+  const clientList = document.getElementById("client-list");
   const reservationsTableBody = document.querySelector(
     "#reservations-table tbody"
   );
-  const showAllButton = document.getElementById("show-all-btn");
-  const sortClientsButton = document.getElementById("sort-clients-btn");
-  const nameInput = document.getElementById("name");
 
-  // Función para obtener los nombres de clientes de Firebase
-  const fetchClientNames = async () => {
-    const clientesRef = collection(db, "Clientes");
-    const snapshot = await getDocs(clientesRef);
-    const clientNames = snapshot.docs.map((doc) => doc.data().name);
-    return clientNames;
-  };
+  reservationForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const name = clientInput.value;
+    const date = reservationForm.date.value;
+    const time = reservationForm.time.value;
+    const guests = reservationForm.guests.value;
 
-  // Función para inicializar el campo de nombre con sugerencias
-  const initializeNameInput = async () => {
-    const clientNames = await fetchClientNames();
-    nameInput.setAttribute("list", "client-names");
-    const datalist = document.createElement("datalist");
-    datalist.id = "client-names";
-    clientNames.forEach((name) => {
-      const option = document.createElement("option");
-      option.value = name;
-      datalist.appendChild(option);
+    // Verificar si el cliente ya existe en la colección Clientes
+    const clientsSnapshot = await getDocs(collection(db, "Clientes"));
+    let clientDoc = null;
+
+    clientsSnapshot.forEach((doc) => {
+      if (doc.data().name === name) {
+        clientDoc = doc;
+      }
     });
-    document.body.appendChild(datalist);
-  };
+    if (clientDoc) {
+      // Si el cliente existe, incrementar el campo reservations
+      await updateDoc(clientDoc.ref, {
+        reservations: increment(1),
+      });
+    } else {
+      // Si el cliente no existe, agregar a la colección Clientes con reservations = 1
+      await addDoc(collection(db, "Clientes"), {
+        name,
+        reservations: 1,
+        availableSessions: 0,
+      });
+    }
 
-  // Llamar a la función para inicializar el campo de nombre con sugerencias
-  initializeNameInput();
+    // Agregar la nueva reserva a la colección Reservas
+    await addDoc(collection(db, "Reservas"), {
+      name,
+      date,
+      time,
+      guests: parseInt(guests),
+      payment: false,
+    });
+
+    reservationForm.reset();
+    await displayReservations();
+  });
 
   const fetchReservations = async (showAll) => {
     const reservations = [];
     const snapshot = await getDocs(collection(db, "Reservas"));
 
-    const today = new Date(); // Obtener la fecha actual
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Establecer a las 00:00 horas
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
 
     snapshot.forEach((doc) => {
       const reservation = { id: doc.id, ...doc.data() };
       const reservationDate = new Date(reservation.date);
 
-      // Filtrar por fecha si no se desea mostrar todas las reservas
       if (showAll || reservationDate >= startOfDay) {
         reservations.push(reservation);
       }
@@ -81,18 +105,40 @@ document.addEventListener("DOMContentLoaded", () => {
     return reservations;
   };
 
-  const updateCustomerReservations = async (name) => {
-    const customerRef = doc(db, "Clientes", name);
-    const docSnapshot = await getDoc(customerRef);
+  const displayReservations = async () => {
+    reservationsTableBody.innerHTML = "";
+    const reservations = await fetchReservations(true);
 
-    if (docSnapshot.exists()) {
-      const currentReservations = docSnapshot.data().reservations || 0;
-      await updateDoc(customerRef, {
-        reservations: increment(currentReservations + 1),
-      });
-    } else {
-      await setDoc(customerRef, { name, reservations: 1 });
+    const sortedReservations = reservations.sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+    const groupedReservations = groupReservationsByDate(sortedReservations);
+    for (const [date, reservations] of Object.entries(groupedReservations)) {
+      const dateObj = new Date(`${date}T00:00:00`);
+      const day = dateObj.toLocaleDateString("es-ES", { weekday: "long" });
+      const formattedDate = dateObj.toLocaleDateString("es-ES");
+
+      const dayHeaderRow = document.createElement("tr");
+      dayHeaderRow.classList.add("day-header");
+      dayHeaderRow.innerHTML = `
+        <td colspan="7">
+          ${day} ${formattedDate}
+        </td>`;
+      reservationsTableBody.appendChild(dayHeaderRow);
+
+      reservations.forEach((reservation) => addReservationToTable(reservation));
     }
+  };
+
+  const groupReservationsByDate = (reservations) => {
+    return reservations.reduce((group, reservation) => {
+      const date = reservation.date;
+      if (!group[date]) {
+        group[date] = [];
+      }
+      group[date].push(reservation);
+      return group;
+    }, {});
   };
 
   const addReservationToTable = (reservation) => {
@@ -109,122 +155,96 @@ document.addEventListener("DOMContentLoaded", () => {
     const row = document.createElement("tr");
     row.dataset.id = id;
     row.innerHTML = `
-            <td>${name}</td>
-            <td>${day}</td>
-            <td>${formattedDate}</td>
-            <td>${formattedTime}</td>
-            <td>${guests}</td>
-            <td><input type="checkbox" class="payment-checkbox" ${
-              payment ? "checked" : ""
-            }></td>
-            <td><button class="cancel-btn">Cancelar</button></td>
-        `;
+      <td>${name}</td>
+      <td>${day}</td>
+      <td>${formattedDate}</td>
+      <td>${formattedTime}</td>
+      <td>${guests}</td>
+      <td><input type="checkbox" class="payment-checkbox" ${
+        payment ? "checked" : ""
+      }></td>
+      <td><button class="cancel-btn">Cancelar</button></td>`;
     reservationsTableBody.appendChild(row);
 
     row
       .querySelector(".payment-checkbox")
       .addEventListener("change", async (e) => {
-        const paymentStatus = e.target.checked;
-        await updateDoc(doc(db, "Reservas", id), {
-          payment: paymentStatus,
-        });
+        const payment = e.target.checked;
+
+        if (payment) {
+          // Obtener el documento del cliente correspondiente
+          const clientsSnapshot = await getDocs(collection(db, "Clientes"));
+          let clientDoc = null;
+
+          clientsSnapshot.forEach((doc) => {
+            if (doc.data().name === name) {
+              clientDoc = doc;
+            }
+          });
+
+          if (clientDoc) {
+            const clientData = clientDoc.data();
+
+            if (clientData.availableSessions > 0) {
+              // Preguntar si pagó usando cuponera
+              const usingCuponera = confirm("Pagar usando cuponera");
+              if (usingCuponera) {
+                // Reducir availableSessions en 1
+                await updateDoc(clientDoc.ref, {
+                  availableSessions: increment(-1),
+                });
+              }
+            }
+            e.target.checked = true; // Revertir el checkbox si no hay sesiones disponibles
+          }
+        }
+
+        await updateDoc(doc(db, "Reservas", id), { payment });
       });
 
     row.querySelector(".cancel-btn").addEventListener("click", async () => {
       await deleteDoc(doc(db, "Reservas", id));
+
+      // Decrementar el campo reservations del cliente
+      const clientsSnapshot = await getDocs(collection(db, "Clientes"));
+      let clientDoc = null;
+
+      clientsSnapshot.forEach((doc) => {
+        if (doc.data().name === name) {
+          clientDoc = doc;
+        }
+      });
+      if (clientDoc) {
+        await updateDoc(clientDoc.ref, {
+          reservations: increment(-1),
+        });
+      }
       row.remove();
     });
   };
 
-  const addDateHeader = (date) => {
-    const dateObj = new Date(date);
-    const day = dateObj.toLocaleDateString("es-ES", { weekday: "long" });
-    const formattedDate = dateObj.toLocaleDateString("es-ES");
+  const fetchClients = async () => {
+    const clients = [];
+    const snapshot = await getDocs(collection(db, "Clientes"));
 
-    const headerRow = document.createElement("tr");
-    const headerCell = document.createElement("td");
-    headerCell.colSpan = 7;
-    headerCell.className = "date-header";
-    headerCell.textContent = `${day} ${formattedDate}`;
-    headerRow.appendChild(headerCell);
-    reservationsTableBody.appendChild(headerRow);
-  };
-
-  const renderReservations = async (showAll) => {
-    reservationsTableBody.innerHTML = "";
-    let currentDate = "";
-
-    const reservations = await fetchReservations(showAll);
-    reservations
-      .sort(
-        (a, b) =>
-          new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`)
-      )
-      .forEach((reservation) => {
-        if (reservation.date !== currentDate) {
-          currentDate = reservation.date;
-          addDateHeader(currentDate);
-        }
-        addReservationToTable(reservation);
-      });
-  };
-
-  reservationForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("name").value;
-    const date = document.getElementById("date").value;
-    const time = document.getElementById("time").value;
-    const guests = document.getElementById("guests").value;
-
-    const docRef = await addDoc(collection(db, "Reservas"), {
-      name,
-      date,
-      time,
-      guests,
-      payment: false,
-    });
-
-    await updateCustomerReservations(name);
-
-    renderReservations(false); // Mostrar solo las reservas a partir de hoy
-
-    reservationForm.reset();
-  });
-
-  showAllButton.addEventListener("click", () => {
-    renderReservations(true); // Mostrar todas las reservas
-  });
-
-  sortClientsButton.addEventListener("click", async () => {
-    const clientesRef = collection(db, "Clientes");
-    const snapshot = await getDocs(clientesRef);
-
-    const clientes = [];
     snapshot.forEach((doc) => {
-      clientes.push({ id: doc.id, ...doc.data() });
+      const client = { id: doc.id, ...doc.data() };
+      clients.push(client);
     });
 
-    clientes.sort((a, b) => b.reservations - a.reservations); // Ordenar por cantidad de reservas
+    return clients;
+  };
 
-    // Limpiar la tabla de reservas
-    reservationsTableBody.innerHTML = "";
-
-    // Agregar los clientes ordenados a la tabla
-    clientes.forEach((cliente) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${cliente.name}</td>
-        <td colspan="6">Reservas: ${cliente.reservations}</td>
-      `;
-      reservationsTableBody.appendChild(row);
+  const populateClientList = async () => {
+    const clients = await fetchClients();
+    clientList.innerHTML = ""; // Clear existing options
+    clients.forEach((client) => {
+      const option = document.createElement("option");
+      option.value = client.name; // Assuming the client document has a "name" field
+      clientList.appendChild(option);
     });
+  };
 
-    sortClientsButton.classList.toggle("active");
-    if (!sortClientsButton.classList.contains("active")) {
-      renderReservations(false); // Mostrar la tabla de reservas por defecto
-    }
-  });
-
-  renderReservations(false); // Mostrar inicialmente solo las reservas a partir de hoy
+  await populateClientList();
+  displayReservations();
 });

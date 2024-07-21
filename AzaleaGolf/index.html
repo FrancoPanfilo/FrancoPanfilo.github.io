@@ -1,33 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tabla de Reservas</title>
+    <title>Gestión de Reservas</title>
     <link rel="stylesheet" href="styles.css" />
-    <script type="module" src="script.js" defer></script>
+    <link rel="stylesheet" href="nav.css" />
   </head>
   <body>
-    <div class="container">
-      <h1>Tabla de Reservas</h1>
-      <div class="options">
-        <button id="show-all-btn">Mostrar Todas las Reservas</button>
-        <button id="sort-clients-btn">Ordenar Clientes por Reservas</button>
+    <nav>
+      <div class="logo">
+        <img src="logo.jpg" alt="logo" />
       </div>
+      <ul>
+        <li>
+          <a href="">Gestion de Reservas</a>
+        </li>
+        <li>
+          <a href="Cuponeras/index.html">Agregar Cuponera</a>
+        </li>
+        <li>
+          <a href="Clientes/index.html">Clientes</a>
+        </li>
+        <li>
+          <a href="Historial/index.html">Historial</a>
+        </li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+    <div class="menubar">
+      <ul>
+        <li>
+          <a href="#">Home</a>
+        </li>
+        <li>
+          <a href="#">Services</a>
+        </li>
+        <li>
+          <a href="#">Blog</a>
+        </li>
+        <li>
+          <a href="#">Contact Us</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="container">
+      <h1>Gestión de Reservas</h1>
       <form id="reservation-form">
+        <label for="name">Nombre:</label>
+        <input list="client-list" id="client-input" name="name" />
+        <datalist id="client-list">
+          <!-- Options will be populated dynamically -->
+        </datalist>
+
+        <label for="date">Fecha:</label>
+        <input type="date" id="date" name="date" required />
+
+        <label for="time">Hora:</label>
+        <select id="time" name="time" required>
+          <option value="">Seleccionar hora</option>
+          <option value="10:00">10:00</option>
+          <option value="11:00">11:00</option>
+          <option value="12:00">12:00</option>
+          <option value="13:00">13:00</option>
+          <option value="14:00">14:00</option>
+          <option value="15:00">15:00</option>
+          <option value="16:00">16:00</option>
+          <option value="17:00">17:00</option>
+          <option value="18:00">18:00</option>
+          <option value="19:00">19:00</option>
+        </select>
+
+        <label for="guests">Invitados:</label>
         <input
-          type="text"
-          id="name"
-          placeholder="Nombre"
+          value="0"
+          type="number"
+          id="guests"
+          name="guests"
+          min="0"
+          max="4"
           required
-          list="clientNames"
         />
-        <datalist id="clientes-list"></datalist>
-        <input type="date" id="date" required />
-        <input type="time" id="time" required />
-        <input type="number" id="guests" placeholder="Invitados" required />
-        <button type="submit">Agregar Reserva</button>
+
+        <button type="submit">Reservar</button>
       </form>
+
       <table id="reservations-table">
         <thead>
           <tr>
@@ -37,13 +99,13 @@
             <th>Hora</th>
             <th>Invitados</th>
             <th>Pago</th>
-            <th>Cancelar</th>
+            <th>X</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Filas se llenarán dinámicamente -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
+
+    <script type="module" src="script.js"></script>
   </body>
 </html>

@@ -1,0 +1,52 @@
+/* styles.css */
+
+/* Estilo para el cuerpo principal */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+/* Estilo para el contenedor principal */
+main {
+  padding: 20px;
+}
+
+/* Estilo para la tabla de clientes */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+  font-weight: bold;
+}
+
+thead th {
+  padding: 12px 15px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
+
+tbody td {
+  padding: 12px 15px;
+}
