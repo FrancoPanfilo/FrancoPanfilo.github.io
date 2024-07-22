@@ -6,6 +6,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #f5f5f5;
+  width: 100%;
 }
 
 /* Estilo para el contenedor principal */
@@ -49,4 +50,39 @@ tbody tr:last-of-type {
 
 tbody td {
   padding: 12px 15px;
+}
+
+/* Estilos para pantallas pequeñas */
+@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 20px;
+  }
+  main {
+    padding: 0px;
+  }
+  thead th {
+    padding: 2px 3px;
+  }
+  tr {
+    margin-bottom: 1px;
+    border-width: 0;
+    padding: 0;
+    font-size: 8px;
+  }
+
+  td {
+    padding: 1px;
+    margin: 0;
+    text-align: left;
+  }
+
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    padding-right: 2px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
 }

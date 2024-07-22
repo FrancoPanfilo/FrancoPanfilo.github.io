@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <td><input type="checkbox" class="payment-checkbox" ${
         payment ? "checked" : ""
       }></td>
-      <td><button class="cancel-btn">Cancelar</button></td>`;
+      <td><button class="cancel-btn">X</button></td>`;
     reservationsTableBody.appendChild(row);
 
     row

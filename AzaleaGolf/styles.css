@@ -3,6 +3,7 @@ body {
   background-color: #f4f4f9;
   margin: 0;
   padding: 0;
+  width: 100%;
 }
 
 .container {
@@ -65,7 +66,7 @@ table {
 
 table th,
 table td {
-  padding: 10px;
+  padding: 5px;
   border: 1px solid #ddd;
   text-align: center;
 }
@@ -141,4 +142,45 @@ tr.day-header td {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+/* Estilos para pantallas pequeñas */
+@media screen and (max-width: 600px) {
+  .container {
+    width: 100%;
+    margin: 0px auto;
+    padding: 0px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  label,
+  input,
+  select,
+  button {
+    font-size: 14px;
+    padding: 5px;
+  }
+
+  table,
+  table th,
+  table td {
+    font-size: 8px;
+    padding: 2px;
+  }
+
+  .cancel-btn {
+    padding: 1px 3px;
+  }
+
+  td input[type="checkbox"] {
+    transform: scale(1);
+  }
+
+  tr.day-header td {
+    padding: 10px;
+    font-size: 12px;
+  }
 }
