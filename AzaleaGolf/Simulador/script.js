@@ -164,7 +164,6 @@ function addTablesToPDF(doc, csvData, name, date) {
       faceImpactVertical,
       closureRate,
     ] = line.split(",");
-console.log("HOLA");
     if (!clubsData[clubName]) clubsData[clubName] = [];
     let cs=0;
           if (parseFloat(clubSpeed) < 250){cs=parseFloat(clubSpeed)  }
@@ -273,7 +272,6 @@ console.log("HOLA");
       x = 5;
       doc.setFont("helvetica", "bold");
       doc.setTextColor(103, 99, 140); // Color púrpura para los valores de promedio
-float clubspeed;
 
       const averageValues = [
         `Average`,
