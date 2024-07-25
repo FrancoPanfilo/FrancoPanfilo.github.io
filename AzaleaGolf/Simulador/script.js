@@ -271,7 +271,10 @@ function addTablesToPDF(doc, csvData, name, date) {
       x = 5;
       doc.setFont("helvetica", "bold");
       doc.setTextColor(103, 99, 140); // Color púrpura para los valores de promedio
-
+float clubspeed;
+      if (`${averages.clubSpeed}` > 250){
+        clubspeed=0;
+      }else {clubspeed=`${averages.clubSpeed}` }
       const averageValues = [
         `Average`,
         `${averages.ballSpeed}`,
