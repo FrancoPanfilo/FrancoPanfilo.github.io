@@ -164,8 +164,10 @@ function addTablesToPDF(doc, csvData, name, date) {
       faceImpactVertical,
       closureRate,
     ] = line.split(",");
-
+console.log("HOLA");
     if (!clubsData[clubName]) clubsData[clubName] = [];
+    float cs=0;
+          if (parseFloat(clubSpeed) < 250){cs=parseFloat(clubSpeed)  }
     clubsData[clubName].push({
       ballSpeed: parseFloat(ballSpeed),
       launchAngle: parseFloat(launchAngle),
@@ -175,7 +177,7 @@ function addTablesToPDF(doc, csvData, name, date) {
       totalDistance: parseFloat(totalDistance),
       peakHeight: parseFloat(peakHeight),
       descentAngle: parseFloat(descentAngle),
-      clubSpeed: parseFloat(clubSpeed),
+      clubSpeed: cs,
       efficiency: parseFloat(efficiency),
       angleOfAttack: parseFloat(angleOfAttack),
       clubPath: parseFloat(clubPath),
@@ -272,9 +274,7 @@ function addTablesToPDF(doc, csvData, name, date) {
       doc.setFont("helvetica", "bold");
       doc.setTextColor(103, 99, 140); // Color púrpura para los valores de promedio
 float clubspeed;
-      if (`${averages.clubSpeed}` > 250){
-        clubspeed=0;
-      }else {clubspeed=`${averages.clubSpeed}` }
+
       const averageValues = [
         `Average`,
         `${averages.ballSpeed}`,
