@@ -313,10 +313,10 @@ function addTablesToPDF(doc, csvData, name, date) {
           isNaN(shot.totalDistance) ? "-" : `${shot.totalDistance}`,
           isNaN(shot.peakHeight) ? "-" : `${shot.peakHeight}`,
           isNaN(shot.descentAngle) ? "-" : `${shot.descentAngle}`,
-          isNaN(shot.clubSpeed) ? "-" : `${shot.clubSpeed}`,
-          isNaN(shot.efficiency) ? "-" : `${shot.efficiency}`,
-          isNaN(shot.angleOfAttack) ? "-" : `${shot.angleOfAttack}`,
-          isNaN(shot.clubPath) ? "-" : `${shot.clubPath}`,
+          (isNaN(shot.clubSpeed)|| shot.clubSpeed==0) ? "-" : `${shot.clubSpeed}`,
+          (isNaN(shot.efficiency)|| shot.efficiency==0) ? "-" : `${shot.efficiency}`,
+          (isNaN(shot.angleOfAttack)|| shot.angleOfAttack==0) ? "-" : `${shot.angleOfAttack}`,
+          (isNaN(shot.clubPath)|| shot.clubPath==0) ? "-" : `${shot.clubPath}`,
         ];
 
         shotValues.forEach((value, index) => {
@@ -358,7 +358,7 @@ function calculateAverages(data) {
       .filter((value) => !isNaN(value));
     if (validValues.length > 0) {
       const sum = validValues.reduce((acc, value) => acc + value, 0);
-      averages[key] = (sum / validValues.length).toFixed(2); // Redondeo a 2 decimales
+      averages[key] = (sum / validValues.length).toFixed(1); // Redondeo a 2 decimales
     } else {
       averages[key] = "-";
     }
