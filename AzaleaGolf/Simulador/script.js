@@ -166,7 +166,7 @@ function addTablesToPDF(doc, csvData, name, date) {
     ] = line.split(",");
 console.log("HOLA");
     if (!clubsData[clubName]) clubsData[clubName] = [];
-    float cs=0;
+    let cs=0;
           if (parseFloat(clubSpeed) < 250){cs=parseFloat(clubSpeed)  }
     clubsData[clubName].push({
       ballSpeed: parseFloat(ballSpeed),
