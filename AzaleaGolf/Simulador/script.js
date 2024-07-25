@@ -27,6 +27,66 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Manejo del formulario de renombrar palos
+const renameForm = document.getElementById("renameForm");
+const clubSelect = document.getElementById("clubSelect");
+const newNameInput = document.getElementById("newName");
+const renameButton = document.getElementById("renameClub");
+
+const clubNames = {
+  Dr: "Dr",
+  "2w": "2w",
+  "3w": "3w",
+  "4w": "4w",
+  "5w": "5w",
+  "7w": "7w",
+  "9w": "9w",
+  "2h": "2h",
+  "3h": "3h",
+  "4h": "4h",
+  "5h": "5h",
+  "1h": "1h",
+  "2h": "2h",
+  "3h": "3h",
+  "4h": "4h",
+  "5h": "5h",
+  "6h": "6h",
+  "7h": "7h",
+  "8h": "8h",
+  "9h": "9h",
+  "1i": "1i",
+  "2i": "2i",
+  "3i": "3i",
+  "4i": "4i",
+  "5i": "5i",
+  "6i": "6i",
+  "7i": "7i",
+  "8i": "8i",
+  "9i": "9i",
+  Pw: "Pw",
+  Gw: "Gw",
+  Sw: "Sw",
+  Lw: "Lw",
+  50: "50",
+  52: "52",
+  54: "54",
+  56: "56",
+  58: "58",
+  60: "60",
+  62: "62",
+  64: "64",
+  Putt: "Putt",
+};
+
+renameButton.addEventListener("click", function () {
+  const selectedClub = clubSelect.value;
+  const newName = newNameInput.value;
+  if (selectedClub && newName) {
+    clubNames[selectedClub] = newName;
+    newNameInput.value = "";
+  }
+});
+
 document.getElementById("csvFile").addEventListener("change", function () {
   document.getElementById("generatePDF").disabled = !this.files.length;
 });
@@ -180,7 +240,7 @@ function addTablesToPDF(doc, csvData, name, date) {
 
       // Encabezados de las columnas
       const headers = [
-        `\n${clubName}`,
+        `\n${clubNames[clubName]}`,
         "Ball \nSpeed\n(mph)",
         "Launch \nAngle\n(deg)",
         "Backspin\n(rpm)",
@@ -306,43 +366,6 @@ function calculateAverages(data) {
 }
 
 async function uploadToFirebase(pdfBlob, fileName, name, date) {
-  /*   const storageRef = firebase.storage().ref();
-  const pdfRef = storageRef.child(`pdfs/${fileName}`);
-  await pdfRef.put(pdfBlob);
-  const downloadURL = await pdfRef.getDownloadURL();
-
-  const docRef = await addDoc(collection(db, "pdfReports"), {
-    name,
-    date,
-    downloadURL,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-  });
-
-  console.log("Document written with ID: ", docRef.id);
-  alert("PDF successfully generated and uploaded to Firebase!"); */
+  // Aquí va el código para subir el archivo PDF a Firebase Storage
+  // y guardar los detalles del documento en Firestore.
 }
-
-/* // Inicializar Firebase Storage
-firebase.initializeApp(firebaseConfig);
-firebase.storage();
-
-// Escuchar el cambio de archivo CSV y habilitar el botón de generación de PDF
-document.getElementById("csvFile").addEventListener("change", function () {
-  document.getElementById("generatePDF").disabled = !this.files.length;
-});
-
-// Escuchar el clic del botón de generación de PDF y procesar el archivo CSV
-document.getElementById("generatePDF").addEventListener("click", function () {
-  const name = document.getElementById("name").value;
-  const date = document.getElementById("date").value;
-  const file = document.getElementById("csvFile").files[0];
-
-  if (name && date && file) {
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      const csvData = event.target.result;
-      generatePDF(name, date, csvData);
-    };
-    reader.readAsText(file);
-  }
-}); */

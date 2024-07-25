@@ -55,6 +55,58 @@
       <label for="csvFile">Seleccionar archivo CSV:</label>
       <input type="file" id="csvFile" accept=".csv" required />
     </div>
+    <form id="renameForm">
+      <label for="clubSelect">Select Club:</label>
+      <select id="clubSelect">
+        <option value="Dr">Dr</option>
+        <option value="2w">2w</option>
+        <option value="3w">3w</option>
+        <option value="4w">4w</option>
+        <option value="5w">5w</option>
+        <option value="7w">7w</option>
+        <option value="9w">9w</option>
+        <option value="2h">2h</option>
+        <option value="3h">3h</option>
+        <option value="4h">4h</option>
+        <option value="5h">5h</option>
+        <option value="1h">1h</option>
+        <option value="2h">2h</option>
+        <option value="3h">3h</option>
+        <option value="4h">4h</option>
+        <option value="5h">5h</option>
+        <option value="6h">6h</option>
+        <option value="7h">7h</option>
+        <option value="8h">8h</option>
+        <option value="9h">9h</option>
+        <option value="1i">1i</option>
+        <option value="2i">2i</option>
+        <option value="3i">3i</option>
+        <option value="4i">4i</option>
+        <option value="5i">5i</option>
+        <option value="6i">6i</option>
+        <option value="7i">7i</option>
+        <option value="8i">8i</option>
+        <option value="9i">9i</option>
+        <option value="Pw">Pw</option>
+        <option value="Gw">Gw</option>
+        <option value="Sw">Sw</option>
+        <option value="Lw">Lw</option>
+        <option value="50">50</option>
+        <option value="52">52</option>
+        <option value="54">54</option>
+        <option value="56">56</option>
+        <option value="58">58</option>
+        <option value="60">60</option>
+        <option value="62">62</option>
+        <option value="64">64</option>
+        <option value="Putt">Putt</option>
+      </select>
+
+      <label for="newName">New Name:</label>
+      <textarea id="newName" rows="4" cols="50"></textarea>
+
+      <button type="button" id="renameClub">Rename Club</button>
+    </form>
     <button id="generatePDF" disabled>Generar PDF</button>
   </body>
 </html>
