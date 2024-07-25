@@ -165,8 +165,16 @@ function addTablesToPDF(doc, csvData, name, date) {
       closureRate,
     ] = line.split(",");
     if (!clubsData[clubName]) clubsData[clubName] = [];
-    let cs=0;
-          if (parseFloat(clubSpeed) < 250){cs=parseFloat(clubSpeed)  }
+    let cs="";
+            let ef=parseFloat(efficiency);
+        let aa=parseFloat(angleOfAttack);
+        let cp=parseFloat(clubPath);
+          if (parseFloat(clubSpeed) < 550){cs=parseFloat(clubSpeed);
+                                          }else{
+            ef="";
+            aa="";
+            cp=""
+                                          }
     clubsData[clubName].push({
       ballSpeed: parseFloat(ballSpeed),
       launchAngle: parseFloat(launchAngle),
@@ -177,9 +185,9 @@ function addTablesToPDF(doc, csvData, name, date) {
       peakHeight: parseFloat(peakHeight),
       descentAngle: parseFloat(descentAngle),
       clubSpeed: cs,
-      efficiency: parseFloat(efficiency),
-      angleOfAttack: parseFloat(angleOfAttack),
-      clubPath: parseFloat(clubPath),
+      efficiency: ef,
+      angleOfAttack: aa,
+      clubPath: cp,
     });
   });
 
