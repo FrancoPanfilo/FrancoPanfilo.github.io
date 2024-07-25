@@ -59,10 +59,10 @@ function generatePDF(name, date, csvData) {
     doc.addImage(logo, "JPEG", 10, 10, logoWidth, logoHeight);
     doc.setFontSize(10); // Ajuste del tamaño de la fuente
     doc.setFont("helvetica", "bold"); // Ajuste del tipo de fuente
-    doc.text(`${name}`, doc.internal.pageSize.getWidth() - 10, 10, {
+    doc.text(`${name}`, doc.internal.pageSize.getWidth() - 10, 15, {
       align: "right",
     });
-    doc.text(`${date}`, doc.internal.pageSize.getWidth() - 10, 20, {
+    doc.text(`${date}`, doc.internal.pageSize.getWidth() - 10, 25, {
       align: "right",
     });
     addTablesToPDF(doc, csvData, name, date);
@@ -126,12 +126,21 @@ function addTablesToPDF(doc, csvData, name, date) {
     "Dr",
     "2w",
     "3w",
+    "4w",
     "5w",
     "7w",
+    "9w",
+    "1h",
     "2h",
     "3h",
     "4h",
     "5h",
+    "6h",
+    "7h",
+    "8h",
+    "9h",
+    "1i",
+    "2i",
     "3i",
     "4i",
     "5i",
@@ -139,9 +148,19 @@ function addTablesToPDF(doc, csvData, name, date) {
     "7i",
     "8i",
     "9i",
+    "Pw",
     "Gw",
     "Sw",
     "Lw",
+    "50",
+    "52",
+    "54",
+    "56",
+    "58",
+    "60",
+    "62",
+    "64",
+    "Putt",
   ];
   let y = 50; // Ajuste de la posición inicial de 'y'
 
