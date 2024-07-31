@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Generador de PDF</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-
     <script defer type="module" src="script.js"></script>
     <style>
       body {
@@ -110,3 +109,210 @@
     <button id="generatePDF" disabled>Generar PDF</button>
   </body>
 </html>
+
+<script>
+  function generatePDF() {
+    const input = document.getElementById("file-input");
+    if (!input.files.length) {
+      alert("Please select a file.");
+      return;
+    }
+
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const csv = event.target.result;
+      Papa.parse(csv, {
+        complete: function (results) {
+          processCSV(results.data);
+        },
+        header: true,
+      });
+    };
+    reader.readAsText(file);
+  }
+
+  function processCSV(data) {
+    const doc = new pdfMake.createPdf({});
+    const clubsData = {};
+
+    data.forEach((row) => {
+      const clubName = row["Club Name"];
+
+      if (!clubsData[clubName]) {
+        clubsData[clubName] = {
+          shots: [],
+          averages: {
+            ballSpeed: [],
+            clubSpeed: [],
+            smashFactor: [],
+            apex: [],
+            carry: [],
+            offline: [],
+            total: [],
+            backSpin: [],
+            sideSpin: [],
+            horizontalLaunchAngle: [],
+            verticalLaunchAngle: [],
+            spinAxis: [],
+          },
+        };
+      }
+
+      const shot = {
+        shotNumber: row["Shot Number"],
+        ballSpeed: parseFloat(row["Ball Speed"]),
+        clubSpeed: parseFloat(row["Club Speed"]),
+        smashFactor: parseFloat(row["Smash Factor"]),
+        apex: parseFloat(row["Apex"]),
+        carry: parseFloat(row["Carry"]),
+        offline: parseFloat(row["Offline"]),
+        total: parseFloat(row["Total"]),
+        backSpin: parseFloat(row["Back Spin"]),
+        sideSpin: parseFloat(row["Side Spin"]),
+        horizontalLaunchAngle: parseFloat(row["Horizontal Launch Angle"]),
+        verticalLaunchAngle: parseFloat(row["Vertical Launch Angle"]),
+        spinAxis: parseFloat(row["Spin Axis"]),
+      };
+
+      Object.keys(shot).forEach((key) => {
+        if (key !== "shotNumber" && !isNaN(shot[key])) {
+          clubsData[clubName].averages[key].push(shot[key]);
+        }
+      });
+
+      clubsData[clubName].shots.push(shot);
+    });
+
+    // Calculate averages
+    Object.keys(clubsData).forEach((clubName) => {
+      const averages = clubsData[clubName].averages;
+      Object.keys(averages).forEach((key) => {
+        const validValues = averages[key].filter(
+          (value) => !isNaN(parseFloat(value)) && value !== null && value !== ""
+        );
+        if (validValues.length > 0) {
+          const sum = validValues.reduce(
+            (acc, value) => acc + parseFloat(value),
+            0
+          );
+          const average = sum / validValues.length;
+          averages[key] = average.toFixed(2); // Redondeo a 2 decimales
+        } else {
+          averages[key] = "-";
+        }
+      });
+    });
+
+    const content = [];
+    Object.keys(clubsData).forEach((clubName) => {
+      const clubData = clubsData[clubName];
+      const clubShots = clubData.shots;
+      const clubAverages = clubData.averages;
+
+      content.push({
+        text: `Club: ${clubName}`,
+        style: "header",
+      });
+
+      const tableBody = [
+        [
+          "Shot #",
+          "Ball Speed",
+          "Club Speed",
+          "Smash Factor",
+          "Apex",
+          "Carry",
+          "Offline",
+          "Total",
+          "Back Spin",
+          "Side Spin",
+          "Hor Launch",
+          "Ver Launch",
+          "Spin Axis",
+        ],
+      ];
+
+      clubShots.forEach((shot) => {
+        tableBody.push([
+          shot.shotNumber,
+          isNaN(shot.ballSpeed) ? "-" : shot.ballSpeed.toFixed(2),
+          isNaN(shot.clubSpeed) ? "-" : shot.clubSpeed.toFixed(2),
+          isNaN(shot.smashFactor) ? "-" : shot.smashFactor.toFixed(2),
+          isNaN(shot.apex) ? "-" : shot.apex.toFixed(2),
+          isNaN(shot.carry) ? "-" : shot.carry.toFixed(2),
+          isNaN(shot.offline) ? "-" : shot.offline.toFixed(2),
+          isNaN(shot.total) ? "-" : shot.total.toFixed(2),
+          isNaN(shot.backSpin) ? "-" : shot.backSpin.toFixed(2),
+          isNaN(shot.sideSpin) ? "-" : shot.sideSpin.toFixed(2),
+          isNaN(shot.horizontalLaunchAngle)
+            ? "-"
+            : shot.horizontalLaunchAngle.toFixed(2),
+          isNaN(shot.verticalLaunchAngle)
+            ? "-"
+            : shot.verticalLaunchAngle.toFixed(2),
+          isNaN(shot.spinAxis) ? "-" : shot.spinAxis.toFixed(2),
+        ]);
+      });
+
+      tableBody.push([
+        "Average",
+        isNaN(clubAverages.ballSpeed) ? "-" : clubAverages.ballSpeed.toFixed(2),
+        isNaN(clubAverages.clubSpeed) ? "-" : clubAverages.clubSpeed.toFixed(2),
+        isNaN(clubAverages.smashFactor)
+          ? "-"
+          : clubAverages.smashFactor.toFixed(2),
+        isNaN(clubAverages.apex) ? "-" : clubAverages.apex.toFixed(2),
+        isNaN(clubAverages.carry) ? "-" : clubAverages.carry.toFixed(2),
+        isNaN(clubAverages.offline) ? "-" : clubAverages.offline.toFixed(2),
+        isNaN(clubAverages.total) ? "-" : clubAverages.total.toFixed(2),
+        isNaN(clubAverages.backSpin) ? "-" : clubAverages.backSpin.toFixed(2),
+        isNaN(clubAverages.sideSpin) ? "-" : clubAverages.sideSpin.toFixed(2),
+        isNaN(clubAverages.horizontalLaunchAngle)
+          ? "-"
+          : clubAverages.horizontalLaunchAngle.toFixed(2),
+        isNaN(clubAverages.verticalLaunchAngle)
+          ? "-"
+          : clubAverages.verticalLaunchAngle.toFixed(2),
+        isNaN(clubAverages.spinAxis) ? "-" : clubAverages.spinAxis.toFixed(2),
+      ]);
+
+      content.push({
+        table: {
+          headerRows: 1,
+          widths: [
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+            "auto",
+          ],
+          body: tableBody,
+        },
+      });
+
+      content.push({ text: " ", margin: [0, 10] });
+    });
+
+    const documentDefinition = {
+      content: content,
+      styles: {
+        header: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 10, 0, 10],
+        },
+      },
+    };
+
+    pdfMake.createPdf(documentDefinition).download("output.pdf");
+  }
+</script>
