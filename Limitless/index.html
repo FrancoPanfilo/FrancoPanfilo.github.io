@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generador de Códigos QR</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background: linear-gradient(to right, #83a4d4, #b6fbff);
+      }
+      .container {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        max-width: 90%;
+        width: 400px;
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin: 10px 0 5px;
+        color: #555;
+      }
+      input,
+      select,
+      button {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #qr-code {
+        margin-top: 20px;
+      }
+      #download-link {
+        margin-top: 20px;
+        display: none;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 18px;
+      }
+      #download-link:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Generador de Códigos QR</h1>
+      <label for="link">Ingresa el enlace:</label>
+      <input type="text" id="link" placeholder="https://example.com" />
+
+      <label for="specificity">Selecciona la especificidad:</label>
+      <select id="specificity">
+        <option value="L">Baja (L)</option>
+        <option value="M">Media (M)</option>
+        <option value="Q">Alta (Q)</option>
+        <option value="H">Muy Alta (H)</option>
+      </select>
+
+      <button onclick="generateQRCode()">Generar QR</button>
+
+      <div id="qr-code"></div>
+      <a id="download-link">Descargar QR</a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+      function generateQRCode() {
+        const link = document.getElementById("link").value;
+        const specificity = document.getElementById("specificity").value;
+
+        if (!link) {
+          alert("Por favor ingresa un enlace.");
+          return;
+        }
+
+        // Limpiar el código QR anterior
+        document.getElementById("qr-code").innerHTML = "";
+
+        const qrCode = new QRCode(document.getElementById("qr-code"), {
+          text: link,
+          width: 256,
+          height: 256,
+          colorDark: "#000000",
+          colorLight: "transparent",
+          correctLevel: QRCode.CorrectLevel[specificity],
+        });
+
+        // Esperar a que se genere el código QR
+        setTimeout(() => {
+          const qrCanvas = document.querySelector("#qr-code canvas");
+          if (qrCanvas) {
+            const imgData = qrCanvas
+              .toDataURL("image/png")
+              .replace("image/png", "image/octet-stream");
+            const downloadLink = document.getElementById("download-link");
+            downloadLink.href = imgData;
+            downloadLink.download = "qr_code.png";
+            downloadLink.style.display = "block";
+          }
+        }, 500);
+      }
+    </script>
+  </body>
+</html>
