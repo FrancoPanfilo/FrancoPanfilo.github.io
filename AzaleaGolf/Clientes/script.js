@@ -2,17 +2,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import {
   getFirestore,
   collection,
-  addDoc,
   getDocs,
   updateDoc,
-  deleteDoc,
-  increment,
-  setDoc,
-  getDoc,
   doc,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCaoKajIMiN3Y8AtPz5X2brHm0YOsFqiuo",
   authDomain: "azalea-92a39.firebaseapp.com",
@@ -22,6 +16,7 @@ const firebaseConfig = {
   appId: "1:564234531814:web:ba8f9c434cd576b01e5c27",
   measurementId: "G-MX1L41XYVE",
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const mobileNav = document.querySelector(".hamburger");
@@ -31,8 +26,9 @@ const toggleNav = () => {
   navbar.classList.toggle("active");
   mobileNav.classList.toggle("hamburger-active");
 };
+
 mobileNav.addEventListener("click", () => toggleNav());
-console.log("object");
+
 document.addEventListener("DOMContentLoaded", async () => {
   const clientsTableBody = document.querySelector("#clients-table tbody");
 
@@ -56,17 +52,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const addClientToTable = (client) => {
-    const { availableSessions, name, email, reservations } = client;
+    const { id, name, email, availableSessions, reservations } = client;
 
     const row = document.createElement("tr");
     row.innerHTML = `
         <td>${name}</td>
-
-        <td>${email}</td>
+        <td contenteditable="true" class="editable">${email}</td>
         <td>${availableSessions}</td>
         <td>${reservations}</td>
+        <td>
+          <button class="save-btn" data-id="${id}">Guardar</button>
+        </td>
       `;
     clientsTableBody.appendChild(row);
+
+    // Añadir evento al botón de guardar
+    row.querySelector(".save-btn").addEventListener("click", async () => {
+      const newEmail = row.querySelector(".editable").innerText;
+      await updateEmail(id, newEmail);
+    });
+  };
+
+  const updateEmail = async (id, newEmail) => {
+    try {
+      const clientDoc = doc(db, "Clientes", id);
+      await updateDoc(clientDoc, { email: newEmail });
+      alert("Email actualizado exitosamente");
+    } catch (error) {
+      console.error("Error actualizando el email: ", error);
+      alert("Error actualizando el email");
+    }
   };
 
   await displayClients();
