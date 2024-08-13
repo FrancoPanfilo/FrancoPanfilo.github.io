@@ -89,14 +89,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fetchReservations = async () => {
     const reservations = [];
     const snapshot = await getDocs(collection(db, "Reservas"));
-
     const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-
+    const startOfDay = new Date(today.setHours(-24, 0, 0, 0));
     snapshot.forEach((doc) => {
       const reservation = { id: doc.id, ...doc.data() };
       const reservationDate = new Date(reservation.date);
-
       if (reservationDate >= startOfDay) {
         reservations.push(reservation);
       }
