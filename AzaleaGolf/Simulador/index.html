@@ -6,10 +6,10 @@
     <title>Generador de PDF</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script defer type="module" src="script.js"></script>
+    <link rel="stylesheet" href="../nav.css" />
     <style>
       body {
         font-family: Arial, sans-serif;
-        margin: 20px;
       }
       .form-group {
         margin-bottom: 15px;
@@ -41,6 +41,52 @@
     </style>
   </head>
   <body>
+    <nav>
+      <div class="logo">
+        <img src="../logo.jpg" alt="logo" />
+      </div>
+      <ul>
+        <li>
+          <a href="../index.html">Gestion de Reservas</a>
+        </li>
+        <li>
+          <a href="../Cuponeras/index.html">Agregar Cuponera</a>
+        </li>
+        <li>
+          <a href="../Clientes/index.html">Clientes</a>
+        </li>
+        <li>
+          <a href="../Historial/index.html">Historial</a>
+        </li>
+        <li>
+          <a href="../Simulador/index.html">PDF</a>
+        </li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+    <div class="menubar">
+      <ul>
+        <li>
+          <a href="../index.html">Gestion de Reservas</a>
+        </li>
+        <li>
+          <a href="../Cuponeras/index.html">Agregar Cuponera</a>
+        </li>
+        <li>
+          <a href="../Clientes/index.html">Clientes</a>
+        </li>
+        <li>
+          <a href="../Historial/index.html">Historial</a>
+        </li>
+        <li>
+          <a href="../Simulador/index.html">PDF</a>
+        </li>
+      </ul>
+    </div>
     <h1>Generador de PDF desde CSV</h1>
     <div class="form-group">
       <label for="name">Nombre:</label>
@@ -86,10 +132,10 @@
         <option value="7i">7i</option>
         <option value="8i">8i</option>
         <option value="9i">9i</option>
-        <option value="Pw">Pw</option>
-        <option value="Gw">Gw</option>
-        <option value="Sw">Sw</option>
-        <option value="Lw">Lw</option>
+        <option value="PW">Pw</option>
+        <option value="GW">Gw</option>
+        <option value="SW">Sw</option>
+        <option value="LW">Lw</option>
         <option value="50">50</option>
         <option value="52">52</option>
         <option value="54">54</option>

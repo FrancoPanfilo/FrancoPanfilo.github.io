@@ -92,7 +92,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sortedReservations = filteredReservations.sort((a, b) => {
       const dateComparison = new Date(a.date) - new Date(b.date);
       if (dateComparison === 0) {
-        return new Date(`${a.date}T${a.time}) - new Date(${b.date}T${b.time}`);
+        return (
+          new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`)
+        );
       }
       return dateComparison;
     });
@@ -142,8 +144,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${name}</td>
-      <td>${day}</td>
-      <td>${formattedDate}</td>
       <td>${formattedTime}</td>
       <td>${guests}</td>
       <td><input type="checkbox" class="payment-checkbox" ${

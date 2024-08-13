@@ -15,6 +15,79 @@ main {
 }
 
 /* Estilo para la tabla de reservas */
+#reservations-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Asignar ancho a cada columna */
+#reservations-table th:nth-child(1),
+#reservations-table td:nth-child(1) {
+  width: 30%;
+}
+
+#reservations-table th:nth-child(2),
+#reservations-table td:nth-child(2) {
+  width: 30%;
+}
+
+#reservations-table th:nth-child(3),
+#reservations-table td:nth-child(3) {
+  width: 30%;
+}
+
+#reservations-table th:nth-child(4),
+#reservations-table td:nth-child(4) {
+  width: 10%;
+}
+.filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Para permitir que los elementos se ajusten en pantallas pequeñas */
+}
+
+.filters > div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Espacio entre elementos en pantallas pequeñas */
+}
+
+.filters label {
+  margin-right: 10px;
+  font-weight: bold;
+  color: #555;
+}
+
+.filters input[type="date"],
+.filters select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  color: #333;
+  font-size: 14px;
+}
+
+.filters button {
+  padding: 4px 8px;
+  background-color: #646464;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.filters button:hover {
+  background-color: #676869;
+}
 table {
   width: 100%;
   border-collapse: collapse;
@@ -40,10 +113,6 @@ tbody tr {
   border-bottom: 1px solid #dddddd;
 }
 
-tbody tr:nth-of-type(even) {
-  background-color: #f3f3f3;
-}
-
 tbody tr:last-of-type {
   border-bottom: 2px solid #009879;
 }
@@ -57,9 +126,47 @@ tbody td {
   font-weight: bold;
   text-align: center;
 }
-
+.day-header:hover {
+  scale: 1;
+}
+tr:hover {
+  background-color: #dbdbdbb4;
+}
 /* Estilos para pantallas pequeñas */
 @media screen and (max-width: 600px) {
+  .date-filter {
+    display: flex;
+    flex-direction: column;
+  }
+  .filters {
+    flex-direction: column; /* Apilar los elementos en columna en lugar de fila */
+    align-items: flex-start; /* Alinear elementos al inicio en columna */
+  }
+
+  .filters > div {
+    width: 100%; /* Ocupa todo el ancho disponible */
+    justify-content: space-between; /* Distribuye el contenido en los elementos internos */
+  }
+
+  .filters button {
+    align-self: center; /* Centrar el botón en dispositivos móviles */
+    width: 100%; /* Hacer que el botón ocupe todo el ancho disponible */
+    margin-top: 10px; /* Espacio superior para separar el botón del resto */
+  }
+
+  .filters input[type="date"],
+  .filters select {
+    width: calc(
+      50% - 10px
+    ); /* Ocupa el 50% del ancho menos un pequeño margen */
+    margin-bottom: 10px; /* Añadir un margen inferior para separar los campos */
+  }
+
+  /* Asegurarse de que el botón de estadísticas se vea bien */
+  #stats-btn {
+    width: 100%;
+    padding: 12px;
+  }
   body {
     font-size: 14px;
   }

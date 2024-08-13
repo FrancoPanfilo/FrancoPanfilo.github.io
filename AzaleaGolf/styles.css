@@ -41,14 +41,15 @@ button {
 }
 
 button {
-  background-color: #007bff;
+  background-color: #009879;
+
   color: white;
   cursor: pointer;
   border: none;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #006e58;
 }
 
 #show-all-btn,
@@ -72,7 +73,8 @@ table td {
 }
 
 th {
-  background-color: #007bff;
+  background-color: #009879;
+
   color: white;
 }
 
@@ -95,7 +97,8 @@ td input[type="checkbox"] {
 
 /* Estilos para las filas de encabezado de los días */
 tr.day-header {
-  background-color: #007bff;
+  background-color: #009879;
+
   color: white;
   font-weight: bold;
   text-align: left;
