@@ -103,10 +103,10 @@
 
         const qrCode = new QRCode(document.getElementById("qr-code"), {
           text: link,
-          width: 256,
-          height: 256,
+          width: 1000, // Aumentar la resolución
+          height: 1000, // Aumentar la resolución
           colorDark: "#000000",
-          colorLight: "transparent",
+          colorLight: "transparent", // Fondo transparente
           correctLevel: QRCode.CorrectLevel[specificity],
         });
 
@@ -115,7 +115,7 @@
           const qrCanvas = document.querySelector("#qr-code canvas");
           if (qrCanvas) {
             const imgData = qrCanvas
-              .toDataURL("image/png")
+              .toDataURL("image/png") // Mantener formato PNG
               .replace("image/png", "image/octet-stream");
             const downloadLink = document.getElementById("download-link");
             downloadLink.href = imgData;

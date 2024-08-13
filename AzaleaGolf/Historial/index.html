@@ -7,6 +7,56 @@
     <link rel="stylesheet" href="styles.css" />
     <script defer type="module" src="script.js"></script>
     <link rel="stylesheet" href="../nav.css" />
+    <style>
+      /* Estilos para el modal y la gráfica */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding-top: 50px;
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+      }
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .chart-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
+      .bar {
+        background-color: #4caf50;
+        height: 20px;
+        border-radius: 4px;
+        text-align: right;
+        color: white;
+        padding-right: 5px;
+      }
+    </style>
   </head>
   <body>
     <nav>
@@ -14,18 +64,10 @@
         <img src="../logo.jpg" alt="logo" />
       </div>
       <ul>
-        <li>
-          <a href="../index.html">Gestion de Reservas</a>
-        </li>
-        <li>
-          <a href="../Cuponeras/index.html">Agregar Cuponera</a>
-        </li>
-        <li>
-          <a href="../Clientes/index.html">Clientes</a>
-        </li>
-        <li>
-          <a href="">Historial</a>
-        </li>
+        <li><a href="../index.html">Gestion de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Agregar Cuponera</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="">Historial</a></li>
       </ul>
       <div class="hamburger">
         <span class="line"></span>
@@ -35,22 +77,31 @@
     </nav>
     <div class="menubar">
       <ul>
-        <li>
-          <a href="../index.html">Gestion de Reservas</a>
-        </li>
-        <li>
-          <a href="../Cuponeras/index.html">Agregar Cuponera</a>
-        </li>
-        <li>
-          <a href="../Clientes/index.html">Clientes</a>
-        </li>
-        <li>
-          <a href="">Historial</a>
-        </li>
+        <li><a href="../index.html">Gestion de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Agregar Cuponera</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="">Historial</a></li>
       </ul>
     </div>
     <main>
       <h1>Reservas</h1>
+      <div class="filters">
+        <div class="date-filter">
+          <label for="start-date">Desde:</label>
+          <input type="date" id="start-date" />
+          <label for="end-date">Hasta:</label>
+          <input type="date" id="end-date" />
+          <button id="filter-btn">Confirmar</button>
+        </div>
+        <div class="client-filter">
+          <label for="client-select">Filtrar por Cliente:</label>
+          <select id="client-select">
+            <option value="">Todos</option>
+            <!-- Opciones de clientes se generarán dinámicamente -->
+          </select>
+        </div>
+        <button id="stats-btn">Ver Estadísticas</button>
+      </div>
       <table id="reservations-table">
         <thead>
           <tr>
@@ -59,6 +110,7 @@
             <th>Fecha</th>
             <th>Hora</th>
             <th>Invitados</th>
+            <th>Pago</th>
           </tr>
         </thead>
         <tbody>
@@ -66,5 +118,14 @@
         </tbody>
       </table>
     </main>
+
+    <!-- Modal para mostrar estadísticas -->
+    <div id="stats-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Horarios Más Solicitados</h2>
+        <div id="chart-container"></div>
+      </div>
+    </div>
   </body>
 </html>

@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await displayReservations();
   });
 
-  const fetchReservations = async (showAll) => {
+  const fetchReservations = async () => {
     const reservations = [];
     const snapshot = await getDocs(collection(db, "Reservas"));
 
@@ -97,37 +97,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       const reservation = { id: doc.id, ...doc.data() };
       const reservationDate = new Date(reservation.date);
 
-      if (showAll || reservationDate >= startOfDay) {
+      if (reservationDate >= startOfDay) {
         reservations.push(reservation);
       }
     });
 
     return reservations;
-  };
-
-  const displayReservations = async () => {
-    reservationsTableBody.innerHTML = "";
-    const reservations = await fetchReservations(true);
-
-    const sortedReservations = reservations.sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    );
-    const groupedReservations = groupReservationsByDate(sortedReservations);
-    for (const [date, reservations] of Object.entries(groupedReservations)) {
-      const dateObj = new Date(`${date}T00:00:00`);
-      const day = dateObj.toLocaleDateString("es-ES", { weekday: "long" });
-      const formattedDate = dateObj.toLocaleDateString("es-ES");
-
-      const dayHeaderRow = document.createElement("tr");
-      dayHeaderRow.classList.add("day-header");
-      dayHeaderRow.innerHTML = `
-        <td colspan="7">
-          ${day} ${formattedDate}
-        </td>`;
-      reservationsTableBody.appendChild(dayHeaderRow);
-
-      reservations.forEach((reservation) => addReservationToTable(reservation));
-    }
   };
 
   const groupReservationsByDate = (reservations) => {
@@ -139,6 +114,42 @@ document.addEventListener("DOMContentLoaded", async () => {
       group[date].push(reservation);
       return group;
     }, {});
+  };
+
+  const displayReservations = async () => {
+    reservationsTableBody.innerHTML = "";
+    const reservations = await fetchReservations();
+
+    // Ordenar las reservas por fecha
+    const sortedReservations = reservations.sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+
+    // Agrupar las reservas por fecha
+    const groupedReservations = groupReservationsByDate(sortedReservations);
+
+    for (const [date, reservations] of Object.entries(groupedReservations)) {
+      // Ordenar las reservas del mismo día por hora
+      const sortedByTime = reservations.sort((a, b) => {
+        const timeA = new Date(`${a.date}T${a.time}`);
+        const timeB = new Date(`${b.date}T${b.time}`);
+        return timeA - timeB;
+      });
+
+      const dateObj = new Date(`${date}T00:00:00`);
+      const day = dateObj.toLocaleDateString("es-ES", { weekday: "long" });
+      const formattedDate = dateObj.toLocaleDateString("es-ES");
+
+      const dayHeaderRow = document.createElement("tr");
+      dayHeaderRow.classList.add("day-header");
+      dayHeaderRow.innerHTML = `
+          <td colspan="7">
+            ${day} ${formattedDate}
+          </td>`;
+      reservationsTableBody.appendChild(dayHeaderRow);
+
+      sortedByTime.forEach((reservation) => addReservationToTable(reservation));
+    }
   };
 
   const addReservationToTable = (reservation) => {
@@ -161,46 +172,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       <td>${formattedTime}</td>
       <td>${guests}</td>
       <td><input type="checkbox" class="payment-checkbox" ${
-        payment ? "checked" : ""
+        payment ? "checked disabled" : ""
       }></td>
       <td><button class="cancel-btn">X</button></td>`;
     reservationsTableBody.appendChild(row);
 
-    row
-      .querySelector(".payment-checkbox")
-      .addEventListener("change", async (e) => {
-        const payment = e.target.checked;
+    const paymentCheckbox = row.querySelector(".payment-checkbox");
 
-        if (payment) {
-          // Obtener el documento del cliente correspondiente
-          const clientsSnapshot = await getDocs(collection(db, "Clientes"));
-          let clientDoc = null;
-
-          clientsSnapshot.forEach((doc) => {
-            if (doc.data().name === name) {
-              clientDoc = doc;
-            }
-          });
-
-          if (clientDoc) {
-            const clientData = clientDoc.data();
-
-            if (clientData.availableSessions > 0) {
-              // Preguntar si pagó usando cuponera
-              const usingCuponera = confirm("Pagar usando cuponera");
-              if (usingCuponera) {
-                // Reducir availableSessions en 1
-                await updateDoc(clientDoc.ref, {
-                  availableSessions: increment(-1),
-                });
-              }
-            }
-            e.target.checked = true; // Revertir el checkbox si no hay sesiones disponibles
-          }
-        }
-
-        await updateDoc(doc(db, "Reservas", id), { payment });
-      });
+    paymentCheckbox.addEventListener("change", async (e) => {
+      let b = confirm("Confirmar pago");
+      console.log(b);
+      if (b) {
+        b = e.target.checked;
+        await updateDoc(doc(db, "Reservas", id), { payment: true });
+        paymentCheckbox.disabled = true; // Deshabilitar el checkbox después de marcarlo
+      } else {
+        e.target.checked = false;
+      }
+    });
 
     row.querySelector(".cancel-btn").addEventListener("click", async () => {
       await deleteDoc(doc(db, "Reservas", id));
