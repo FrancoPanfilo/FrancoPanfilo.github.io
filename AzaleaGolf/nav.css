@@ -133,7 +133,15 @@ nav ul li a:hover {
   padding: 5px 10px;
   border-radius: 5px;
 }
-
+body {
+  /* Nav 
+  overflow: visible
+overflow: hidden
+overflow: scroll
+overflow: auto
+  */
+  overflow: scroll;
+}
 .menubar ul li a:hover {
   background-color: #f5f5f5;
 }

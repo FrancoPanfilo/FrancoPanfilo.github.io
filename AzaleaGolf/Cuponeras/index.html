@@ -14,21 +14,11 @@
         <img src="../logo.jpg" alt="logo" />
       </div>
       <ul>
-        <li>
-          <a href="../index.html">Gestion de Reservas</a>
-        </li>
-        <li>
-          <a href="">Agregar Cuponera</a>
-        </li>
-        <li>
-          <a href="../Clientes/index.html">Clientes</a>
-        </li>
-        <li>
-          <a href="../Historial/index.html">Historial</a>
-        </li>
-        <li>
-          <a href="../Simulador/index.html">PDF</a>
-        </li>
+        <li><a href="../index.html">Gestión de Reservas</a></li>
+        <li><a href="">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
       </ul>
       <div class="hamburger">
         <span class="line"></span>
@@ -38,42 +28,72 @@
     </nav>
     <div class="menubar">
       <ul>
-        <li>
-          <a href="../index.html">Gestion de Reservas</a>
-        </li>
-        <li>
-          <a href="">Agregar Cuponera</a>
-        </li>
-        <li>
-          <a href="../Clientes/index.html">Clientes</a>
-        </li>
-        <li>
-          <a href="../Historial/index.html">Historial</a>
-        </li>
+        <li><a href="../index.html">Gestion de Reservas</a></li>
+        <li><a href="">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
         <li>
           <a href="../Simulador/index.html">PDF</a>
         </li>
       </ul>
     </div>
-    <div class="container">
-      <h1>Agregar Cuponera</h1>
-      <form id="coupon-form">
-        <label for="coupon-name">Nombre del Cliente:</label>
-        <input
-          type="text"
-          id="coupon-name"
-          name="coupon-name"
-          required
-          list="client-names"
-        />
-        <datalist id="client-names"></datalist>
+    <div class="buttons-container">
+      <button id="nuevoAcuerdoBtn">Nuevo Acuerdo</button>
+      <button id="agregarVentaBtn">Ingresar Venta</button>
+    </div>
 
-        <label for="sessions">Número de Sesiones:</label>
-        <input type="number" id="sessions" name="sessions" min="1" required />
+    <!-- Tabla de acuerdos con ventas -->
+    <div id="acuerdosContainer">
+      <table id="acuerdosTable" class="tabla1">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Total Ventas</th>
+          </tr>
+        </thead>
+        <tbody id="acuerdosTableBody">
+          <!-- Las filas de los acuerdos se agregarán aquí dinámicamente -->
+        </tbody>
+      </table>
+    </div>
 
-        <button type="submit">Confirmar</button>
-      </form>
-      <button id="back-btn">Volver</button>
+    <!-- Modal para Nuevo Acuerdo -->
+    <div id="acuerdoModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Nuevo Acuerdo</h2>
+        <form id="acuerdoForm">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required />
+          <br />
+          <label for="porcentaje">Porcentaje:</label>
+          <input type="number" id="porcentaje" name="porcentaje" required />
+          <br />
+          <button type="submit">Agregar Acuerdo</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para Ingresar Venta -->
+    <div id="ventaModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Agregar Venta</h2>
+        <form id="ventaForm">
+          <label for="acuerdoSelect">Seleccionar Acuerdo:</label>
+          <select id="acuerdoSelect" name="acuerdoSelect" required></select>
+          <br />
+          <label for="cliente">Cliente:</label>
+          <input type="text" id="cliente" name="cliente" required />
+          <label for="monto">Monto:</label>
+          <input type="number" id="monto" name="monto" required />
+          <br />
+          <label for="descripcion">Descripción:</label>
+          <input type="text" id="descripcion" name="descripcion" required />
+          <br />
+          <button type="submit">Confirmar Venta</button>
+        </form>
+      </div>
     </div>
   </body>
 </html>

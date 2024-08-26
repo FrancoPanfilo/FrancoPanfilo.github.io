@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+      }
+      .login-box {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .login-box input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .login-box button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .login-box button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-box">
+      <h2>Iniciar Sesión</h2>
+      <input type="text" id="email" placeholder="Correo Electrónico" />
+      <input type="password" id="password" placeholder="Contraseña" />
+      <button onclick="login()">Ingresar</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.x/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x/firebase-auth.js"></script>
+
+    <script>
+      // Configuración de Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCaoKajIMiN3Y8AtPz5X2brHm0YOsFqiuo",
+        authDomain: "azalea-92a39.firebaseapp.com",
+        projectId: "azalea-92a39",
+        storageBucket: "azalea-92a39.appspot.com",
+        messagingSenderId: "564234531814",
+        appId: "1:564234531814:web:ba8f9c434cd576b01e5c27",
+        measurementId: "G-MX1L41XYVE",
+      };
+      // Inicializa Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+
+      // Función para iniciar sesión
+      function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        firebase
+          .auth()
+          .signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            // Inicio de sesión exitoso
+            sessionStorage.setItem("authenticated", "true");
+            window.location.href = "homepage.html"; // Redirige a la página principal
+          })
+          .catch((error) => {
+            alert("Error al iniciar sesión: " + error.message);
+          });
+      }
+    </script>
+  </body>
+</html>

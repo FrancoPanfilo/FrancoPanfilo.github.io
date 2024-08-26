@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/fireba
 import {
   getFirestore,
   collection,
+  increment,
   getDocs,
   updateDoc,
   doc,
@@ -21,6 +22,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const mobileNav = document.querySelector(".hamburger");
 const navbar = document.querySelector(".menubar");
+mobileNav.addEventListener("click", () => toggleNav());
+console.log("object");
+
+document.addEventListener("DOMContentLoaded", () => {});
 
 const toggleNav = () => {
   navbar.classList.toggle("active");
@@ -85,4 +90,121 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   await displayClients();
+});
+document.addEventListener("DOMContentLoaded", function () {
+  const openModalBtn = document.getElementById("openModalBtn");
+  const modal = document.createElement("div");
+  modal.classList.add("modal");
+
+  const modalContent = document.createElement("div");
+  modalContent.classList.add("modal-content");
+  modalContent.innerHTML = `
+      <span class="close">&times;</span>
+ <div class="container">
+        <h1>Agregar Cuponera</h1>
+        <form id="coupon-form">
+          <label for="coupon-name">Nombre del Cliente:</label>
+          <input
+            type="text"
+            id="coupon-name"
+            name="coupon-name"
+            required
+            list="client-names"
+          />
+          <datalist id="client-names"></datalist>
+
+          <label for="sessions">Número de Sesiones:</label>
+          <input type="number" id="sessions" name="sessions" min="1" required />
+
+          <button type="submit">Confirmar</button>
+        </form>
+        <button id="back-btn">Volver</button>
+      </div>
+  `;
+
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+
+  const closeModalBtn = modalContent.querySelector(".close");
+
+  openModalBtn.addEventListener("click", function () {
+    modal.style.display = "block";
+    document.body.classList.add("modal-open");
+  });
+
+  closeModalBtn.addEventListener("click", function () {
+    modal.style.display = "none";
+    document.body.classList.remove("modal-open");
+  });
+
+  window.addEventListener("click", function (event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+      document.body.classList.remove("modal-open");
+    }
+  });
+  const couponForm = document.getElementById("coupon-form");
+  const backButton = document.getElementById("back-btn");
+  const couponNameInput = document.getElementById("coupon-name");
+  const fetchClientNames = async () => {
+    const clientesRef = collection(db, "Clientes");
+    const snapshot = await getDocs(clientesRef);
+    const clientNames = snapshot.docs.map((doc) => doc.data().name);
+    return clientNames;
+  };
+
+  const initializeNameInput = async (inputElement) => {
+    const clientNames = await fetchClientNames();
+    inputElement.setAttribute("list", "client-names");
+    const datalist = document.getElementById("client-names");
+    datalist.innerHTML = "";
+    clientNames.forEach((name) => {
+      const option = document.createElement("option");
+      option.value = name;
+      datalist.appendChild(option);
+    });
+  };
+
+  // Inicializar el campo de nombre con sugerencias
+  initializeNameInput(couponNameInput);
+
+  couponForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    console.log("ola");
+    const formData = new FormData(couponForm);
+    const name = formData.get("coupon-name");
+    const sessions = parseInt(formData.get("sessions"));
+
+    const clientsSnapshot = await getDocs(collection(db, "Clientes"));
+    let clientDoc = null;
+
+    clientsSnapshot.forEach((doc) => {
+      if (doc.data().name === name) {
+        clientDoc = doc;
+      }
+    });
+    if (clientDoc) {
+      await updateDoc(
+        clientDoc.ref,
+        {
+          availableSessions: increment(sessions),
+        },
+        { merge: true }
+      );
+      alert("Cuponera ingresada exitosamente");
+    } else {
+      await setDoc(clientDoc.ref, {
+        name,
+        availableSessions: sessions,
+        reservations: 0,
+      });
+      alert("Cliente agregado y cuponera ingresada exitosamente");
+    }
+
+    couponForm.reset();
+  });
+
+  backButton.addEventListener("click", () => {
+    window.location.href = "../index.html"; // Ajusta según la ruta de tu página principal
+  });
 });
