@@ -154,14 +154,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Añadir evento para el checkbox de pago
     const paymentCheckbox = row.querySelector(".payment-checkbox");
     paymentCheckbox.addEventListener("change", async (e) => {
-      let b = confirm("Confirmar pago");
-      console.log(b);
-      if (b) {
-        b = e.target.checked;
-        await updateDoc(doc(db, "Reservas", id), { payment: true });
-        paymentCheckbox.disabled = true; // Deshabilitar el checkbox después de marcarlo
+      const clientsSnapshot = await getDocs(collection(db, "Clientes"));
+      let clientDoc = null;
+
+      clientsSnapshot.forEach((doc) => {
+        if (doc.data().name === name) {
+          clientDoc = doc;
+        }
+      });
+
+      // Si se encuentra el cliente, obtener las sesiones disponibles y mostrarlas en consola
+      const sesiones = clientDoc.data().availableSessions;
+      if (sesiones < 1) {
+        let b = confirm("Confirmar pago");
+        if (b) {
+          b = e.target.checked;
+          await updateDoc(doc(db, "Reservas", id), { payment: true });
+          paymentCheckbox.disabled = true; // Deshabilitar el checkbox después de marcarlo
+        } else {
+          e.target.checked = false;
+        }
       } else {
-        e.target.checked = false;
+        let b = confirm("Desea Pagar usando cuponera?");
+        if (b) {
+          b = e.target.checked;
+          await updateDoc(doc(db, "Clientes", clientDoc.id), {
+            availableSessions: sesiones - 1,
+          });
+          await updateDoc(doc(db, "Reservas", id), { payment: true });
+          paymentCheckbox.disabled = true; // Deshabilitar el checkbox después de marcarlo
+        } else {
+          let b = confirm("Confirmar pago");
+          if (b) {
+            b = e.target.checked;
+            await updateDoc(doc(db, "Reservas", id), { payment: true });
+            paymentCheckbox.disabled = true; // Deshabilitar el checkbox después de marcarlo
+          } else {
+            e.target.checked = false;
+          }
+        }
       }
     });
   };
