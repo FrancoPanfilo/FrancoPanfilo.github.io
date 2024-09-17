@@ -13,7 +13,9 @@ import {
   arrayUnion,
   doc,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
 // Configuración de Firebase
+console.log(qi10);
 const firebaseConfig = {
   projectId: qi10,
 };

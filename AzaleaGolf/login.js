@@ -6,4 +6,5 @@ d.addEventListener("click", function iSSS() {
   console.log("object");
   let i = prompt("Ingrese la contraseña");
   localStorage.setItem("qi10", i);
+  location.reload();
 });
