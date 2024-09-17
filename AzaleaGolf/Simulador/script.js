@@ -1,6 +1,3 @@
-// Configuración de Firebase (Firebase ya no está en uso en este código)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 const today = new Date();
 
 // Formatea la fecha en formato YYYY-MM-DD (el formato que <input type="date"> espera)
@@ -11,19 +8,6 @@ const formattedDate = `${year}-${month}-${day}`;
 
 // Establece el valor del campo de entrada
 document.getElementById("date").value = formattedDate;
-const firebaseConfig = {
-  apiKey: "AIzaSyCaoKajIMiN3Y8AtPz5X2brHm0YOsFqiuo",
-  authDomain: "azalea-92a39.firebaseapp.com",
-  projectId: "azalea-92a39",
-  storageBucket: "azalea-92a39.appspot.com",
-  messagingSenderId: "564234531814",
-  appId: "1:564234531814:web:ba8f9c434cd576b01e5c27",
-  measurementId: "G-MX1L41XYVE",
-};
-
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 // Manejo del formulario de renombrar palos
 const renameForm = document.getElementById("renameForm");
