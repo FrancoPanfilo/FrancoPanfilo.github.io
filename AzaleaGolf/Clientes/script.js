@@ -1,4 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { db, collection, increment, getDocs, updateDoc, doc } from "../db.js";
 
 const mobileNav = document.querySelector(".hamburger");
@@ -11,9 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {});
 const toggleNav = () => {
   navbar.classList.toggle("active");
   mobileNav.classList.toggle("hamburger-active");
+  console.log("hola");
 };
-
-mobileNav.addEventListener("click", () => toggleNav());
 
 document.addEventListener("DOMContentLoaded", async () => {
   const clientsTableBody = document.querySelector("#clients-table tbody");

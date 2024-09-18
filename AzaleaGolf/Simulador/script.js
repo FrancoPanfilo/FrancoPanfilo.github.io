@@ -1,5 +1,13 @@
 const today = new Date();
 
+const mobileNav = document.querySelector(".hamburger");
+const navbar = document.querySelector(".menubar");
+
+const toggleNav = () => {
+  navbar.classList.toggle("active");
+  mobileNav.classList.toggle("hamburger-active");
+};
+mobileNav.addEventListener("click", () => toggleNav());
 // Formatea la fecha en formato YYYY-MM-DD (el formato que <input type="date"> espera)
 const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2, "0"); // getMonth() es 0-based
