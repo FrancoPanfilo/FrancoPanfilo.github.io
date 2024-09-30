@@ -5,6 +5,7 @@ import {
   getDocs,
   updateDoc,
   doc,
+  addDoc,
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Configuración de Firebase
@@ -77,7 +78,6 @@ function generateQRCode() {
   // Esperar a que se genere el código QR
   setTimeout(() => {
     const qrCanvas = document.querySelector("#qr-code canvas");
-    console.log(qrCanvas);
     if (qrCanvas) {
       const imgData = qrCanvas
         .toDataURL("image/png") // Mantener formato PNG
