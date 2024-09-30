@@ -102,6 +102,7 @@ function generateQRDinamicCode() {
 
   // Limpiar el código QR anterior
   document.getElementById("qr-code").innerHTML = "";
+  location.reload();
 }
 // tabla
 
