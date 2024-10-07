@@ -207,9 +207,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   const displayStats = () => {
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
+    const selectedClient = clientSelect.value;
     const dayHourCounts = {};
-
-    reservations.forEach((reservation) => {
+    const filteredReservations = reservations.filter((reservation) => {
+      const reservationDate = new Date(reservation.date);
+      const matchesClient =
+        !selectedClient || reservation.name === selectedClient;
+      const matchesDateRange =
+        (!startDate || reservationDate >= new Date(startDate)) &&
+        (!endDate || reservationDate <= new Date(endDate));
+      return matchesClient && matchesDateRange;
+    });
+    filteredReservations.forEach((reservation) => {
       const dateObj = new Date(`${reservation.date}T${reservation.time}`);
       const day = dateObj.toLocaleDateString("es-ES", { weekday: "long" });
       const hour = dateObj.getHours();
@@ -220,22 +231,136 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       dayHourCounts[key]++;
     });
+    chartContainer.innerHTML = `<div style="width: 80%; margin: 0 auto;">
+        <canvas id="myChart"></canvas>
+    </div>`;
+    console.log(dayHourCounts);
+    const diasSemana = {
+      lunes: 1,
+      martes: 2,
+      miércoles: 3,
+      jueves: 4,
+      viernes: 5,
+      sábado: 6,
+      domingo: 7,
+    };
 
-    chartContainer.innerHTML = ""; // Limpiar contenido previo
+    // Función para ordenar el array de reservas por día de la semana y hora
+    function ordenarReservas(reservas) {
+      return Object.entries(reservas).sort(([diaHoraA], [diaHoraB]) => {
+        const [diaA, horaA] = diaHoraA.split(" ");
+        const [diaB, horaB] = diaHoraB.split(" ");
+        const [horaAInt, minutoA] = horaA.split(":").map(Number);
+        const [horaBInt, minutoB] = horaB.split(":").map(Number);
 
-    Object.keys(dayHourCounts)
-      .sort()
-      .forEach((key) => {
-        const barLength =
-          (dayHourCounts[key] / Math.max(...Object.values(dayHourCounts))) *
-          100;
-        const bar = document.createElement("div");
-        bar.classList.add("chart-bar");
-        bar.innerHTML = `
-          <span>${key}</span>
-          <div class="bar" style="width: ${barLength}%;">${dayHourCounts[key]}</div>`;
-        chartContainer.appendChild(bar);
+        // Comparar por día y luego por hora
+        if (diasSemana[diaA] !== diasSemana[diaB]) {
+          return diasSemana[diaA] - diasSemana[diaB];
+        }
+        return horaAInt - horaBInt || minutoA - minutoB;
       });
+    }
+
+    // Obtener las reservas ordenadas
+    const reservasOrdenadas = ordenarReservas(dayHourCounts);
+    console.log(reservasOrdenadas);
+    const reservas = [
+      ["martes 13:00", 0],
+      ["martes 14:00", 0],
+      ["martes 15:00", 0],
+      ["martes 16:00", 0],
+      ["martes 17:00", 0],
+      ["martes 18:00", 0],
+      ["martes 19:00", 0],
+      ["miércoles 13:00", 0],
+      ["miércoles 14:00", 0],
+      ["miércoles 15:00", 0],
+      ["miércoles 16:00", 0],
+      ["miércoles 17:00", 0],
+      ["miércoles 18:00", 0],
+      ["miércoles 19:00", 0],
+      ["jueves 13:00", 0],
+      ["jueves 14:00", 0],
+      ["jueves 15:00", 0],
+      ["jueves 16:00", 0],
+      ["jueves 17:00", 0],
+      ["jueves 18:00", 0],
+      ["jueves 19:00", 0],
+      ["viernes 13:00", 0],
+      ["viernes 14:00", 0],
+      ["viernes 15:00", 0],
+      ["viernes 16:00", 0],
+      ["viernes 17:00", 0],
+      ["viernes 18:00", 0],
+      ["viernes 19:00", 0],
+      ["sábado 10:00", 0],
+      ["sábado 11:00", 0],
+      ["sábado 12:00", 0],
+      ["sábado 13:00", 0],
+    ];
+    function combinarReservas(reservas, reservasOrdenadas) {
+      reservas.forEach((reserva) => {
+        const [diaHora, valorReserva] = reserva;
+        const reservaOrdenada = reservasOrdenadas.find(
+          ([diaHoraOrdenada]) => diaHoraOrdenada === diaHora
+        );
+
+        if (reservaOrdenada) {
+          reserva[1] += reservaOrdenada[1]; // Sumar los valores
+        }
+      });
+    }
+
+    combinarReservas(reservas, reservasOrdenadas);
+
+    // Extraer las etiquetas (día y hora) y los valores (cantidad de reservas)
+    const etiquetas = reservas.map(([diaHora]) => diaHora);
+    const valores = reservas.map(([, cantidad]) => cantidad);
+    // Configuración del gráfico con Chart.js
+    const ctx = document.getElementById("myChart").getContext("2d");
+    const myChart = new Chart(ctx, {
+      type: "line", // Puedes cambiar el tipo de gráfico a 'bar' si prefieres barras.
+      data: {
+        labels: etiquetas,
+        datasets: [
+          {
+            label: "Cantidad de Reservas",
+            fillColor: "rgba(220,220,220,0.2)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: valores,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: "Día y Hora",
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: "Reservas",
+            },
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1, // Controla el intervalo de los valores en el eje Y
+              callback: function (value) {
+                if (Number.isInteger(value)) {
+                  return value; // Solo muestra los valores enteros
+                }
+              },
+            },
+          },
+        },
+      },
+    });
   };
 
   await fetchReservations();

@@ -3,6 +3,14 @@ main {
   padding: 20px;
 }
 
+.modal-content {
+  width: 100%;
+  margin: 0 0;
+}
+.modal-content #myChart {
+  width: 1000px;
+  height: 500px;
+}
 /* Estilo para la tabla de reservas */
 #reservations-table {
   width: 100%;
