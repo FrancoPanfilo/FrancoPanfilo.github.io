@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Limitless</title>
+    <script type="module" src="script.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Generador de Códigos QR</h1>
+      <label for="link">Ingresa el enlace:</label>
+      <input type="text" id="link" placeholder="https://example.com" />
+
+      <label for="specificity">Selecciona la especificidad:</label>
+      <select id="specificity">
+        <option value="L">Baja (L)</option>
+        <option value="M">Media (M)</option>
+        <option value="Q">Alta (Q)</option>
+        <option value="H">Muy Alta (H)</option>
+      </select>
+
+      <button id="boton">Generar QR</button>
+
+      <div id="qr-code"></div>
+      <a id="download-link">Descargar QR</a>
+    </div>
+    <div class="container">
+      <h1>QR Dinamico</h1>
+      <label for="link">Ingresa el enlace: No inculuir https://</label>
+      <input type="text" id="link1" placeholder="example.com" />
+      <label for="name">Ingresa el cliente:</label>
+      <input type="text" id="name1" placeholder="Juan Perez" />
+
+      <button id="boton1">Generar QR</button>
+
+      <div id="qr-code1"></div>
+    </div>
+    <table id="qrTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Link</th>
+          <th>Acciones</th>
+          <th>QR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Las filas se generarán dinámicamente aquí -->
+      </tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  </body>
+</html>
