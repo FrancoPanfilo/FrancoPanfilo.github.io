@@ -34,7 +34,7 @@ async function agregarQR(nombre, link) {
     const copiarContenido = async () => {
       try {
         await navigator.clipboard.writeText(
-          `www.scanyourstyle.uy?id=${docRef.id}`
+          `www.scanyourstyle.uy/QRDinamicos/?id=${docRef.id}`
         );
         alert("Link copiado en portapapeles");
       } catch (err) {
