@@ -139,7 +139,7 @@ function descargarQR(id) {
   const copiarContenido = async () => {
     try {
       await navigator.clipboard.writeText(
-        `www.scanyourstyle.uy/QRDinamicos/index.html?id=${id}`
+        `www.scanyourstyle.uy/QRDinamicos/?id=${id}`
       );
       alert("Link copiado en portapapeles");
     } catch (err) {
