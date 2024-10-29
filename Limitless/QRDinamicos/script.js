@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Iniciar la transición después de un breve retraso
   setTimeout(() => {
+    console.log(logoContainer);
     logoContainer.classList.add("hide");
   }, 1000);
 });
