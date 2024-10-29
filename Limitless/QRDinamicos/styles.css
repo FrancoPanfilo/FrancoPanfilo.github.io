@@ -3,6 +3,10 @@
   padding: 0;
   box-sizing: border-box;
 }
+@font-face {
+  font-family: "Geist";
+  src: url("https://pham.codes/d/GeistVF.woff2") format("woff2");
+}
 
 body {
   display: flex;
@@ -25,7 +29,7 @@ body {
 .logo-part {
   width: 80px;
   height: 80px;
-  border: 2px solid #fff;
+  border: 4px solid #fff;
   border-radius: 0px;
   transition: transform 2s ease;
 }
@@ -99,7 +103,7 @@ body {
 
 .logo-text {
   margin-top: 20px;
-  font-family: Inter;
+  font-family: "Geist";
   font-size: 35px;
   color: #fff;
   transition: opacity 1s ease 1s;
@@ -111,14 +115,17 @@ body {
 }
 
 .logo-text span {
-  margin-right: 0.2em; /* Espacio entre letras */
+  font-weight: 100;
+  margin-right: 0.4em; /* Espacio entre letras */
 }
 
 .logo-text span:last-child {
   margin-right: 0; /* Sin margen a la última letra */
 }
 .logo-subtext {
-  font-family: Inter;
+  font-family: "Geist";
+  font-weight: 100;
+
   margin-top: 7px;
 
   font-size: 12px;
