@@ -49,12 +49,14 @@ body {
 
 /* Aplica la animación a los elementos ocultos */
 .hidden {
-  animation: rotate-fade 2s ease forwards;
+  animation: rotate-fade 1.5s ease forwards;
 }
 .Ele1 {
+  animation-delay: 0.3s;
   width: 9px;
 }
 .Ele2 {
+  animation-delay: 0.3s;
   width: 9px;
   margin-bottom: 2px;
 }
