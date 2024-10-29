@@ -109,34 +109,35 @@ body {
 .logo-text {
   margin-top: 20px;
   font-family: "Geist";
-  font-size: 35px;
+  font-size: 22px;
   color: #fff;
   transition: opacity 1s ease 1s;
   text-wrap-mode: nowrap;
 }
 .logo-text {
+  width: 240px;
   display: flex; /* Usa flexbox para alinear los elementos */
   justify-content: center; /* Centra los elementos (opcional) */
+  gap: 20px;
 }
 
 .logo-text span {
   font-weight: 100;
-  margin-right: 0.4em; /* Espacio entre letras */
 }
 
-.logo-text span:last-child {
-  margin-right: 0; /* Sin margen a la última letra */
+.margen {
+  margin-right: 5px;
 }
 .logo-subtext {
   font-family: "Geist";
-  font-weight: 100;
-
+  font-weight: 80;
+  width: 155px;
   margin-top: 7px;
-
-  font-size: 12px;
+  font-size: 8px;
   color: #fff;
+  display: flex; /* Usa flexbox para alinear los elementos */
+  justify-content: space-between; /* Centra los elementos (opcional) */
   transition: opacity 1s ease 1s;
-  text-wrap-mode: nowrap;
 }
 .logo-text span,
 .logo-subtext span {
