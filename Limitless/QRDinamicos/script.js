@@ -27,10 +27,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const qrId = urlParams.get("id");
 document.addEventListener("DOMContentLoaded", () => {
   const logoContainer = document.querySelector(".logo-container");
-
+  document.querySelectorAll(".Ele1, .Ele2").forEach((element) => {
+    element.classList.add("hidden");
+  });
   // Iniciar la transición después de un breve retraso
   setTimeout(() => {
-    console.log(logoContainer);
     logoContainer.classList.add("hide");
   }, 1000);
 });
