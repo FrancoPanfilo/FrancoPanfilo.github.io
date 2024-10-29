@@ -46,6 +46,8 @@ body {
 
 /* Aplica la animación a los elementos ocultos */
 .hidden {
+  animation-delay: 0.3s;
+
   animation: rotate-fade 1.5s ease forwards;
 }
 .Ele1 {
