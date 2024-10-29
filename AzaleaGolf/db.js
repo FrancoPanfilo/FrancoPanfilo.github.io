@@ -12,6 +12,8 @@ import {
   getDoc,
   arrayUnion,
   doc,
+  query,
+  orderBy,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
 // Configuración de Firebase
@@ -35,4 +37,6 @@ export {
   getDoc,
   doc,
   arrayUnion,
+  query,
+  orderBy,
 };

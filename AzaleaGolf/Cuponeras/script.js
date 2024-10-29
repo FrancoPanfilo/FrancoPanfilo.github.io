@@ -8,6 +8,8 @@ import {
   updateDoc,
   doc,
   arrayUnion,
+  query,
+  orderBy,
 } from "../db.js";
 const mobileNav = document.querySelector(".hamburger");
 const navbar = document.querySelector(".menubar");
@@ -232,4 +234,124 @@ function toggleVentasAcordeon(acuerdoId, ventas, porcentaje, rowElement) {
   } else {
     alert("No tiene ventas registradas");
   }
+}
+// Tareas
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Botón para abrir el modal de nueva tarea
+  const botonModalTareas = document.getElementById("botonModalTareas");
+  botonModalTareas.addEventListener("click", showNewTaskModal);
+
+  // Botón para agregar una nueva tarea
+  const botonAgregarTarea = document.getElementById("botonAgregarTarea");
+  botonAgregarTarea.addEventListener("click", addTask);
+
+  // Botón para cerrar el modal de nueva tarea
+  const botonCancelarTarea = document.getElementById("botonCancelarTarea");
+  botonCancelarTarea.addEventListener("click", hideNewTaskModal);
+
+  // Cargar las tareas iniciales
+  loadTasks();
+});
+
+// Función para mostrar el modal de nueva tarea
+function showNewTaskModal() {
+  document.getElementById("newTaskModal").style.display = "block";
+}
+
+// Función para ocultar el modal de nueva tarea
+function hideNewTaskModal() {
+  document.getElementById("newTaskModal").style.display = "none";
+}
+
+// Función para agregar una nueva tarea a Firestore
+async function addTask() {
+  const empresa = document.getElementById("newTaskEmpresa").value;
+  const fechaLimite = document.getElementById("newTaskFecha").value;
+  const descripcion = document.getElementById("newTaskDescripcion").value;
+
+  await addDoc(collection(db, "tareas"), { empresa, fechaLimite, descripcion });
+  hideNewTaskModal();
+  loadTasks();
+}
+
+// Función para cargar tareas
+async function loadTasks() {
+  const tasksBody = document.getElementById("tasksBody");
+  tasksBody.innerHTML = "";
+
+  const tasksSnapshot = await getDocs(
+    query(collection(db, "tareas"), orderBy("fechaLimite"))
+  );
+  tasksSnapshot.forEach((taskDoc) => {
+    const taskData = taskDoc.data();
+    const taskRow = document.createElement("tr");
+
+    taskRow.innerHTML = `
+      <td>${taskData.empresa}</td>
+      <td>${taskData.fechaLimite}</td>
+      <td>${taskData.descripcion || ""}</td>
+    `;
+
+    taskRow.onclick = () => toggleSubtasks(taskDoc.id);
+    tasksBody.appendChild(taskRow);
+
+    const subtasksRow = document.createElement("tr");
+    subtasksRow.classList.add("subtasks-row");
+    subtasksRow.id = `subtasks-${taskDoc.id}`;
+    tasksBody.appendChild(subtasksRow);
+  });
+}
+
+function toggleSubtasks(taskId) {
+  const subtasksRow = document.getElementById(`subtasks-${taskId}`);
+  if (subtasksRow.style.display === "none") {
+    loadSubtasks(taskId);
+    subtasksRow.style.display = "table-row";
+  } else {
+    subtasksRow.style.display = "none";
+  }
+}
+
+async function loadSubtasks(taskId) {
+  const subtasksRow = document.getElementById(`subtasks-${taskId}`);
+  const subtasksSnapshot = await getDocs(
+    collection(db, `tareas/${taskId}/subtareas`)
+  );
+
+  subtasksRow.innerHTML = `<td colspan='3'><ul id='subtasksList'></ul><button onclick='showNewSubtaskModal(\"" +
+    taskId +
+    "\")'>Agregar Subtarea</button></td>`;
+
+  subtasksSnapshot.forEach((subtaskDoc) => {
+    const subtaskData = subtaskDoc.data();
+    const subtaskItem = document.createElement("li");
+    subtaskItem.innerHTML = `
+      ${subtaskData.titulo}: ${subtaskData.descripcion || ""}
+      <button onclick='markSubtaskCompleted("${taskId}", "${
+      subtaskDoc.id
+    }")'>Marcar como Realizada</button>
+    `;
+    subtasksRow.querySelector("#subtasksList").appendChild(subtaskItem);
+  });
+}
+
+async function showNewSubtaskModal(taskId) {
+  const titulo = prompt("Título de la subtarea:");
+  const descripcion = prompt("Descripción de la subtarea:");
+
+  if (titulo) {
+    await addDoc(collection(db, `tareas/${taskId}/subtareas`), {
+      titulo,
+      descripcion,
+      realizada: false,
+    });
+    loadSubtasks(taskId);
+  }
+}
+
+async function markSubtaskCompleted(taskId, subtaskId) {
+  const subtaskRef = doc(db, `tareas/${taskId}/subtareas/${subtaskId}`);
+  await updateDoc(subtaskRef, { realizada: true });
+  loadSubtasks(taskId);
 }

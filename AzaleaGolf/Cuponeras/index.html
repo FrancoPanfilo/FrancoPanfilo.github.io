@@ -9,6 +9,21 @@
     <script defer src="../login.js"></script>
     <script defer type="module" src="script.js"></script>
     <link rel="stylesheet" href="../nav.css" />
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ccc;
+      }
+      .subtasks-row {
+        display: none;
+        background-color: #f9f9f9;
+      }
+    </style>
   </head>
   <body>
     <nav>
@@ -58,7 +73,28 @@
         </tbody>
       </table>
     </div>
+    <h1>Gestión de Tareas</h1>
+    <button id="botonModalTareas">Nueva Tarea</button>
+    <table id="tasksTable">
+      <thead>
+        <tr>
+          <th>Empresa</th>
+          <th>Fecha Límite</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody id="tasksBody"></tbody>
+    </table>
 
+    <!-- Modal para Nueva Tarea -->
+    <div id="newTaskModal" style="display: none">
+      <label>Empresa: <input type="text" id="newTaskEmpresa" /></label><br />
+      <label>Fecha Límite: <input type="date" id="newTaskFecha" /></label><br />
+      <label>Descripción: <input type="text" id="newTaskDescripcion" /></label
+      ><br />
+      <button id="botonAgregarTarea">Agregar Tarea</button>
+      <button id="botonCancelarTarea">Cancelar</button>
+    </div>
     <!-- Modal para Nuevo Acuerdo -->
     <div id="acuerdoModal" class="modal">
       <div class="modal-content">

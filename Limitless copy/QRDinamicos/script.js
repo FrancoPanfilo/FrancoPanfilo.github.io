@@ -25,6 +25,14 @@ const db = getFirestore(app);
 // Obtener el ID del QR desde la URL usando parámetros de consulta
 const urlParams = new URLSearchParams(window.location.search);
 const qrId = urlParams.get("id");
+document.addEventListener("DOMContentLoaded", () => {
+  const logoContainer = document.querySelector(".logo-container");
+
+  // Iniciar la transición después de un breve retraso
+  setTimeout(() => {
+    logoContainer.classList.add("hide");
+  }, 1000);
+});
 
 if (qrId) {
   // Busca el documento en Firebase Firestore
@@ -35,12 +43,11 @@ if (qrId) {
         const qrData = docSnap.data();
         window.location.href = `https://${qrData.link}`; // Redirige al link asociado al QR
       } else {
-        alert("El QR no es válido.");
       }
     })
     .catch((error) => {
       console.error("Error obteniendo el documento:", error);
     });
 } else {
-  alert("No se encontró el ID del QR.");
+  //alert("No se encontró el ID del QR.");
 }
