@@ -3,6 +3,9 @@
   padding: 0;
   box-sizing: border-box;
 }
+::-webkit-scrollbar {
+  display: none;
+}
 @font-face {
   font-family: "Geist";
   src: url("https://pham.codes/d/GeistVF.woff2") format("woff2");
@@ -46,9 +49,7 @@ body {
 
 /* Aplica la animación a los elementos ocultos */
 .hidden {
-  animation-delay: 0.3s;
-
-  animation: rotate-fade 1.5s ease forwards;
+  animation: rotate-fade 2s ease forwards;
 }
 .Ele1 {
   width: 9px;
@@ -232,7 +233,7 @@ body {
 }
 
 .hide .logo-part.bottom-left {
-  transition-delay: 0.8s;
+  transition-delay: 0.9s;
 
   transform: translateX(-500px) translateY(500px);
 }

@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".Ele1, .Ele2").forEach((element) => {
     element.classList.add("hidden");
   });
+
   // Iniciar la transición después de un breve retraso
   setTimeout(() => {
     logoContainer.classList.add("hide");
