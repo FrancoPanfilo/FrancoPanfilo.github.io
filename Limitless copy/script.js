@@ -34,7 +34,7 @@ async function agregarQR(nombre, link) {
     const copiarContenido = async () => {
       try {
         await navigator.clipboard.writeText(
-          `www.scanyourstyle.uy/Redirigiendo/?id=${docRef.id}`
+          `www.scanyourstyle.com/Redirigiendo/?id=${docRef.id}`
         );
         alert("Link copiado en portapapeles");
       } catch (err) {
@@ -139,7 +139,7 @@ function descargarQR(id) {
   const copiarContenido = async () => {
     try {
       await navigator.clipboard.writeText(
-        `www.scanyourstyle.uy/Redirigiendo/?id=${id}`
+        `www.scanyourstyle.com/Redirigiendo/?id=${id}`
       );
       alert("Link copiado en portapapeles");
     } catch (err) {

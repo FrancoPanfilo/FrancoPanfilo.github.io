@@ -1,23 +1,123 @@
-/* Estilos globales */
-html,
 body {
+  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  height: 100%;
 }
 
-/* Usamos flexbox para centrar el logo */
-body {
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: #333;
+  color: white;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+}
+
+.hero {
+  background: url("hero-image.jpg") no-repeat center center/cover;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+.cta-button {
+  padding: 10px 20px;
+  background: #ff6347;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+#services,
+#gallery,
+#contact {
+  padding: 40px 20px;
+}
+
+.gallery {
+  display: flex;
+  gap: 20px;
+}
+
+.gallery-item {
+  width: 30%;
+  height: 200px;
+  background: #f0f0f0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #000000; /* Fondo opcional */
 }
 
-/* Estilo para la imagen del logo */
+footer {
+  background: #333;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.social-links a {
+  margin: 0 10px;
+  color: white;
+  text-decoration: none;
+}
+
 img {
   max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  vertical-align: top;
+}
+#services {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.gallery {
+  flex: 0.3;
+  display: flex;
+  margin: 10px auto;
+  max-width: 600px;
+  position: relative;
+  padding-top: 66.6666666667%;
+}
+@media screen and (min-width: 600px) {
+  .gallery {
+    padding-top: 400px;
+  }
+}
+.gallery__img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+.gallery__thumb {
+  padding-top: 6px;
+  margin: 6px;
+  display: block;
+}
+.gallery__selector {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+}
+.gallery__selector:checked + .gallery__img {
+  opacity: 1;
+}
+.gallery__selector:checked ~ .gallery__thumb > img {
+  box-shadow: 0 0 0 3px #0be2f6;
 }

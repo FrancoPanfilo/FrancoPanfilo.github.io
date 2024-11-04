@@ -1,12 +1,269 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Limitless</title>
+    <title>Limitless - Scan your style</title>
     <link rel="stylesheet" href="styles.css" />
+    <script defer src="script.js"></script>
   </head>
   <body>
-    <img src="LOGO.jpeg" />
+    <!-- Encabezado -->
+    <header>
+      <div class="logo">Limitless</div>
+      <nav>
+        <ul>
+          <li><a href="#hero">Inicio</a></li>
+          <li><a href="#services">Servicios</a></li>
+          <li><a href="#gallery">Galería</a></li>
+          <li><a href="#contact">Contacto</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Sección de Héroe -->
+    <section id="hero" class="hero">
+      <h1>Bienvenidos a Limitless</h1>
+      <p>Scan your style</p>
+      <a href="#services" class="cta-button">Conócenos</a>
+    </section>
+
+    <!-- Sección de Servicios -->
+    <section id="services">
+      <section class="gallery">
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="1img-1"
+            checked
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1015/600/400.jpg"
+            alt=""
+          />
+          <label for="1img-1" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1015/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="1img-2"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1039/600/400.jpg"
+            alt=""
+          />
+          <label for="1img-2" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1039/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="1img-3"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1057/600/400.jpg"
+            alt=""
+          />
+          <label for="1img-3" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1057/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="1img-4"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/106/600/400.jpg"
+            alt=""
+          />
+          <label for="1img-4" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/106/150/100.jpg" alt=""
+          /></label>
+        </div>
+      </section>
+      <section class="gallery">
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="2img-1"
+            checked
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1015/600/400.jpg"
+            alt=""
+          />
+          <label for="2img-1" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1015/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="2img-2"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1039/600/400.jpg"
+            alt=""
+          />
+          <label for="2img-2" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1039/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="2img-3"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1057/600/400.jpg"
+            alt=""
+          />
+          <label for="2img-3" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1057/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="2img-4"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/106/600/400.jpg"
+            alt=""
+          />
+          <label for="2img-4" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/106/150/100.jpg" alt=""
+          /></label>
+        </div>
+      </section>
+      <section class="gallery">
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="img-1"
+            checked
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1015/600/400.jpg"
+            alt=""
+          />
+          <label for="img-1" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1015/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="img-2"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1039/600/400.jpg"
+            alt=""
+          />
+          <label for="img-2" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1039/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="img-3"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/1057/600/400.jpg"
+            alt=""
+          />
+          <label for="img-3" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/1057/150/100.jpg" alt=""
+          /></label>
+        </div>
+        <div class="gallery__item">
+          <input
+            type="radio"
+            id="img-4"
+            name="gallery"
+            class="gallery__selector"
+          />
+          <img
+            class="gallery__img"
+            src="https://picsum.photos/id/106/600/400.jpg"
+            alt=""
+          />
+          <label for="img-4" class="gallery__thumb"
+            ><img src="https://picsum.photos/id/106/150/100.jpg" alt=""
+          /></label>
+        </div>
+      </section>
+    </section>
+
+    <!-- Galerías de Productos -->
+    <section id="gallery">
+      <h2>Nuestra Galería</h2>
+      <div class="gallery">
+        <div class="gallery-item">Galería 1</div>
+        <div class="gallery-item">Galería 2</div>
+        <div class="gallery-item">Galería 3</div>
+      </div>
+    </section>
+
+    <!-- Formulario de Contacto -->
+    <section id="contact">
+      <h2>Contacto</h2>
+      <form>
+        <input type="text" placeholder="Nombre" required />
+        <input type="email" placeholder="Correo electrónico" required />
+        <textarea placeholder="Mensaje" required></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+
+    <!-- Pie de Página -->
+    <footer>
+      <p>© 2024 Limitless. Todos los derechos reservados.</p>
+      <div class="social-links">
+        <a href="https://instagram.com" target="_blank">Instagram</a>
+        <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a>
+        <a href="mailto:info@limitless.com">Email</a>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
   </body>
 </html>
