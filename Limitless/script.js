@@ -1,12 +1,40 @@
-// Aquí puedes agregar la funcionalidad para las animaciones
+// script.js
 document.addEventListener("DOMContentLoaded", () => {
-  // Ejemplo de desplazamiento suave
-  const links = document.querySelectorAll("nav a");
-  links.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute("href"));
-      target.scrollIntoView({ behavior: "smooth" });
+  const mainImage = document.getElementById("mainImage1");
+  const thumbnails = document.querySelectorAll(".thumbnail1");
+
+  thumbnails.forEach((thumbnail) => {
+    thumbnail.addEventListener("click", () => {
+      // Intercambiar la imagen principal con la miniatura seleccionada
+      const mainSrc = mainImage.src;
+      mainImage.src = thumbnail.src;
+      thumbnail.src = mainSrc;
+    });
+  });
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const mainImage = document.getElementById("mainImage2");
+  const thumbnails = document.querySelectorAll(".thumbnail2");
+
+  thumbnails.forEach((thumbnail) => {
+    thumbnail.addEventListener("click", () => {
+      // Intercambiar la imagen principal con la miniatura seleccionada
+      const mainSrc = mainImage.src;
+      mainImage.src = thumbnail.src;
+      thumbnail.src = mainSrc;
+    });
+  });
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const mainImage = document.getElementById("mainImage3");
+  const thumbnails = document.querySelectorAll(".thumbnail3");
+
+  thumbnails.forEach((thumbnail) => {
+    thumbnail.addEventListener("click", () => {
+      // Intercambiar la imagen principal con la miniatura seleccionada
+      const mainSrc = mainImage.src;
+      mainImage.src = thumbnail.src;
+      thumbnail.src = mainSrc;
     });
   });
 });

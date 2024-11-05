@@ -8,262 +8,114 @@
     <script defer src="script.js"></script>
   </head>
   <body>
+    <div class="one">
+      <h1>LIMITLESS</h1>
+    </div>
     <!-- Encabezado -->
-    <header>
-      <div class="logo">Limitless</div>
-      <nav>
-        <ul>
-          <li><a href="#hero">Inicio</a></li>
-          <li><a href="#services">Servicios</a></li>
-          <li><a href="#gallery">Galería</a></li>
-          <li><a href="#contact">Contacto</a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <!-- Sección de Héroe -->
-    <section id="hero" class="hero">
-      <h1>Bienvenidos a Limitless</h1>
-      <p>Scan your style</p>
-      <a href="#services" class="cta-button">Conócenos</a>
-    </section>
-
-    <!-- Sección de Servicios -->
-    <section id="services">
-      <section class="gallery">
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="1img-1"
-            checked
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1015/600/400.jpg"
-            alt=""
-          />
-          <label for="1img-1" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1015/150/100.jpg" alt=""
-          /></label>
+    <section class="horizontal-accordion">
+      <div class="accordion__item" id="item1">
+        <div class="gallery">
+          <div class="gallery__main">
+            <img
+              src="https://www.travismathew.com/wd/md_ADjQwSPDGxp272EC.jpg"
+              alt="Imagen Principal"
+              id="mainImage1"
+            />
+          </div>
+          <div class="gallery__thumbnails">
+            <img
+              src="https://www.travismathew.com/wd/md_ADjQwSPDGxp272EC.jpg"
+              alt="Miniatura 1"
+              class="thumbnail1"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_EXp1Yx3x9e839ILD.jpg"
+              alt="Miniatura 2"
+              class="thumbnail1"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_szVB7O3gi9t66wrY.jpg"
+              alt="Miniatura 3"
+              class="thumbnail1"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_YXsni9wUFrT91cIp.jpg"
+              alt="Miniatura 4"
+              class="thumbnail1"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_U4nWXzBv28x51sES.jpg"
+              alt="Miniatura 5"
+              class="thumbnail1"
+            />
+          </div>
         </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="1img-2"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1039/600/400.jpg"
-            alt=""
-          />
-          <label for="1img-2" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1039/150/100.jpg" alt=""
-          /></label>
-        </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="1img-3"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1057/600/400.jpg"
-            alt=""
-          />
-          <label for="1img-3" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1057/150/100.jpg" alt=""
-          /></label>
-        </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="1img-4"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/106/600/400.jpg"
-            alt=""
-          />
-          <label for="1img-4" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/106/150/100.jpg" alt=""
-          /></label>
-        </div>
-      </section>
-      <section class="gallery">
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="2img-1"
-            checked
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1015/600/400.jpg"
-            alt=""
-          />
-          <label for="2img-1" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1015/150/100.jpg" alt=""
-          /></label>
-        </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="2img-2"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1039/600/400.jpg"
-            alt=""
-          />
-          <label for="2img-2" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1039/150/100.jpg" alt=""
-          /></label>
-        </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="2img-3"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1057/600/400.jpg"
-            alt=""
-          />
-          <label for="2img-3" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1057/150/100.jpg" alt=""
-          /></label>
-        </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="2img-4"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/106/600/400.jpg"
-            alt=""
-          />
-          <label for="2img-4" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/106/150/100.jpg" alt=""
-          /></label>
-        </div>
-      </section>
-      <section class="gallery">
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="img-1"
-            checked
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1015/600/400.jpg"
-            alt=""
-          />
-          <label for="img-1" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1015/150/100.jpg" alt=""
-          /></label>
-        </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="img-2"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1039/600/400.jpg"
-            alt=""
-          />
-          <label for="img-2" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1039/150/100.jpg" alt=""
-          /></label>
-        </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="img-3"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/1057/600/400.jpg"
-            alt=""
-          />
-          <label for="img-3" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/1057/150/100.jpg" alt=""
-          /></label>
-        </div>
-        <div class="gallery__item">
-          <input
-            type="radio"
-            id="img-4"
-            name="gallery"
-            class="gallery__selector"
-          />
-          <img
-            class="gallery__img"
-            src="https://picsum.photos/id/106/600/400.jpg"
-            alt=""
-          />
-          <label for="img-4" class="gallery__thumb"
-            ><img src="https://picsum.photos/id/106/150/100.jpg" alt=""
-          /></label>
-        </div>
-      </section>
-    </section>
-
-    <!-- Galerías de Productos -->
-    <section id="gallery">
-      <h2>Nuestra Galería</h2>
-      <div class="gallery">
-        <div class="gallery-item">Galería 1</div>
-        <div class="gallery-item">Galería 2</div>
-        <div class="gallery-item">Galería 3</div>
       </div>
-    </section>
 
-    <!-- Formulario de Contacto -->
-    <section id="contact">
-      <h2>Contacto</h2>
-      <form>
-        <input type="text" placeholder="Nombre" required />
-        <input type="email" placeholder="Correo electrónico" required />
-        <textarea placeholder="Mensaje" required></textarea>
-        <button type="submit">Enviar</button>
-      </form>
+      <div class="accordion__item" id="item2">
+        <div class="gallery">
+          <div class="gallery__main">
+            <img
+              src="https://www.travismathew.com/wd/1280_Q57Kx0yW6Kz51Y3q.jpg"
+              alt="Imagen Principal"
+              id="mainImage2"
+            />
+          </div>
+          <div class="gallery__thumbnails">
+            <img
+              src="https://www.travismathew.com/wd/1280_Q57Kx0yW6Kz51Y3q.jpg"
+              alt="Miniatura 1"
+              class="thumbnail2"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_oU2LJwwNhAF01MDl.jpg"
+              alt="Miniatura 2"
+              class="thumbnail2"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_QS8OfT7cfAV49ggL.jpg"
+              alt="Miniatura 3"
+              class="thumbnail2"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion__item" id="item3">
+        <div class="gallery">
+          <div class="gallery__main">
+            <img
+              src="https://www.travismathew.com/wd/1280_MCzF33DWh41knpMY.jpg"
+              alt="Imagen Principal"
+              id="mainImage3"
+            />
+          </div>
+          <div class="gallery__thumbnails">
+            <img
+              src="https://www.travismathew.com/wd/1280_MCzF33DWh41knpMY.jpg"
+              alt="Miniatura 1"
+              class="thumbnail3"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_aX5oFotypb1560Zl.jpg"
+              alt="Miniatura 2"
+              class="thumbnail3"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_kVOmsCJ5aaK56cG2.jpg"
+              alt="Miniatura 3"
+              class="thumbnail3"
+            />
+            <img
+              src="https://www.travismathew.com/wd/1280_yw0ax0XkBh28IpFT.jpg"
+              alt="Miniatura 4"
+              class="thumbnail3"
+            />
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Pie de Página -->
-    <footer>
-      <p>© 2024 Limitless. Todos los derechos reservados.</p>
-      <div class="social-links">
-        <a href="https://instagram.com" target="_blank">Instagram</a>
-        <a href="https://wa.me/1234567890" target="_blank">WhatsApp</a>
-        <a href="mailto:info@limitless.com">Email</a>
-      </div>
-    </footer>
-
-    <script src="script.js"></script>
   </body>
 </html>
