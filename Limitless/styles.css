@@ -34,6 +34,7 @@ body {
   padding: 0;
   background: #00010a;
   overflow: hidden;
+  z-index: -1;
 }
 .background li {
   position: absolute;
