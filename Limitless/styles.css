@@ -15,15 +15,14 @@ body {
   0% {
     transform: translateY(0) rotate(0deg);
     opacity: 1;
-    border-radius: 0;
   }
   100% {
     transform: translateY(-1000px) rotate(720deg);
     opacity: 0;
-    border-radius: 50%;
   }
 }
 
+/* Fondo principal */
 .background {
   position: fixed;
   width: 100vw;
@@ -36,16 +35,21 @@ body {
   overflow: hidden;
   z-index: -1;
 }
+
+/* Estilos para cada elemento "QR" */
 .background li {
   position: absolute;
-  display: block;
   list-style: none;
-  width: 20px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
   animation: animate 19s linear infinite;
 }
 
+/* Insertar el SVG de QR en cada elemento li */
+.background li img {
+  width: 100%;
+  height: 100%;
+}
 .background li:nth-child(0) {
   left: 15%;
   width: 32px;
@@ -427,9 +431,30 @@ h1 em {
   margin-bottom: 20px;
   margin-top: 20px;
 }
-
-.horizontal-accordion {
+.contenido {
+  border-radius: 0px 30px 0px 30px;
+  color: rgb(255, 255, 255);
+  padding: 15px;
+  background-color: rgba(10, 36, 36, 0.808);
+  display: flex;
+  flex-direction: column;
   width: 60%;
+  height: 500px;
+}
+.contenido h3 {
+  font-family: "Raleway", sans-serif;
+
+  margin-bottom: 2px;
+}
+hr {
+  height: 1px;
+  width: 300px;
+  margin-bottom: 10px;
+  background-color: rgb(255, 255, 255);
+}
+.horizontal-accordion {
+  background-color: #ffffff00;
+  width: 100%;
   display: flex;
   height: 100px;
   margin-bottom: 500px;
@@ -484,4 +509,197 @@ h1 em {
 .gallery__thumbnails img:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#item2 {
+  flex: 1.8;
+  max-width: 300px;
+  background-color: #00000000;
+  padding: 20px;
+  height: max-content;
+}
+
+.contacto {
+  max-width: 100%;
+  display: flex;
+
+  padding-top: 0;
+}
+.contacto svg {
+  height: 50px;
+}
+.lista {
+  margin-bottom: 10px;
+}
+.lista li {
+  font-family: "Raleway", sans-serif;
+
+  list-style: none;
+  position: relative;
+  padding: 3px 0 2px 25px;
+  margin-bottom: 7px;
+}
+
+.lista li::before {
+  content: "-";
+  position: absolute;
+  top: 2px;
+  left: 0;
+}
+@media screen and (max-width: 1050px) {
+  .contenido {
+    padding: 15px;
+    width: 80%;
+    height: 500px;
+  }
+  hr {
+    height: 10px;
+    width: 200px;
+  }
+
+  #item2 {
+    flex: 1.8;
+    max-width: 250px;
+    font-size: small;
+
+    padding: 20px;
+    height: max-content;
+  }
+  .contacto {
+    padding-left: 0;
+  }
+  .contacto svg {
+    height: 35px;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .contenido {
+    padding: 15px;
+    width: 80%;
+    height: 400px;
+  }
+  hr {
+    height: 1px;
+    width: 200px;
+  }
+
+  #item2 {
+    flex: 1.8;
+    max-width: 220px;
+    font-size: smaller;
+
+    padding: 20px;
+    height: max-content;
+    flex-wrap: wrap;
+  }
+  .contacto {
+    padding-left: 0;
+  }
+  .contacto svg {
+    height: 35px;
+  }
+}
+@media screen and (max-width: 650px) {
+  hr {
+    height: 1px;
+    width: 200px;
+  }
+  .contenido {
+    height: 830px;
+  }
+  .horizontal-accordion {
+    background-color: #00000000;
+    height: 1000px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    margin-bottom: 0;
+  }
+  .accordion__item {
+    width: 100%;
+    height: 500px;
+    max-height: 300px;
+  }
+
+  .gallery__main img {
+    height: 100%;
+    width: auto;
+  }
+
+  #item1 .gallery {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 250px;
+  }
+
+  #item1 .gallery .gallery__main {
+    flex: 1;
+  }
+
+  .gallery__thumbnails {
+    flex: 1;
+    opacity: 1;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .gallery__thumbnails img {
+    min-width: 35%;
+  }
+
+  .gallery__thumbnails img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  #item3 .gallery {
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+    height: 250px;
+  }
+
+  #item3 .gallery .gallery__main {
+    flex: 1;
+  }
+
+  #item2 {
+    flex: 0;
+    width: 100%;
+    max-width: none;
+    height: fit-content;
+    margin-bottom: 0;
+  }
+  .contacto {
+    max-width: 100%;
+    display: flex;
+    padding-left: 50px;
+    padding-top: 0;
+    height: 50px;
+  }
+  .contacto svg {
+    height: 50px;
+  }
+  .lista {
+    margin-bottom: 0px;
+  }
+  .lista li {
+    font-family: "Raleway", sans-serif;
+
+    list-style: none;
+    position: relative;
+    padding: 3px 0 2px 25px;
+    margin-bottom: 7px;
+  }
+
+  .lista li::before {
+    content: "-";
+    position: absolute;
+    top: 2px;
+    left: 0;
+  }
 }
