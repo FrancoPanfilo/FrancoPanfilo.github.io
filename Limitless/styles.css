@@ -624,8 +624,9 @@ hr {
   }
 
   .gallery__main img {
-    height: 100%;
-    width: auto;
+    max-height: 250px;
+    width: 90%;
+    height: auto;
   }
 
   #item1 .gallery {
@@ -633,6 +634,7 @@ hr {
     flex-direction: row;
     width: 100%;
     height: 250px;
+    align-items: center;
   }
 
   #item1 .gallery .gallery__main {
@@ -649,6 +651,7 @@ hr {
   }
   .gallery__thumbnails img {
     min-width: 35%;
+    height: auto;
   }
 
   .gallery__thumbnails img:hover {
@@ -660,6 +663,7 @@ hr {
     display: flex;
     flex-direction: row-reverse;
     width: 100%;
+    align-items: center;
     height: 250px;
   }
 
