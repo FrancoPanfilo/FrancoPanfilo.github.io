@@ -25,7 +25,6 @@ body {
 /* Fondo principal */
 .background {
   border: none;
-  filter: blur(2px);
   position: fixed;
   width: 110vw;
   height: 110vh;
@@ -40,6 +39,8 @@ body {
 
 /* Estilos para cada elemento "QR" */
 .background li {
+  filter: blur(2px);
+
   position: absolute;
   list-style: none;
   width: 40px;
