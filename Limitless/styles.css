@@ -24,6 +24,7 @@ body {
 
 /* Fondo principal */
 .background {
+  border: none;
   filter: blur(2px);
   position: fixed;
   width: 110vw;
