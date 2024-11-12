@@ -491,7 +491,6 @@ hr {
   justify-content: center;
   opacity: 0;
   transition: opacity 0.5s ease;
-  pointer-events: none; /* Para evitar que interfiera al estar oculto */
 }
 
 .gallery:hover .gallery__thumbnails {
