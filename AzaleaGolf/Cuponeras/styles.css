@@ -136,3 +136,10 @@
   margin: 0;
   background-color: #009879;
 }
+
+#Tareas .tablas {
+  background-color: #ffffff;
+}
+.tablas div img {
+  margin: 0 auto;
+}

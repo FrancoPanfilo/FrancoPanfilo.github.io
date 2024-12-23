@@ -6,52 +6,71 @@
     <title>Limitless</title>
     <script type="module" src="script.js"></script>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="nav.css" />
   </head>
   <body>
+    <nav>
+      <a class="link" href="#">Limitless Admin</a>
+      <ul class="list">
+        <li><a class="link" href="">Inicio</a></li>
+        <li><a class="link" href="Clientes/index.html">Clientes</a></li>
+        <li><a class="link" href="">Productos</a></li>
+        <li><a class="link" href="CreadorQR/index.html">QR</a></li>
+      </ul>
+      <button class="menu">Menu</button>
+    </nav>
     <div class="container">
-      <h1>Generador de Códigos QR</h1>
-      <label for="link">Ingresa el enlace:</label>
-      <input type="text" id="link" placeholder="https://example.com" />
-
-      <label for="specificity">Selecciona la especificidad:</label>
-      <select id="specificity">
-        <option value="L">Baja (L)</option>
-        <option value="M">Media (M)</option>
-        <option value="Q">Alta (Q)</option>
-        <option value="H">Muy Alta (H)</option>
+      <h1>Nueva Venta</h1>
+      <label for="link">Cliente</label>
+      <select id="link"></select>
+      <label for="link1">Producto</label>
+      <select id="link1"></select>
+      <select id="talles">
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
       </select>
-
-      <button id="boton">Generar QR</button>
-
-      <div id="qr-code"></div>
-      <a id="download-link">Descargar QR</a>
+      <label for="dir">Direccion</label>
+      <input id="dir" placeholder="Campeon del Siglo" />
+      <button id="boton">Crear venta</button>
     </div>
-    <div class="container">
-      <h1>QR Dinamico</h1>
-      <label for="link">Ingresa el enlace: No inculuir https://</label>
-      <input type="text" id="link1" placeholder="example.com" />
-      <label for="name">Ingresa el cliente:</label>
-      <input type="text" id="name1" placeholder="Juan Perez" />
 
-      <button id="boton1">Generar QR</button>
-
-      <div id="qr-code1"></div>
-    </div>
     <table id="qrTable">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Link</th>
-          <th>Acciones</th>
-          <th>QR</th>
+          <th>Codigo</th>
+          <th>Vinculo</th>
+          <th>Cliente</th>
+          <th>Producto</th>
+          <th>Talle</th>
+          <th>Direccion</th>
+          <th>Pagado</th>
+          <th>Enviado</th>
+          <th>Entregado</th>
         </tr>
       </thead>
       <tbody>
         <!-- Las filas se generarán dinámicamente aquí -->
       </tbody>
     </table>
-
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span id="cerrarM" class="close">&times;</span>
+        <h2>Selecciona un elemento</h2>
+        <table id="modalTable">
+          <thead>
+            <tr>
+              <th>Atributo 1</th>
+              <th>Atributo 2</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button id="seleccionarBtn">Seleccionar</button>
+      </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   </body>
 </html>

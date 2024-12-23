@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Limitless</title>
+    <script type="module" src="script.js"></script>
+    <link rel="stylesheet" href="../nav.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav>
+      <a class="link" href="#">Limitless Admin</a>
+      <ul class="list">
+        <li><a class="link" href="../index.html">Inicio</a></li>
+        <li><a class="link" href="../Clientes/index.html">Clientes</a></li>
+        <li><a class="link" href="">Productos</a></li>
+        <li><a class="link" href="../CreadorQR/index.html">QR</a></li>
+      </ul>
+      <button class="menu">Menu</button>
+    </nav>
+    <div class="container">
+      <h1>Nuevo Producto</h1>
+      <label for="link">Ingresa el nombre</label>
+      <input type="text" id="link" placeholder="Federico Valverde" />
+      <label for="link1">Ingresa el precio</label>
+      <input type="text" id="link1" placeholder="1000" />
+      <button id="boton">Crear cliente</button>
+    </div>
+
+    <table id="qrTable">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Ventas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Las filas se generarán dinámicamente aquí -->
+      </tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  </body>
+</html>

@@ -245,7 +245,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Botón para agregar una nueva tarea
   const botonAgregarTarea = document.getElementById("botonAgregarTarea");
   botonAgregarTarea.addEventListener("click", addTask);
-
+  const botonAgregarSubTarea = document.getElementById("botonAgregarTarea");
+  botonAgregarSubTarea.addEventListener("click", () => {
+    addSubTask();
+    console.log("object");
+  });
   // Botón para cerrar el modal de nueva tarea
   const botonCancelarTarea = document.getElementById("botonCancelarTarea");
   botonCancelarTarea.addEventListener("click", hideNewTaskModal);
@@ -253,17 +257,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cargar las tareas iniciales
   loadTasks();
 });
-
+let task;
 // Función para mostrar el modal de nueva tarea
 function showNewTaskModal() {
   document.getElementById("newTaskModal").style.display = "block";
 }
-
+function showNewSubTaskModal(id) {
+  task = id;
+  document.getElementById("newSubTaskModal").style.display = "block";
+}
 // Función para ocultar el modal de nueva tarea
 function hideNewTaskModal() {
   document.getElementById("newTaskModal").style.display = "none";
 }
-
+function hideNewSubTaskModal() {
+  document.getElementById("newSubTaskModal").style.display = "none";
+}
 // Función para agregar una nueva tarea a Firestore
 async function addTask() {
   const empresa = document.getElementById("newTaskEmpresa").value;
@@ -274,23 +283,36 @@ async function addTask() {
   hideNewTaskModal();
   loadTasks();
 }
+async function addSubTask() {
+  const titulo = document.getElementById("newSubTaskEmpresa").value;
+  const fechaLimite = document.getElementById("newSubTaskFecha").value;
+  const descripcion = document.getElementById("newSubTaskDescripcion").value;
 
+  if (titulo) {
+    await addDoc(collection(db, `tareas/${task}/subtareas`), {
+      titulo,
+      descripcion,
+      fechaLimite,
+      realizada: false,
+    });
+  }
+  console.log("llega");
+  hideNewSubTaskModal();
+  loadTasks();
+}
 // Función para cargar tareas
 async function loadTasks() {
-  const tasksBody = document.getElementById("tasksBody");
-  tasksBody.innerHTML = "";
-
+  const tasksBody = document.getElementById("Tareas");
   const tasksSnapshot = await getDocs(
     query(collection(db, "tareas"), orderBy("fechaLimite"))
   );
   tasksSnapshot.forEach((taskDoc) => {
     const taskData = taskDoc.data();
-    const taskRow = document.createElement("tr");
+    const taskRow = document.createElement("table");
+    taskRow.classList = "tablas";
 
     taskRow.innerHTML = `
-      <td>${taskData.empresa}</td>
-      <td>${taskData.fechaLimite}</td>
-      <td>${taskData.descripcion || ""}</td>
+    <caption>${taskData.empresa} para ${taskData.fechaLimite}</caption>
     `;
 
     taskRow.onclick = () => toggleSubtasks(taskDoc.id);
@@ -300,9 +322,12 @@ async function loadTasks() {
     subtasksRow.classList.add("subtasks-row");
     subtasksRow.id = `subtasks-${taskDoc.id}`;
     tasksBody.appendChild(subtasksRow);
+    taskRow.innerHTML += `<div id="${taskDoc.id}Boton"><img src="mas.png"/></div>`;
+    const mas = document.getElementById(`${taskDoc.id}Boton`);
+    console.log(mas);
+    mas.addEventListener("click", () => showNewSubTaskModal(`${taskDoc.id}`));
   });
 }
-
 function toggleSubtasks(taskId) {
   const subtasksRow = document.getElementById(`subtasks-${taskId}`);
   if (subtasksRow.style.display === "none") {
@@ -334,20 +359,6 @@ async function loadSubtasks(taskId) {
     `;
     subtasksRow.querySelector("#subtasksList").appendChild(subtaskItem);
   });
-}
-
-async function showNewSubtaskModal(taskId) {
-  const titulo = prompt("Título de la subtarea:");
-  const descripcion = prompt("Descripción de la subtarea:");
-
-  if (titulo) {
-    await addDoc(collection(db, `tareas/${taskId}/subtareas`), {
-      titulo,
-      descripcion,
-      realizada: false,
-    });
-    loadSubtasks(taskId);
-  }
 }
 
 async function markSubtaskCompleted(taskId, subtaskId) {
