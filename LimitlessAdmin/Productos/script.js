@@ -31,7 +31,7 @@ async function agregarCliente(nombre, precio) {
       ventas: 0,
     });
     cargarClientes();
-    prompt("Producto cargado correctamente");
+    alert("Producto cargado correctamente");
   } catch (err) {
     console.error("Error", err);
   }

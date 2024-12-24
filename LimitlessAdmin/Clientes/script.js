@@ -41,7 +41,7 @@ async function agregarCliente(nombre) {
       codigo: codigo,
     });
     cargarClientes();
-    prompt("Cliente cargado correctamente");
+    alert("Cliente cargado correctamente");
   } catch (err) {
     console.error("Error", err);
   }
