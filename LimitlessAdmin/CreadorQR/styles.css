@@ -7,10 +7,13 @@ body {
   margin: 0;
   background: linear-gradient(to right, #83a4d4, #b6fbff);
 }
-
+.cont {
+  display: flex;
+}
 .container {
   margin-top: 100px;
-
+  margin-right: 10px;
+  margin-left: 10px;
   margin-bottom: 10px;
   background-color: #ffffff;
   padding: 20px;
@@ -48,12 +51,13 @@ button {
 button:hover {
   background-color: #45a049;
 }
-#qr-code {
+#qr-code,
+#qr-code1 {
   margin-top: 20px;
   display: none;
 }
 #qr-code img {
-  width: 100%;
+  width: 0%;
 }
 #download-link {
   margin-top: 20px;

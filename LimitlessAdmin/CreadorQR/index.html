@@ -12,28 +12,45 @@
     <nav>
       <a class="link" href="#">Limitless Admin</a>
       <ul class="list">
-        <li><a class="link" href="../index.html">Inicio</a></li>
+        <li><a class="link" href="../index.html">Ventas</a></li>
         <li><a class="link" href="../Clientes/index.html">Clientes</a></li>
         <li><a class="link" href="../Productos/index.html">Productos</a></li>
         <li><a class="link" href="">QR</a></li>
       </ul>
       <button class="menu">Menu</button>
     </nav>
-
-    <div class="container">
-      <h1>QR Dinamico</h1>
-      <input type="color" id="colorPicker" />
-      <div id="preview"></div>
-      <select id="specificity">
-        <option value="L">Baja (L)</option>
-        <option value="M">Media (M)</option>
-        <option value="Q">Alta (Q)</option>
-        <option value="H">Muy Alta (H)</option>
-      </select>
-      <button id="boton1">Generar QR</button>
-      <a id="download-link">Descargar QR</a>
-      <div id="qr-code"></div>
+    <div class="cont">
+      <div class="container">
+        <h1>QR Dinamico</h1>
+        <input type="color" id="colorPicker" />
+        <div id="preview"></div>
+        <select id="specificity">
+          <option value="L">Baja (L)</option>
+          <option value="M">Media (M)</option>
+          <option value="Q">Alta (Q)</option>
+          <option value="H">Muy Alta (H)</option>
+        </select>
+        <button id="boton1">Generar QR</button>
+        <a id="download-link">Descargar QR</a>
+        <div id="qr-code"></div>
+      </div>
+      <div class="container">
+        <h1>Generar Imagen Qr</h1>
+        <input type="color" id="colorPicker1" />
+        <input placeholder="link" id="text1" />
+        <div id="preview1"></div>
+        <select id="specificity1">
+          <option value="L">Baja (L)</option>
+          <option value="M">Media (M)</option>
+          <option value="Q">Alta (Q)</option>
+          <option value="H">Muy Alta (H)</option>
+        </select>
+        <button id="boton11">Generar QR</button>
+        <a id="download-link1">Descargar QR</a>
+        <div id="qr-code1"></div>
+      </div>
     </div>
+
     <table id="qrTable">
       <thead>
         <tr>

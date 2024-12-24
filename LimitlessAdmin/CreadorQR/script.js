@@ -21,9 +21,13 @@ const firebaseConfig = {
 };
 const colorPicker = document.getElementById("colorPicker");
 const preview = document.getElementById("preview");
-
+const colorPicker1 = document.getElementById("colorPicker1");
+const preview1 = document.getElementById("preview1");
 colorPicker.addEventListener("input", () => {
   preview.style.backgroundColor = colorPicker.value;
+});
+colorPicker1.addEventListener("input", () => {
+  preview.style.backgroundColor = colorPicker1.value;
 });
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
@@ -99,13 +103,48 @@ async function agregarQR() {
   }, 500);
   cargarQRs();
 }
+async function agregarQR1(link) {
+  let codigo = 0;
+
+  const specificity = document.getElementById("specificity1").value;
+
+  // Limpiar el código QR anterior
+  document.getElementById("qr-code1").innerHTML = "";
+  let color = document.getElementById("colorPicker1").value;
+  const qrCode = new QRCode(document.getElementById("qr-code1"), {
+    text: qrLink,
+    width: 1000, // Aumentar la resolución
+    height: 1000, // Aumentar la resolución
+    colorDark: color,
+    colorLight: "transparent", // Fondo transparente
+    correctLevel: QRCode.CorrectLevel[specificity],
+  });
+
+  // Esperar a que se genere el código QR
+  setTimeout(() => {
+    const qrCanvas = document.querySelector("#qr-code1 canvas");
+    if (qrCanvas) {
+      const imgData = qrCanvas
+        .toDataURL("image/png") // Mantener formato PNG
+        .replace("image/png", "image/octet-stream");
+      const downloadLink = document.getElementById("download-link1");
+      downloadLink.href = imgData;
+      downloadLink.download = "qr.png";
+      downloadLink.style.display = "block";
+    }
+  }, 500);
+  cargarQRs();
+}
 
 document
   .getElementById("boton1")
   .addEventListener("click", () => generateQRDinamicCode());
+document
+  .getElementById("boton11")
+  .addEventListener("click", () => generateQRCode());
 function generateQRCode() {
-  const link = document.getElementById("link").value;
-  const specificity = document.getElementById("specificity").value;
+  const link = document.getElementById("text1").value;
+  const specificity = document.getElementById("specificity1").value;
 
   if (!link) {
     alert("Por favor ingresa un enlace..");
@@ -113,9 +152,9 @@ function generateQRCode() {
   }
 
   // Limpiar el código QR anterior
-  document.getElementById("qr-code").innerHTML = "";
-  let color = document.getElementById("colorPicker").value;
-  const qrCode = new QRCode(document.getElementById("qr-code"), {
+  document.getElementById("qr-code1").innerHTML = "";
+  let color = document.getElementById("colorPicker1").value;
+  const qrCode = new QRCode(document.getElementById("qr-code1"), {
     text: link,
     width: 1000, // Aumentar la resolución
     height: 1000, // Aumentar la resolución
@@ -126,12 +165,12 @@ function generateQRCode() {
 
   // Esperar a que se genere el código QR
   setTimeout(() => {
-    const qrCanvas = document.querySelector("#qr-code canvas");
+    const qrCanvas = document.querySelector("#qr-code1 canvas");
     if (qrCanvas) {
       const imgData = qrCanvas
         .toDataURL("image/png") // Mantener formato PNG
         .replace("image/png", "image/octet-stream");
-      const downloadLink = document.getElementById("download-link");
+      const downloadLink = document.getElementById("download-link1");
       downloadLink.href = imgData;
       downloadLink.download = "qr_code.png";
       downloadLink.style.display = "block";
