@@ -10,6 +10,16 @@ body {
 .cont {
   display: flex;
 }
+#preview,
+#preview1 {
+  font-family: Arial, Helvetica, sans-serif;
+  padding-top: 23px;
+  color: rgb(155, 111, 111);
+  height: 50px;
+  width: 100%;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
 .container {
   margin-top: 100px;
   margin-right: 10px;
@@ -59,13 +69,15 @@ button:hover {
 #qr-code img {
   width: 0%;
 }
-#download-link {
+#download-link,
+#download-link1 {
   margin-top: 20px;
   display: none;
   color: #007bff;
   text-decoration: none;
   font-size: 18px;
 }
+#download-link:hover,
 #download-link:hover {
   text-decoration: underline;
 }

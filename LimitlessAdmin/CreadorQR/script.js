@@ -23,11 +23,13 @@ const colorPicker = document.getElementById("colorPicker");
 const preview = document.getElementById("preview");
 const colorPicker1 = document.getElementById("colorPicker1");
 const preview1 = document.getElementById("preview1");
+preview1.style.backgroundColor = colorPicker1.value;
+preview.style.backgroundColor = colorPicker.value;
 colorPicker.addEventListener("input", () => {
   preview.style.backgroundColor = colorPicker.value;
 });
 colorPicker1.addEventListener("input", () => {
-  preview.style.backgroundColor = colorPicker1.value;
+  preview1.style.backgroundColor = colorPicker1.value;
 });
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
