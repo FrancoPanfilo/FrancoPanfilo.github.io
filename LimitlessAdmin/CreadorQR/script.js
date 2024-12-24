@@ -44,6 +44,7 @@ async function agregarQR() {
     const docRef = await addDoc(collection(db, "QRs"), {
       nombre: nombre,
       link: link,
+      vinculado: "",
     });
     qrLink = `www.scanyourstyle.com/Redirigiendo/?id=${docRef.id}`;
     const copiarContenido = async () => {

@@ -39,7 +39,7 @@ async function mostrarModal(idVenta, codigoVenta) {
   tableBody.innerHTML = ""; // Limpiar la tabla antes de llenar
 
   qrList.forEach((qr) => {
-    if (qr.vinculado != "") {
+    if (qr.vinculado === "") {
       const row = document.createElement("tr");
 
       // Crear celdas para cada campo
