@@ -5,7 +5,7 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0;
-  background: linear-gradient(to right, #83a4d4, #b6fbff);
+  background: linear-gradient(to bottom, #053800, #c49b34);
 }
 .cont {
   display: flex;
