@@ -30,6 +30,8 @@ async function agregarCliente(nombre, precio) {
       precio: precio,
       ventas: 0,
     });
+    cargarClientes();
+    prompt("Producto cargado correctamente");
   } catch (err) {
     console.error("Error", err);
   }

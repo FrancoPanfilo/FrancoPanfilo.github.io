@@ -142,6 +142,9 @@ async function agregarCliente(nombre, precio, talle, direccion) {
       entregado: false,
       codigo: codigo,
     });
+    cargarClientes();
+
+    prompt("Venta cargada correcctamente");
   } catch (err) {
     console.error("Error", err);
   }

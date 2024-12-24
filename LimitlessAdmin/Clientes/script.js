@@ -40,6 +40,8 @@ async function agregarCliente(nombre) {
       cantCompras: 0,
       codigo: codigo,
     });
+    cargarClientes();
+    prompt("Cliente cargado correctamente");
   } catch (err) {
     console.error("Error", err);
   }
@@ -49,7 +51,6 @@ async function agregarCliente(nombre) {
   } catch (error) {
     console.error("Error actualizando el email: ", error);
   }
-  cargarClientes();
 }
 
 // tabla
