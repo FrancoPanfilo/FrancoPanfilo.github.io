@@ -20,6 +20,14 @@ const firebaseConfig = {
   appId: "1:780450660358:web:9f6fd50c7770b5b9e34387",
   measurementId: "G-N6EVVE075H",
 };
+const mobileNav = document.querySelector(".hamburger");
+const navbar = document.querySelector(".menubar");
+
+const toggleNav = () => {
+  navbar.classList.toggle("active");
+  mobileNav.classList.toggle("hamburger-active");
+};
+mobileNav.addEventListener("click", () => toggleNav());
 const tableBody = document.querySelector("tbody");
 const modal = document.getElementById("myModal");
 const modalTable = document.getElementById("modalTable");

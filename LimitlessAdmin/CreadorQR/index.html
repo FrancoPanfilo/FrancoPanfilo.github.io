@@ -10,20 +10,36 @@
   </head>
   <body>
     <nav>
-      <a class="link" href="#">Limitless Admin</a>
-      <ul class="list">
+      <div class="logo" id="acceso">
+        <img src="../Logo.png" alt="logo" />
+      </div>
+      <ul>
         <li><a class="link" href="../index.html">Ventas</a></li>
         <li><a class="link" href="../Clientes/index.html">Clientes</a></li>
         <li><a class="link" href="../Productos/index.html">Productos</a></li>
         <li><a class="link" href="">QR</a></li>
       </ul>
-      <button class="menu">Menu</button>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
     </nav>
+    <div class="menubar">
+      <ul>
+        <li><a class="link" href="../index.html">Ventas</a></li>
+        <li><a class="link" href="../Clientes/index.html">Clientes</a></li>
+        <li><a class="link" href="../Productos/index.html">Productos</a></li>
+        <li><a class="link" href="">QR</a></li>
+      </ul>
+    </div>
+
     <div class="cont">
       <div class="container">
         <h1>QR Dinamico</h1>
         <input type="color" id="colorPicker" />
         <div id="preview">Cambiar color en el selector de ariba</div>
+        <label for="specificity">Ingresa la calidad del qr</label>
         <select id="specificity">
           <option value="L">Baja (L)</option>
           <option value="M">Media (M)</option>
@@ -38,8 +54,11 @@
         <h1>Generar Imagen Qr</h1>
         <input type="color" id="colorPicker1" />
         <div id="preview1">Cambiar color en el selector de ariba</div>
+        <label for="link">Ingresa el enlace</label>
 
         <input placeholder="link" id="text1" />
+        <label for="specificity1">Ingresa la calidad del qr</label>
+
         <select id="specificity1">
           <option value="L">Baja (L)</option>
           <option value="M">Media (M)</option>

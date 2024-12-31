@@ -5,11 +5,9 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0;
-  background: linear-gradient(to bottom, #053800, #c49b34);
+  background-color: white;
 
-  background-color: #f4f7fc;
   margin: 0;
-  padding: 20px;
 }
 body {
   font-family: "Arial", sans-serif;
@@ -21,7 +19,7 @@ body {
   background-color: #007bff;
 }
 .container {
-  margin-top: 130px;
+  margin-top: 20px;
   margin-bottom: 10px;
   background-color: #ffffff;
   padding: 20px;
@@ -91,37 +89,6 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* Estilo de la tabla */
-table {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  border-collapse: collapse;
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-th,
-td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background-color: #4caf50;
-  color: white;
-  font-weight: bold;
-}
-
-td {
-  color: #333;
-}
-
-/* Estilo de las filas */
-tr:hover {
-  background-color: #f1f1f1;
-}
 .modal {
   display: none; /* Oculta el modal por defecto */
   position: fixed; /* Fija el modal en una posición específica */
