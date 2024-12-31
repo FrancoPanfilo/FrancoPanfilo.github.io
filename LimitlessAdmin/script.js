@@ -57,7 +57,7 @@ async function mostrarModal(idVenta, codigoVenta) {
   
   
         `;
-
+      console.log(qr.id);
       tableBody.appendChild(row);
       row.addEventListener("click", () => {
         const conf = confirm(`Vincular ${codigoVenta} a ${qr.nombre}`);
@@ -69,7 +69,7 @@ async function mostrarModal(idVenta, codigoVenta) {
             console.error("Error actualizando el email: ", error);
           }
           try {
-            const clientDoc = doc(db, "QRs", idVenta);
+            const clientDoc = doc(db, "QRs", qr.id);
             updateDoc(clientDoc, { vinculado: codigoVenta });
           } catch (error) {
             console.error("Error actualizando el email: ", error);
