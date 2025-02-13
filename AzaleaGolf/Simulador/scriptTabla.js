@@ -110,7 +110,7 @@ function calculateStatistics(shotsByClub) {
 
 async function rellenarYardageBook(datos) {
   // Cargar el PDF existente desde una URL
-  const existingPdfBytes = await fetch('ruta-a-tu/YardageBook.pdf').then(res => res.arrayBuffer());
+  const existingPdfBytes = await fetch('YardageBook.pdf').then(res => res.arrayBuffer());
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const pages = pdfDoc.getPages();
