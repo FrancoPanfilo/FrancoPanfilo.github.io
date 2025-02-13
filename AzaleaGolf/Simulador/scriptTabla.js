@@ -136,8 +136,8 @@ function calculateStatistics(shotsByClub) {
 
     // Coordenadas iniciales de la tabla
     let xBase = 47;
-    let yBase = 315;
-    const stepY = 20.3;
+    let yBase = 313;
+    const stepY = 20.25;
 
     // Recorrer los datos y rellenar la tabla
     let index = 0;
@@ -152,9 +152,9 @@ function calculateStatistics(shotsByClub) {
         const xClub = xBase - (textWidth / 2);
         const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
         const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
-        const xAvgCarry = xBase + 47 - (avgCarryWidth / 2);
+        const xAvgCarry = xBase + 45.5 - (avgCarryWidth / 2);
         const lateralDispersionWidth = fontRegular.widthOfTextAtSize(dato.lateralDispersion, 8);
-        const xLateralDispersion = xBase + 95 - (lateralDispersionWidth / 2);
+        const xLateralDispersion = xBase + 94 - (lateralDispersionWidth / 2);
         const variationText = `${dato.variation.toFixed(0)}`;
         const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 167 - (variationWidth / 2);
