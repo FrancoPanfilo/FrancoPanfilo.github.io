@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA8");
+console.log("HOLA7");
 
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
 let datos;
