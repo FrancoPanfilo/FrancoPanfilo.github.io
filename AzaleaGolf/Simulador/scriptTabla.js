@@ -1,6 +1,6 @@
  import { PDFDocument } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA6");
+console.log("HOLA7");
 
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
 
@@ -118,8 +118,8 @@ function calculateStatistics(shotsByClub) {
 
     // Coordenadas iniciales de la tabla
   let xBase = 40;
-  let yBase = 320;
-  const stepY = 21;
+  let yBase = 315;
+  const stepY = 20;
     // Recorrer los datos y rellenar la tabla
     let index = 0;
     for (const palo in datos) {
@@ -127,8 +127,8 @@ function calculateStatistics(shotsByClub) {
       const yPos = yBase - index * stepY;
 
       firstPage.drawText(palo, { x: xBase, y: yPos, size: 8 });                    // Nombre del palo
-      firstPage.drawText(`${dato.avgCarry.toFixed(0)} yds`, { x: xBase + 10, y: yPos, size: 8 });  // Carry promedio
-      firstPage.drawText(dato.lateralDispersion, { x: xBase + 10, y: yPos, size: 8 }); // Dispersión lateral
+      firstPage.drawText(`${dato.avgCarry.toFixed(0)} yds`, { x: xBase + 42, y: yPos, size: 8 });  // Carry promedio
+      firstPage.drawText(dato.lateralDispersion, { x: xBase + 85, y: yPos, size: 8 }); // Dispersión lateral
       firstPage.drawText(`${dato.variation.toFixed(0)} yds`, { x: xBase + 162, y: yPos, size: 8 }); // Variación de distancia
 
       index++;
