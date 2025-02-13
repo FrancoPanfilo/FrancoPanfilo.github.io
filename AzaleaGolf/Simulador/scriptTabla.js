@@ -186,5 +186,5 @@ function calculateStatistics(shotsByClub) {
 }
   rellenarYardageBook(clubStats);
 
-  return clubStats;
+  
 }
