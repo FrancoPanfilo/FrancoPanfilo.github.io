@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA7");
+console.log("HOLA9");
 
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
 let datos;
@@ -106,15 +106,16 @@ function calculateStatistics(shotsByClub) {
     };
   });
 
-  // Orden específico de los palos
-  const orderedClubs = [
-    "Dr", "2w", "3w", "4w", "5w", "7w", "9w",
-    "2h", "3h", "4h", "5h", "1h", "2h", "3h",
-    "4h", "5h", "6h", "7h", "8h", "9h",
-    "1i", "2i", "3i", "4i", "5i", "6i",
-    "7i", "8i", "9i", "PW", "GW", "SW", "LW",
-    "50", "52", "54", "56", "58", "60", "62", "64"
-  ];
+  // Orden específico de los palos con nombres más expresivos
+  const orderedClubs = {
+    "Driver": "Dr", "Madera 3": "3w", "Madera 5": "5w", "Madera 7": "7w",
+    "Madera 9": "9w", "Híbrido 2": "2h", "Híbrido 3": "3h", "Híbrido 4": "4h",
+    "Híbrido 5": "5h", "Hierro 1": "1i", "Hierro 2": "2i", "Hierro 3": "3i",
+    "Hierro 4": "4i", "Hierro 5": "5i", "Hierro 6": "6i", "Hierro 7": "7i",
+    "Hierro 8": "8i", "Hierro 9": "9i", "PW": "PW", "GW": "GW", "SW": "SW",
+    "LW": "LW", "50": "50", "52": "52", "54": "54", "56": "56", "58": "58",
+    "60": "60", "62": "62", "64": "64"
+  };
 
   // Eliminar putt de clubStats
   delete clubStats.Putt;
@@ -126,7 +127,7 @@ function calculateStatistics(shotsByClub) {
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
     // Coordenadas iniciales de la tabla
     let xBase = 40;
@@ -135,13 +136,14 @@ function calculateStatistics(shotsByClub) {
 
     // Recorrer los datos y rellenar la tabla
     let index = 0;
-    orderedClubs.forEach((club) => {
-      if (datos[club]) {
-        const dato = datos[club];
+    Object.keys(orderedClubs).forEach((clubName) => {
+      const clubCode = orderedClubs[clubName];
+      if (datos[clubCode]) {
+        const dato = datos[clubCode];
         const yPos = yBase - index * stepY;
 
         // Calcular el ancho del texto para centrarlo
-        const textWidth = font.widthOfTextAtSize(club, 8);
+        const textWidth = font.widthOfTextAtSize(clubName, 8);
         const xClub = xBase - (textWidth / 2);
         const avgCarryText = `${dato.avgCarry.toFixed(0)} yds`;
         const avgCarryWidth = font.widthOfTextAtSize(avgCarryText, 8);
@@ -152,7 +154,7 @@ function calculateStatistics(shotsByClub) {
         const variationWidth = font.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 162 - (variationWidth / 2);
 
-        firstPage.drawText(club, { x: xClub, y: yPos, size: 8, font });                    // Nombre del palo
+        firstPage.drawText(clubName, { x: xClub, y: yPos, size: 8, font });                    // Nombre del palo
         firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8, font });  // Carry promedio
         firstPage.drawText(dato.lateralDispersion, { x: xLateralDispersion, y: yPos, size: 8, font }); // Dispersión lateral
         firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8, font }); // Variación de distancia
