@@ -1,4 +1,4 @@
- import { PDFDocument } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
+import { PDFDocument } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
 console.log("HOLA7");
 
@@ -104,9 +104,20 @@ function calculateStatistics(shotsByClub) {
       lateralDispersion,
       variation,
     };
-  
   });
 
+  // Orden específico de los palos
+  const orderedClubs = [
+    "Dr", "2w", "3w", "4w", "5w", "7w", "9w",
+    "2h", "3h", "4h", "5h", "1h", "2h", "3h",
+    "4h", "5h", "6h", "7h", "8h", "9h",
+    "1i", "2i", "3i", "4i", "5i", "6i",
+    "7i", "8i", "9i", "PW", "GW", "SW", "LW",
+    "50", "52", "54", "56", "58", "60", "62", "64"
+  ];
+
+  // Eliminar putt de clubStats
+  delete clubStats.Putt;
 
   async function rellenarYardageBook(datos) {
     // Cargar el PDF existente desde una URL
@@ -117,22 +128,37 @@ function calculateStatistics(shotsByClub) {
     const firstPage = pages[0];
 
     // Coordenadas iniciales de la tabla
-  let xBase = 40;
-  let yBase = 315;
-  const stepY = 20.3;
+    let xBase = 40;
+    let yBase = 315;
+    const stepY = 20.3;
+
     // Recorrer los datos y rellenar la tabla
     let index = 0;
-    for (const palo in datos) {
-      const dato = datos[palo];
-      const yPos = yBase - index * stepY;
+    orderedClubs.forEach((club) => {
+      if (datos[club]) {
+        const dato = datos[club];
+        const yPos = yBase - index * stepY;
 
-      firstPage.drawText(palo, { x: xBase, y: yPos, size: 8 });                    // Nombre del palo
-      firstPage.drawText(`${dato.avgCarry.toFixed(0)} yds`, { x: xBase + 42, y: yPos, size: 8 });  // Carry promedio
-      firstPage.drawText(dato.lateralDispersion, { x: xBase + 85, y: yPos, size: 8 }); // Dispersión lateral
-      firstPage.drawText(`${dato.variation.toFixed(0)} yds`, { x: xBase + 162, y: yPos, size: 8 }); // Variación de distancia
+        // Calcular el ancho del texto para centrarlo
+        const textWidth = firstPage.getWidthOfTextAtSize(club, 8);
+        const xClub = xBase - (textWidth / 2);
+        const avgCarryText = `${dato.avgCarry.toFixed(0)} yds`;
+        const avgCarryWidth = firstPage.getWidthOfTextAtSize(avgCarryText, 8);
+        const xAvgCarry = xBase + 42 - (avgCarryWidth / 2);
+        const lateralDispersionWidth = firstPage.getWidthOfTextAtSize(dato.lateralDispersion, 8);
+        const xLateralDispersion = xBase + 85 - (lateralDispersionWidth / 2);
+        const variationText = `${dato.variation.toFixed(0)} yds`;
+        const variationWidth = firstPage.getWidthOfTextAtSize(variationText, 8);
+        const xVariation = xBase + 162 - (variationWidth / 2);
 
-      index++;
-    }
+        firstPage.drawText(club, { x: xClub, y: yPos, size: 8 });                    // Nombre del palo
+        firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8 });  // Carry promedio
+        firstPage.drawText(dato.lateralDispersion, { x: xLateralDispersion, y: yPos, size: 8 }); // Dispersión lateral
+        firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8 }); // Variación de distancia
+
+        index++;
+      }
+    });
 
     // Guardar el PDF modificado
     const pdfBytes = await pdfDoc.save();
@@ -146,9 +172,6 @@ function calculateStatistics(shotsByClub) {
 
     console.log('Tabla rellenada y nuevo PDF descargado.');
   }
-
-  // Datos de ejemplo proporcionados
-
 
   rellenarYardageBook(clubStats);
 
