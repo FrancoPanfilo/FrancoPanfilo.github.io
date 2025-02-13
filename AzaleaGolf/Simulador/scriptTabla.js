@@ -1,6 +1,6 @@
-import { PDFDocument } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
+import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA7");
+console.log("HOLA8");
 
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
 let datos;
@@ -126,6 +126,7 @@ function calculateStatistics(shotsByClub) {
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     // Coordenadas iniciales de la tabla
     let xBase = 40;
@@ -140,21 +141,21 @@ function calculateStatistics(shotsByClub) {
         const yPos = yBase - index * stepY;
 
         // Calcular el ancho del texto para centrarlo
-        const textWidth = firstPage.getWidthOfTextAtSize(club, 8);
+        const textWidth = font.widthOfTextAtSize(club, 8);
         const xClub = xBase - (textWidth / 2);
         const avgCarryText = `${dato.avgCarry.toFixed(0)} yds`;
-        const avgCarryWidth = firstPage.getWidthOfTextAtSize(avgCarryText, 8);
+        const avgCarryWidth = font.widthOfTextAtSize(avgCarryText, 8);
         const xAvgCarry = xBase + 42 - (avgCarryWidth / 2);
-        const lateralDispersionWidth = firstPage.getWidthOfTextAtSize(dato.lateralDispersion, 8);
+        const lateralDispersionWidth = font.widthOfTextAtSize(dato.lateralDispersion, 8);
         const xLateralDispersion = xBase + 85 - (lateralDispersionWidth / 2);
         const variationText = `${dato.variation.toFixed(0)} yds`;
-        const variationWidth = firstPage.getWidthOfTextAtSize(variationText, 8);
+        const variationWidth = font.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 162 - (variationWidth / 2);
 
-        firstPage.drawText(club, { x: xClub, y: yPos, size: 8 });                    // Nombre del palo
-        firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8 });  // Carry promedio
-        firstPage.drawText(dato.lateralDispersion, { x: xLateralDispersion, y: yPos, size: 8 }); // Dispersión lateral
-        firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8 }); // Variación de distancia
+        firstPage.drawText(club, { x: xClub, y: yPos, size: 8, font });                    // Nombre del palo
+        firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8, font });  // Carry promedio
+        firstPage.drawText(dato.lateralDispersion, { x: xLateralDispersion, y: yPos, size: 8, font }); // Dispersión lateral
+        firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8, font }); // Variación de distancia
 
         index++;
       }
