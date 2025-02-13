@@ -1,3 +1,5 @@
+  import { PDFDocument } from 'pdf-lib';
+import fs from 'fs';
 document.getElementById("botonTabla"),
   addEventListener("click", () => handleFile());
 function handleFile() {
@@ -103,5 +105,59 @@ function calculateStatistics(shotsByClub) {
   });
 
   console.log(clubStats);
+  //Nuevo
+
+
+async function rellenarYardageBook(datos) {
+  // Cargar el PDF existente
+  const existingPdfBytes = fs.readFileSync('ruta/YardageBook.pdf');
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  const pages = pdfDoc.getPages();
+  const firstPage = pages[0];
+
+  // Coordenadas iniciales de la tabla
+  let xBase = 80;
+  let yBase = 600;
+  const stepY = 20;
+
+  // Recorrer los datos y rellenar la tabla
+  let index = 0;
+  for (const palo in datos) {
+    const dato = datos[palo];
+    const yPos = yBase - index * stepY;
+
+    firstPage.drawText(palo, { x: xBase, y: yPos, size: 10 });                    // Nombre del palo
+    firstPage.drawText(`${dato.avgCarry.toFixed(2)} yds`, { x: xBase + 100, y: yPos, size: 10 });  // Carry promedio
+    firstPage.drawText(dato.lateralDispersion, { x: xBase + 200, y: yPos, size: 10 }); // Dispersión lateral
+    firstPage.drawText(`${dato.variation.toFixed(2)} yds`, { x: xBase + 400, y: yPos, size: 10 }); // Variación de distancia
+
+    index++;
+  }
+
+  // Guardar el PDF modificado
+  const pdfBytes = await pdfDoc.save();
+  fs.writeFileSync('ruta/nuevo-YardageBook.pdf', pdfBytes);
+
+  console.log('Tabla rellenada y nuevo PDF guardado como "nuevo-YardageBook.pdf".');
+}
+
+// Datos de ejemplo proporcionados
+const datos = {
+  LW: { avgCarry: 77.53, lateralDispersion: "3.8L - 3.7R", variation: 3.20 },
+  SW: { avgCarry: 92.70, lateralDispersion: "4L - 1.6R", variation: 2.20 },
+  GW: { avgCarry: 111.13, lateralDispersion: "5.3L - 1.9R", variation: 2.45 },
+  PW: { avgCarry: 124.17, lateralDispersion: "5.9L - 6.1R", variation: 2.38 },
+  "9i": { avgCarry: 140.93, lateralDispersion: "11L - 1.9R", variation: 1.29 },
+  "8i": { avgCarry: 151.63, lateralDispersion: "6.4L - 1.9R", variation: 0.86 },
+  "7i": { avgCarry: 159.02, lateralDispersion: "14.3L - 13.2R", variation: 3.65 },
+  "6i": { avgCarry: 173.44, lateralDispersion: "19L - 1.4R", variation: 2.38 },
+  "5i": { avgCarry: 176.17, lateralDispersion: "21.1L - 11R", variation: 3.90 },
+  "4i": { avgCarry: 180.17, lateralDispersion: "16.8L - 13.7R", variation: 2.57 },
+  Dr: { avgCarry: 224.33, lateralDispersion: "25.9L - 7R", variation: 1.72 },
+  "2w": { avgCarry: 213.40, lateralDispersion: "19.3L - 10.9R", variation: 5.77 }
+};
+
+rellenarYardageBook(datos);
+  //Nuevo
   return clubStats;
 }
