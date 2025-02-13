@@ -64,19 +64,29 @@ function calculateStatistics(shotsByClub) {
   const clubStats = {};
 
   Object.keys(shotsByClub).forEach((club) => {
-    const shots = shotsByClub[club].sort((a, b) => a.carry - b.carry);
+    const shots = shotsByClub[club];
     let carryValues;
-    
+
     if (shots.length >= 5) {
-      // Remove the 2 shortest and the longest shots if there are at least 5 shots
-      const filteredShots = shots.slice(2, shots.length - 1);
-      carryValues = filteredShots.map((s) => s.carry);
+      // Calculate average carry
+      const avgCarry = shots.reduce((sum, s) => sum + s.carry, 0) / shots.length;
+      
+      // Find the percentage of shots closest to the average carry
+      const closestShots = shots.sort((a, b) => Math.abs(a.carry - avgCarry) - Math.abs(b.carry - avgCarry));
+      const limit = Math.floor(shots.length * deviationPercentage);
+      const selectedShots = closestShots.slice(0, limit);
+      
+      carryValues = selectedShots.map((s) => s.carry);
     } else {
       // Use all shots if there are fewer than 5
       carryValues = shots.map((s) => s.carry);
     }
 
     const avgCarry = carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length;
+    const minCarry = Math.min(...carryValues);
+    const maxCarry = Math.max(...carryValues);
+    const variation = (maxCarry - minCarry) / 2;
+
     const offlineValues = shots.map((s) => s.offline).sort((a, b) => a - b);
 
     const lateralLimit = Math.floor(offlineValues.length * deviationPercentage);
@@ -90,14 +100,10 @@ function calculateStatistics(shotsByClub) {
 
     const lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
 
-    const deviationRange = deviationPercentage * avgCarry;
-    const minCarry = avgCarry - deviationRange;
-    const maxCarry = avgCarry + deviationRange;
-
     clubStats[club] = {
       avgCarry,
       lateralDispersion,
-      variation: `${minCarry.toFixed(0)} - ${maxCarry.toFixed(0)}`
+      variation: variation.toFixed(0)
     };
   });
 
