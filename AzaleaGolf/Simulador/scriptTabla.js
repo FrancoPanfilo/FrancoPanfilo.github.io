@@ -3,7 +3,7 @@ import { PDFDocument } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.j
 console.log("HOLA7");
 
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
-let datos
+let datos;
 function handleFile() {
   const input = document.getElementById("fileInput");
   if (input.files.length === 0) {
