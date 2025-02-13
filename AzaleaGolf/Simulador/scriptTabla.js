@@ -1,6 +1,6 @@
  import { PDFDocument } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA2");
+console.log("HOLA3");
 
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
 
@@ -117,9 +117,9 @@ function calculateStatistics(shotsByClub) {
     const firstPage = pages[0];
 
     // Coordenadas iniciales de la tabla
-    let xBase = 100;
-    let yBase = 700;
-    const stepY = 20;
+    let xBase = 80;
+    let yBase = 600;
+    const stepY = 15;
 
     // Recorrer los datos y rellenar la tabla
     let index = 0;
