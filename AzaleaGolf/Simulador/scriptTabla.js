@@ -117,8 +117,8 @@ function calculateStatistics(shotsByClub) {
     const firstPage = pages[0];
 
     // Coordenadas iniciales de la tabla
-  let xBase = 80;
-  let yBase = 610;
+  let xBase = 12;
+  let yBase = 300;
   const stepY = 20;
     // Recorrer los datos y rellenar la tabla
     let index = 0;
@@ -126,10 +126,10 @@ function calculateStatistics(shotsByClub) {
       const dato = datos[palo];
       const yPos = yBase - index * stepY;
 
-      firstPage.drawText(palo, { x: xBase, y: yPos, size: 10 });                    // Nombre del palo
-      firstPage.drawText(`${dato.avgCarry.toFixed(2)} yds`, { x: xBase + 100, y: yPos, size: 10 });  // Carry promedio
-      firstPage.drawText(dato.lateralDispersion, { x: xBase + 200, y: yPos, size: 10 }); // Dispersión lateral
-      firstPage.drawText(`${dato.variation.toFixed(2)} yds`, { x: xBase + 400, y: yPos, size: 10 }); // Variación de distancia
+      firstPage.drawText(palo, { x: xBase, y: yPos, size: 8 });                    // Nombre del palo
+      firstPage.drawText(`${dato.avgCarry.toFixed(0)} yds`, { x: xBase + 80, y: yPos, size: 8 });  // Carry promedio
+      firstPage.drawText(dato.lateralDispersion, { x: xBase + 130, y: yPos, size: 8 }); // Dispersión lateral
+      firstPage.drawText(`${dato.variation.toFixed(0)} yds`, { x: xBase + 190, y: yPos, size: 8 }); // Variación de distancia
 
       index++;
     }
