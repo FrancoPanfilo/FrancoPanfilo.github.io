@@ -66,8 +66,12 @@ function calculateStatistics(shotsByClub) {
   Object.keys(shotsByClub).forEach((club) => {
     const shots = shotsByClub[club];
     let carryValues;
+    let lateralDispersion = "-";
+    let variation = "-";
 
-    if (shots.length >= 5) {
+    if (shots.length === 1) {
+      carryValues = shots.map((s) => s.carry);
+    } else if (shots.length >= 5) {
       // Calculate average carry
       const avgCarry = shots.reduce((sum, s) => sum + s.carry, 0) / shots.length;
       
@@ -82,28 +86,30 @@ function calculateStatistics(shotsByClub) {
       carryValues = shots.map((s) => s.carry);
     }
 
-    const avgCarry = carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length;
-    const minCarry = Math.min(...carryValues);
-    const maxCarry = Math.max(...carryValues);
-    const variation = (maxCarry - minCarry) / 2;
-
-    const offlineValues = shots.map((s) => s.offline).sort((a, b) => a - b);
-
-    const lateralLimit = Math.floor(offlineValues.length * deviationPercentage);
-    const selectedOffline = shots
-      .map((s) => s.offline)
-      .sort((a, b) => Math.abs(a) - Math.abs(b)) // Ordenar por magnitud de offline
-      .slice(0, lateralLimit); // Tomar el % indicado
-
-    const maxLeft = Math.min(...selectedOffline); // Máximo fallo a la izquierda
-    const maxRight = Math.max(...selectedOffline); // Máximo fallo a la derecha
-
-    const lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
+    if (shots.length > 1) {
+      const avgCarry = carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length;
+      const minCarry = Math.min(...carryValues);
+      const maxCarry = Math.max(...carryValues);
+      variation = ((maxCarry - minCarry) / 2).toFixed(0);
+  
+      const offlineValues = shots.map((s) => s.offline).sort((a, b) => a - b);
+  
+      const lateralLimit = Math.floor(offlineValues.length * deviationPercentage);
+      const selectedOffline = shots
+        .map((s) => s.offline)
+        .sort((a, b) => Math.abs(a) - Math.abs(b)) // Ordenar por magnitud de offline
+        .slice(0, lateralLimit); // Tomar el % indicado
+  
+      const maxLeft = Math.min(...selectedOffline); // Máximo fallo a la izquierda
+      const maxRight = Math.max(...selectedOffline); // Máximo fallo a la derecha
+  
+      lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
+    }
 
     clubStats[club] = {
-      avgCarry,
+      avgCarry: carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length,
       lateralDispersion,
-      variation: variation.toFixed(0)
+      variation
     };
   });
 
