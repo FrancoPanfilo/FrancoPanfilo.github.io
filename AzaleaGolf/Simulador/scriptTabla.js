@@ -154,7 +154,7 @@ function calculateStatistics(shotsByClub) {
         const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
         const xAvgCarry = xBase + 45.5 - (avgCarryWidth / 2);
         const lateralDispersionWidth = fontRegular.widthOfTextAtSize(dato.lateralDispersion, 8);
-        const xLateralDispersion = xBase + 94 - (lateralDispersionWidth / 2);
+        const xLateralDispersion = xBase + 95.5 - (lateralDispersionWidth / 2);
         const variationText = `${dato.variation.toFixed(0)}`;
         const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 167 - (variationWidth / 2);
