@@ -65,14 +65,19 @@ function calculateStatistics(shotsByClub) {
 
   Object.keys(shotsByClub).forEach((club) => {
     const shots = shotsByClub[club].sort((a, b) => a.carry - b.carry);
+    let carryValues;
+    
+    if (shots.length >= 5) {
+      // Remove the 2 shortest and the longest shots if there are at least 5 shots
+      const filteredShots = shots.slice(2, shots.length - 1);
+      carryValues = filteredShots.map((s) => s.carry);
+    } else {
+      // Use all shots if there are fewer than 5
+      carryValues = shots.map((s) => s.carry);
+    }
 
-    // Remove the 2 shortest and the longest shots
-    const filteredShots = shots.slice(2, shots.length - 1);
-    const carryValues = filteredShots.map((s) => s.carry);
+    const avgCarry = carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length;
     const offlineValues = shots.map((s) => s.offline).sort((a, b) => a - b);
-
-    const avgCarry =
-      carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length;
 
     const lateralLimit = Math.floor(offlineValues.length * deviationPercentage);
     const selectedOffline = shots
@@ -175,6 +180,10 @@ function calculateStatistics(shotsByClub) {
     console.log('Tabla rellenada y nuevo PDF descargado.');
   }
 
+  rellenarYardageBook(clubStats);
+
+  return clubStats;
+}
   rellenarYardageBook(clubStats);
 
   return clubStats;
