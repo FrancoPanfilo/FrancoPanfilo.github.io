@@ -1,4 +1,4 @@
-  import { PDFDocument } from 'pdf-lib';
+  import { PDFDocument } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 import fs from 'fs';
 document.getElementById("botonTabla"),
   addEventListener("click", () => handleFile());
