@@ -150,7 +150,7 @@ function calculateStatistics(shotsByClub) {
   // Datos de ejemplo proporcionados
 
 
-  rellenarYardageBook(ClubStats);
+  rellenarYardageBook(clubStats);
 
   return clubStats;
 }
