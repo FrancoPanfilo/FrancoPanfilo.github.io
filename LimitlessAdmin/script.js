@@ -57,7 +57,6 @@ async function mostrarModal(idVenta, codigoVenta) {
   
   
         `;
-      console.log(qr.id);
       tableBody.appendChild(row);
       row.addEventListener("click", () => {
         const conf = confirm(`Vincular ${codigoVenta} a ${qr.nombre}`);
