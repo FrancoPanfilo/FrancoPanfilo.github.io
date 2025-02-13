@@ -117,8 +117,8 @@ function calculateStatistics(shotsByClub) {
     const firstPage = pages[0];
 
     // Coordenadas iniciales de la tabla
-    let xBase = 80;
-    let yBase = 600;
+    let xBase = 0;
+    let yBase = 0;
     const stepY = 20;
 
     // Recorrer los datos y rellenar la tabla
