@@ -110,8 +110,9 @@ function calculateStatistics(shotsByClub) {
 
 
 async function rellenarYardageBook(datos) {
-  // Cargar el PDF existente
-  const existingPdfBytes = fs.readFileSync('ruta/YardageBook.pdf');
+  // Cargar el PDF existente desde una URL
+  const existingPdfBytes = await fetch('ruta-a-tu/YardageBook.pdf').then(res => res.arrayBuffer());
+
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
@@ -137,10 +138,18 @@ async function rellenarYardageBook(datos) {
 
   // Guardar el PDF modificado
   const pdfBytes = await pdfDoc.save();
-  fs.writeFileSync('ruta/nuevo-YardageBook.pdf', pdfBytes);
 
-  console.log('Tabla rellenada y nuevo PDF guardado como "nuevo-YardageBook.pdf".');
+  // Crear un enlace de descarga para el nuevo PDF
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'nuevo-YardageBook.pdf';
+  link.click();
+
+  console.log('Tabla rellenada y nuevo PDF descargado.');
 }
+
+
 
 // Datos de ejemplo proporcionados
 const datos = {
