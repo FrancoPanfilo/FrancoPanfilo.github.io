@@ -3,7 +3,7 @@
 console.log("HOLA7");
 
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
-
+let datos
 function handleFile() {
   const input = document.getElementById("fileInput");
   if (input.files.length === 0) {
@@ -104,9 +104,9 @@ function calculateStatistics(shotsByClub) {
       lateralDispersion,
       variation,
     };
+  
   });
 
-  console.log(clubStats);
 
   async function rellenarYardageBook(datos) {
     // Cargar el PDF existente desde una URL
@@ -119,7 +119,7 @@ function calculateStatistics(shotsByClub) {
     // Coordenadas iniciales de la tabla
   let xBase = 40;
   let yBase = 315;
-  const stepY = 20;
+  const stepY = 20.3;
     // Recorrer los datos y rellenar la tabla
     let index = 0;
     for (const palo in datos) {
@@ -148,22 +148,9 @@ function calculateStatistics(shotsByClub) {
   }
 
   // Datos de ejemplo proporcionados
-  const datos = {
-    LW: { avgCarry: 77.53, lateralDispersion: "3.8L - 3.7R", variation: 3.20 },
-    SW: { avgCarry: 92.70, lateralDispersion: "4L - 1.6R", variation: 2.20 },
-    GW: { avgCarry: 111.13, lateralDispersion: "5.3L - 1.9R", variation: 2.45 },
-    PW: { avgCarry: 124.17, lateralDispersion: "5.9L - 6.1R", variation: 2.38 },
-    "9i": { avgCarry: 140.93, lateralDispersion: "11L - 1.9R", variation: 1.29 },
-    "8i": { avgCarry: 151.63, lateralDispersion: "6.4L - 1.9R", variation: 0.86 },
-    "7i": { avgCarry: 159.02, lateralDispersion: "14.3L - 13.2R", variation: 3.65 },
-    "6i": { avgCarry: 173.44, lateralDispersion: "19L - 1.4R", variation: 2.38 },
-    "5i": { avgCarry: 176.17, lateralDispersion: "21.1L - 11R", variation: 3.90 },
-    "4i": { avgCarry: 180.17, lateralDispersion: "16.8L - 13.7R", variation: 2.57 },
-    Dr: { avgCarry: 224.33, lateralDispersion: "25.9L - 7R", variation: 1.72 },
-    "2w": { avgCarry: 213.40, lateralDispersion: "19.3L - 10.9R", variation: 5.77 }
-  };
 
-  rellenarYardageBook(datos);
+
+  rellenarYardageBook(ClubStats);
 
   return clubStats;
 }
