@@ -121,13 +121,18 @@ function calculateStatistics(shotsByClub) {
   delete clubStats.Putt;
 
   async function rellenarYardageBook(datos) {
+    // Obtener valores de nombre y fecha
+    const nombre = document.getElementById("nombre").value;
+    const fecha = document.getElementById("fecha").value;
+
     // Cargar el PDF existente desde una URL
     const existingPdfBytes = await fetch('YardageBook.pdf').then(res => res.arrayBuffer());
 
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
-    const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     // Coordenadas iniciales de la tabla
     let xBase = 40;
@@ -143,25 +148,29 @@ function calculateStatistics(shotsByClub) {
         const yPos = yBase - index * stepY;
 
         // Calcular el ancho del texto para centrarlo
-        const textWidth = font.widthOfTextAtSize(clubName, 8);
+        const textWidth = fontBold.widthOfTextAtSize(clubName, 8);
         const xClub = xBase - (textWidth / 2);
-        const avgCarryText = `${dato.avgCarry.toFixed(0)} yds`;
-        const avgCarryWidth = font.widthOfTextAtSize(avgCarryText, 8);
+        const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
+        const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
         const xAvgCarry = xBase + 42 - (avgCarryWidth / 2);
-        const lateralDispersionWidth = font.widthOfTextAtSize(dato.lateralDispersion, 8);
+        const lateralDispersionWidth = fontRegular.widthOfTextAtSize(dato.lateralDispersion, 8);
         const xLateralDispersion = xBase + 85 - (lateralDispersionWidth / 2);
-        const variationText = `${dato.variation.toFixed(0)} yds`;
-        const variationWidth = font.widthOfTextAtSize(variationText, 8);
+        const variationText = `${dato.variation.toFixed(0)}`;
+        const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 162 - (variationWidth / 2);
 
-        firstPage.drawText(clubName, { x: xClub, y: yPos, size: 8, font });                    // Nombre del palo
-        firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8, font });  // Carry promedio
-        firstPage.drawText(dato.lateralDispersion, { x: xLateralDispersion, y: yPos, size: 8, font }); // Dispersión lateral
-        firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8, font }); // Variación de distancia
+        firstPage.drawText(clubName, { x: xClub, y: yPos, size: 8, font: fontBold });                    // Nombre del palo en negrita
+        firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8, font: fontRegular });  // Carry promedio sin 'yds'
+        firstPage.drawText(dato.lateralDispersion, { x: xLateralDispersion, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral
+        firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8, font: fontRegular }); // Variación de distancia
 
         index++;
       }
     });
+
+    // Añadir nombre y fecha en la esquina superior derecha
+    firstPage.drawText(`Nombre: ${nombre}`, { x: 400, y: 750, size: 12, font: fontRegular });
+    firstPage.drawText(`Fecha: ${fecha}`, { x: 400, y: 735, size: 12, font: fontRegular });
 
     // Guardar el PDF modificado
     const pdfBytes = await pdfDoc.save();
@@ -170,7 +179,7 @@ function calculateStatistics(shotsByClub) {
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'nuevo-YardageBook.pdf';
+    link.download = `YardageBook_${nombre}_${fecha}.pdf`;
     link.click();
 
     console.log('Tabla rellenada y nuevo PDF descargado.');
