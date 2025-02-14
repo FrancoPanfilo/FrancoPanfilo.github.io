@@ -158,7 +158,7 @@ function calculateStatistics(shotsByClub) {
 
         // Recorrer los datos y rellenar la tabla
         let index = 0;
-        Object.keys(orderedClubs).forEach((clubName) => {
+        Object.keys(orderedClubs).forEach(async (clubName) => {
             const clubCode = orderedClubs[clubName];
             if (datos[clubCode]) {
                 const dato = datos[clubCode];
@@ -233,6 +233,4 @@ function calculateStatistics(shotsByClub) {
 }
 
 // Llama a la función dentro de un contexto async
-(async () => {
-    await handleFile();
-})();
+handleFile();
