@@ -73,6 +73,8 @@ const lateralPerc = parseFloat(document.getElementById("lateralDeviation").value
     let carryValues;
     let lateralDispersion = "-";
     let variation = "-";
+      let maxRight=0;
+      let maxLeft=0;
 
     if (shots.length === 1) {
       carryValues = shots.map((s) => s.carry);
@@ -105,8 +107,8 @@ const lateralPerc = parseFloat(document.getElementById("lateralDeviation").value
         .sort((a, b) => Math.abs(a) - Math.abs(b)) // Ordenar por magnitud de offline
         .slice(0, lateralLimit); // Tomar el % indicado
   
-      const maxLeft = Math.min(...selectedOffline).toFixed(0); // Máximo fallo a la izquierda
-      const maxRight = Math.max(...selectedOffline).toFixed(0); // Máximo fallo a la derecha
+      maxLeft = Math.min(...selectedOffline).toFixed(0); // Máximo fallo a la izquierda
+      maxRight = Math.max(...selectedOffline).toFixed(0); // Máximo fallo a la derecha
 
       lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
     }
@@ -167,10 +169,11 @@ const lateralPerc = parseFloat(document.getElementById("lateralDeviation").value
         const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
         const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
         const xAvgCarry = xBase + 112.5 - (avgCarryWidth / 2);
-        const lateralDispersionWidth = fontRegular.widthOfTextAtSize(dato.lateralDispersion, 8);
-        const xLateralDispersion = xBase + 60.5 - (lateralDispersionWidth / 2);
-        const LLateralDispersion = xBase + 55.5 - (lateralDispersionWidth / 2);
-        const RLateralDispersion = xBase + 65.5 - (lateralDispersionWidth / 2);
+        const lateralDispersionWidthL = fontRegular.widthOfTextAtSize(dato.maxLeft, 8);
+        const lateralDispersionWidthR = fontRegular.widthOfTextAtSize(dato.maxRight, 8);
+        const xLateralDispersion = xBase + 60.5  ;
+        const LLateralDispersion = xBase + 55.5 - (lateralDispersionWidthL / 2);
+        const RLateralDispersion = xBase + 65.5 - (lateralDispersionWidthR / 2);
         const variationText = `${dato.variation}`;
         const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 167 - (variationWidth / 2);
