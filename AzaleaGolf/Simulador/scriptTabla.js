@@ -157,14 +157,14 @@ function calculateStatistics(shotsByClub) {
         const stepY = 20.25;
 
         // Recorrer los datos y rellenar la tabla
-        let index = -1;
+        let index = 0;
         Object.keys(orderedClubs).forEach(async (clubName) => {
-                            index++;
+
             const clubCode = orderedClubs[clubName];
             if (datos[clubCode]) {
                 const dato = datos[clubCode];
                 const yPos = yBase - index * stepY;
-
+                                            index++;
                 // Calcular el ancho del texto para centrarlo
                 const textWidth = fontBold.widthOfTextAtSize(clubName, 8);
                 const xClub = xBase - (textWidth / 2);
