@@ -184,8 +184,8 @@ lateralDispersion = convertirFormato(lateralDispersion);
     // Añadir nombre y fecha en la esquina superior derecha
     firstPage.drawText(`Nombre: ${nombre}`, { x: 20, y: 350, size: 15, font: fontRegular });
     firstPage.drawText(`Fecha: ${fecha}`, { x: 20, y: 330, size: 13, font: fontRegular });
-    firstPage.drawText(`Fecha: ${(deviationPercentage*100)toFixed(0)}`, { x: 20, y: 30, size: 6, font: fontRegular });
-    firstPage.drawText(`${(lateralPerc*100)toFixed(0)}`, { x: 20, y: 30, size: 6, font: fontRegular });
+    firstPage.drawText(`Fecha: ${(deviationPercentage*100).toFixed(0)}`, { x: 20, y: 30, size: 6, font: fontRegular });
+    firstPage.drawText(`${(lateralPerc*100).toFixed(0)}`, { x: 20, y: 30, size: 6, font: fontRegular });
     // Guardar el PDF modificado
     const pdfBytes = await pdfDoc.save();
 
