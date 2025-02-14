@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA11");
+console.log("HOLA12");
   function convertirFormato(dispersion) {
   // Divide el string original en izquierda (L) y derecha (R)
   const [izquierda, derecha] = dispersion.split(' - ').map(val => val.replace(/[LR]/, '').trim());
@@ -182,10 +182,10 @@ lateralDispersion = convertirFormato(lateralDispersion);
     });
 
     // Añadir nombre y fecha en la esquina superior derecha
-    firstPage.drawText(`Nombre: ${nombre}`, { x: 20, y: 350, size: 15, font: fontRegular });
-    firstPage.drawText(`Fecha: ${fecha}`, { x: 20, y: 330, size: 13, font: fontRegular });
-    firstPage.drawText(`Fecha: ${(deviationPercentage*100).toFixed(0)}`, { x: 20, y: 30, size: 6, font: fontRegular });
-    firstPage.drawText(`${(lateralPerc*100).toFixed(0)}`, { x: 20, y: 30, size: 6, font: fontRegular });
+    firstPage.drawText(`${nombre}`, { x: 10, y: 390, size: 13, font: fontRegular });
+    firstPage.drawText(`${fecha}`, { x: 10, y: 370, size: 11, font: fontRegular });
+    firstPage.drawText(`${(deviationPercentage*100).toFixed(0)}`, { x: 110, y: 22, size: 4.5, font: fontRegular });
+    firstPage.drawText(`${(lateralPerc*100).toFixed(0)}`, { x: 100, y: 35, size: 4.5, font: fontRegular });
     // Guardar el PDF modificado
     const pdfBytes = await pdfDoc.save();
 
