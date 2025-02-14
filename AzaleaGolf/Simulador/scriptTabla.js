@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA16");
+console.log("HOLA17");
 
 function formatearFecha(fechaISO) {
     const fecha = new Date(fechaISO);
