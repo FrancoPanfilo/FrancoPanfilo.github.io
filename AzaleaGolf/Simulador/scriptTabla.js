@@ -110,6 +110,7 @@ function calculateStatistics(shotsByClub) {
                 .slice(0, lateralLimit); // Tomar el % indicado
         
             maxLeft = Math.min(...selectedOffline).toFixed(0); // Máximo fallo a la izquierda
+            maxLeft = Math.abs(maxLeft);
             maxRight = Math.max(...selectedOffline).toFixed(0); // Máximo fallo a la derecha
 
             lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
@@ -173,8 +174,8 @@ function calculateStatistics(shotsByClub) {
                 const xAvgCarry = xBase + 112.5 - (avgCarryWidth / 2);
 
                 const xLateralDispersion = xBase + 60.5;
-                const LLateralDispersion = xBase + 55.5 ;
-                const RLateralDispersion = xBase + 65.5 ;
+                const LLateralDispersion = xBase + 51.5 ;
+                const RLateralDispersion = xBase + 69.5 ;
                 const variationText = `${dato.variation}`;
                 const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
                 const xVariation = xBase + 167 - (variationWidth / 2);
