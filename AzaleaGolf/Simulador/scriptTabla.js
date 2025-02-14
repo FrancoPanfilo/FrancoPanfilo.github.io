@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA18");
+console.log("HOLA19");
 
 function formatearFecha(fechaISO) {
     const fecha = new Date(fechaISO);
@@ -179,11 +179,16 @@ function calculateStatistics(shotsByClub) {
                 const variationText = `${dato.variation}`;
                 const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
                 const xVariation = xBase + 167 - (variationWidth / 2);
-
+const maxLeftText = `${dato.maxLeft}`;
+const maxRightText = `${dato.maxRight}`;
+const maxLeftWidth = fontRegular.widthOfTextAtSize(maxLeftText, 8);
+const maxRightWidth = fontRegular.widthOfTextAtSize(maxRightText, 8);
+const xMaxLeft = LLateralDispersion - (maxLeftWidth / 2);
+const xMaxRight = RLateralDispersion - (maxRightWidth / 2);
                 firstPage.drawText(clubName, { x: xClub, y: yPos, size: 8, font: fontBold }); // Nombre del palo en negrita
                 firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8, font: fontRegular }); // Carry promedio sin 'yds'
-                firstPage.drawText(dato.maxLeft, { x: LLateralDispersion, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral
-                firstPage.drawText(dato.maxRight, { x: RLateralDispersion, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral
+firstPage.drawText(maxLeftText.toString(), { x: xMaxLeft, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral izquierda centrada
+firstPage.drawText(maxRightText.toString(), { x: xMaxRight, y: yPos, size: 8, font: fontRegular });
                 firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8, font: fontRegular }); // Variación de distancia
 
                 // Cargar la imagen de la flecha
