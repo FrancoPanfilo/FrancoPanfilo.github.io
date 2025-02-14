@@ -157,8 +157,9 @@ function calculateStatistics(shotsByClub) {
         const stepY = 20.25;
 
         // Recorrer los datos y rellenar la tabla
-        let index = 0;
+        let index = -1;
         Object.keys(orderedClubs).forEach(async (clubName) => {
+                            index++;
             const clubCode = orderedClubs[clubName];
             if (datos[clubCode]) {
                 const dato = datos[clubCode];
@@ -170,11 +171,10 @@ function calculateStatistics(shotsByClub) {
                 const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
                 const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
                 const xAvgCarry = xBase + 112.5 - (avgCarryWidth / 2);
-                const lateralDispersionWidthL = fontRegular.widthOfTextAtSize(dato.maxLeft, 8);
-                const lateralDispersionWidthR = fontRegular.widthOfTextAtSize(dato.maxRight, 8);
+
                 const xLateralDispersion = xBase + 60.5;
-                const LLateralDispersion = xBase + 55.5 - (lateralDispersionWidthL / 2);
-                const RLateralDispersion = xBase + 65.5 - (lateralDispersionWidthR / 2);
+                const LLateralDispersion = xBase + 55.5 ;
+                const RLateralDispersion = xBase + 65.5 ;
                 const variationText = `${dato.variation}`;
                 const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
                 const xVariation = xBase + 167 - (variationWidth / 2);
@@ -203,7 +203,7 @@ function calculateStatistics(shotsByClub) {
                     height: imgHeight,
                 });
 
-                index++;
+
             }
         });
 
