@@ -1,12 +1,17 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA12");
+console.log("HOLA14");
   function convertirFormato(dispersion) {
   // Divide el string original en izquierda (L) y derecha (R)
   const [izquierda, derecha] = dispersion.split(' - ').map(val => val.replace(/[LR]/, '').trim());
   
   // Retorna el nuevo formato
-  return `${izquierda} <-> ${derecha}`;
+  return `${izquierda} "\u27F7" ${derecha}`;
+}
+    function formatearFecha(fechaISO) {
+    const fecha = new Date(fechaISO);
+    const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
+    return fecha.toLocaleDateString('es-ES', opciones);
 }
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
 let datos;
@@ -111,7 +116,10 @@ const lateralPerc = parseFloat(document.getElementById("lateralDeviation").value
 
       lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
     }
-lateralDispersion = convertirFormato(lateralDispersion);
+    if(shots.length>1){
+      lateralDispersion = convertirFormato(lateralDispersion);
+      }else lateralDispersion="-";
+
     clubStats[club] = {
       avgCarry: carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length,
       lateralDispersion,
@@ -165,9 +173,9 @@ lateralDispersion = convertirFormato(lateralDispersion);
         const xClub = xBase - (textWidth / 2);
         const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
         const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
-        const xAvgCarry = xBase + 105.5 - (avgCarryWidth / 2);
+        const xAvgCarry = xBase + 112.5 - (avgCarryWidth / 2);
         const lateralDispersionWidth = fontRegular.widthOfTextAtSize(dato.lateralDispersion, 8);
-        const xLateralDispersion = xBase + 45.5 - (lateralDispersionWidth / 2);
+        const xLateralDispersion = xBase + 60.5 - (lateralDispersionWidth / 2);
         const variationText = `${dato.variation}`;
         const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 167 - (variationWidth / 2);
@@ -182,10 +190,12 @@ lateralDispersion = convertirFormato(lateralDispersion);
     });
 
     // Añadir nombre y fecha en la esquina superior derecha
-    firstPage.drawText(`${nombre}`, { x: 10, y: 390, size: 13, font: fontRegular });
-    firstPage.drawText(`${fecha}`, { x: 10, y: 370, size: 11, font: fontRegular });
-    firstPage.drawText(`${(deviationPercentage*100).toFixed(0)}`, { x: 110, y: 22, size: 4.5, font: fontRegular });
-    firstPage.drawText(`${(lateralPerc*100).toFixed(0)}`, { x: 100, y: 35, size: 4.5, font: fontRegular });
+
+    fecha= formatearFecha(fecha)
+    firstPage.drawText(`${nombre}`, { x: 10, y: 380, size: 13, font: fontRegular });
+    firstPage.drawText(`${fecha}`, { x: 10, y: 360, size: 11, font: fontRegular });
+    firstPage.drawText(`${(deviationPercentage*100).toFixed(0)}`, { x: 109, y: 21, size: 4.5, font: fontRegular });
+    firstPage.drawText(`${(lateralPerc*100).toFixed(0)}`, { x: 100.5, y: 35.5, size: 4.5, font: fontRegular });
     // Guardar el PDF modificado
     const pdfBytes = await pdfDoc.save();
 
