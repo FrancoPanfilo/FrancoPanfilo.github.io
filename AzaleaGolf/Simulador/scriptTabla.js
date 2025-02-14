@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA17");
+console.log("HOLA18");
 
 function formatearFecha(fechaISO) {
     const fecha = new Date(fechaISO);
@@ -171,11 +171,11 @@ function calculateStatistics(shotsByClub) {
                 const xClub = xBase - (textWidth / 2);
                 const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
                 const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
-                const xAvgCarry = xBase + 112.5 - (avgCarryWidth / 2);
+                const xAvgCarry = xBase + 114 - (avgCarryWidth / 2);
 
-                const xLateralDispersion = xBase + 60.5;
-                const LLateralDispersion = xBase + 51.5 ;
-                const RLateralDispersion = xBase + 69.5 ;
+                const xLateralDispersion = xBase + 55.5;
+                const LLateralDispersion = xBase + 46.5 ;
+                const RLateralDispersion = xBase + 64.5 ;
                 const variationText = `${dato.variation}`;
                 const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
                 const xVariation = xBase + 167 - (variationWidth / 2);
