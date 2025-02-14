@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA15");
+console.log("HOLA16");
 
     function formatearFecha(fechaISO) {
     const fecha = new Date(fechaISO);
@@ -180,21 +180,31 @@ const lateralPerc = parseFloat(document.getElementById("lateralDeviation").value
         firstPage.drawText(dato.maxLeft, { x: LLateralDispersion, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral
         firstPage.drawText(dato.maxRight, { x: RLateralDispersion, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral
         firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8, font: fontRegular }); // Variación de distancia
-const imageBytes = fs.readFileSync("flecha-doble.png");
-const image = await pdfDoc.embedPng(imageBytes);
+async function agregarImagenAlPDF(pdfDoc, firstPage) {
+    // Cargar la imagen de la flecha
+    const imageBytes = fs.readFileSync("flecha-doble.png");
+    const image = await pdfDoc.embedPng(imageBytes); // Usa await dentro de la función async
 
-// Definir dimensiones y posición de la imagen
-const imgWidth = 15; // Ajusta el tamaño según necesidad
-const imgHeight = 8;
-const xImage = RLateralDispersion + 15; // Justo después del dato de dispersión derecha
+    // Definir dimensiones y posición de la imagen
+    const imgWidth = 15;
+    const imgHeight = 8;
+    const xImage = xLateralDispersion;
 
-// Dibujar la imagen en la misma línea que el texto
-firstPage.drawImage(image, {
-    x: xLateralDispersion,
-    y: yPos - 2, // Pequeño ajuste si la imagen está desalineada
-    width: imgWidth,
-    height: imgHeight,
-});
+    // Dibujar la imagen en la misma línea que el texto
+    firstPage.drawImage(image, {
+        x: xImage,
+        y: yPos - 2,
+        width: imgWidth,
+        height: imgHeight,
+    });
+
+}
+
+// Llamar a la función dentro de un contexto async
+(async () => {
+    await agregarImagenAlPDF(pdfDoc, firstPage);
+})();
+
         index++;
       }
     });
