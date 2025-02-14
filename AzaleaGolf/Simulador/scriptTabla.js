@@ -1,13 +1,7 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA14");
-  function convertirFormato(dispersion) {
-  // Divide el string original en izquierda (L) y derecha (R)
-  const [izquierda, derecha] = dispersion.split(' - ').map(val => val.replace(/[LR]/, '').trim());
-  
-  // Retorna el nuevo formato
-  return `${izquierda} "\u27F7" ${derecha}`;
-}
+console.log("HOLA15");
+
     function formatearFecha(fechaISO) {
     const fecha = new Date(fechaISO);
     const opciones = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -111,18 +105,17 @@ const lateralPerc = parseFloat(document.getElementById("lateralDeviation").value
         .sort((a, b) => Math.abs(a) - Math.abs(b)) // Ordenar por magnitud de offline
         .slice(0, lateralLimit); // Tomar el % indicado
   
-      const maxLeft = Math.min(...selectedOffline); // Máximo fallo a la izquierda
-      const maxRight = Math.max(...selectedOffline); // Máximo fallo a la derecha
+      const maxLeft = Math.min(...selectedOffline).toFixed(0); // Máximo fallo a la izquierda
+      const maxRight = Math.max(...selectedOffline).toFixed(0); // Máximo fallo a la derecha
 
       lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
     }
-    if(shots.length>1){
-      lateralDispersion = convertirFormato(lateralDispersion);
-      }else lateralDispersion="-";
+
 
     clubStats[club] = {
       avgCarry: carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length,
-      lateralDispersion,
+      maxLeft,
+      maxRight,
       variation
     };
   });
@@ -176,15 +169,32 @@ const lateralPerc = parseFloat(document.getElementById("lateralDeviation").value
         const xAvgCarry = xBase + 112.5 - (avgCarryWidth / 2);
         const lateralDispersionWidth = fontRegular.widthOfTextAtSize(dato.lateralDispersion, 8);
         const xLateralDispersion = xBase + 60.5 - (lateralDispersionWidth / 2);
+        const LLateralDispersion = xBase + 55.5 - (lateralDispersionWidth / 2);
+        const RLateralDispersion = xBase + 65.5 - (lateralDispersionWidth / 2);
         const variationText = `${dato.variation}`;
         const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 167 - (variationWidth / 2);
 
         firstPage.drawText(clubName, { x: xClub, y: yPos, size: 8, font: fontBold }); // Nombre del palo en negrita
         firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8, font: fontRegular }); // Carry promedio sin 'yds'
-        firstPage.drawText(dato.lateralDispersion, { x: xLateralDispersion, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral
+        firstPage.drawText(dato.maxLeft, { x: LLateralDispersion, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral
+        firstPage.drawText(dato.maxRight, { x: RLateralDispersion, y: yPos, size: 8, font: fontRegular }); // Dispersión lateral
         firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8, font: fontRegular }); // Variación de distancia
+const imageBytes = fs.readFileSync("flecha-doble.png");
+const image = await pdfDoc.embedPng(imageBytes);
 
+// Definir dimensiones y posición de la imagen
+const imgWidth = 15; // Ajusta el tamaño según necesidad
+const imgHeight = 8;
+const xImage = RLateralDispersion + 15; // Justo después del dato de dispersión derecha
+
+// Dibujar la imagen en la misma línea que el texto
+firstPage.drawImage(image, {
+    x: xLateralDispersion,
+    y: yPos - 2, // Pequeño ajuste si la imagen está desalineada
+    width: imgWidth,
+    height: imgHeight,
+});
         index++;
       }
     });
