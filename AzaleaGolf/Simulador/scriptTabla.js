@@ -1,7 +1,13 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA9");
-
+console.log("HOLA10");
+  function convertirFormato(dispersion) {
+  // Divide el string original en izquierda (L) y derecha (R)
+  const [izquierda, derecha] = dispersion.split(' - ').map(val => val.replace(/[LR]/, '').trim());
+  
+  // Retorna el nuevo formato
+  return `${izquierda} ←→ ${derecha}`;
+}
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
 let datos;
 function handleFile() {
@@ -102,13 +108,7 @@ function calculateStatistics(shotsByClub) {
   
       const maxLeft = Math.min(...selectedOffline); // Máximo fallo a la izquierda
       const maxRight = Math.max(...selectedOffline); // Máximo fallo a la derecha
-  function convertirFormato(dispersion) {
-  // Divide el string original en izquierda (L) y derecha (R)
-  const [izquierda, derecha] = dispersion.split(' - ').map(val => val.replace(/[LR]/, '').trim());
-  
-  // Retorna el nuevo formato
-  return `${izquierda} ←→ ${derecha}`;
-}
+
       lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
     }
 lateralDispersion = convertirFormato(lateralDispersion);
