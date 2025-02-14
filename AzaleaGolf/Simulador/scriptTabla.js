@@ -66,7 +66,7 @@ function parseGolfShots(csvData) {
 
 function calculateStatistics(shotsByClub) {
   const deviationPercentage = parseFloat(document.getElementById("deviationPercentage").value) / 100;
-
+const lateralPerc = parseFloat(document.getElementById("lateralDeviation").value) / 100;
   const clubStats = {};
 
   Object.keys(shotsByClub).forEach((club) => {
@@ -96,11 +96,11 @@ function calculateStatistics(shotsByClub) {
       const avgCarry = carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length;
       const minCarry = Math.min(...carryValues);
       const maxCarry = Math.max(...carryValues);
-      variation = ((maxCarry - minCarry) / 2).toFixed(0);
+      variation = `±${((maxCarry - minCarry) / 2).toFixed(0)}`;
   
       const offlineValues = shots.map((s) => s.offline).sort((a, b) => a - b);
   
-      const lateralLimit = Math.floor(offlineValues.length * deviationPercentage);
+      const lateralLimit = Math.floor(offlineValues.length * lateralPerc);
       const selectedOffline = shots
         .map((s) => s.offline)
         .sort((a, b) => Math.abs(a) - Math.abs(b)) // Ordenar por magnitud de offline
@@ -126,8 +126,8 @@ lateralDispersion = convertirFormato(lateralDispersion);
     "Híbrido 5": "5h", "Hierro 1": "1i", "Hierro 2": "2i", "Hierro 3": "3i",
     "Hierro 4": "4i", "Hierro 5": "5i", "Hierro 6": "6i", "Hierro 7": "7i",
     "Hierro 8": "8i", "Hierro 9": "9i", "PW": "PW", "GW": "GW", "SW": "SW",
-    "LW": "LW", "50": "50", "52": "52", "54": "54", "56": "56", "58": "58",
-    "60": "60", "62": "62", "64": "64"
+    "LW": "LW", "50°": "50", "52°": "52", "54°": "54", "56°": "56", "58°": "58",
+    "60°": "60", "62°": "62", "64°": "64"
   };
 
   // Eliminar putt de clubStats
@@ -165,9 +165,9 @@ lateralDispersion = convertirFormato(lateralDispersion);
         const xClub = xBase - (textWidth / 2);
         const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
         const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
-        const xAvgCarry = xBase + 45.5 - (avgCarryWidth / 2);
+        const xAvgCarry = xBase + 105.5 - (avgCarryWidth / 2);
         const lateralDispersionWidth = fontRegular.widthOfTextAtSize(dato.lateralDispersion, 8);
-        const xLateralDispersion = xBase + 95.5 - (lateralDispersionWidth / 2);
+        const xLateralDispersion = xBase + 45.5 - (lateralDispersionWidth / 2);
         const variationText = `${dato.variation}`;
         const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
         const xVariation = xBase + 167 - (variationWidth / 2);
@@ -182,9 +182,10 @@ lateralDispersion = convertirFormato(lateralDispersion);
     });
 
     // Añadir nombre y fecha en la esquina superior derecha
-    firstPage.drawText(`Nombre: ${nombre}`, { x: 400, y: 750, size: 12, font: fontRegular });
-    firstPage.drawText(`Fecha: ${fecha}`, { x: 400, y: 735, size: 12, font: fontRegular });
-
+    firstPage.drawText(`Nombre: ${nombre}`, { x: 20, y: 350, size: 15, font: fontRegular });
+    firstPage.drawText(`Fecha: ${fecha}`, { x: 20, y: 330, size: 13, font: fontRegular });
+    firstPage.drawText(`Fecha: ${(deviationPercentage*100)toFixed(0)}`, { x: 20, y: 30, size: 6, font: fontRegular });
+    firstPage.drawText(`${(lateralPerc*100)toFixed(0)}`, { x: 20, y: 30, size: 6, font: fontRegular });
     // Guardar el PDF modificado
     const pdfBytes = await pdfDoc.save();
 
