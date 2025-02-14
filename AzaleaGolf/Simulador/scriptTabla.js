@@ -1,12 +1,12 @@
 import { PDFDocument, StandardFonts } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA10");
+console.log("HOLA11");
   function convertirFormato(dispersion) {
   // Divide el string original en izquierda (L) y derecha (R)
   const [izquierda, derecha] = dispersion.split(' - ').map(val => val.replace(/[LR]/, '').trim());
   
   // Retorna el nuevo formato
-  return `${izquierda} ←→ ${derecha}`;
+  return `${izquierda} <-> ${derecha}`;
 }
 document.getElementById("botonTabla").addEventListener("click", () => handleFile());
 let datos;
