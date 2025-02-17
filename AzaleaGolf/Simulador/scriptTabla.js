@@ -3,7 +3,7 @@ import {
   StandardFonts,
 } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA20");
+console.log("HOLA21");
 
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
@@ -175,13 +175,13 @@ function calculateStatistics(shotsByClub) {
   // Eliminar putt de clubStats
   delete clubStats.Putt;
 
-  async function rellenarYardageBook(datos) {
+  async function rellenarPDF(datos, pdfName) {
     // Obtener valores de nombre y fecha
     const nombre = document.getElementById("nombre").value;
     const fecha = document.getElementById("fecha").value;
 
     // Cargar el PDF existente desde una URL
-    const existingPdfBytes = await fetch("YardageBook.pdf").then((res) =>
+    const existingPdfBytes = await fetch(`${pdfName}.pdf`).then((res) =>
       res.arrayBuffer()
     );
 
@@ -304,13 +304,14 @@ function calculateStatistics(shotsByClub) {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `YardageBook_${nombre}_${fechaFormateada}.pdf`;
+    link.download = `${pdfName}_${nombre}_${fechaFormateada}.pdf`;
     link.click();
 
-    console.log("Tabla rellenada y nuevo PDF descargado.");
+    console.log(`Tabla rellenada y nuevo PDF (${pdfName}) descargado.`);
   }
 
-  rellenarYardageBook(clubStats);
+  rellenarPDF(clubStats, "YardageBook");
+  rellenarPDF(clubStats, "vacio");
 
   return clubStats;
 }
