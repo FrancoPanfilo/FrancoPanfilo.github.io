@@ -1,0 +1,84 @@
+.hero {
+  height: 40vh;
+  width: 100%;
+}
+.hero1 {
+  display: flex;
+  align-items: center;
+  background-color: rgb(178, 178, 178);
+  height: 25vh;
+  width: 100%;
+}
+.hero1 img {
+  margin-left: 20px;
+  height: 100%;
+}
+.hero-text {
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.hero-text button {
+  margin-top: 10px;
+  color: white;
+  background-color: black;
+  border-radius: 20px;
+  padding: 8px;
+}
+
+.hero2 {
+  flex-wrap: nowrap;
+  display: flex;
+  background-color: aqua;
+  height: 25vh;
+}
+
+.hero2 img {
+  height: 100%;
+}
+.hero2 div:first-child {
+  text-align: center;
+
+  flex: 1;
+  background-color: rgb(192, 192, 192);
+}
+.hero2 div:nth-child(2) {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 0px;
+}
+.hero2 div:nth-child(3) {
+  text-align: center;
+  flex: 1;
+  background-color: rgb(159, 159, 159);
+}
+.hero2 .p1 {
+  letter-spacing: 2px;
+  color: white;
+  text-align: center;
+  text-wrap: nowrap;
+  margin-bottom: 0px;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+.hero2 .p2 {
+  color: white;
+  text-align: center;
+  text-wrap: wrap;
+  margin-top: 0px;
+  font-size: 0.7rem;
+}
+
+.hero2 div:nth-child(1) img {
+  margin-top: 20px;
+  height: 80%;
+}
+.hero2 div:nth-child(3) img {
+  height: 80%;
+}
