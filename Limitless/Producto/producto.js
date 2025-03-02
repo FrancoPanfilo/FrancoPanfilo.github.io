@@ -82,8 +82,19 @@ function comprar() {
       " en talle " +
       talles.value
   );
-  const instagramUrl = `https://www.instagram.com/direct/t/limitless_uy/?message=${message}`;
+  const appUrl = `instagram://user?username=limitless_uy&message=${message}`;
+  // URL fallback para la web con ig.me
+  const webUrl = `https://ig.me/m/limitless_uy?message=${message}`;
 
-  // Redirige a la URL
-  window.location.href = instagramUrl;
+  // Intenta abrir la app primero
+  window.location.href = appUrl;
+
+  // Fallback a la web si la app no se abre después de 2 segundos
+  setTimeout(() => {
+    if (document.hidden) {
+      // Si la app se abrió, la pestaña está en segundo plano, no hacemos nada
+      return;
+    }
+    window.location.href = webUrl;
+  }, 2000);
 }
