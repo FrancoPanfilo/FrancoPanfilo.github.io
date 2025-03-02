@@ -82,9 +82,9 @@ function comprar() {
       " en talle " +
       talles.value
   );
-  const appUrl = `instagram://user?username=limitless_uy&message=${message}`;
+  const appUrl = `https://wa.me/<número>?text=${message}`;
   // URL fallback para la web con ig.me
-  const webUrl = `https://ig.me/m/limitless_uy?message=${message}`;
+  const webUrl = `https://wa.me/<número>?text=${message}`;
 
   // Intenta abrir la app primero
   window.location.href = appUrl;
