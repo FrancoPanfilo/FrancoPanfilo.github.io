@@ -84,7 +84,7 @@ function comprar() {
   );
   const appUrl = `https://wa.me/<número>?text=${message}`;
   // URL fallback para la web con ig.me
-  const webUrl = `https://wa.me/<número>?text=${message}`;
+  const webUrl = `https://wa.me/59898731913?text=${message}`;
 
   // Intenta abrir la app primero
   window.location.href = appUrl;
