@@ -27,9 +27,11 @@
   background-color: black;
   border-radius: 20px;
   padding: 8px;
+  border-color: black;
 }
 
 .hero2 {
+  width: 100%;
   flex-wrap: nowrap;
   display: flex;
   background-color: aqua;
