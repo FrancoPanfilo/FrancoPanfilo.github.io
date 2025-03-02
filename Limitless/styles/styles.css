@@ -19,13 +19,16 @@ body {
 
 /* Estilos del catálogo */
 h2 {
+  margin-top: ;
   width: 100%;
   height: 20px;
 }
 .producto-item {
-  width: 110px;
+  text-align: center;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+  width: 40%;
   margin-top: 20px;
-  height: 200px;
+  height: 260px;
   margin-left: 13px;
   margin-right: 13px;
 }
@@ -85,10 +88,10 @@ h2 {
 }
 #catalogo {
   padding: 20px;
-  background-color: white;
+  background-color: rgb(227, 227, 227);
   margin-top: 100px;
   margin-bottom: 20px;
-  width: 85%;
+  width: 93%;
   height: fit-content;
   display: flex;
   flex-direction: row;
@@ -99,6 +102,11 @@ h2 {
   cursor: pointer;
   scale: 1.1;
 }
+h3 {
+  margin-top: 10px;
+}
 .precio {
-  text-align: right;
+  margin-top: 10px;
+  color: rgb(60, 126, 60);
+  text-align: center;
 }

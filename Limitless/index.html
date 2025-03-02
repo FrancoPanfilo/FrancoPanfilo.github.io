@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles/background.css" />
     <link rel="stylesheet" href="styles/footer.css" />
     <link rel="stylesheet" href="styles/hero.css" />
+    <link rel="stylesheet" href="styles/card.css" />
     <script defer src="script.js"></script>
 
     <!-- Favicon para Apple Devices (iPhones, iPads) -->
@@ -237,27 +238,16 @@
     </div>
     <div class="catalogo" id="catalogo">
       <h2>Season 1</h2>
-      <div class="producto-item" onclick="verProducto(0)">
+      <a class="producto-item" href="Producto/index.html?Remera=S1C1">
         <img src="img/S1C1-1.JPG" alt="Producto 1" />
         <h3>Chapter 1</h3>
         <p class="precio">1190 $</p>
-      </div>
-      <div class="producto-item" onclick="verProducto(1)">
+      </a>
+      <a class="producto-item" href="Producto/index.html?Remera=S1C2">
         <img src="img/S1C2-1.jpeg" alt="Producto 2" />
         <h3>Chapter 2</h3>
         <p class="precio">1190 $</p>
-      </div>
-    </div>
-
-    <div class="producto" id="producto">
-      <img id="imagenProducto" src="" alt="Imagen del Producto" />
-      <div class="controles">
-        <button onclick="cambiarImagen(-1)">◀</button>
-        <button onclick="cambiarImagen(1)">▶</button>
-      </div>
-      <button class="volver" onclick="volverCatalogo()">
-        Volver al catálogo
-      </button>
+      </a>
     </div>
     <footer id="footer" class="footer">
       <div class="contact-info">

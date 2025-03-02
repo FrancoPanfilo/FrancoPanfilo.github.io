@@ -1,0 +1,107 @@
+.container {
+  margin-top: 20px;
+  margin-left: 10px;
+  width: 95%;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+}
+.galeria {
+  height: 60vh;
+  width: 50%;
+}
+.info {
+  display: flex;
+  flex-direction: column;
+  justify-content: baseline;
+  width: 50%;
+}
+.info h1 {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+select {
+  background-color: #c1c1c1;
+  color: white;
+  padding: 5px;
+  width: 70px;
+  border: none;
+  font-size: 12px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  -webkit-appearance: button;
+  appearance: button;
+  outline: none;
+}
+select:hover {
+  background-color: #9b9b9b;
+}
+
+option {
+  padding: 0;
+  font-size: 8px;
+}
+img {
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.gallery {
+  height: 100%;
+  display: flex;
+  margin: 10px auto;
+  max-width: 600px;
+  position: relative;
+  padding-top: 66.6666666667%;
+}
+
+@media screen and (min-width: 600px) {
+  .gallery {
+    padding-top: 400px;
+  }
+}
+.gallery__img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-height: 200px;
+  margin-left: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+.gallery__thumb {
+  padding-top: 6px;
+  margin: 10px;
+  margin-top: 100px;
+  display: block;
+}
+.gallery__selector {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+}
+.gallery__selector:checked + .gallery__img {
+  opacity: 1;
+}
+.gallery__selector:checked ~ .gallery__thumb > img {
+  box-shadow: 0 0 0 3px #0be2f6;
+}
+/* Boton compra */
+.compra {
+  margin-top: 15px;
+  color: black;
+  font-size: 16px;
+  border-radius: 20px;
+  padding: 10px;
+  border-color: black;
+}
+#precio {
+  font-size: 19px;
+  color: rgb(43, 47, 47);
+}
+.precioytalle {
+  margin-top: 15px;
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
+}
