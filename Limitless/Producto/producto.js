@@ -47,14 +47,10 @@ const titulo = document.getElementById("titulo");
 const descripcion = document.getElementById("descripcion");
 const precio = document.getElementById("precio");
 const talles = document.getElementById("talles");
-const imagen1 = document.getElementById("imagen1");
-const imagen2 = document.getElementById("imagen2");
-const imagen3 = document.getElementById("imagen3");
-const imagen4 = document.getElementById("imagen4");
-const label1 = document.getElementById("label1");
-const label2 = document.getElementById("label2");
-const label3 = document.getElementById("label3");
-const label4 = document.getElementById("label4");
+const imagenPre = document.getElementById("imagenPre");
+const imagenActiva = document.getElementById("imagenActiva");
+const imagenPost = document.getElementById("imagenPost");
+
 titulo.innerHTML = producto.Titulo;
 descripcion.innerHTML = producto.Descripcion;
 precio.innerHTML = producto.Precio;
@@ -64,15 +60,57 @@ producto.Talles.forEach((talle) => {
   option.text = talle;
   talles.appendChild(option);
 });
-imagen1.src = producto.imagen1;
-imagen2.src = producto.imagen2;
-imagen3.src = producto.imagen3;
-imagen4.src = producto.imagen4;
-label1.src = producto.imagen1;
-label2.src = producto.imagen2;
-label3.src = producto.imagen3;
-label4.src = producto.imagen4;
+imagenPre.src = producto.imagen4;
+imagenActiva.src = producto.imagen1;
+imagenPost.src = producto.imagen2;
+function extraerRutaImagen(cadena) {
+  const index = cadena.indexOf("/img");
+  if (index !== -1) {
+    return "../" + cadena.slice(index + 1);
+  }
+  return ""; // Devuelve una cadena vacía si no se encuentra "/img"
+}
+document.getElementById("fIzq").addEventListener("click", () => {
+  let ruta = extraerRutaImagen(imagenActiva.src);
 
+  if (ruta === producto.imagen1) {
+    imagenActiva.src = producto.imagen4;
+    imagenPre.src = producto.imagen3;
+    imagenPost.src = producto.imagen1;
+  } else if (ruta === producto.imagen2) {
+    imagenActiva.src = producto.imagen1;
+    imagenPre.src = producto.imagen4;
+    imagenPost.src = producto.imagen2;
+  } else if (ruta === producto.imagen3) {
+    imagenActiva.src = producto.imagen2;
+    imagenPre.src = producto.imagen1;
+    imagenPost.src = producto.imagen3;
+  } else if (ruta === producto.imagen4) {
+    imagenActiva.src = producto.imagen3;
+    imagenPre.src = producto.imagen2;
+    imagenPost.src = producto.imagen4;
+  }
+});
+document.getElementById("fDer").addEventListener("click", () => {
+  let ruta = extraerRutaImagen(imagenActiva.src);
+  if (ruta === producto.imagen1) {
+    imagenActiva.src = producto.imagen2;
+    imagenPre.src = producto.imagen1;
+    imagenPost.src = producto.imagen3;
+  } else if (ruta === producto.imagen2) {
+    imagenActiva.src = producto.imagen3;
+    imagenPre.src = producto.imagen2;
+    imagenPost.src = producto.imagen4;
+  } else if (ruta === producto.imagen3) {
+    imagenActiva.src = producto.imagen4;
+    imagenPre.src = producto.imagen3;
+    imagenPost.src = producto.imagen1;
+  } else if (ruta === producto.imagen4) {
+    imagenActiva.src = producto.imagen1;
+    imagenPre.src = producto.imagen4;
+    imagenPost.src = producto.imagen2;
+  }
+});
 document.getElementById("compra").addEventListener("click", comprar);
 function comprar() {
   // Construye la URL de Instagram Direct con el mensaje
@@ -97,4 +135,13 @@ function comprar() {
     }
     window.location.href = webUrl;
   }, 2000);
+}
+
+//nuevo
+const activeImage = document.querySelector(".product-image .active");
+const productImages = document.querySelectorAll(".image-list img");
+const navItem = document.querySelector("a.toggle-nav");
+
+function changeImage(e) {
+  activeImage.src = e.target.src;
 }

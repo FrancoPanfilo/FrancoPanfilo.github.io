@@ -1,17 +1,18 @@
 body {
   background: #e5dcd6;
+  font-family: "Jost", Arial, sans-serif;
 }
 div.fotos {
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: 140px;
+  height: fit-content;
   padding-left: 30px;
   padding-right: 30px;
 }
 .contenedorImg {
   text-align: center;
-  height: 100%;
+  height: fit-content;
   flex: 1;
 }
 .foto1 {
@@ -26,7 +27,6 @@ div.fotos {
   margin-top: 20px;
   margin-bottom: 20px;
   font-size: 22px;
-  font-family: "universBold", sans-serif;
 }
 .descripcion {
   line-height: 25px;
@@ -34,4 +34,13 @@ div.fotos {
   font-family: "universBold", sans-serif;
   padding: 20px;
   padding-top: 0;
+}
+@media (min-width: 768px) {
+  .foto1 {
+    margin-top: 20px;
+    height: 200px;
+  }
+  .foto2 {
+    height: 200px;
+  }
 }

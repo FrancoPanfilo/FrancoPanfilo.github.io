@@ -13,7 +13,7 @@ nav {
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
   z-index: 1;
   background-color: #fff;
-  height: 70px;
+  height: 55px;
 }
 nav .logo {
   display: flex;
