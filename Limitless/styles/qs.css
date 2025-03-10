@@ -1,6 +1,7 @@
+@import url("https://fonts.googleapis.com/css?family=Pontano+Sans");
 body {
   background: #e5dcd6;
-  font-family: "Jost", Arial, sans-serif;
+  font-family: "Pontano Sans", sans-serif;
 }
 div.fotos {
   display: flex;
@@ -35,12 +36,28 @@ div.fotos {
   padding: 20px;
   padding-top: 0;
 }
-@media (min-width: 768px) {
+.foto1 {
+  margin-top: 20px;
+  height: 200px;
+}
+.foto2 {
+  height: 200px;
+}
+@media (max-width: 768px) {
   .foto1 {
     margin-top: 20px;
-    height: 200px;
+    height: 100px;
   }
   .foto2 {
-    height: 200px;
+    height: 100px;
+  }
+}
+@media (max-width: 400px) {
+  .foto1 {
+    margin-top: 10px;
+    height: 70px;
+  }
+  .foto2 {
+    height: 70px;
   }
 }

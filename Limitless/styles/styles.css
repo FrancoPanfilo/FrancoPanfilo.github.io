@@ -114,7 +114,7 @@ h3 {
     max-height: 200px;
   }
 }
-@media (max-width: 370px) {
+@media (max-width: 380px) {
   .producto-item img {
     max-height: 160px;
   }

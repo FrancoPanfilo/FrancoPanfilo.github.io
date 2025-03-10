@@ -39,7 +39,7 @@ p {
     padding-left: 40px;
   }
 }
-@media (max-width: 350px) {
+@media (max-width: 400px) {
   h1 {
     font-size: 2rem;
   }

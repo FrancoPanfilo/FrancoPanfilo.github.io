@@ -60,21 +60,21 @@
   width: 50%;
   background-color: rgb(159, 159, 159);
 }
-.hero2 .p1 {
+.p1 {
   letter-spacing: 2px;
   color: white;
   text-align: center;
   text-wrap: nowrap;
-  margin-bottom: 0px;
+  margin-bottom: 22px;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 4vw;
 }
-.hero2 .p2 {
+.p2 {
   color: white;
   text-align: center;
   text-wrap: wrap;
   margin-top: 0px;
-  font-size: 0.7rem;
+  font-size: 2vw;
 }
 
 .hero2 div:nth-child(1) img {
@@ -90,5 +90,32 @@
   }
   .hero2 {
     height: 50vh;
+  }
+}
+@media (max-height: 700px) {
+  .hero {
+    margin-bottom: 60px;
+  }
+}
+@media (max-height: 550px) {
+  .hero {
+    margin-bottom: 80px;
+  }
+}
+@media (max-width: 768px) {
+  .p1 {
+    font-size: 5vw;
+    margin-bottom: 8px;
+  }
+  .p2 {
+    font-size: 2.5vw;
+  }
+}
+@media (max-width: 468px) {
+  .p1 {
+    font-size: 5vw;
+  }
+  .p2 {
+    font-size: 3.5vw;
   }
 }
