@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css?family=Pontano+Sans");
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,7 +7,7 @@
 }
 
 body {
-  font-family: "Jost", Arial, sans-serif;
+  font-family: "Pontano Sans", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -106,4 +108,18 @@ h3 {
   margin-top: 10px;
   color: rgb(60, 126, 60);
   text-align: center;
+}
+@media (max-width: 470px) {
+  .producto-item img {
+    max-height: 200px;
+  }
+}
+@media (max-width: 370px) {
+  .producto-item img {
+    max-height: 160px;
+  }
+  .producto-item {
+    margin-left: 6px;
+    margin-right: 6px;
+  }
 }

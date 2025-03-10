@@ -39,3 +39,16 @@ p {
     padding-left: 40px;
   }
 }
+@media (max-width: 350px) {
+  h1 {
+    font-size: 2rem;
+  }
+  p {
+    font-size: 0.9rem;
+  }
+  .gif {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
+}

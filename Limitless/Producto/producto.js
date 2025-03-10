@@ -120,9 +120,9 @@ function comprar() {
       " en talle " +
       talles.value
   );
-  const appUrl = `https://wa.me/<número>?text=${message}`;
+  const appUrl = `https://wa.me/59895032534?text=${message}`;
   // URL fallback para la web con ig.me
-  const webUrl = `https://wa.me/59898731913?text=${message}`;
+  const webUrl = `https://wa.me/59895032534?text=${message}`;
 
   // Intenta abrir la app primero
   window.location.href = appUrl;
