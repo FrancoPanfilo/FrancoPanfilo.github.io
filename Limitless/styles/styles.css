@@ -111,6 +111,7 @@ h3 {
 }
 @media (max-width: 470px) {
   .producto-item img {
+    max-width: 120px;
     max-height: 200px;
   }
 }
