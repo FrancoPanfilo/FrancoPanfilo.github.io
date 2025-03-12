@@ -110,6 +110,9 @@ h3 {
   text-align: center;
 }
 @media (max-width: 470px) {
+  #catalogo {
+    margin-top: 45px;
+  }
   .producto-item img {
     max-width: 120px;
     max-height: 200px;
