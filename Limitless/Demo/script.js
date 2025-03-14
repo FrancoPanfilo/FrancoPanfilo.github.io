@@ -45,7 +45,7 @@ if (qrId) {
       if (docSnap.exists()) {
         const qrData = docSnap.data();
         setTimeout(() => {
-          window.location.href = `https://${qrData.link}`; // Redirige al link asociado al QR
+          window.location.href = `${qrData.link}`; // Redirige al link asociado al QR
         }, 1000);
       } else {
       }
