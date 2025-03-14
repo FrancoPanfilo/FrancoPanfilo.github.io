@@ -45,7 +45,8 @@ function generateQRCode(url) {
     console.error("La URL no puede estar vacía");
     return null;
   }
-  url = `www.scanyourstyle.com/Redirigiendo/?id=${url}`;
+  url = `www.scanyourstyle.com/Demo/?id=${url}`;
+  console.log(url);
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
     url
   )}`;

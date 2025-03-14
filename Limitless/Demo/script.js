@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 if (qrId) {
   // Busca el documento en Firebase Firestore
-  const qrDoc = doc(db, "QRs", qrId);
+  const qrDoc = doc(db, "QRsDemo", qrId);
   getDoc(qrDoc)
     .then((docSnap) => {
       if (docSnap.exists()) {
