@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="../styles/background.css" />
     <link rel="stylesheet" href="../styles/footer.css" />
     <link rel="stylesheet" href="../styles/qs.css" />
-    <script defer src="../script.js"></script>
-
   </head>
   <body>
     <!-- <ul class="background">
@@ -138,7 +136,7 @@
         </li>
       </ul>
     </div>
-    <h1 class="titulo">Quiénes somos</h1>
+    <!--     <h1 class="titulo">Quiénes somos</h1>
     <p class="descripcion">
       En Limitless, la moda no tiene límites. Creemos en la expresión auténtica
       y en el estilo como una extensión de la personalidad. Nuestras camisetas
@@ -164,7 +162,106 @@
             Scan Your Style no es solo un slogan, es la invitación a hacer cada detalle tuyo. Conecta con lo que te representa, muestra tu esencia y deja que tu estilo hable por sí solo.
           </p>
       </p>
-    <footer id="footer" class="footer">
+       -->
+    <div class="scroll-progress"></div>
+    <div class="hero-container">
+      <div class="background-layer"></div>
+      <div class="hero-content">
+        <h1>Limitless</h1>
+        <div class="slogan">Scan Your Style</div>
+      </div>
+
+      <div class="story-section" data-scroll-offset="20">
+        <img
+          class="parallax-image"
+          src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"
+          alt="Remera Oversize"
+        />
+        <h2>Rompe las Reglas</h2>
+        <p>
+          Limitless no es solo una remera oversize. Es una declaración de
+          libertad, con materiales premium que combinan comodidad y resistencia.
+        </p>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <img
+              src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3"
+              alt="QR Dinámico"
+            />
+            <h3>Tu QR, Tu Regla</h3>
+            <p>
+              Un QR dinámico que puedes personalizar cuando quieras. Conecta tu
+              mundo con un escaneo.
+            </p>
+          </div>
+          <div class="feature-card">
+            <img
+              src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c"
+              alt="Estilo Único"
+            />
+            <h3>Define Tu Estilo</h3>
+            <p>
+              Oversize no significa desorden. Es diseño audaz con un ajuste
+              perfecto.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="story-section" data-scroll-offset="60">
+        <img
+          class="parallax-image"
+          src="https://images.unsplash.com/photo-1512436991641-6745cdb1722f"
+          alt="Narrativa Visual"
+        />
+        <h2>Vive Sin Límites</h2>
+        <p>
+          Cada remera cuenta una historia. La tuya. Escanea, comparte, y haz que
+          el mundo te escuche.
+        </p>
+      </div>
+
+      <div class="scroll-invite">Sigue Explorando</div>
+    </div>
+
+    <script>
+      // Animaciones al hacer scroll
+      window.addEventListener("scroll", () => {
+        const scrollPosition = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const totalHeight =
+          document.querySelector(".hero-container").scrollHeight;
+
+        // Barra de progreso
+        const progress = (scrollPosition / (totalHeight - windowHeight)) * 100;
+        document.querySelector(".scroll-progress").style.width = `${progress}%`;
+
+        // Activar animaciones de entrada
+        const hero = document.querySelector(".hero-content");
+        if (scrollPosition > 50) {
+          hero.classList.add("scroll-active");
+        }
+
+        // Parallax y secciones
+        document.querySelectorAll(".story-section").forEach((section) => {
+          const offset =
+            (section.getAttribute("data-scroll-offset") * windowHeight) / 100;
+          const sectionTop =
+            section.getBoundingClientRect().top + scrollPosition;
+          if (scrollPosition > sectionTop - windowHeight + offset) {
+            section.classList.add("active");
+          }
+
+          const img = section.querySelector(".parallax-image");
+          if (img) {
+            const parallaxSpeed = 0.3;
+            const translateY = (scrollPosition - sectionTop) * parallaxSpeed;
+            img.style.transform = `translateY(${translateY}px)`;
+          }
+        });
+      });
+    </script>
+    <!--     <footer id="footer" class="footer">
       <div class="contact-info">
         <a
           href="https://www.instagram.com/limitless_uy"
@@ -174,7 +271,7 @@
           <img src="../img/instagram-icon.webp" alt="Instagram" />
           @limitless_uy
         </a>
-        
+
         <a href="mailto:contacto.limitlessuy@gmail.com" class="social-link">
           <img src="../img/email-icon.png" alt="Correo" />
           contacto.limitlessuy@gmail.com
@@ -190,6 +287,6 @@
         />
         <button type="submit">Enviar</button>
       </form>
-    </footer>
+    </footer> -->
   </body>
 </html>

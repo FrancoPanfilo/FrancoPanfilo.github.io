@@ -45,13 +45,26 @@ if (qrId) {
       if (docSnap.exists()) {
         const qrData = docSnap.data();
         setTimeout(() => {
-        window.location.href = `https://${qrData.link}`; // Redirige al link asociado al QR
-},1000);
+          window.location.href = `https://${qrData.link}`; // Redirige al link asociado al QR
+        }, 1000);
       } else {
       }
     })
     .catch((error) => {
-      console.error("Error obteniendo el documento:", error);
+      const qrDoc = doc(db, "QRs", qrId);
+      getDoc(qrDoc)
+        .then((docSnap) => {
+          if (docSnap.exists()) {
+            const qrData = docSnap.data();
+            setTimeout(() => {
+              window.location.href = `https://${qrData.link}`; // Redirige al link asociado al QR
+            }, 1000);
+          } else {
+          }
+        })
+        .catch((error) => {
+          console.error("Error obteniendo el documento:", error);
+        });
     });
 } else {
   //alert("No se encontró el ID del QR.");

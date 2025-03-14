@@ -111,6 +111,8 @@ h3 {
 }
 @media (max-width: 470px) {
   #catalogo {
+    justify-content: space-around;
+    align-items: center;
     margin-top: 45px;
   }
   .producto-item img {

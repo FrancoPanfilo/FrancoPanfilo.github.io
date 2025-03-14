@@ -14,7 +14,7 @@ const catalogo = [
   },
   {
     codigo: "S1C2",
-    imagen1: "../img/S1C2-1.JPG",
+    imagen1: "../img/S1C2-1.jpeg",
     imagen2: "../img/S1C2-2.JPG",
     imagen3: "../img/S1C2-3.jpeg",
     imagen4: "../img/S1C2-4.jpg",
@@ -28,13 +28,13 @@ const catalogo = [
   },
   {
     codigo: "S1C3",
-    imagen1: "https://example.com/product3_img1.jpg",
-    imagen2: "https://example.com/product3_img2.jpg",
-    imagen3: "https://example.com/product3_img3.jpg",
-    imagen4: "https://example.com/product3_img4.jpg",
-    imagen5: "https://example.com/product3_img5.jpg",
+    imagen1: "../img/S1C3-1.jpeg",
+    imagen2: "../img/S1C3-1.jpeg",
+    imagen3: "../img/S1C3-1.jpeg",
+    imagen4: "../img/S1C3-4.jpeg",
     Titulo: "Season 1 - Chapter 3",
-    Descripcion: "Sudadera cómoda para entrenamiento",
+    Descripcion:
+      "Remera oversize celeste de algodón suave, con un corte amplio y caída relajada. Su tela liviana garantiza comodidad, mientras que el diseño minimalista la convierte en una opción versátil y moderna.",
     Precio: "1190 $",
     Talles: ["S", "M", "L", "XL", "XXL"],
   },
