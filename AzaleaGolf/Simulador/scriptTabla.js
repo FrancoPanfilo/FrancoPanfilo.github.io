@@ -3,7 +3,7 @@ import {
   StandardFonts,
 } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA21");
+console.log("HOLA");
 
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
@@ -88,20 +88,15 @@ function calculateStatistics(shotsByClub) {
     if (shots.length === 1) {
       carryValues = shots.map((s) => s.carry);
     } else if (shots.length >= 5) {
-      // Calculate average carry
       const avgCarry =
         shots.reduce((sum, s) => sum + s.carry, 0) / shots.length;
-
-      // Find the percentage of shots closest to the average carry
       const closestShots = shots.sort(
         (a, b) => Math.abs(a.carry - avgCarry) - Math.abs(b.carry - avgCarry)
       );
       const limit = Math.floor(shots.length * deviationPercentage);
       const selectedShots = closestShots.slice(0, limit);
-
       carryValues = selectedShots.map((s) => s.carry);
     } else {
-      // Use all shots if there are fewer than 5
       carryValues = shots.map((s) => s.carry);
     }
 
@@ -113,19 +108,17 @@ function calculateStatistics(shotsByClub) {
       variation = `±${((maxCarry - minCarry) / 2).toFixed(0)}`;
 
       const offlineValues = shots.map((s) => s.offline).sort((a, b) => a - b);
-
       const lateralLimit = Math.floor(offlineValues.length * lateralPerc);
       const selectedOffline = shots
         .map((s) => s.offline)
-        .sort((a, b) => Math.abs(a) - Math.abs(b)) // Ordenar por magnitud de offline
-        .slice(0, lateralLimit); // Tomar el % indicado
+        .sort((a, b) => Math.abs(a) - Math.abs(b))
+        .slice(0, lateralLimit);
 
-      maxLeft = Math.min(...selectedOffline).toFixed(0); // Máximo fallo a la izquierda
-      maxRight = Math.max(...selectedOffline).toFixed(0); // Máximo fallo a la derecha
+      maxLeft = Math.min(...selectedOffline).toFixed(0);
+      maxRight = Math.max(...selectedOffline).toFixed(0);
       if (maxLeft > 0) maxLeft = 0;
       if (maxRight < 0) maxRight = 0;
       maxLeft = Math.abs(maxLeft);
-
       lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
     }
 
@@ -138,7 +131,6 @@ function calculateStatistics(shotsByClub) {
     };
   });
 
-  // Orden específico de los palos con nombres más expresivos
   const orderedClubs = {
     Driver: "Dr",
     "Madera 3": "3w",
@@ -172,37 +164,44 @@ function calculateStatistics(shotsByClub) {
     "64°": "64",
   };
 
-  // Eliminar putt de clubStats
   delete clubStats.Putt;
 
-  async function rellenarPDF(datos, pdfName) {
-    // Obtener valores de nombre y fecha
+  async function rellenarPDF(datos, pdfName, useTemplate = true) {
     const nombre = document.getElementById("nombre").value;
     const fecha = document.getElementById("fecha").value;
+    let pdfDoc;
 
-    // Cargar el PDF existente desde una URL
-    const existingPdfBytes = await fetch(`${pdfName}.pdf`).then((res) =>
-      res.arrayBuffer()
-    );
+    if (useTemplate) {
+      const existingPdfBytes = await fetch(`${pdfName}.pdf`).then((res) =>
+        res.arrayBuffer()
+      );
+      pdfDoc = await PDFDocument.load(existingPdfBytes);
+    } else {
+      pdfDoc = await PDFDocument.create();
+      pdfDoc.addPage([595.28, 841.89]); // Tamaño A4
+    }
 
-    const pdfDoc = await PDFDocument.load(existingPdfBytes);
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    // Cargar la imagen de la flecha
     const flechaBytes = await fetch("flecha-doble.png").then((res) =>
       res.arrayBuffer()
     );
     const flechaImage = await pdfDoc.embedPng(flechaBytes);
 
-    // Coordenadas iniciales de la tabla
-    let xBase = 47;
-    let yBase = 313;
+    const contentWidth = 167 + 47; // Ancho aproximado del contenido
+    let xBase;
+    if (useTemplate) {
+      xBase = 47; // Posición original para plantilla
+    } else {
+      xBase = (595.28 - contentWidth) / 2; // Centrado en A4
+    }
+
+    const yBase = useTemplate ? 313 : 841.89 - 22.68; // 0.8 cm = 22.68 puntos desde el tope
     const stepY = 20.25;
 
-    // Recorrer los datos y rellenar la tabla
     let index = 0;
     Object.keys(orderedClubs).forEach(async (clubName) => {
       const clubCode = orderedClubs[clubName];
@@ -210,7 +209,6 @@ function calculateStatistics(shotsByClub) {
         const dato = datos[clubCode];
         const yPos = yBase - index * stepY;
         index++;
-        // Calcular el ancho del texto para centrarlo
         const textWidth = fontBold.widthOfTextAtSize(clubName, 8);
         const xClub = xBase - textWidth / 2;
         const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
@@ -229,38 +227,13 @@ function calculateStatistics(shotsByClub) {
         const maxRightWidth = fontRegular.widthOfTextAtSize(maxRightText, 8);
         const xMaxLeft = LLateralDispersion - maxLeftWidth / 2;
         const xMaxRight = RLateralDispersion - maxRightWidth / 2;
-        firstPage.drawText(clubName, {
-          x: xClub,
-          y: yPos,
-          size: 8,
-          font: fontBold,
-        }); // Nombre del palo en negrita
-        firstPage.drawText(avgCarryText, {
-          x: xAvgCarry,
-          y: yPos,
-          size: 8,
-          font: fontRegular,
-        }); // Carry promedio sin 'yds'
-        firstPage.drawText(maxLeftText.toString(), {
-          x: xMaxLeft,
-          y: yPos,
-          size: 8,
-          font: fontRegular,
-        }); // Dispersión lateral izquierda centrada
-        firstPage.drawText(maxRightText.toString(), {
-          x: xMaxRight,
-          y: yPos,
-          size: 8,
-          font: fontRegular,
-        });
-        firstPage.drawText(variationText, {
-          x: xVariation,
-          y: yPos,
-          size: 8,
-          font: fontRegular,
-        }); // Variación de distancia
 
-        // Dibujar la imagen de la flecha
+        firstPage.drawText(clubName, { x: xClub, y: yPos, size: 8, font: fontBold });
+        firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8, font: fontRegular });
+        firstPage.drawText(maxLeftText.toString(), { x: xMaxLeft, y: yPos, size: 8, font: fontRegular });
+        firstPage.drawText(maxRightText.toString(), { x: xMaxRight, y: yPos, size: 8, font: fontRegular });
+        firstPage.drawText(variationText, { x: xVariation, y: yPos, size: 8, font: fontRegular });
+
         firstPage.drawImage(flechaImage, {
           x: xLateralDispersion - 5,
           y: yPos - 2,
@@ -270,37 +243,46 @@ function calculateStatistics(shotsByClub) {
       }
     });
 
-    // Añadir nombre y fecha en la esquina superior derecha
     const fechaFormateada = formatearFecha(fecha);
-    firstPage.drawText(`${nombre}`, {
-      x: 10,
-      y: 385,
-      size: 13,
-      font: fontRegular,
-    });
-    firstPage.drawText(`${fechaFormateada}`, {
-      x: 10,
-      y: 365,
-      size: 11,
-      font: fontRegular,
-    });
-    firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-      x: 109,
-      y: 21,
-      size: 4.5,
-      font: fontRegular,
-    });
-    firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
-      x: 100.5,
-      y: 35.5,
-      size: 4.5,
-      font: fontRegular,
-    });
+    if (useTemplate) {
+      firstPage.drawText(`${nombre}`, { x: 10, y: 385, size: 13, font: fontRegular });
+      firstPage.drawText(`${fechaFormateada}`, { x: 10, y: 365, size: 11, font: fontRegular });
+      firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, { x: 109, y: 21, size: 4.5, font: fontRegular });
+      firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, { x: 100.5, y: 35.5, size: 4.5, font: fontRegular });
+    } else {
+      const nombreWidth = fontRegular.widthOfTextAtSize(nombre, 13);
+      const fechaWidth = fontRegular.widthOfTextAtSize(fechaFormateada, 11);
+      firstPage.drawText(`${nombre}`, {
+        x: (595.28 - nombreWidth) / 2,
+        y: 841.89 - 40,
+        size: 13,
+        font: fontRegular,
+      });
+      firstPage.drawText(`${fechaFormateada}`, {
+        x: (595.28 - fechaWidth) / 2,
+        y: 841.89 - 60,
+        size: 11,
+        font: fontRegular,
+      });
+      const devText = `${(deviationPercentage * 100).toFixed(0)}`;
+      const latText = `${(lateralPerc * 100).toFixed(0)}`;
+      const devWidth = fontRegular.widthOfTextAtSize(devText, 4.5);
+      const latWidth = fontRegular.widthOfTextAtSize(latText, 4.5);
+      firstPage.drawText(devText, {
+        x: (595.28 - devWidth) / 2,
+        y: 30,
+        size: 4.5,
+        font: fontRegular,
+      });
+      firstPage.drawText(latText, {
+        x: (595.28 - latWidth) / 2,
+        y: 40,
+        size: 4.5,
+        font: fontRegular,
+      });
+    }
 
-    // Guardar el PDF modificado
     const pdfBytes = await pdfDoc.save();
-
-    // Crear un enlace de descarga para el nuevo PDF
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -310,11 +292,10 @@ function calculateStatistics(shotsByClub) {
     console.log(`Tabla rellenada y nuevo PDF (${pdfName}) descargado.`);
   }
 
-  rellenarPDF(clubStats, "YardageBook");
-  rellenarPDF(clubStats, "vacio");
+  rellenarPDF(clubStats, "YardageBook", true);
+  rellenarPDF(clubStats, "vacio", false);
 
   return clubStats;
 }
 
-// Llama a la función dentro de un contexto async
 handleFile();
