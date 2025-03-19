@@ -197,8 +197,8 @@ function calculateStatistics(shotsByClub) {
     const flechaImage = await pdfDoc.embedPng(flechaBytes);
 
     // Coordenadas iniciales de la tabla
-    let xBase = 200;
-    let yBase = 750;
+    let xBase = 213;
+    let yBase = 723;
     const stepY = 20.25;
 
     // Recorrer los datos y rellenar la tabla
@@ -273,25 +273,25 @@ function calculateStatistics(shotsByClub) {
     const fechaFormateada = formatearFecha(fecha);
     firstPage.drawText(`${nombre}`, {
       x: 180,
-      y: 805,
+      y: 795,
       size: 13,
       font: fontRegular,
     });
     firstPage.drawText(`${fechaFormateada}`, {
       x: 180,
-      y: 785,
+      y: 775,
       size: 11,
       font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-      x: 279,
-      y: 565,
+      x: 297.5,
+      y: 432,
       size: 4.5,
       font: fontRegular,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
-      x: 270,
-      y: 580,
+      x: 286,
+      y: 452,
       size: 4.5,
       font: fontRegular,
     });
