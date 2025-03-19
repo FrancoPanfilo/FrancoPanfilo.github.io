@@ -198,7 +198,7 @@ function calculateStatistics(shotsByClub) {
 
     // Coordenadas iniciales de la tabla
     let xBase = 213;
-    let yBase = 723;
+    let yBase = 725;
     const stepY = 20.25;
 
     // Recorrer los datos y rellenar la tabla
@@ -273,25 +273,25 @@ function calculateStatistics(shotsByClub) {
     const fechaFormateada = formatearFecha(fecha);
     firstPage.drawText(`${nombre}`, {
       x: 180,
-      y: 795,
+      y: 797,
       size: 13,
       font: fontRegular,
     });
     firstPage.drawText(`${fechaFormateada}`, {
       x: 180,
-      y: 775,
+      y: 777,
       size: 11,
       font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
       x: 300,
-      y: 430.5,
+      y: 434,
       size: 5,
       font: fontBold,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
       x: 288.5,
-      y: 448.5,
+      y: 452,
       size: 5,
       font: fontBold,
     });
