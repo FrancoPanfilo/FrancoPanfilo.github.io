@@ -3,7 +3,7 @@ import {
   StandardFonts,
 } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA");
+console.log("HOLA2");
 
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
@@ -191,16 +191,16 @@ function calculateStatistics(shotsByClub) {
     );
     const flechaImage = await pdfDoc.embedPng(flechaBytes);
 
-    const contentWidth = 167 + 47; // Ancho aproximado del contenido
-    let xBase;
-    if (useTemplate) {
-      xBase = 47; // Posición original para plantilla
-    } else {
-      xBase = (595.28 - contentWidth) / 2; // Centrado en A4
+    // Definir el desplazamiento para centrar el bloque completo en "vacio"
+    let xOffset = 0;
+    if (!useTemplate) {
+      const contentWidth = 167 + 47; // Ancho del bloque (desde x=47 hasta x=167+47)
+      xOffset = (595.28 - contentWidth) / 2 - 47; // Desplazamiento para centrar el bloque
     }
 
-    const yBase = useTemplate ? 313 : 841.89 - 22.68; // 0.8 cm = 22.68 puntos desde el tope
+    const yBase = useTemplate ? 313 : 841.89 - 22.68; // 0.8 cm desde el tope para "vacio"
     const stepY = 20.25;
+    const xBase = 47; // Posición base original
 
     let index = 0;
     Object.keys(orderedClubs).forEach(async (clubName) => {
@@ -210,17 +210,17 @@ function calculateStatistics(shotsByClub) {
         const yPos = yBase - index * stepY;
         index++;
         const textWidth = fontBold.widthOfTextAtSize(clubName, 8);
-        const xClub = xBase - textWidth / 2;
+        const xClub = xBase + xOffset - textWidth / 2;
         const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
         const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
-        const xAvgCarry = xBase + 114 - avgCarryWidth / 2;
+        const xAvgCarry = xBase + xOffset + 114 - avgCarryWidth / 2;
 
-        const xLateralDispersion = xBase + 59.5;
-        const LLateralDispersion = xBase + 45.5;
-        const RLateralDispersion = xBase + 73.5;
+        const xLateralDispersion = xBase + xOffset + 59.5;
+        const LLateralDispersion = xBase + xOffset + 45.5;
+        const RLateralDispersion = xBase + xOffset + 73.5;
         const variationText = `${dato.variation}`;
         const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
-        const xVariation = xBase + 167 - variationWidth / 2;
+        const xVariation = xBase + xOffset + 167 - variationWidth / 2;
         const maxLeftText = `${dato.maxLeft}`;
         const maxRightText = `${dato.maxRight}`;
         const maxLeftWidth = fontRegular.widthOfTextAtSize(maxLeftText, 8);
@@ -228,7 +228,7 @@ function calculateStatistics(shotsByClub) {
         const xMaxLeft = LLateralDispersion - maxLeftWidth / 2;
         const xMaxRight = RLateralDispersion - maxRightWidth / 2;
 
-        firstPage.drawText(clubName, { x: xClub, y: yPos, size: 8, font: fontBold });
+        firstPage.drawText(clubName, { x: xClub, y: yPos, size: 8, font: FONTBOLD });
         firstPage.drawText(avgCarryText, { x: xAvgCarry, y: yPos, size: 8, font: fontRegular });
         firstPage.drawText(maxLeftText.toString(), { x: xMaxLeft, y: yPos, size: 8, font: fontRegular });
         firstPage.drawText(maxRightText.toString(), { x: xMaxRight, y: yPos, size: 8, font: fontRegular });
@@ -250,36 +250,10 @@ function calculateStatistics(shotsByClub) {
       firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, { x: 109, y: 21, size: 4.5, font: fontRegular });
       firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, { x: 100.5, y: 35.5, size: 4.5, font: fontRegular });
     } else {
-      const nombreWidth = fontRegular.widthOfTextAtSize(nombre, 13);
-      const fechaWidth = fontRegular.widthOfTextAtSize(fechaFormateada, 11);
-      firstPage.drawText(`${nombre}`, {
-        x: (595.28 - nombreWidth) / 2,
-        y: 841.89 - 40,
-        size: 13,
-        font: fontRegular,
-      });
-      firstPage.drawText(`${fechaFormateada}`, {
-        x: (595.28 - fechaWidth) / 2,
-        y: 841.89 - 60,
-        size: 11,
-        font: fontRegular,
-      });
-      const devText = `${(deviationPercentage * 100).toFixed(0)}`;
-      const latText = `${(lateralPerc * 100).toFixed(0)}`;
-      const devWidth = fontRegular.widthOfTextAtSize(devText, 4.5);
-      const latWidth = fontRegular.widthOfTextAtSize(latText, 4.5);
-      firstPage.drawText(devText, {
-        x: (595.28 - devWidth) / 2,
-        y: 30,
-        size: 4.5,
-        font: fontRegular,
-      });
-      firstPage.drawText(latText, {
-        x: (595.28 - latWidth) / 2,
-        y: 40,
-        size: 4.5,
-        font: fontRegular,
-      });
+      firstPage.drawText(`${nombre}`, { x: 10 + xOffset, y: 841.89 - 40, size: 13, font: fontRegular });
+      firstPage.drawText(`${fechaFormateada}`, { x: 10 + xOffset, y: 841.89 - 60, size: 11, font: fontRegular });
+      firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, { x: 109 + xOffset, y: 21, size: 4.5, font: fontRegular });
+      firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, { x: 100.5 + xOffset, y: 35.5, size: 4.5, font: fontRegular });
     }
 
     const pdfBytes = await pdfDoc.save();
