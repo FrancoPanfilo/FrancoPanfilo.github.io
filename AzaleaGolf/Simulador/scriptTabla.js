@@ -3,7 +3,7 @@ import {
   StandardFonts,
 } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA1");
+console.log("HOLA");
 
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
@@ -18,7 +18,9 @@ let datos;
 
 function handleFile() {
   const input = document.getElementById("fileInput");
-
+if (input.files.length === 0) {
+    return;
+  }
 
   const file = input.files[0];
   const reader = new FileReader();
@@ -195,8 +197,8 @@ function calculateStatistics(shotsByClub) {
     const flechaImage = await pdfDoc.embedPng(flechaBytes);
 
     // Coordenadas iniciales de la tabla
-    let xBase = 400;
-    let yBase = 950;
+    let xBase = 200;
+    let yBase = 750;
     const stepY = 20.25;
 
     // Recorrer los datos y rellenar la tabla
@@ -270,14 +272,14 @@ function calculateStatistics(shotsByClub) {
     // Añadir nombre y fecha en la esquina superior derecha
     const fechaFormateada = formatearFecha(fecha);
     firstPage.drawText(`${nombre}`, {
-      x: 100,
-      y: 900,
+      x: 180,
+      y: 820,
       size: 13,
       font: fontRegular,
     });
     firstPage.drawText(`${fechaFormateada}`, {
-      x: 310,
-      y: 880,
+      x: 180,
+      y: 800,
       size: 11,
       font: fontRegular,
     });
