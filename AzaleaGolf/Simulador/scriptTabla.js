@@ -284,16 +284,16 @@ function calculateStatistics(shotsByClub) {
       font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-      x: 297.5,
-      y: 432,
-      size: 4.5,
-      font: fontRegular,
+      x: 300,
+      y: 430.5,
+      size: 5,
+      font: fontBold,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
-      x: 286,
-      y: 452,
-      size: 4.5,
-      font: fontRegular,
+      x: 288.5,
+      y: 448.5,
+      size: 5,
+      font: fontBold,
     });
 
     // Guardar el PDF modificado
