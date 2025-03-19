@@ -3,7 +3,7 @@ import {
   StandardFonts,
 } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA");
+console.log("HOLA1");
 
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
@@ -18,10 +18,7 @@ let datos;
 
 function handleFile() {
   const input = document.getElementById("fileInput");
-  if (input.files.length === 0) {
-    alert("Por favor, selecciona un archivo CSV.");
-    return;
-  }
+
 
   const file = input.files[0];
   const reader = new FileReader();
@@ -198,8 +195,8 @@ function calculateStatistics(shotsByClub) {
     const flechaImage = await pdfDoc.embedPng(flechaBytes);
 
     // Coordenadas iniciales de la tabla
-    let xBase = 100;
-    let yBase = 650;
+    let xBase = 400;
+    let yBase = 950;
     const stepY = 20.25;
 
     // Recorrer los datos y rellenar la tabla
@@ -273,26 +270,26 @@ function calculateStatistics(shotsByClub) {
     // Añadir nombre y fecha en la esquina superior derecha
     const fechaFormateada = formatearFecha(fecha);
     firstPage.drawText(`${nombre}`, {
-      x: 10,
-      y: 385,
+      x: 100,
+      y: 900,
       size: 13,
       font: fontRegular,
     });
     firstPage.drawText(`${fechaFormateada}`, {
-      x: 10,
-      y: 365,
+      x: 310,
+      y: 880,
       size: 11,
       font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-      x: 109,
-      y: 21,
+      x: 409,
+      y: 621,
       size: 4.5,
       font: fontRegular,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
-      x: 100.5,
-      y: 35.5,
+      x: 400.5,
+      y: 635.5,
       size: 4.5,
       font: fontRegular,
     });
