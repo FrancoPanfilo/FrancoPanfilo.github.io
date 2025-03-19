@@ -3,7 +3,7 @@ import {
   StandardFonts,
 } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA");
+console.log("HOLA1");
 
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
@@ -273,25 +273,25 @@ function calculateStatistics(shotsByClub) {
     const fechaFormateada = formatearFecha(fecha);
     firstPage.drawText(`${nombre}`, {
       x: 180,
-      y: 820,
+      y: 805,
       size: 13,
       font: fontRegular,
     });
     firstPage.drawText(`${fechaFormateada}`, {
       x: 180,
-      y: 800,
+      y: 785,
       size: 11,
       font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-      x: 409,
-      y: 621,
+      x: 279,
+      y: 565,
       size: 4.5,
       font: fontRegular,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
-      x: 400.5,
-      y: 635.5,
+      x: 270,
+      y: 580,
       size: 4.5,
       font: fontRegular,
     });
