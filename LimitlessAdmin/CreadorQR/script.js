@@ -3,10 +3,13 @@ import {
   getFirestore,
   collection,
   getDocs,
+  getDoc,
   updateDoc,
   doc,
   addDoc,
   increment,
+  query,
+  where,
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Configuración de Firebase
@@ -184,37 +187,131 @@ function generateQRDinamicCode() {
   document.getElementById("qr-code").innerHTML = "";
 }
 // tabla
-
 async function cargarQRs() {
   const qrCollection = collection(db, "QRs");
   const qrSnapshot = await getDocs(qrCollection);
-  const qrList = qrSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  let qrList = qrSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+  // Ordenar por nombre
   qrList.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
   const tableBody = document.querySelector("#qrTable tbody");
-  tableBody.innerHTML = ""; // Limpiar la tabla antes de llenar
+  const nameFilter = document.getElementById("nameFilter");
+  const linkFilter = document.getElementById("linkFilter");
+  const vinculadoFilter = document.getElementById("vinculadoFilter");
 
-  qrList.forEach((qr) => {
-    const row = document.createElement("tr");
-
-    // Crear celdas para cada campo
-    row.innerHTML = `
+  function renderTable(filteredList) {
+    tableBody.innerHTML = ""; // Limpiar la tabla
+    filteredList.forEach((qr) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
         <td>${qr.id}</td>
         <td>${qr.nombre}</td>
+        <td>
+          ${qr.vinculado || "No vinculado"}
+          ${
+            qr.vinculado
+              ? `<span class="tooltip" data-id="${qr.vinculado}">?</span>`
+              : ""
+          }
+        </td>
         <td><input type="text" value="${qr.link}" id="link-${qr.id}" /></td>
-        <td><button id='save${qr.id}'>Guardar</button></td>
-        <td><button id='link${qr.id}'>Link</button></td>
-
+        <td><button id="save${qr.id}">Guardar</button></td>
+        <td><button id="link${qr.id}">Link</button></td>
       `;
+      tableBody.appendChild(row);
+      document
+        .getElementById(`save${qr.id}`)
+        .addEventListener("click", () => guardarLink(qr.id));
+      document
+        .getElementById(`link${qr.id}`)
+        .addEventListener("click", () => descargarQR(qr.id));
+    });
 
-    tableBody.appendChild(row);
-    document
-      .getElementById(`save${qr.id}`)
-      .addEventListener("click", () => guardarLink(qr.id));
-    document
-      .getElementById(`link${qr.id}`)
-      .addEventListener("click", () => descargarQR(qr.id));
-  });
+    // Agregar tooltips dinámicos después de renderizar la tabla
+    addTooltips();
+  }
+  async function addTooltips() {
+    const tooltips = document.querySelectorAll(".tooltip");
+    tooltips.forEach((tooltip) => {
+      const ventaId = tooltip.getAttribute("data-id");
+
+      // Si no hay ID de venta, no hacemos nada
+      if (!ventaId) return;
+
+      // Buscar la venta en la colección "Ventas" por el campo único
+      const fetchVentaData = async () => {
+        try {
+          console.log(ventaId);
+          // Suponiendo que el campo único en "Ventas" se llama "ventaId"
+          const ventasQuery = query(
+            collection(db, "Ventas"),
+            where("codigo", "==", ventaId)
+          );
+          const querySnapshot = await getDocs(ventasQuery);
+
+          if (!querySnapshot.empty) {
+            // Tomamos el primer documento (asumiendo que "ventaId" es único)
+            const ventaData = querySnapshot.docs[0].data();
+            const tooltipText = `
+              ID Venta: ${ventaId}
+              Cliente: ${ventaData.cliente || "N/A"}
+              Producto: ${ventaData.producto || "N/A"}
+              Talle: ${ventaData.talle || "N/A"}
+            `;
+            tooltip.setAttribute("data-tooltip", tooltipText);
+          } else {
+            tooltip.setAttribute("data-tooltip", "Venta no encontrada");
+          }
+        } catch (error) {
+          console.error("Error al cargar datos de la venta:", error);
+          tooltip.setAttribute("data-tooltip", "Error al cargar datos");
+        }
+      };
+
+      // Ejecutar la búsqueda de datos al pasar el mouse
+      tooltip.addEventListener("mouseenter", fetchVentaData);
+    });
+  }
+  function applyFilters() {
+    let filteredList = [...qrList];
+
+    // Filtro por nombre
+    const nameValue = nameFilter.value.toLowerCase();
+    if (nameValue) {
+      filteredList = filteredList.filter((qr) =>
+        qr.nombre.toLowerCase().includes(nameValue)
+      );
+    }
+
+    // Filtro por link
+    const linkValue = linkFilter.value.toLowerCase();
+    if (linkValue) {
+      filteredList = filteredList.filter((qr) =>
+        qr.link.toLowerCase().includes(linkValue)
+      );
+    }
+
+    // Filtro por vinculación
+    const vinculadoValue = vinculadoFilter.value;
+    if (vinculadoValue !== "todos") {
+      filteredList = filteredList.filter((qr) =>
+        vinculadoValue === "vinculados"
+          ? qr.vinculado != ""
+          : qr.vinculado == ""
+      );
+    }
+
+    renderTable(filteredList);
+  }
+
+  // Event listeners para los filtros
+  nameFilter.addEventListener("input", applyFilters);
+  linkFilter.addEventListener("input", applyFilters);
+  vinculadoFilter.addEventListener("change", applyFilters);
+
+  // Render inicial
+  applyFilters();
 }
 function descargarQR(id) {
   const copiarContenido = async () => {

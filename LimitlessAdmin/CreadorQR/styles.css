@@ -105,3 +105,68 @@ h1 {
   font-size: 24px;
   margin-bottom: 20px;
 }
+.filtroh2 {
+  width: 75%;
+  color: #000000;
+  text-align: left;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.filter-container {
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 90%;
+  width: 75%;
+  height: 100px;
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: #ccc;
+  color: #fff;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -100%; /* Ajusta según necesites */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  /* Para permitir saltos de línea */
+  z-index: 10;
+  min-width: 150px; /* Ancho mínimo para legibilidad */
+}
+
+.tooltip:hover::before {
+  text-align: left;
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0;
+  border-style: solid;
+  border-color: #333 transparent transparent;
+  z-index: 10;
+}

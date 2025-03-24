@@ -32,6 +32,8 @@ async function agregarCliente(nombre, precio) {
     });
     cargarClientes();
     alert("Producto cargado correctamente");
+    document.getElementById("link").value = "";
+    document.getElementById("link1").value = "";
   } catch (err) {
     console.error("Error", err);
   }

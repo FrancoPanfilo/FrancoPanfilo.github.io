@@ -51,7 +51,30 @@
       <input id="dir" placeholder="Campeon del Siglo" />
       <button id="boton">Crear venta</button>
     </div>
+    <h2 class="filtroh2">Filtros</h2>
 
+    <!-- Después del div.container y antes de la tabla -->
+    <div class="filter-container">
+      <select id="filtroPagado">
+        <option value="todas">Pagado: Todas</option>
+        <option value="si">Pagado: Sí</option>
+        <option value="no">Pagado: No</option>
+      </select>
+      <select id="filtroEnviado">
+        <option value="todas">Enviado: Todas</option>
+        <option value="si">Enviado: Sí</option>
+        <option value="no">Enviado: No</option>
+      </select>
+      <select id="filtroEntregado">
+        <option value="todas">Entregado: Todas</option>
+        <option value="si">Entregado: Sí</option>
+        <option value="no">Entregado: No</option>
+      </select>
+    </div>
+
+    <table id="qrTable">
+      <!-- Resto de la tabla sigue igual -->
+    </table>
     <table id="qrTable">
       <thead>
         <tr>
@@ -83,7 +106,6 @@
           </thead>
           <tbody></tbody>
         </table>
-        <button id="seleccionarBtn">Seleccionar</button>
       </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

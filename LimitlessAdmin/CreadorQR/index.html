@@ -70,12 +70,32 @@
         <div id="qr-code1"></div>
       </div>
     </div>
+    <h2 class="filtroh2">Filtros</h2>
 
+    <div class="filter-container">
+      <div class="filter-group">
+        <label for="nameFilter">Filtrar por nombre:</label>
+        <input type="text" id="nameFilter" placeholder="Ingrese nombre" />
+      </div>
+      <div class="filter-group">
+        <label for="linkFilter">Filtrar por link:</label>
+        <input type="text" id="linkFilter" placeholder="Ingrese link" />
+      </div>
+      <div class="filter-group">
+        <label for="vinculadoFilter">Estado de vinculación:</label>
+        <select id="vinculadoFilter">
+          <option value="todos">Todos</option>
+          <option value="vinculados">Solo vinculados</option>
+          <option value="no-vinculados">Solo no vinculados</option>
+        </select>
+      </div>
+    </div>
     <table id="qrTable">
       <thead>
         <tr>
           <th>ID</th>
           <th>Nombre</th>
+          <th>Venta</th>
           <th>Link</th>
           <th>Acciones</th>
           <th>QR</th>

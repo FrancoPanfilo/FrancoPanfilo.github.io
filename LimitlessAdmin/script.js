@@ -20,6 +20,7 @@ const firebaseConfig = {
   appId: "1:780450660358:web:9f6fd50c7770b5b9e34387",
   measurementId: "G-N6EVVE075H",
 };
+
 const mobileNav = document.querySelector(".hamburger");
 const navbar = document.querySelector(".menubar");
 
@@ -28,76 +29,52 @@ const toggleNav = () => {
   mobileNav.classList.toggle("hamburger-active");
 };
 mobileNav.addEventListener("click", () => toggleNav());
-const tableBody = document.querySelector("tbody");
-const modal = document.getElementById("myModal");
-const modalTable = document.getElementById("modalTable");
-const seleccionarBtn = document.getElementById("seleccionarBtn");
-document
-  .getElementById("cerrarM")
-  .addEventListener("click", () => cerrarModal());
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 async function mostrarModal(idVenta, codigoVenta) {
-  console.log(idVenta, codigoVenta);
   modal.style.display = "block";
   const qrCollection = collection(db, "QRs");
   const qrSnapshot = await getDocs(qrCollection);
   const qrList = qrSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   qrList.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-  const tableBody = document.querySelector("#modalTable");
-  tableBody.innerHTML = ""; // Limpiar la tabla antes de llenar
+  const tableBody = document.querySelector("#modalTable tbody"); // Ajustado a tbody
+  tableBody.innerHTML = "";
 
   qrList.forEach((qr) => {
     if (qr.vinculado === "") {
       const row = document.createElement("tr");
-
-      // Crear celdas para cada campo
       row.innerHTML = `
-          <td>${qr.nombre}</td>
-          <td>${qr.link}</td>
-  
-  
-        `;
+        <td>${qr.nombre}</td>
+        <td>${qr.link}</td>
+      `;
       tableBody.appendChild(row);
-      row.addEventListener("click", () => {
+      row.addEventListener("click", async () => {
         const conf = confirm(`Vincular ${codigoVenta} a ${qr.nombre}`);
         if (conf) {
           try {
-            const clientDoc = doc(db, "Ventas", idVenta);
-            updateDoc(clientDoc, { vinculo: qr.nombre });
+            const ventaDoc = doc(db, "Ventas", idVenta);
+            await updateDoc(ventaDoc, { vinculo: qr.nombre });
+            const qrDoc = doc(db, "QRs", qr.id);
+            await updateDoc(qrDoc, { vinculado: codigoVenta });
+            cerrarModal();
+            cargarClientes();
           } catch (error) {
-            console.error("Error actualizando el email: ", error);
+            console.error("Error al vincular:", error);
           }
-          try {
-            const clientDoc = doc(db, "QRs", qr.id);
-            updateDoc(clientDoc, { vinculado: codigoVenta });
-          } catch (error) {
-            console.error("Error actualizando el email: ", error);
-          }
-        } else {
         }
       });
     }
   });
 }
 
-// Función para cerrar el modal
 function cerrarModal() {
   modal.style.display = "none";
 }
 
-// Función para manejar la selección de una fila en el modal
-
-// Agregar el event listener al botón "Agregar"
-document.querySelectorAll(".accion button").forEach((button) => {
-  button.addEventListener("click", mostrarModal);
-});
-
-// Agregar el event listener al botón "Seleccionar" del modal
-// Inicializa Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 async function agregarCliente(nombre, precio, talle, direccion) {
-  console.log(precio);
   let codigo = 0;
   const snapshot = await getDocs(collection(db, "Contadores"));
 
@@ -116,7 +93,7 @@ async function agregarCliente(nombre, precio, talle, direccion) {
     const clientDoc = doc(db, "Productos", idProd);
     await updateDoc(clientDoc, { ventas: increment(1) });
   } catch (error) {
-    console.error("Error actualizando el email: ", error);
+    console.error("Error actualizando producto: ", error);
   }
   const snapshotC = await getDocs(collection(db, "Clientes"));
   let idC;
@@ -126,19 +103,17 @@ async function agregarCliente(nombre, precio, talle, direccion) {
     }
   });
   try {
-    console.log(idC);
     const clientDoc = doc(db, "Clientes", idC);
     await updateDoc(clientDoc, {
       compras: arrayUnion(codigo),
       cantCompras: increment(1),
     });
   } catch (error) {
-    console.error("Error actualizando el email: ", error);
+    console.error("Error actualizando cliente: ", error);
   }
 
   try {
-    // Crea un nuevo documento en la colección 'QRs' con los datos proporcionados
-    const docRef = await addDoc(collection(db, "Ventas"), {
+    await addDoc(collection(db, "Ventas"), {
       cliente: nombre,
       vinculo: "",
       producto: precio,
@@ -150,105 +125,127 @@ async function agregarCliente(nombre, precio, talle, direccion) {
       codigo: codigo,
     });
     cargarClientes();
-
-    alert("Venta cargada correcctamente");
+    document.getElementById("link").value = "";
+    document.getElementById("link1").value = "";
+    document.getElementById("talles").value = "";
+    document.getElementById("dir").value = "";
   } catch (err) {
-    console.error("Error", err);
+    console.error("Error al agregar venta:", err);
   }
   try {
     const clientDoc = doc(db, "Contadores", "Contadores");
     await updateDoc(clientDoc, { venta: increment(1) });
+    alert("Venta cargada correctamente");
   } catch (error) {
-    console.error("Error actualizando el email: ", error);
+    console.error("Error actualizando contador: ", error);
   }
 }
-
-// tabla
 
 async function cargarClientes() {
   const qrCollection = collection(db, "Ventas");
   const qrSnapshot = await getDocs(qrCollection);
-  const qrList = qrSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  let qrList = qrSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   qrList.sort((a, b) => a.codigo.localeCompare(b.codigo));
 
   const tableBody = document.querySelector("#qrTable tbody");
-  tableBody.innerHTML = ""; // Limpiar la tabla antes de llenar
+  const filtroPagado = document.getElementById("filtroPagado");
+  const filtroEnviado = document.getElementById("filtroEnviado");
+  const filtroEntregado = document.getElementById("filtroEntregado");
 
-  qrList.forEach((qr) => {
-    const row = document.createElement("tr");
-    row.dataset.id = qr.id; // Agregamos el ID del documento a la fila
+  function renderTable(filteredList) {
+    tableBody.innerHTML = "";
+    filteredList.forEach((qr) => {
+      const row = document.createElement("tr");
+      row.dataset.id = qr.id;
+      row.innerHTML = `
+        <td>${qr.codigo}</td>
+        <td class="accion">${qr.vinculo}</td>
+        <td>${qr.cliente}</td>
+        <td>${qr.producto}</td>
+        <td>${qr.talle}</td>
+        <td>${qr.direccion}</td>
+        <td><input type="checkbox" class="pagado-checkbox" ${
+          qr.pagado ? "checked disabled" : ""
+        }></td>
+        <td><input type="checkbox" class="enviado-checkbox" ${
+          qr.enviado ? "checked disabled" : ""
+        }></td>
+        <td><input type="checkbox" class="entregado-checkbox" ${
+          qr.entregado ? "checked disabled" : ""
+        }></td>
+      `;
+      tableBody.appendChild(row);
 
-    // Crear celdas para cada campo
-    row.innerHTML = `
-      <td>${qr.codigo}</td>
-      <td class="accion">${qr.vinculo}</td>
-      <td>${qr.cliente}</td>
-      <td>${qr.producto}</td>
-      <td>${qr.talle}</td>
-      <td>${qr.direccion}</td>
-  
-      <td><input type="checkbox" class="pagado-checkbox" ${
-        qr.pagado ? "checked disabled" : ""
-      }></td>
-      <td><input type="checkbox" class="enviado-checkbox" ${
-        qr.enviado ? "checked disabled" : ""
-      }></td>
-      <td><input type="checkbox" class="entregado-checkbox" ${
-        qr.entregado ? "checked disabled" : ""
-      }></td>
-    `;
-
-    tableBody.appendChild(row);
-    const actionCell = row.querySelector(".accion");
-
-    // Crear el botón o mostrar el valor del vínculo
-    if (qr.vinculo === "") {
-      const button = document.createElement("button");
-      button.textContent = "+";
-      actionCell.appendChild(button);
-      button.addEventListener("click", () =>
-        mostrarModal(row.dataset.id, qr.codigo)
-      );
-    } else {
-      actionCell.textContent = qr.vinculo;
-    }
-    // Agregar el event listener a cada fila
-    row.addEventListener("click", async (event) => {
-      if (event.target.type === "checkbox") {
-        event.stopPropagation();
-
-        const confirmed = confirm("¿Estás seguro de realizar este cambio?");
-
-        if (confirmed) {
-          const checkboxClass = event.target.classList[0];
-          const field = checkboxClass.replace("-checkbox", "");
-
-          // Actualizar el documento en Firebase
-          const docRef = doc(db, "Ventas", row.dataset.id); // Usamos el ID de la fila
-          await updateDoc(docRef, {
-            [field]: event.target.checked,
-          })
-            .then(() => {
-              console.log("Documento actualizado correctamente");
-            })
-            .catch((error) => {
-              console.error("Error al actualizar el documento:", error);
-            });
-
-          // Deshabilitar el checkbox
-          event.target.disabled = true;
-        } else {
-          // Deshacer el cambio visual (opcional)
-          event.target.checked = !event.target.checked;
-        }
+      const actionCell = row.querySelector(".accion");
+      if (qr.vinculo === "") {
+        const button = document.createElement("button");
+        button.textContent = "+";
+        actionCell.appendChild(button);
+        button.addEventListener("click", () =>
+          mostrarModal(row.dataset.id, qr.codigo)
+        );
+      } else {
+        actionCell.textContent = qr.vinculo;
       }
+
+      row.addEventListener("click", async (event) => {
+        if (event.target.type === "checkbox") {
+          event.stopPropagation();
+          const confirmed = confirm("¿Estás seguro de realizar este cambio?");
+          if (confirmed) {
+            const checkboxClass = event.target.classList[0];
+            const field = checkboxClass.replace("-checkbox", "");
+            const docRef = doc(db, "Ventas", row.dataset.id);
+            await updateDoc(docRef, { [field]: event.target.checked })
+              .then(() => {
+                console.log("Documento actualizado correctamente");
+              })
+              .catch((error) => {
+                console.error("Error al actualizar el documento:", error);
+              });
+            event.target.disabled = true;
+          } else {
+            event.target.checked = !event.target.checked;
+          }
+        }
+      });
     });
-  });
+  }
+
+  function applyFilters() {
+    let filteredList = [...qrList];
+    const pagadoValue = filtroPagado.value;
+    const enviadoValue = filtroEnviado.value;
+    const entregadoValue = filtroEntregado.value;
+
+    if (pagadoValue !== "todas") {
+      filteredList = filteredList.filter(
+        (qr) => qr.pagado === (pagadoValue === "si")
+      );
+    }
+    if (enviadoValue !== "todas") {
+      filteredList = filteredList.filter(
+        (qr) => qr.enviado === (enviadoValue === "si")
+      );
+    }
+    if (entregadoValue !== "todas") {
+      filteredList = filteredList.filter(
+        (qr) => qr.entregado === (entregadoValue === "si")
+      );
+    }
+
+    renderTable(filteredList);
+  }
+
+  filtroPagado.addEventListener("change", applyFilters);
+  filtroEnviado.addEventListener("change", applyFilters);
+  filtroEntregado.addEventListener("change", applyFilters);
+
+  applyFilters(); // Renderizado inicial con "Todas"
 }
-// Cargar los QR dinámicos al cargar la página
+
 document.getElementById("boton").addEventListener("click", () => {
   const link = document.getElementById("link").value;
-  console.log(link);
   const link1 = document.getElementById("link1").value;
   agregarCliente(
     link,
@@ -256,72 +253,48 @@ document.getElementById("boton").addEventListener("click", () => {
     document.getElementById("talles").value,
     document.getElementById("dir").value
   );
-  cargarClientes();
 });
+
 async function populateSelectFromFirebase() {
   const selectElement = document.getElementById("link");
-
-  if (!selectElement) {
-    console.error('No se encontró el elemento <select> con id="link".');
-    return;
-  }
+  if (!selectElement) return;
 
   try {
-    // Obtener la referencia a la colección "Clientes"
     const qrCollection = collection(db, "Clientes");
     const clientesSnapshot = await getDocs(qrCollection);
-    // Limpiar las opciones actuales del select
     selectElement.innerHTML = "";
-
-    // Agregar una opción por cada cliente
     clientesSnapshot.forEach((doc) => {
-      const cliente = doc.data(); // Datos del cliente
+      const cliente = doc.data();
       const option = document.createElement("option");
-      option.value = `${cliente.codigo}-${cliente.nombre}`; // Usar el ID del documento como valor
-      option.textContent = cliente.nombre; // Mostrar el nombre del cliente
+      option.value = `${cliente.codigo}-${cliente.nombre}`;
+      option.textContent = cliente.nombre;
       selectElement.appendChild(option);
     });
-
-    console.log("Opciones cargadas correctamente.");
   } catch (error) {
-    console.error(
-      'Error al obtener los datos de la colección "Clientes":',
-      error
-    );
+    console.error("Error al obtener clientes:", error);
   }
 }
+
 async function populateSelectFromFirebase1() {
   const selectElement = document.getElementById("link1");
-
-  if (!selectElement) {
-    console.error('No se encontró el elemento <select> con id="link".');
-    return;
-  }
+  if (!selectElement) return;
 
   try {
-    // Obtener la referencia a la colección "Clientes"
     const qrCollection = collection(db, "Productos");
     const clientesSnapshot = await getDocs(qrCollection);
-    // Limpiar las opciones actuales del select
     selectElement.innerHTML = "";
-
-    // Agregar una opción por cada cliente
     clientesSnapshot.forEach((doc) => {
-      const cliente = doc.data(); // Datos del cliente
+      const cliente = doc.data();
       const option = document.createElement("option");
-      option.value = cliente.nombre; // Usar el ID del documento como valor
-      option.textContent = cliente.nombre; // Mostrar el nombre del cliente
+      option.value = cliente.nombre;
+      option.textContent = cliente.nombre;
       selectElement.appendChild(option);
     });
-
-    console.log("Opciones cargadas correctamente.");
   } catch (error) {
-    console.error(
-      'Error al obtener los datos de la colección "Clientes":',
-      error
-    );
+    console.error("Error al obtener productos:", error);
   }
 }
+
 document.addEventListener("DOMContentLoaded", populateSelectFromFirebase);
 document.addEventListener("DOMContentLoaded", populateSelectFromFirebase1);
 cargarClientes();
