@@ -89,7 +89,7 @@
         </li>
       </ul>
     </div>
-    <div id="csvCombiner">
+   <div id="csvCombiner">
     <h2>Combinador de Archivos de Golf</h2>
     <input type="file" id="fileInput" multiple accept=".csv">
     <button onclick="combineCSVFiles()">Combinar y Descargar</button>
@@ -156,6 +156,7 @@ function combineCSVFiles() {
             for (let j = 1; j < lines.length; j++) {
                 const line = lines[j].trim();
                 if (line) {
+                    // Separar la línea en columnas y reemplazar el Shot Number más tarde
                     combinedData.push(line);
                 }
             }
@@ -164,21 +165,28 @@ function combineCSVFiles() {
             
             // Cuando se hayan procesado todos los archivos
             if (processedFiles === files.length) {
-                // Combinar encabezado con datos
-                const finalCSV = header + '\n' + combinedData.join('\n');
+                // Renumerar todos los tiros
+                let renumberedData = combinedData.map((line, index) => {
+                    const columns = line.split(',');
+                    columns[0] = (index + 1).toString(); // Reemplazar el Shot Number con el nuevo número secuencial
+                    return columns.join(',');
+                });
+                
+                // Combinar encabezado con datos renumerados
+                const finalCSV = header + '\n' + renumberedData.join('\n');
                 
                 // Crear y descargar el archivo
                 const blob = new Blob([finalCSV], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'combined_shots_' + new Date().toISOString().slice(0,10) + '.csv';
+                a.download = 'combined_shots_renumbered_' + new Date().toISOString().slice(0,10) + '.csv';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
                 
-                status.textContent = `Se han combinado ${files.length} archivos exitosamente`;
+                status.textContent = `Se han combinado ${files.length} archivos con ${renumberedData.length} tiros renumerados exitosamente`;
             }
         };
         
