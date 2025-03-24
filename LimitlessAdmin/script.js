@@ -23,7 +23,7 @@ const firebaseConfig = {
 
 const mobileNav = document.querySelector(".hamburger");
 const navbar = document.querySelector(".menubar");
-
+const modal = document.getElementById("myModal");
 const toggleNav = () => {
   navbar.classList.toggle("active");
   mobileNav.classList.toggle("hamburger-active");
