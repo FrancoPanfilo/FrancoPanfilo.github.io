@@ -176,7 +176,7 @@ async function addQrTooltips() {
           // Tomamos el primer documento (asumiendo que "nombre" es único)
           const qrData = querySnapshot.docs[0].data();
           const tooltipText = `
-            Nombre: ${qrData.nombre || "N/A"}
+            Nombre: ${qrData.nombre || "N/A"}\n
             Link: ${qrData.link || "N/A"}
           `;
           tooltip.setAttribute("data-tooltip", tooltipText);
