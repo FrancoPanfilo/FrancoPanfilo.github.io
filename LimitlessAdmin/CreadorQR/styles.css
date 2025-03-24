@@ -154,7 +154,8 @@ h1 {
   border-radius: 5px;
   font-size: 14px;
   text-align: left;
-  white-space: wrap;
+  white-space: pre-wrap;
+  line-height: 0.9;
   /* Para permitir saltos de línea */
   z-index: 10;
   min-width: 150px; /* Ancho mínimo para legibilidad */

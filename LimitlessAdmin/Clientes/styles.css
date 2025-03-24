@@ -173,10 +173,13 @@ h1 {
   background-color: #333;
   color: #fff;
   padding: 5px 10px;
+  padding-top: 0;
+  line-height: 0.9;
+
   border-radius: 5px;
   font-size: 14px;
   text-align: left;
-  white-space: wrap;
+  white-space: pre-wrap;
   /* Para permitir saltos de línea */
   z-index: 10;
   min-width: 150px; /* Ancho mínimo para legibilidad */

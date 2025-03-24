@@ -124,7 +124,7 @@ async function mostrarModal(clienteCodigo) {
             }
           </td>
           <td><input type="checkbox" class="pagado-checkbox" ${
-            venta.pagado ? "checked disabled" : ""
+            venta.pagado ? "checked disabled" : "disabled"
           }></td>
         `;
         tableBody.appendChild(row);
@@ -176,8 +176,8 @@ async function addQrTooltips() {
           // Tomamos el primer documento (asumiendo que "nombre" es único)
           const qrData = querySnapshot.docs[0].data();
           const tooltipText = `
-            Nombre: ${qrData.nombre || "N/A"}\n
-            Link: ${qrData.link || "N/A"}
+           \nNombre: ${qrData.nombre || "N/A"}
+           \nLink: ${qrData.link || "N/A"}
           `;
           tooltip.setAttribute("data-tooltip", tooltipText);
         } else {

@@ -254,10 +254,10 @@ async function cargarQRs() {
             // Tomamos el primer documento (asumiendo que "ventaId" es único)
             const ventaData = querySnapshot.docs[0].data();
             const tooltipText = `
-              ID Venta: ${ventaId}\n
-              Cliente: ${ventaData.cliente || "N/A"}\n
-              Producto: ${ventaData.producto || "N/A"}\n
-              Talle: ${ventaData.talle || "N/A"}
+              \nID Venta: ${ventaId}
+              \nCliente: ${ventaData.cliente || "N/A"}
+              \nProducto: ${ventaData.producto || "N/A"}
+              \nTalle: ${ventaData.talle || "N/A"}
             `;
             tooltip.setAttribute("data-tooltip", tooltipText);
           } else {
