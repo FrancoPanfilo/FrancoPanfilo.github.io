@@ -24,6 +24,7 @@ const firebaseConfig = {
 const mobileNav = document.querySelector(".hamburger");
 const navbar = document.querySelector(".menubar");
 const modal = document.getElementById("myModal");
+document.getElementById("cerrarM").addEventListener("click", cerrarModal);
 const toggleNav = () => {
   navbar.classList.toggle("active");
   mobileNav.classList.toggle("hamburger-active");
@@ -254,7 +255,6 @@ document.getElementById("boton").addEventListener("click", () => {
     document.getElementById("dir").value
   );
 });
-
 async function populateSelectFromFirebase() {
   const selectElement = document.getElementById("link");
   if (!selectElement) return;
@@ -262,9 +262,18 @@ async function populateSelectFromFirebase() {
   try {
     const qrCollection = collection(db, "Clientes");
     const clientesSnapshot = await getDocs(qrCollection);
+
+    // Convertir los documentos en un array de objetos
+    const clientesList = clientesSnapshot.docs.map((doc) => doc.data());
+
+    // Ordenar alfabéticamente por el campo 'nombre'
+    clientesList.sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    // Limpiar el select
     selectElement.innerHTML = "";
-    clientesSnapshot.forEach((doc) => {
-      const cliente = doc.data();
+
+    // Llenar el select con las opciones ordenadas
+    clientesList.forEach((cliente) => {
       const option = document.createElement("option");
       option.value = `${cliente.codigo}-${cliente.nombre}`;
       option.textContent = cliente.nombre;

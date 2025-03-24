@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acciones - Limitless</title>
+    <script type="module" src="script.js"></script>
+    <link rel="stylesheet" href="../nav.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav>
+      <div class="logo" id="acceso">
+        <img src="../Logo.png" alt="logo" />
+      </div>
+      <ul>
+        <li><a class="link" href="../index.html">Ventas</a></li>
+        <li><a class="link" href="../Clientes/index.html">Clientes</a></li>
+        <li><a class="link" href="../Productos/index.html">Productos</a></li>
+        <li><a class="link" href="../CreadorQR/index.html">QR</a></li>
+        <li>
+          <a class="link active" href="../Acciones/index.html">Acciones</a>
+        </li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+    <div class="menubar">
+      <ul>
+        <li><a class="link" href="../index.html">Ventas</a></li>
+        <li><a class="link" href="../Clientes/index.html">Clientes</a></li>
+        <li><a class="link" href="../Productos/index.html">Productos</a></li>
+        <li><a class="link" href="../CreadorQR/index.html">QR</a></li>
+        <li>
+          <a class="link active" href="../Acciones/index.html">Acciones</a>
+        </li>
+      </ul>
+    </div>
+
+    <main>
+      <h1>Acciones</h1>
+      <section class="acciones-container">
+        <!-- Buscar venta -->
+        <div class="accion-item">
+          <h2>Buscar Venta</h2>
+          <input type="text" id="buscarVenta" placeholder="Ej: V001" />
+          <button id="buscarBtn">Buscar</button>
+          <div id="ventaInfo"></div>
+        </div>
+
+        <!-- Acciones disponibles -->
+        <div class="accion-item">
+          <h2>Acciones Disponibles</h2>
+          <button id="desvincularQrBtn" disabled>Desvincular QR</button>
+          <button id="eliminarVentaBtn" disabled>Eliminar Venta</button>
+          <button id="restaurarVentaBtn" disabled>Restaurar Venta</button>
+          <button id="editarVentaBtn" disabled>Editar Venta</button>
+          <button id="exportarJsonBtn">Exportar BD a JSON</button>
+          <button id="generarReporteBtn">Generar Reporte</button>
+        </div>
+      </section>
+
+      <!-- Visor de dinero -->
+      <section class="dinero-container">
+        <h2>Resumen Financiero</h2>
+        <div id="dineroInfo">
+          <p>
+            <strong>Dinero Entrado:</strong> <span id="dineroEntrado">$0</span>
+          </p>
+          <p>
+            <strong>Dinero por Entrar:</strong>
+            <span id="dineroPorEntrar">$0</span>
+          </p>
+        </div>
+        <button id="actualizarDineroBtn">Actualizar</button>
+      </section>
+
+      <!-- Modal para edición -->
+      <div id="editarModal" class="modal">
+        <div class="modal-content">
+          <h2>Editar Venta</h2>
+          <input id="editCliente" placeholder="Cliente" />
+          <input id="editProducto" placeholder="Producto" />
+          <input id="editTalle" placeholder="Talle" />
+          <input id="editDireccion" placeholder="Dirección" />
+          <button id="guardarEdicionBtn">Guardar</button>
+          <button id="cerrarModalBtn">Cerrar</button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
