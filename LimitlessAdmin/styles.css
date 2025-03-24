@@ -162,6 +162,7 @@ h1 {
 }
 .filtroh2 {
   width: 75%;
+  text-decoration: none;
   color: #000000;
   text-align: left;
   font-size: 20px;
