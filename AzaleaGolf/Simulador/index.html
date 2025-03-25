@@ -6,41 +6,12 @@
     <title>Generador de PDF</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script defer type="module" src="../db.js"></script>
-    <script defer type="module" src="script.js"></script>
     <script defer type="module" src="scriptTabla.js"></script>
+    <script defer type="module" src="combinador.js"></script>
     <link rel="stylesheet" href="../nav.css" />
+    <link rel="stylesheet" href="styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <style>
-      .form-group {
-        margin-bottom: 15px;
-      }
-      label {
-        display: block;
-        margin-bottom: 5px;
-      }
-      input,
-      button {
-        width: 100%;
-        padding: 8px;
-        box-sizing: border-box;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-      }
-      th,
-      td {
-        border: 1px solid black;
-        padding: 4px;
-        text-align: center;
-      }
-      th {
-        background-color: #f4f4f4;
-      }
-    </style>
   </head>
   <body>
     <nav>
@@ -48,21 +19,11 @@
         <img src="../logo.jpg" alt="logo" />
       </div>
       <ul>
-        <li>
-          <a href="../index.html">Gestion de Reservas</a>
-        </li>
-        <li>
-          <a href="../Cuponeras/index.html">Acuerdos</a>
-        </li>
-        <li>
-          <a href="../Clientes/index.html">Clientes</a>
-        </li>
-        <li>
-          <a href="../Historial/index.html">Historial</a>
-        </li>
-        <li>
-          <a href="../Simulador/index.html">PDF</a>
-        </li>
+        <li><a href="../index.html">Gestion de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
       </ul>
       <div class="hamburger">
         <span class="line"></span>
@@ -72,128 +33,21 @@
     </nav>
     <div class="menubar">
       <ul>
-        <li>
-          <a href="../index.html">Gestion de Reservas</a>
-        </li>
-        <li>
-          <a href="../Cuponeras/index.html">Acuerdos</a>
-        </li>
-        <li>
-          <a href="../Clientes/index.html">Clientes</a>
-        </li>
-        <li>
-          <a href="../Historial/index.html">Historial</a>
-        </li>
-        <li>
-          <a href="../Simulador/index.html">PDF</a>
-        </li>
+        <li><a href="../index.html">Gestion de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
       </ul>
     </div>
-   <div id="csvCombiner">
-    <h2>Combinador de Archivos de Golf</h2>
-    <input type="file" id="fileInput" multiple accept=".csv">
-    <button onclick="combineCSVFiles()">Combinar y Descargar</button>
-    <p id="status"></p>
-</div>
 
-<style>
-    #csvCombiner {
-        padding: 20px;
-        max-width: 600px;
-        margin: 20px auto;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    input, button {
-        margin: 10px 0;
-        display: block;
-    }
-    button {
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-    button:hover {
-        background-color: #45a049;
-    }
-    #status {
-        color: #666;
-        margin-top: 10px;
-    }
-</style>
+    <div id="csvCombiner">
+      <h2>Combinador de Archivos de Golf</h2>
+      <input type="file" id="csvCombinerInput" multiple accept=".csv" />
+      <button onclick="combineCSVFiles()">Combinar y Descargar</button>
+      <p id="status"></p>
+    </div>
 
-<script>
-function combineCSVFiles() {
-    const fileInput = document.getElementById('fileInput');
-    const status = document.getElementById('status');
-    const files = fileInput.files;
-
-    if (files.length < 1) {
-        status.textContent = 'Por favor, selecciona al menos un archivo CSV';
-        return;
-    }
-
-    status.textContent = 'Procesando...';
-    let combinedData = [];
-    let header = '';
-    let processedFiles = 0;
-
-    for (let i = 0; i < files.length; i++) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            const text = e.target.result;
-            const lines = text.split('\n');
-            
-            // Guardar el encabezado del primer archivo
-            if (i === 0 && lines.length > 0) {
-                header = lines[0].trim();
-            }
-            
-            // Agregar datos (excluyendo el encabezado)
-            for (let j = 1; j < lines.length; j++) {
-                const line = lines[j].trim();
-                if (line) {
-                    // Separar la línea en columnas y reemplazar el Shot Number más tarde
-                    combinedData.push(line);
-                }
-            }
-            
-            processedFiles++;
-            
-            // Cuando se hayan procesado todos los archivos
-            if (processedFiles === files.length) {
-                // Renumerar todos los tiros
-                let renumberedData = combinedData.map((line, index) => {
-                    const columns = line.split(',');
-                    columns[0] = (index + 1).toString(); // Reemplazar el Shot Number con el nuevo número secuencial
-                    return columns.join(',');
-                });
-                
-                // Combinar encabezado con datos renumerados
-                const finalCSV = header + '\n' + renumberedData.join('\n');
-                
-                // Crear y descargar el archivo
-                const blob = new Blob([finalCSV], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'combined_shots_renumbered_' + new Date().toISOString().slice(0,10) + '.csv';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                
-                status.textContent = `Se han combinado ${files.length} archivos con ${renumberedData.length} tiros renumerados exitosamente`;
-            }
-        };
-        
-        reader.readAsText(files[i]);
-    }
-}
-</script>
     <h1>Generador de PDF desde CSV</h1>
     <div class="form-group">
       <label for="name">Nombre:</label>
@@ -253,232 +107,45 @@ function combineCSVFiles() {
         <option value="64">64</option>
         <option value="Putt">Putt</option>
       </select>
-
       <label for="newName">New Name:</label>
       <textarea id="newName" rows="4" cols="50"></textarea>
-
       <button type="button" id="renameClub">Rename Club</button>
     </form>
     <button id="generatePDF" disabled>Generar PDF</button>
-    <input type="file" id="fileInput" accept=".csv" />
+    <input type="file" id="pdfFileInput" accept=".csv" />
     <br />
     <label for="nombre">Nombre:</label>
-<input type="text" id="nombre" name="nombre"><br><br>
-<label for="fecha">Fecha:</label>
-<input type="date" id="fecha" name="fecha"><br><br>
+    <input type="text" id="nombre" name="nombre" /><br /><br />
+    <label for="fecha">Fecha:</label>
+    <input type="date" id="fecha" name="fecha" /><br /><br />
     <label>Desviación Lateral (%): </label>
     <input type="number" id="lateralDeviation" min="0" max="100" value="75" />
     <br />
-<label for="deviationPercentage">Porcentaje de Desviación:</label>
-<input type="number" id="deviationPercentage" name="deviationPercentage" value="75" step="0.01"><br><br>
+    <label for="deviationPercentage">Porcentaje de Desviación:</label>
+    <input
+      type="number"
+      id="deviationPercentage"
+      name="deviationPercentage"
+      value="75"
+      step="0.01"
+    /><br /><br />
     <br />
+
+    <div class="checkbox-group">
+      <div class="checkbox-container">
+        <input type="checkbox" id="yardageBookCheckbox" checked />
+        <label for="yardageBookCheckbox">Descargar YardageBook</label>
+      </div>
+      <div class="checkbox-container">
+        <input type="checkbox" id="vacioCheckbox" checked />
+        <label for="vacioCheckbox">Descargar Vacío</label>
+      </div>
+      <div class="checkbox-container">
+        <input type="checkbox" id="conicalFormatCheckbox" />
+        <label for="conicalFormatCheckbox">Formato aconado</label>
+      </div>
+    </div>
+
     <button id="botonTabla">Cargar Archivo</button>
   </body>
 </html>
-
-<script>
-  function generatePDF() {
-    const input = document.getElementById("file-input");
-    if (!input.files.length) {
-      alert("Please select a file.");
-      return;
-    }
-
-    const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      const csv = event.target.result;
-      Papa.parse(csv, {
-        complete: function (results) {
-          processCSV(results.data);
-        },
-        header: true,
-      });
-    };
-    reader.readAsText(file);
-  }
-
-  function processCSV(data) {
-    const doc = new pdfMake.createPdf({});
-    const clubsData = {};
-
-    data.forEach((row) => {
-      const clubName = row["Club Name"];
-
-      if (!clubsData[clubName]) {
-        clubsData[clubName] = {
-          shots: [],
-          averages: {
-            ballSpeed: [],
-            clubSpeed: [],
-            smashFactor: [],
-            apex: [],
-            carry: [],
-            offline: [],
-            total: [],
-            backSpin: [],
-            sideSpin: [],
-            horizontalLaunchAngle: [],
-            verticalLaunchAngle: [],
-            spinAxis: [],
-          },
-        };
-      }
-
-      const shot = {
-        shotNumber: row["Shot Number"],
-        ballSpeed: parseFloat(row["Ball Speed"]),
-        clubSpeed: parseFloat(row["Club Speed"]),
-        smashFactor: parseFloat(row["Smash Factor"]),
-        apex: parseFloat(row["Apex"]),
-        carry: parseFloat(row["Carry"]),
-        offline: parseFloat(row["Offline"]),
-        total: parseFloat(row["Total"]),
-        backSpin: parseFloat(row["Back Spin"]),
-        sideSpin: parseFloat(row["Side Spin"]),
-        horizontalLaunchAngle: parseFloat(row["Horizontal Launch Angle"]),
-        verticalLaunchAngle: parseFloat(row["Vertical Launch Angle"]),
-        spinAxis: parseFloat(row["Spin Axis"]),
-      };
-
-      Object.keys(shot).forEach((key) => {
-        if (key !== "shotNumber" && !isNaN(shot[key])) {
-          clubsData[clubName].averages[key].push(shot[key]);
-        }
-      });
-
-      clubsData[clubName].shots.push(shot);
-    });
-
-    // Calculate averages
-    Object.keys(clubsData).forEach((clubName) => {
-      const averages = clubsData[clubName].averages;
-      Object.keys(averages).forEach((key) => {
-        const validValues = averages[key].filter(
-          (value) => !isNaN(parseFloat(value)) && value !== null && value !== ""
-        );
-        if (validValues.length > 0) {
-          const sum = validValues.reduce(
-            (acc, value) => acc + parseFloat(value),
-            0
-          );
-          const average = sum / validValues.length;
-          averages[key] = average.toFixed(2); // Redondeo a 2 decimales
-        } else {
-          averages[key] = "-";
-        }
-      });
-    });
-
-    const content = [];
-    Object.keys(clubsData).forEach((clubName) => {
-      const clubData = clubsData[clubName];
-      const clubShots = clubData.shots;
-      const clubAverages = clubData.averages;
-
-      content.push({
-        text: `Club: ${clubName}`,
-        style: "header",
-      });
-
-      const tableBody = [
-        [
-          "Shot #",
-          "Ball Speed",
-          "Club Speed",
-          "Smash Factor",
-          "Apex",
-          "Carry",
-          "Offline",
-          "Total",
-          "Back Spin",
-          "Side Spin",
-          "Hor Launch",
-          "Ver Launch",
-          "Spin Axis",
-        ],
-      ];
-
-      clubShots.forEach((shot) => {
-        tableBody.push([
-          shot.shotNumber,
-          isNaN(shot.ballSpeed) ? "-" : shot.ballSpeed.toFixed(2),
-          isNaN(shot.clubSpeed) ? "-" : shot.clubSpeed.toFixed(2),
-          isNaN(shot.smashFactor) ? "-" : shot.smashFactor.toFixed(2),
-          isNaN(shot.apex) ? "-" : shot.apex.toFixed(2),
-          isNaN(shot.carry) ? "-" : shot.carry.toFixed(2),
-          isNaN(shot.offline) ? "-" : shot.offline.toFixed(2),
-          isNaN(shot.total) ? "-" : shot.total.toFixed(2),
-          isNaN(shot.backSpin) ? "-" : shot.backSpin.toFixed(2),
-          isNaN(shot.sideSpin) ? "-" : shot.sideSpin.toFixed(2),
-          isNaN(shot.horizontalLaunchAngle)
-            ? "-"
-            : shot.horizontalLaunchAngle.toFixed(2),
-          isNaN(shot.verticalLaunchAngle)
-            ? "-"
-            : shot.verticalLaunchAngle.toFixed(2),
-          isNaN(shot.spinAxis) ? "-" : shot.spinAxis.toFixed(2),
-        ]);
-      });
-
-      tableBody.push([
-        "Average",
-        isNaN(clubAverages.ballSpeed) ? "-" : clubAverages.ballSpeed.toFixed(2),
-        isNaN(clubAverages.clubSpeed) ? "-" : clubAverages.clubSpeed.toFixed(2),
-        isNaN(clubAverages.smashFactor)
-          ? "-"
-          : clubAverages.smashFactor.toFixed(2),
-        isNaN(clubAverages.apex) ? "-" : clubAverages.apex.toFixed(2),
-        isNaN(clubAverages.carry) ? "-" : clubAverages.carry.toFixed(2),
-        isNaN(clubAverages.offline) ? "-" : clubAverages.offline.toFixed(2),
-        isNaN(clubAverages.total) ? "-" : clubAverages.total.toFixed(2),
-        isNaN(clubAverages.backSpin) ? "-" : clubAverages.backSpin.toFixed(2),
-        isNaN(clubAverages.sideSpin) ? "-" : clubAverages.sideSpin.toFixed(2),
-        isNaN(clubAverages.horizontalLaunchAngle)
-          ? "-"
-          : clubAverages.horizontalLaunchAngle.toFixed(2),
-        isNaN(clubAverages.verticalLaunchAngle)
-          ? "-"
-          : clubAverages.verticalLaunchAngle.toFixed(2),
-        isNaN(clubAverages.spinAxis) ? "-" : clubAverages.spinAxis.toFixed(2),
-      ]);
-
-      content.push({
-        table: {
-          headerRows: 1,
-          widths: [
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-            "auto",
-          ],
-          body: tableBody,
-        },
-      });
-
-      content.push({ text: " ", margin: [0, 10] });
-    });
-
-    const documentDefinition = {
-      content: content,
-      styles: {
-        header: {
-          fontSize: 14,
-          bold: true,
-          margin: [0, 10, 0, 10],
-        },
-      },
-    };
-
-    pdfMake.createPdf(documentDefinition).download("output.pdf");
-  }
-</script>

@@ -3,22 +3,21 @@ import {
   StandardFonts,
 } from "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.esm.js";
 
-console.log("HOLA1");
+// Listener para el botón "Cargar Archivo"
+document.getElementById("botonTabla").addEventListener("click", handleFile);
 
+// Función para formatear la fecha
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
   const opciones = { day: "numeric", month: "long", year: "numeric" };
   return fecha.toLocaleDateString("es-ES", opciones);
 }
 
-document
-  .getElementById("botonTabla")
-  .addEventListener("click", () => handleFile());
-let datos;
-
+// Función principal para manejar el archivo
 function handleFile() {
-  const input = document.getElementById("fileInput");
-if (input.files.length === 0) {
+  const input = document.getElementById("pdfFileInput");
+  if (!input || input.files.length === 0) {
+    alert("Por favor, selecciona un archivo CSV para generar el PDF.");
     return;
   }
 
@@ -28,24 +27,44 @@ if (input.files.length === 0) {
   reader.onload = function (e) {
     const csvData = e.target.result;
     const shotsByClub = parseGolfShots(csvData);
-    calculateStatistics(shotsByClub);
+    const data = calculateStatistics(shotsByClub);
+
+    const yardageBookChecked = document.getElementById(
+      "yardageBookCheckbox"
+    ).checked;
+    const vacioChecked = document.getElementById("vacioCheckbox").checked;
+
+    if (yardageBookChecked) {
+      createYardageBookPDF(data);
+    }
+    if (vacioChecked) {
+      createVacioPDF(data);
+    }
+    if (!yardageBookChecked && !vacioChecked) {
+      alert("Por favor, selecciona al menos un PDF para descargar.");
+    }
+  };
+
+  reader.onerror = function () {
+    alert("Error al leer el archivo CSV.");
   };
 
   reader.readAsText(file);
 }
 
+// Función para parsear los datos del CSV
 function parseGolfShots(csvData) {
   const rows = csvData.split("\n").map((row) => row.split(","));
   const headers = rows[0].map((h) => h.trim().toLowerCase());
-
-  console.log("Columnas detectadas en el CSV:", headers);
 
   const clubIndex = headers.findIndex((h) => h.includes("club"));
   const carryIndex = headers.findIndex((h) => h.includes("carry"));
   const offlineIndex = headers.findIndex((h) => h.includes("offline"));
 
   if (clubIndex === -1 || carryIndex === -1 || offlineIndex === -1) {
-    console.error("No se encontraron las columnas necesarias en el CSV.");
+    alert(
+      "El CSV no tiene las columnas esperadas: 'Club', 'Carry', 'Offline'."
+    );
     return {};
   }
 
@@ -69,17 +88,44 @@ function parseGolfShots(csvData) {
   return shotsByClub;
 }
 
+// Función para calcular las estadísticas
 function calculateStatistics(shotsByClub) {
   const deviationPercentage =
-    parseFloat(document.getElementById("deviationPercentage").value) / 100;
+    parseFloat(document.getElementById("deviationPercentage").value) / 100 ||
+    0.75;
   const lateralPerc =
-    parseFloat(document.getElementById("lateralDeviation").value) / 100;
+    parseFloat(document.getElementById("lateralDeviation").value) / 100 || 0.75;
+  const conicalFormat = document.getElementById(
+    "conicalFormatCheckbox"
+  ).checked;
   const clubStats = {};
 
+  const clubCategories = {
+    wedges: ["60", "58", "56", "54", "52", "50", "LW", "SW", "GW"],
+    irons: ["PW", "9i", "8i", "7i", "6i", "5i", "4i", "3i", "2i", "1i"],
+    hybridsWoods: [
+      "7h",
+      "6h",
+      "9w",
+      "5h",
+      "4h",
+      "7w",
+      "6w",
+      "3h",
+      "5w",
+      "4w",
+      "2h",
+      "3w",
+
+      "2w",
+    ],
+    driver: ["Dr"],
+  };
+
+  // Calcular estadísticas iniciales
   Object.keys(shotsByClub).forEach((club) => {
     const shots = shotsByClub[club];
     let carryValues;
-    let lateralDispersion = "-";
     let variation = "-";
     let maxRight = 0;
     let maxLeft = 0;
@@ -87,20 +133,15 @@ function calculateStatistics(shotsByClub) {
     if (shots.length === 1) {
       carryValues = shots.map((s) => s.carry);
     } else if (shots.length >= 5) {
-      // Calculate average carry
       const avgCarry =
         shots.reduce((sum, s) => sum + s.carry, 0) / shots.length;
-
-      // Find the percentage of shots closest to the average carry
       const closestShots = shots.sort(
         (a, b) => Math.abs(a.carry - avgCarry) - Math.abs(b.carry - avgCarry)
       );
       const limit = Math.floor(shots.length * deviationPercentage);
       const selectedShots = closestShots.slice(0, limit);
-
       carryValues = selectedShots.map((s) => s.carry);
     } else {
-      // Use all shots if there are fewer than 5
       carryValues = shots.map((s) => s.carry);
     }
 
@@ -112,42 +153,64 @@ function calculateStatistics(shotsByClub) {
       variation = `±${((maxCarry - minCarry) / 2).toFixed(0)}`;
 
       const offlineValues = shots.map((s) => s.offline).sort((a, b) => a - b);
-
       const lateralLimit = Math.floor(offlineValues.length * lateralPerc);
       const selectedOffline = shots
         .map((s) => s.offline)
-        .sort((a, b) => Math.abs(a) - Math.abs(b)) // Ordenar por magnitud de offline
-        .slice(0, lateralLimit); // Tomar el % indicado
+        .sort((a, b) => Math.abs(a) - Math.abs(b))
+        .slice(0, lateralLimit);
 
-      maxLeft = Math.min(...selectedOffline).toFixed(0); // Máximo fallo a la izquierda
-      maxRight = Math.max(...selectedOffline).toFixed(0); // Máximo fallo a la derecha
-      if (maxLeft > 0) maxLeft = 0;
+      maxLeft = Math.abs(Math.min(...selectedOffline)).toFixed(0);
+      maxRight = Math.max(...selectedOffline).toFixed(0);
       if (maxRight < 0) maxRight = 0;
-      maxLeft = Math.abs(maxLeft);
-
-      lateralDispersion = `${Math.abs(maxLeft)}L - ${Math.abs(maxRight)}R`;
     }
 
     clubStats[club] = {
       avgCarry:
         carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length,
-      maxLeft,
-      maxRight,
-      variation,
+      maxLeft: maxLeft,
+      maxRight: maxRight,
+      variation: variation,
     };
   });
 
-  // Orden específico de los palos con nombres más expresivos
+  // Aplicar "Formato aconado" si está activado
+  if (conicalFormat) {
+    const adjustDispersion = (categoryClubs) => {
+      const existingClubs = categoryClubs.filter((club) => clubStats[club]);
+      for (let i = 1; i < existingClubs.length; i++) {
+        const currentClub = existingClubs[i];
+        const prevClub = existingClubs[i - 1];
+
+        const prevMaxLeft = parseFloat(clubStats[prevClub].maxLeft) || 0;
+        const prevMaxRight = parseFloat(clubStats[prevClub].maxRight) || 0;
+        const currMaxLeft = parseFloat(clubStats[currentClub].maxLeft) || 0;
+        const currMaxRight = parseFloat(clubStats[currentClub].maxRight) || 0;
+
+        clubStats[currentClub].maxLeft = Math.max(currMaxLeft, prevMaxLeft);
+        clubStats[currentClub].maxRight = Math.max(currMaxRight, prevMaxRight);
+      }
+    };
+
+    adjustDispersion(clubCategories.wedges);
+    adjustDispersion(clubCategories.irons);
+    adjustDispersion(clubCategories.hybridsWoods);
+  }
+
   const orderedClubs = {
     Driver: "Dr",
+    "Madera 2": "2w",
     "Madera 3": "3w",
+    "Madera 4": "4w",
     "Madera 5": "5w",
+    "Madera 6": "6w",
     "Madera 7": "7w",
     "Madera 9": "9w",
     "Híbrido 2": "2h",
     "Híbrido 3": "3h",
     "Híbrido 4": "4h",
     "Híbrido 5": "5h",
+    "Híbrido 6": "6h",
+    "Híbrido 7": "7h",
     "Hierro 1": "1i",
     "Hierro 2": "2i",
     "Hierro 3": "3i",
@@ -171,18 +234,53 @@ function calculateStatistics(shotsByClub) {
     "64°": "64",
   };
 
-  // Eliminar putt de clubStats
   delete clubStats.Putt;
 
-  async function rellenarPDF(datos, pdfName) {
-    // Obtener valores de nombre y fecha
-    const nombre = document.getElementById("nombre").value;
-    const fecha = document.getElementById("fecha").value;
+  return { clubStats, orderedClubs, deviationPercentage, lateralPerc };
+}
 
-    // Cargar el PDF existente desde una URL
-    const existingPdfBytes = await fetch(`${pdfName}.pdf`).then((res) =>
-      res.arrayBuffer()
-    );
+// Función para crear el PDF "YardageBook"
+async function createYardageBookPDF(data) {
+  const { clubStats, orderedClubs, deviationPercentage, lateralPerc } = data;
+  await rellenarPDF(
+    clubStats,
+    orderedClubs,
+    deviationPercentage,
+    lateralPerc,
+    "YardageBook"
+  );
+}
+
+// Función para crear el PDF "vacio"
+async function createVacioPDF(data) {
+  const { clubStats, orderedClubs, deviationPercentage, lateralPerc } = data;
+  await rellenarPDF(
+    clubStats,
+    orderedClubs,
+    deviationPercentage,
+    lateralPerc,
+    "vacio"
+  );
+}
+
+// Función auxiliar para rellenar PDFs
+async function rellenarPDF(
+  clubStats,
+  orderedClubs,
+  deviationPercentage,
+  lateralPerc,
+  pdfName
+) {
+  const nombre = document.getElementById("nombre").value || "Sin nombre";
+  const fecha =
+    document.getElementById("fecha").value ||
+    new Date().toISOString().slice(0, 10);
+
+  try {
+    const existingPdfBytes = await fetch(`${pdfName}.pdf`).then((res) => {
+      if (!res.ok) throw new Error("No se pudo cargar el PDF base.");
+      return res.arrayBuffer();
+    });
 
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     const pages = pdfDoc.getPages();
@@ -190,26 +288,24 @@ function calculateStatistics(shotsByClub) {
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    // Cargar la imagen de la flecha
-    const flechaBytes = await fetch("flecha-doble.png").then((res) =>
-      res.arrayBuffer()
-    );
+    const flechaBytes = await fetch("flecha-doble.png").then((res) => {
+      if (!res.ok) throw new Error("No se pudo cargar la imagen de flecha.");
+      return res.arrayBuffer();
+    });
     const flechaImage = await pdfDoc.embedPng(flechaBytes);
 
-    // Coordenadas iniciales de la tabla
     let xBase = 213;
     let yBase = 725;
     const stepY = 20.25;
 
-    // Recorrer los datos y rellenar la tabla
     let index = 0;
-    Object.keys(orderedClubs).forEach(async (clubName) => {
+    Object.keys(orderedClubs).forEach((clubName) => {
       const clubCode = orderedClubs[clubName];
-      if (datos[clubCode]) {
-        const dato = datos[clubCode];
+      if (clubStats[clubCode]) {
+        const dato = clubStats[clubCode];
         const yPos = yBase - index * stepY;
         index++;
-        // Calcular el ancho del texto para centrarlo
+
         const textWidth = fontBold.widthOfTextAtSize(clubName, 8);
         const xClub = xBase - textWidth / 2;
         const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
@@ -228,24 +324,25 @@ function calculateStatistics(shotsByClub) {
         const maxRightWidth = fontRegular.widthOfTextAtSize(maxRightText, 8);
         const xMaxLeft = LLateralDispersion - maxLeftWidth / 2;
         const xMaxRight = RLateralDispersion - maxRightWidth / 2;
+
         firstPage.drawText(clubName, {
           x: xClub,
           y: yPos,
           size: 8,
           font: fontBold,
-        }); // Nombre del palo en negrita
+        });
         firstPage.drawText(avgCarryText, {
           x: xAvgCarry,
           y: yPos,
           size: 8,
           font: fontRegular,
-        }); // Carry promedio sin 'yds'
+        });
         firstPage.drawText(maxLeftText.toString(), {
           x: xMaxLeft,
           y: yPos,
           size: 8,
           font: fontRegular,
-        }); // Dispersión lateral izquierda centrada
+        });
         firstPage.drawText(maxRightText.toString(), {
           x: xMaxRight,
           y: yPos,
@@ -257,9 +354,8 @@ function calculateStatistics(shotsByClub) {
           y: yPos,
           size: 8,
           font: fontRegular,
-        }); // Variación de distancia
+        });
 
-        // Dibujar la imagen de la flecha
         firstPage.drawImage(flechaImage, {
           x: xLateralDispersion - 5,
           y: yPos - 2,
@@ -269,7 +365,6 @@ function calculateStatistics(shotsByClub) {
       }
     });
 
-    // Añadir nombre y fecha en la esquina superior derecha
     const fechaFormateada = formatearFecha(fecha);
     firstPage.drawText(`${nombre}`, {
       x: 180,
@@ -296,24 +391,17 @@ function calculateStatistics(shotsByClub) {
       font: fontBold,
     });
 
-    // Guardar el PDF modificado
     const pdfBytes = await pdfDoc.save();
-
-    // Crear un enlace de descarga para el nuevo PDF
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = `${pdfName}_${nombre}_${fechaFormateada}.pdf`;
+    document.body.appendChild(link);
     link.click();
-
-    console.log(`Tabla rellenada y nuevo PDF (${pdfName}) descargado.`);
+    document.body.removeChild(link);
+  } catch (error) {
+    alert(
+      `No se pudo generar el PDF ${pdfName}. Revisa la consola para más detalles.`
+    );
   }
-
-  rellenarPDF(clubStats, "YardageBook");
-  rellenarPDF(clubStats, "vacio");
-
-  return clubStats;
 }
-
-// Llama a la función dentro de un contexto async
-handleFile();

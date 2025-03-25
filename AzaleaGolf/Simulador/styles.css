@@ -1,0 +1,110 @@
+.form-group {
+  margin-bottom: 15px;
+}
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+input,
+button {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+th,
+td {
+  border: 1px solid black;
+  padding: 4px;
+  text-align: center;
+}
+th {
+  background-color: #f4f4f4;
+}
+#csvCombiner {
+  padding: 20px;
+  max-width: 600px;
+  margin: 20px auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+#csvCombiner input,
+#csvCombiner button {
+  margin: 10px 0;
+  display: block;
+}
+#csvCombiner button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+#csvCombiner button:hover {
+  background-color: #45a049;
+}
+#status {
+  color: #666;
+  margin-top: 10px;
+}
+.checkbox-group {
+  margin: 20px 0;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+.checkbox-container input[type="checkbox"] {
+  display: none;
+}
+.checkbox-container label {
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  user-select: none;
+}
+.checkbox-container label:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #4caf50;
+  border-radius: 4px;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+.checkbox-container input[type="checkbox"]:checked + label:before {
+  background: #4caf50;
+  border-color: #4caf50;
+}
+.checkbox-container label:after {
+  content: "\2713";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.checkbox-container input[type="checkbox"]:checked + label:after {
+  opacity: 1;
+}
+.checkbox-container label:hover:before {
+  border-color: #45a049;
+}
