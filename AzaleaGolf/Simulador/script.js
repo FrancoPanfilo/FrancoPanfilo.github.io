@@ -261,7 +261,7 @@ function addTablesToPDF(doc, csvData, name, date) {
   ); // Ajustar el ancho del texto a la página
   doc.text(texto, 5, y);
   y += 2 + texto.length * 5;
-
+console.log(name,date,clubData)
   clubOrder.forEach((clubName) => {
     if (clubsData[clubName]) {
       const clubData = clubsData[clubName];
