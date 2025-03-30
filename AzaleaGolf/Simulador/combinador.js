@@ -1,3 +1,4 @@
+document.getElementById("combinador").addEventListener("click",combineCSVFiles)
 function combineCSVFiles() {
   const fileInput = document.getElementById("csvCombinerInput");
   const status = document.getElementById("status");
