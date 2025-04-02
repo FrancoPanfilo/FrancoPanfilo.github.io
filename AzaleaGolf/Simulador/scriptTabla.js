@@ -5,7 +5,7 @@ import {
 
 // Listener para el botón "Cargar Archivo"
 document.getElementById("botonTabla").addEventListener("click", handleFile);
-
+console.log("Hola")
 // Función para formatear la fecha
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
@@ -435,10 +435,9 @@ async function rellenarPDF2(
     });
     const flechaImage = await pdfDoc.embedPng(flechaBytes);
 
-    let xBase = 213;
-    let yBase = 725;
-    const stepY = 20.25;
-
+  let xBase = 47;
+     let yBase = 313;
+     const stepY = 20.25;
     let index = 0;
     Object.keys(orderedClubs).forEach((clubName) => {
       const clubCode = orderedClubs[clubName];
@@ -508,28 +507,28 @@ async function rellenarPDF2(
 
     const fechaFormateada = formatearFecha(fecha);
     firstPage.drawText(`${nombre}`, {
-      x: 180,
-      y: 797,
-      size: 13,
-      font: fontRegular,
+      x: 10,
+       y: 385,
+       size: 13,
+       font: fontRegular,
     });
     firstPage.drawText(`${fechaFormateada}`, {
-      x: 180,
-      y: 777,
-      size: 11,
-      font: fontRegular,
+      x: 10,
+       y: 365,
+       size: 11,
+       font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-      x: 300,
-      y: 434,
-      size: 5,
-      font: fontBold,
+      x: 109,
+       y: 21,
+       size: 4.5,
+       font: fontRegular,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
-      x: 288.5,
-      y: 452,
-      size: 5,
-      font: fontBold,
+      x: 100.5,
+       y: 35.5,
+       size: 4.5,
+       font: fontRegular,
     });
 
     const pdfBytes = await pdfDoc.save();
