@@ -519,14 +519,14 @@ async function rellenarPDF2(
        font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-     x: 132,
-       y: 30,
+    x: 132,
+       y: 23,
        size: 4.5,
        font: fontBold,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
       x: 124,
-       y: 33,
+       y: 40,
        size: 4.5,
        font: fontBold,
     });
