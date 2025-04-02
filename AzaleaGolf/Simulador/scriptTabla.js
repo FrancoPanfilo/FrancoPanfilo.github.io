@@ -519,16 +519,16 @@ async function rellenarPDF2(
        font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-      x: 109,
-       y: 21,
+     x: 132,
+       y: 30,
        size: 4.5,
-       font: fontRegular,
+       font: fontBold,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
-      x: 100.5,
-       y: 35.5,
+      x: 124,
+       y: 33,
        size: 4.5,
-       font: fontRegular,
+       font: fontBold,
     });
 
     const pdfBytes = await pdfDoc.save();
