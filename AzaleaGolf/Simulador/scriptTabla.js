@@ -5,7 +5,7 @@ import {
 
 // Listener para el botón "Cargar Archivo"
 document.getElementById("botonTabla").addEventListener("click", handleFile);
-console.log("Hola")
+
 // Función para formatear la fecha
 function formatearFecha(fechaISO) {
   const fecha = new Date(fechaISO);
@@ -519,18 +519,17 @@ async function rellenarPDF2(
        font: fontRegular,
     });
     firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
-    x: 132,
-       y: 23,
+    x: 133.5,
+       y: 22.5,
        size: 4.5,
        font: fontBold,
     });
     firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
       x: 124,
-       y: 40,
+       y: 40.5,
        size: 4.5,
        font: fontBold,
     });
-
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
