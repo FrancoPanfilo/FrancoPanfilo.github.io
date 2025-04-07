@@ -3,6 +3,13 @@
   padding: 0;
   box-sizing: border-box;
 }
+::-webkit-scrollbar {
+  display: none;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("https://pham.codes/d/GeistVF.woff2") format("woff2");
+}
 
 body {
   display: flex;
@@ -25,9 +32,33 @@ body {
 .logo-part {
   width: 80px;
   height: 80px;
-  border: 2px solid #fff;
+  border: 4px solid #fff;
   border-radius: 0px;
   transition: transform 2s ease;
+}
+@keyframes rotate-fade {
+  from {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(360deg);
+  }
+}
+
+/* Aplica la animación a los elementos ocultos */
+.hidden {
+  animation: rotate-fade 1.5s ease forwards;
+}
+.Ele1 {
+  animation-delay: 0.3s;
+  width: 9px;
+}
+.Ele2 {
+  animation-delay: 0.3s;
+  width: 9px;
+  margin-bottom: 2px;
 }
 
 .top-left {
@@ -35,6 +66,12 @@ body {
   border-right: none;
   top: 0;
   left: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-right: 40px;
+  padding-bottom: 25px;
 }
 
 .top-right {
@@ -42,6 +79,12 @@ body {
   border-left: none;
   top: 0;
   right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-left: 40px;
+  padding-bottom: 25px;
 }
 
 .bottom-left {
@@ -49,6 +92,12 @@ body {
   border-right: none;
   bottom: 0;
   left: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-right: 40px;
+  padding-top: 25px;
 }
 
 .bottom-right {
@@ -60,21 +109,36 @@ body {
 
 .logo-text {
   margin-top: 20px;
-  font-family: Inter;
-  font-size: 35px;
+  font-family: "Geist";
+  font-size: 22px;
   color: #fff;
   transition: opacity 1s ease 1s;
   text-wrap-mode: nowrap;
 }
+.logo-text {
+  width: 240px;
+  display: flex; /* Usa flexbox para alinear los elementos */
+  justify-content: center; /* Centra los elementos (opcional) */
+  gap: 20px;
+}
 
+.logo-text span {
+  font-weight: 100;
+}
+
+.margen {
+  margin-right: 5px;
+}
 .logo-subtext {
-  font-family: Inter;
+  font-family: "Geist";
+  font-weight: 80;
+  width: 155px;
   margin-top: 7px;
-
-  font-size: 12px;
+  font-size: 8px;
   color: #fff;
+  display: flex; /* Usa flexbox para alinear los elementos */
+  justify-content: space-between; /* Centra los elementos (opcional) */
   transition: opacity 1s ease 1s;
-  text-wrap-mode: nowrap;
 }
 .logo-text span,
 .logo-subtext span {
@@ -95,85 +159,92 @@ body {
 
 /* Retraso en la animación para cada letra */
 .logo-text span:nth-child(1) {
-  animation-delay: 1.05s;
+  animation-delay: 1.35s;
 }
 .logo-text span:nth-child(2) {
-  animation-delay: 1s;
+  animation-delay: 1.3s;
 }
 .logo-text span:nth-child(3) {
-  animation-delay: 0.95s;
+  animation-delay: 1.25s;
 }
 .logo-text span:nth-child(4) {
-  animation-delay: 0.9s;
+  animation-delay: 1.2s;
 }
 .logo-text span:nth-child(5) {
-  animation-delay: 0.85s;
+  animation-delay: 1.15s;
 }
 .logo-text span:nth-child(6) {
-  animation-delay: 0.8s;
+  animation-delay: 1.1s;
 }
 .logo-text span:nth-child(7) {
-  animation-delay: 0.75s;
+  animation-delay: 1.05s;
 }
 .logo-text span:nth-child(8) {
-  animation-delay: 0.7s;
+  animation-delay: 1s;
 }
 .logo-text span:nth-child(9) {
-  animation-delay: 0.65s;
+  animation-delay: 0.95s;
 }
 
 .logo-subtext span:nth-child(1) {
-  animation-delay: 0s;
-}
-.logo-subtext span:nth-child(2) {
-  animation-delay: 0.05;
-}
-.logo-subtext span:nth-child(3) {
-  animation-delay: 0.1s;
-}
-.logo-subtext span:nth-child(4) {
-  animation-delay: 0.15s;
-}
-.logo-subtext span:nth-child(5) {
-  animation-delay: 0.2s;
-}
-.logo-subtext span:nth-child(6) {
-  animation-delay: 0.25s;
-}
-.logo-subtext span:nth-child(7) {
   animation-delay: 0.3s;
 }
-.logo-subtext span:nth-child(8) {
+.logo-subtext span:nth-child(2) {
   animation-delay: 0.35s;
 }
-.logo-subtext span:nth-child(9) {
+.logo-subtext span:nth-child(3) {
   animation-delay: 0.4s;
 }
-.logo-subtext span:nth-child(10) {
+.logo-subtext span:nth-child(4) {
   animation-delay: 0.45s;
 }
-.logo-subtext span:nth-child(11) {
+.logo-subtext span:nth-child(5) {
   animation-delay: 0.5s;
 }
-.logo-subtext span:nth-child(12) {
+.logo-subtext span:nth-child(6) {
   animation-delay: 0.55s;
 }
-.logo-subtext span:nth-child(13) {
+.logo-subtext span:nth-child(7) {
   animation-delay: 0.6s;
 }
+.logo-subtext span:nth-child(8) {
+  animation-delay: 0.65s;
+}
+.logo-subtext span:nth-child(9) {
+  animation-delay: 0.7s;
+}
+.logo-subtext span:nth-child(10) {
+  animation-delay: 0.75s;
+}
+.logo-subtext span:nth-child(11) {
+  animation-delay: 0.8s;
+}
+.logo-subtext span:nth-child(12) {
+  animation-delay: 0.85s;
+}
+.logo-subtext span:nth-child(13) {
+  animation-delay: 0.9s;
+}
 .hide .logo-part.top-left {
+  transition-delay: 0.3s;
+
   transform: translateX(-500px) translateY(-500px);
 }
 
 .hide .logo-part.top-right {
+  transition-delay: 0.5s;
   transform: translateX(500px) translateY(-500px);
 }
 
 .hide .logo-part.bottom-left {
+  transition-delay: 0.9s;
+
   transform: translateX(-500px) translateY(500px);
 }
 
 .hide .logo-part.bottom-right {
+  transition-delay: 0.7s;
+
   transform: translateX(500px) translateY(500px);
 }
 

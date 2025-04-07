@@ -27,6 +27,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const qrId = urlParams.get("id");
 document.addEventListener("DOMContentLoaded", () => {
   const logoContainer = document.querySelector(".logo-container");
+  document.querySelectorAll(".Ele1, .Ele2").forEach((element) => {
+    element.classList.add("hidden");
+  });
 
   // Iniciar la transición después de un breve retraso
   setTimeout(() => {
@@ -41,7 +44,9 @@ if (qrId) {
     .then((docSnap) => {
       if (docSnap.exists()) {
         const qrData = docSnap.data();
-        window.location.href = `https://${qrData.link}`; // Redirige al link asociado al QR
+        setTimeout(() => {
+          window.location.href = `https://${qrData.link}`; // Redirige al link asociado al QR
+        }, 1000);
       } else {
       }
     })
