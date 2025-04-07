@@ -1,35 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Franco Panfilo</title>
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
-    <main>
-        <nav class="barraLateralEscondida">
-            <svg class="contenedorDesplegar" xmlns="http://www.w3.org/2000/svg" fill="white">
-                <path class="cambiarEscala" fill-rule="evenodd" d="M6 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L12.293 7.5H6.5A.5.5 0 0 0 6 8Zm-2.5 7a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5Z"/>
-              </svg>
-            <!-- Lo que quiero mostrar
-                <ul>
-                <li>Proyectos</li>
-                <li>Herramientas</li>
-                <li>Curriculum Vitae</li>
-                <li>Contacto</li>
-            </ul>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor">
-                <path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5ZM10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5Z"/>
-              </svg>
-             -->
-        </nav>
-        <div class="cuerpo">
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis Proyectos Web</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+        text-align: center;
+      }
+      h1 {
+        color: #333;
+      }
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+      }
+      .card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        overflow: hidden;
+        transition: transform 0.2s;
+      }
+      .card:hover {
+        transform: scale(1.05);
+      }
+      .card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+      .card h2 {
+        font-size: 1.2em;
+        margin: 10px 0;
+        color: #333;
+      }
+      .card p {
+        margin: 0 10px 10px;
+        color: #666;
+        font-size: 0.9em;
+      }
+      .card a {
+        display: block;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 0 0 8px 8px;
+      }
+      .card a:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mis Proyectos Web</h1>
+    <div class="container">
+      <!-- Proyecto 1 -->
+      <div class="card">
+        <img src="pagina1/preview.jpg" alt="Preview de Página 1" />
+        <h2>Página 1</h2>
+        <p>Azalea Golf.</p>
+        <a href="/AzaleaGolf/index.html">Visitar</a>
+      </div>
+      <!-- Proyecto 2 -->
+      <div class="card">
+        <img src="pagina2/preview.jpg" alt="Preview de Página 2" />
+        <h2>Página 2</h2>
+        <p>Solucion a Martina.</p>
+        <a href="/Bio-Diagnostico-Admin/index.html">Visitar</a>
+      </div>
+      <!-- Proyecto 3 -->
+      <div class="card">
+        <img src="pagina3/preview.jpg" alt="Preview de Página 3" />
+        <h2>Página 3</h2>
+        <p>Pagina de ventas y qr dinamicos.</p>
+        <a href="LimitlessAdmin/index.html">Visitar</a>
+      </div>
+      <div class="card">
+        <img src="pagina4/preview.jpg" alt="Preview de Página 4" />
+        <h2>Página 4</h2>
+        <p>Proyecto final JS.</p>
+        <a href="PFjavascript/indexPF.html">Visitar</a>
+      </div>
+      <div class="card">
+        <img src="pagina5/preview.jpg" alt="Preview de Página 5" />
+        <h2>Página 5</h2>
+        <p>Proyecto Final React.</p>
+        <a href="https://atomicproyect.vercel.app">Visitar</a>
+      </div>
+      <div class="card">
+        <img src="pagina6/preview.jpg" alt="Preview de Página 6" />
+        <h2>Página 6</h2>
+        <p>Sin seguimiento.</p>
+        <a href="zzPartidosMarmol/">Visitar</a>
+      </div>
 
-        </div>
-    </main>
-
-</body>
+      <!-- Añade más tarjetas según tus páginas -->
+    </div>
+  </body>
 </html>
-<!--  -->
