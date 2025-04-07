@@ -242,7 +242,7 @@ function calculateStatistics(shotsByClub) {
 // Función para crear el PDF "YardageBook"
 async function createYardageBookPDF(data) {
   const { clubStats, orderedClubs, deviationPercentage, lateralPerc } = data;
-  await rellenarPDF(
+  await rellenarPDF2(
     clubStats,
     orderedClubs,
     deviationPercentage,
@@ -391,6 +391,145 @@ async function rellenarPDF(
       font: fontBold,
     });
 
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${pdfName}_${nombre}_${fechaFormateada}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    alert(
+      `No se pudo generar el PDF ${pdfName}. Revisa la consola para más detalles.`
+    );
+  }
+}
+async function rellenarPDF2(
+  clubStats,
+  orderedClubs,
+  deviationPercentage,
+  lateralPerc,
+  pdfName
+) {
+  const nombre = document.getElementById("nombre").value || "Sin nombre";
+  const fecha =
+    document.getElementById("fecha").value ||
+    new Date().toISOString().slice(0, 10);
+
+  try {
+    const existingPdfBytes = await fetch(`${pdfName}.pdf`).then((res) => {
+      if (!res.ok) throw new Error("No se pudo cargar el PDF base.");
+      return res.arrayBuffer();
+    });
+
+    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+    const flechaBytes = await fetch("flecha-doble.png").then((res) => {
+      if (!res.ok) throw new Error("No se pudo cargar la imagen de flecha.");
+      return res.arrayBuffer();
+    });
+    const flechaImage = await pdfDoc.embedPng(flechaBytes);
+
+  let xBase = 47;
+     let yBase = 313;
+     const stepY = 20.25;
+    let index = 0;
+    Object.keys(orderedClubs).forEach((clubName) => {
+      const clubCode = orderedClubs[clubName];
+      if (clubStats[clubCode]) {
+        const dato = clubStats[clubCode];
+        const yPos = yBase - index * stepY;
+        index++;
+
+        const textWidth = fontBold.widthOfTextAtSize(clubName, 8);
+        const xClub = xBase - textWidth / 2;
+        const avgCarryText = `${dato.avgCarry.toFixed(0)}`;
+        const avgCarryWidth = fontRegular.widthOfTextAtSize(avgCarryText, 8);
+        const xAvgCarry = xBase + 114 - avgCarryWidth / 2;
+
+        const xLateralDispersion = xBase + 59.5;
+        const LLateralDispersion = xBase + 45.5;
+        const RLateralDispersion = xBase + 73.5;
+        const variationText = `${dato.variation}`;
+        const variationWidth = fontRegular.widthOfTextAtSize(variationText, 8);
+        const xVariation = xBase + 167 - variationWidth / 2;
+        const maxLeftText = `${dato.maxLeft}`;
+        const maxRightText = `${dato.maxRight}`;
+        const maxLeftWidth = fontRegular.widthOfTextAtSize(maxLeftText, 8);
+        const maxRightWidth = fontRegular.widthOfTextAtSize(maxRightText, 8);
+        const xMaxLeft = LLateralDispersion - maxLeftWidth / 2;
+        const xMaxRight = RLateralDispersion - maxRightWidth / 2;
+
+        firstPage.drawText(clubName, {
+          x: xClub,
+          y: yPos,
+          size: 8,
+          font: fontBold,
+        });
+        firstPage.drawText(avgCarryText, {
+          x: xAvgCarry,
+          y: yPos,
+          size: 8,
+          font: fontRegular,
+        });
+        firstPage.drawText(maxLeftText.toString(), {
+          x: xMaxLeft,
+          y: yPos,
+          size: 8,
+          font: fontRegular,
+        });
+        firstPage.drawText(maxRightText.toString(), {
+          x: xMaxRight,
+          y: yPos,
+          size: 8,
+          font: fontRegular,
+        });
+        firstPage.drawText(variationText, {
+          x: xVariation,
+          y: yPos,
+          size: 8,
+          font: fontRegular,
+        });
+
+        firstPage.drawImage(flechaImage, {
+          x: xLateralDispersion - 5,
+          y: yPos - 2,
+          width: 10,
+          height: 10,
+        });
+      }
+    });
+
+    const fechaFormateada = formatearFecha(fecha);
+    firstPage.drawText(`${nombre}`, {
+      x: 10,
+       y: 385,
+       size: 13,
+       font: fontRegular,
+    });
+    firstPage.drawText(`${fechaFormateada}`, {
+      x: 10,
+       y: 365,
+       size: 11,
+       font: fontRegular,
+    });
+    firstPage.drawText(`${(deviationPercentage * 100).toFixed(0)}`, {
+    x: 133.5,
+       y: 22.5,
+       size: 4.5,
+       font: fontBold,
+    });
+    firstPage.drawText(`${(lateralPerc * 100).toFixed(0)}`, {
+      x: 124,
+       y: 40.5,
+       size: 4.5,
+       font: fontBold,
+    });
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const link = document.createElement("a");
