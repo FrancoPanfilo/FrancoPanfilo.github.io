@@ -1,27 +1,19 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import {
+  db,
   getFirestore,
   collection,
   getDocs,
-  getDoc,
   updateDoc,
+  increment,
   doc,
   addDoc,
-  increment,
+  arrayUnion,
+  getDoc,
   query,
   where,
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-// Configuración de Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBZskI-w8lTQ5eF7b24d9Mae27Jjc6nenU",
-  authDomain: "limitless-259e1.firebaseapp.com",
-  projectId: "limitless-259e1",
-  storageBucket: "limitless-259e1.appspot.com",
-  messagingSenderId: "780450660358",
-  appId: "1:780450660358:web:9f6fd50c7770b5b9e34387",
-  measurementId: "G-N6EVVE075H",
-};
+  deleteDoc,
+  setDoc,
+} from "./../db.js";
 const colorPicker = document.getElementById("colorPicker");
 const preview = document.getElementById("preview");
 const colorPicker1 = document.getElementById("colorPicker1");
@@ -34,9 +26,7 @@ colorPicker.addEventListener("input", () => {
 colorPicker1.addEventListener("input", () => {
   preview1.style.backgroundColor = colorPicker1.value;
 });
-// Inicializa Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+
 async function agregarQR() {
   let codigo = 0;
   const snapshot = await getDocs(collection(db, "Contadores"));

@@ -1,29 +1,19 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import {
+  db,
   getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  getDocs,
   collection,
+  getDocs,
+  updateDoc,
+  increment,
+  doc,
+  addDoc,
+  arrayUnion,
+  getDoc,
+  query,
+  where,
+  deleteDoc,
   setDoc,
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-// Configuración de Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBZskI-w8lTQ5eF7b24d9Mae27Jjc6nenU",
-  authDomain: "limitless-259e1.firebaseapp.com",
-  projectId: "limitless-259e1",
-  storageBucket: "limitless-259e1.appspot.com",
-  messagingSenderId: "780450660358",
-  appId: "1:780450660358:web:9f6fd50c7770b5b9e34387",
-  measurementId: "G-N6EVVE075H",
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+} from "./../db.js";
 // Menú hamburguesa
 const mobileNav = document.querySelector(".hamburger");
 const navbar = document.querySelector(".menubar");

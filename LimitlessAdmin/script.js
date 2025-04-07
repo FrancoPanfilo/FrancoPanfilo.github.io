@@ -1,5 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import {
+  db,
   getFirestore,
   collection,
   getDocs,
@@ -8,18 +8,12 @@ import {
   doc,
   addDoc,
   arrayUnion,
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-// Configuración de Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBZskI-w8lTQ5eF7b24d9Mae27Jjc6nenU",
-  authDomain: "limitless-259e1.firebaseapp.com",
-  projectId: "limitless-259e1",
-  storageBucket: "limitless-259e1.appspot.com",
-  messagingSenderId: "780450660358",
-  appId: "1:780450660358:web:9f6fd50c7770b5b9e34387",
-  measurementId: "G-N6EVVE075H",
-};
+  getDoc,
+  query,
+  where,
+  deleteDoc,
+  setDoc,
+} from "./db.js";
 
 const mobileNav = document.querySelector(".hamburger");
 const navbar = document.querySelector(".menubar");
@@ -30,9 +24,6 @@ const toggleNav = () => {
   mobileNav.classList.toggle("hamburger-active");
 };
 mobileNav.addEventListener("click", () => toggleNav());
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 async function mostrarModal(idVenta, codigoVenta) {
   modal.style.display = "block";
