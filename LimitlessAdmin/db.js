@@ -15,14 +15,14 @@ import {
   setDoc,
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-let qi10 = localStorage.getItem("qi10");
+let qi10 = localStorage.getItem("qi35");
 
 let d = document.getElementById("acceso");
 console.log(d);
 d.addEventListener("click", function iSSS() {
   console.log("object");
   let i = prompt("Ingrese la contraseña");
-  localStorage.setItem("qi10", i);
+  localStorage.setItem("qi35", i);
   location.reload();
 });
 
