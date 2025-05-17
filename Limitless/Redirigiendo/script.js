@@ -44,28 +44,34 @@ if (qrId) {
     .then((docSnap) => {
       if (docSnap.exists()) {
         const qrData = docSnap.data();
-        // Obtener el contador actual o inicializarlo en 0
-        const currentCount = qrData.contador || 0;
-        // Incrementar el contador
-        const newCount = currentCount + 1;
 
-        // Actualizar el documento con el nuevo contador
-        updateDoc(qrDoc, {
-          contador: newCount,
-        })
-          .then(() => {
-            // Redirigir después de actualizar el contador
-            setTimeout(() => {
-              window.location.href = `https://${qrData.link}`;
-            }, 1000);
+        // Verificar si el dispositivo ya escaneó este QR
+        const scannedQRs = JSON.parse(
+          localStorage.getItem("scannedQRs") || "[]"
+        );
+        if (!scannedQRs.includes(qrId)) {
+          // Dispositivo no ha escaneado este QR antes
+          const currentCount = qrData.contador || 0;
+          const newCount = currentCount + 1;
+
+          // Actualizar el contador en Firestore
+          updateDoc(qrDoc, {
+            contador: newCount,
           })
-          .catch((error) => {
-            console.error("Error actualizando el contador:", error);
-            // Redirigir incluso si falla la actualización del contador
-            setTimeout(() => {
-              window.location.href = `https://${qrData.link}`;
-            }, 1000);
-          });
+            .then(() => {
+              // Guardar el qrId en localStorage
+              scannedQRs.push(qrId);
+              localStorage.setItem("scannedQRs", JSON.stringify(scannedQRs));
+            })
+            .catch((error) => {
+              console.error("Error actualizando el contador:", error);
+            });
+        }
+
+        // Redirigir después de procesar (independientemente de si se actualizó el contador)
+        setTimeout(() => {
+          window.location.href = `https://${qrData.link}`;
+        }, 1000);
       } else {
         console.error("El documento QR no existe");
       }

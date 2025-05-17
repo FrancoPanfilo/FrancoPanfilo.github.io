@@ -207,6 +207,7 @@ async function cargarQRs() {
         </td>
         <td><input type="text" value="${qr.link}" id="link-${qr.id}" /></td>
         <td><button id="save${qr.id}">Guardar</button></td>
+        <td>>${qr.contador}</td>
         <td><button id="link${qr.id}">Link</button></td>
       `;
       tableBody.appendChild(row);
