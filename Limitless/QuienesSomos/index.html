@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Limitless - Scan Your Style</title>
+    <script defer type="module" src="script.js"></script>
+    <script defer type="module" src="../script.js"></script>
+    <link rel="stylesheet" href="../styles/nav.css" />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        overflow-x: hidden;
+        background-color: #000;
+        color: #fff;
+        line-height: 1.6;
+      }
+
+      .hero-container {
+        position: relative;
+        width: 100%;
+        height: 300vh; /* Más espacio para una narrativa inmersiva */
+        background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+        overflow: hidden;
+      }
+
+      .background-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.05) 0%,
+          #000000e6 80%
+        );
+        z-index: -1;
+        transform: scale(1);
+        transition: transform 0.8s ease;
+      }
+
+      .hero-container:hover .background-layer {
+        transform: scale(1.1);
+      }
+      #qrcode {
+        width: 80px;
+        height: 80px;
+      }
+      .hero-content {
+        position: sticky;
+        top: 10vh;
+        text-align: center;
+        padding: 0 20px;
+        z-index: 2;
+      }
+
+      h1 {
+        font-size: 6rem;
+        text-transform: uppercase;
+        letter-spacing: 10px;
+        background: linear-gradient(90deg, #fff, #ccc);
+        -webkit-background-clip: text;
+        color: transparent;
+        transform: translateY(-20vh);
+        transition: transform 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+      }
+
+      .slogan {
+        font-size: 2rem;
+        color: #ddd;
+        letter-spacing: 5px;
+        margin-top: 20px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: transform 0.7s ease, opacity 0.7s ease;
+      }
+
+      .scroll-active h1,
+      .scroll-active .slogan {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .story-section {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+      }
+
+      .story-section.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .story-section h2 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+      }
+
+      .story-section p {
+        font-size: 1.3rem;
+        max-width: 800px;
+        color: #ccc;
+      }
+
+      .parallax-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        transform: translateY(0);
+        transition: transform 0.1s ease;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+        width: 100%;
+        max-width: 1200px;
+        margin-top: 60px;
+      }
+
+      .feature-card {
+        background: #ffffff0d;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        transition: transform 0.5s ease, background 0.5s ease;
+        cursor: pointer;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-15px) scale(1.05);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .feature-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        transition: transform 0.6s ease;
+      }
+
+      .feature-card:hover img {
+        transform: scale(1.1);
+      }
+
+      .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 5px;
+        background: #fff;
+        z-index: 10;
+        transition: width 0.1s linear;
+      }
+
+      .scroll-invite {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.2rem;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        animation: bounce 2s infinite;
+      }
+      /* Nuevos estilos para input y button */
+      .feature-card input[type="text"] {
+        width: 100%;
+        padding: 12px 15px;
+        margin: 15px 0;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        outline: none;
+        transition: border-color 0.3s ease, background 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .feature-card input[type="text"]:focus,
+      .feature-card input[type="text"]:hover {
+        border-color: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.02);
+      }
+
+      .feature-card button {
+        padding: 12px 20px;
+        background: linear-gradient(90deg, #fff, #ccc);
+        border: none;
+        border-radius: 8px;
+        color: #000;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: transform 0.3s ease, background 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      #qrcode {
+        border-radius: 0px;
+      }
+      .feature-card button:hover {
+        transform: translateY(-3px);
+        background: linear-gradient(90deg, #ccc, #fff);
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+      }
+
+      .feature-card button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+      }
+      .scroll-invite::after {
+        content: "↓";
+        margin-left: 10px;
+        font-size: 1.5rem;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        40% {
+          transform: translateX(-50%) translateY(-10px);
+        }
+        60% {
+          transform: translateX(-50%) translateY(-5px);
+        }
+      }
+
+      /* Responsividad */
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 3.5rem;
+        }
+        .slogan {
+          font-size: 1.5rem;
+        }
+        .story-section h2 {
+          font-size: 2rem;
+        }
+        .story-section p {
+          font-size: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 2.5rem;
+        }
+        .slogan {
+          font-size: 1.2rem;
+        }
+        .story-section h2 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="logo" id="acceso">
+        <img src="../img/Limitless Blaco.png" alt="logo" />
+      </div>
+      <ul>
+        <li>
+          <a href="../index.html">Inicio</a>
+        </li>
+        <li>
+          <a href="">Quienes somos</a>
+        </li>
+        <li>
+          <a href="#footer">Contacto</a>
+        </li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+    <div class="menubar">
+      <ul>
+        <li>
+          <a href="../index.html">Inicio</a>
+        </li>
+        <li>
+          <a href="">Quienes somos</a>
+        </li>
+        <li>
+          <a href="#footer">Contacto</a>
+        </li>
+      </ul>
+    </div>
+    <div class="scroll-progress"></div>
+    <div class="hero-container">
+      <div class="background-layer"></div>
+      <div class="hero-content">
+        <h1>Limitless</h1>
+        <div class="slogan">Scan Your Style</div>
+      </div>
+
+      <div class="story-section" data-scroll-offset="20">
+        <!--      <img
+          class="parallax-image"
+          src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"
+          alt="Remera Oversize"
+        /> -->
+        <h2>Rompe las Reglas</h2>
+        <p>
+          Limitless no es solo una remera oversize. Es una declaración de
+          libertad, con materiales premium que combinan comodidad y resistencia.
+        </p>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <img
+              id="qrcode"
+              src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3"
+              alt="QR Dinámico"
+            />
+            <input type="text" id="text" value="" />
+            <button id="boton">Cambiar link</button>
+            <h3>Tu QR, Tu Regla</h3>
+            <p>
+              Un QR dinámico que puedes personalizar cuando quieras. Conecta tu
+              mundo con un escaneo.
+            </p>
+          </div>
+          <div class="feature-card">
+            <img src="../img/sinfondo.png" alt="Estilo Único" />
+            <h3>Define Tu Estilo</h3>
+            <p>
+              Oversize no significa desorden. Es diseño audaz con un ajuste
+              perfecto.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="story-section" data-scroll-offset="60">
+        <h2>Vive Sin Límites</h2>
+        <p>
+          Cada remera cuenta una historia. La tuya. Escanea, comparte, y haz que
+          el mundo te escuche.
+        </p>
+      </div>
+
+      <div class="scroll-invite">Sigue Explorando</div>
+    </div>
+
+    <script>
+      // Animaciones al hacer scroll
+      window.addEventListener("scroll", () => {
+        const scrollPosition = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const totalHeight =
+          document.querySelector(".hero-container").scrollHeight;
+
+        // Barra de progreso
+        const progress = (scrollPosition / (totalHeight - windowHeight)) * 100;
+        document.querySelector(".scroll-progress").style.width = `${progress}%`;
+
+        // Activar animaciones de entrada
+        const hero = document.querySelector(".hero-content");
+        if (scrollPosition > 50) {
+          hero.classList.add("scroll-active");
+        }
+
+        // Parallax y secciones
+        document.querySelectorAll(".story-section").forEach((section) => {
+          const offset =
+            (section.getAttribute("data-scroll-offset") * windowHeight) / 100;
+          const sectionTop =
+            section.getBoundingClientRect().top + scrollPosition;
+          if (scrollPosition > sectionTop - windowHeight + offset) {
+            section.classList.add("active");
+          }
+
+          const img = section.querySelector(".parallax-image");
+          if (img) {
+            const parallaxSpeed = 0.3;
+            const translateY = (scrollPosition - sectionTop) * parallaxSpeed;
+            img.style.transform = `translateY(${translateY}px)`;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
