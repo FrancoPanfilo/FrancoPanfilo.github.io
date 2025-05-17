@@ -194,6 +194,7 @@ async function cargarQRs() {
     tableBody.innerHTML = ""; // Limpiar la tabla
     filteredList.forEach((qr) => {
       const row = document.createElement("tr");
+      contador = qr.contador || 0; // Asegurarse de que contador tenga un valor
       row.innerHTML = `
         <td>${qr.id}</td>
         <td>${qr.nombre}</td>
@@ -207,7 +208,7 @@ async function cargarQRs() {
         </td>
         <td><input type="text" value="${qr.link}" id="link-${qr.id}" /></td>
         <td><button id="save${qr.id}">Guardar</button></td>
-        <td>>${qr.contador}</td>
+        <td>${contador}</td>
         <td><button id="link${qr.id}">Link</button></td>
       `;
       tableBody.appendChild(row);
