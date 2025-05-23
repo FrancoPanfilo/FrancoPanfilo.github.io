@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Azalea Members Club</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Encabezado -->
+    <header class="header">
+      <div class="logo">
+        <img src="logo.png" alt="Azalea Members Club Logo" />
+      </div>
+      <nav class="nav">
+        <ul>
+          <li><a href="#">Inicio</a></li>
+          <li><a href="#">Sesiones</a></li>
+          <li><a href="#">Progreso</a></li>
+          <li><a href="#">Perfil</a></li>
+          <li><a href="#" class="logout">Cerrar Sesión</a></li>
+        </ul>
+      </nav>
+      <div class="user-info">
+        <span>Bienvenido, Usuario 1</span>
+      </div>
+    </header>
+
+    <!-- Bienvenida -->
+    <section class="welcome">
+      <h1>Bienvenido al Azalea Members Club, Usuario 1</h1>
+      <p>Explora tus sesiones de golf y mejora tu juego con nosotros.</p>
+      <a href="#sessions" class="btn">Ver Mis Sesiones</a>
+    </section>
+
+    <!-- Resumen de Progreso -->
+    <section class="progress">
+      <h2>Tu Progreso</h2>
+      <div class="progress-cards">
+        <div class="card">
+          <h3>Distancia Máxima</h3>
+          <p>275 yardas</p>
+        </div>
+        <div class="card">
+          <h3>Tendencia de Vuelo (Hierros)</h3>
+          <p>Fade</p>
+        </div>
+        <div class="card">
+          <h3>Palo Favorito</h3>
+          <p>Driver</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lista de Sesiones -->
+    <section id="sessions" class="sessions">
+      <h2>Tus Sesiones de Golf</h2>
+      <table class="sessions-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Nº de Tiros</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-05-20</td>
+            <td>10</td>
+            <td><a href="#" class="btn-table">Ver Detalles</a></td>
+          </tr>
+          <tr>
+            <td>2025-05-15</td>
+            <td>8</td>
+            <td><a href="#" class="btn-table">Ver Detalles</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Estrellas del PGA Tour -->
+    <section class="pga-tour">
+      <h2>Estrellas del PGA Tour</h2>
+      <p>Inspírate con los mejores golfistas del mundo.</p>
+      <div class="pga-tour-grid">
+        <div class="pga-card">
+          <h3>Scottie Scheffler</h3>
+          <ul>
+            <li><strong>Driving Distance:</strong> 305.0 yds</li>
+            <li><strong>Scoring Average:</strong> 69.02</li>
+            <li><strong>Strokes Gained Approach:</strong> 1.235</li>
+            <li><strong>Birdies per Round:</strong> 4.50</li>
+          </ul>
+        </div>
+        <div class="pga-card">
+          <h3>Rory McIlroy</h3>
+          <ul>
+            <li><strong>Driving Distance:</strong> 319.3 yds</li>
+            <li><strong>Scoring Average:</strong> 69.219</li>
+            <li><strong>Strokes Gained Approach:</strong> 0.974</li>
+            <li><strong>Birdies per Round:</strong> 4.20</li>
+          </ul>
+        </div>
+        <div class="pga-card">
+          <h3>Collin Morikawa</h3>
+          <ul>
+            <li><strong>Driving Distance:</strong> 295.0 yds</li>
+            <li><strong>Scoring Average:</strong> 70.10</li>
+            <li><strong>Strokes Gained Approach:</strong> 1.100</li>
+            <li><strong>Birdies per Round:</strong> 3.90</li>
+          </ul>
+        </div>
+        <div class="pga-card">
+          <h3>Justin Thomas</h3>
+          <ul>
+            <li><strong>Driving Distance:</strong> 300.0 yds</li>
+            <li><strong>Scoring Average:</strong> 70.50</li>
+            <li><strong>Strokes Gained Approach:</strong> 0.850</li>
+            <li><strong>Birdies per Round:</strong> 4.80</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pie de Página -->
+    <footer class="footer">
+      <p>Azalea Members Club © 2025. Todos los derechos reservados.</p>
+      <ul class="footer-links">
+        <li><a href="#">Política de Privacidad</a></li>
+        <li><a href="#">Contacto</a></li>
+        <li><a href="#">Instagram</a></li>
+      </ul>
+    </footer>
+  </body>
+</html>

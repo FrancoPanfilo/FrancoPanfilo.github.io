@@ -1,0 +1,327 @@
+/* Paleta de colores */
+:root {
+  --pink-light: #f8b8d0;
+  --pink-dark: #d81b60;
+  --blue-light: #a5d6f7;
+  --white: #ffffff;
+  --gray-light: #f4f4f4;
+}
+
+/* Estilos generales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  background-color: var(--white);
+  color: #333;
+}
+
+/* Encabezado */
+.header {
+  background-color: var(--pink-light);
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo img {
+  height: 50px;
+}
+
+.nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav a {
+  color: var(--pink-dark);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.nav a:hover {
+  color: var(--blue-light);
+}
+
+.logout {
+  background-color: var(--pink-dark);
+  color: var(--white);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.logout:hover {
+  background-color: var(--blue-light);
+  color: var(--white);
+}
+
+.user-info {
+  font-size: 14px;
+  color: var(--pink-dark);
+}
+
+/* Bienvenida */
+.welcome {
+  background-color: var(--gray-light);
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.welcome h1 {
+  font-size: 36px;
+  color: var(--pink-dark);
+  margin-bottom: 20px;
+}
+
+.welcome p {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.btn {
+  background-color: var(--blue-light);
+  color: var(--white);
+  padding: 12px 24px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: var(--pink-dark);
+}
+
+/* Resumen de Progreso */
+.progress {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.progress h2 {
+  font-size: 28px;
+  color: var(--pink-dark);
+  margin-bottom: 30px;
+}
+
+.progress-cards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background-color: var(--white);
+  border: 1px solid var(--pink-light);
+  border-radius: 8px;
+  padding: 20px;
+  width: 200px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card h3 {
+  font-size: 18px;
+  color: var(--pink-dark);
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 24px;
+  color: #555;
+}
+
+/* Lista de Sesiones */
+.sessions {
+  padding: 40px 20px;
+  background-color: var(--gray-light);
+}
+
+.sessions h2 {
+  font-size: 28px;
+  color: var(--pink-dark);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sessions-table {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: var(--white);
+}
+
+.sessions-table th,
+.sessions-table td {
+  border: 1px solid var(--pink-light);
+  padding: 12px;
+  text-align: left;
+}
+
+.sessions-table th {
+  background-color: var(--blue-light);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.sessions-table tr:nth-child(even) {
+  background-color: var(--gray-light);
+}
+
+.sessions-table tr:hover {
+  background-color: var(--pink-light);
+}
+
+.btn-table {
+  background-color: var(--blue-light);
+  color: var(--white);
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.btn-table:hover {
+  background-color: var(--pink-dark);
+}
+
+/* Estrellas del PGA Tour */
+.pga-tour {
+  padding: 60px 20px;
+  background-color: var(--blue-light);
+  text-align: center;
+}
+
+.pga-tour h2 {
+  font-size: 32px;
+  color: var(--pink-dark);
+  margin-bottom: 20px;
+}
+
+.pga-tour p {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.pga-tour-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pga-card {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.pga-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.pga-card h3 {
+  font-size: 22px;
+  color: var(--pink-dark);
+  margin-bottom: 15px;
+}
+
+.pga-card ul {
+  list-style: none;
+  text-align: left;
+}
+
+.pga-card li {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.pga-card strong {
+  color: var(--pink-dark);
+}
+
+/* Pie de Página */
+.footer {
+  background-color: var(--pink-light);
+  padding: 20px;
+  text-align: center;
+}
+
+.footer p {
+  color: var(--pink-dark);
+  margin-bottom: 10px;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.footer-links a {
+  color: var(--pink-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer-links a:hover {
+  color: var(--blue-light);
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .nav ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .progress-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .welcome h1 {
+    font-size: 28px;
+  }
+
+  .welcome p {
+    font-size: 16px;
+  }
+
+  .pga-tour-grid {
+    grid-template-columns: 1fr;
+  }
+}

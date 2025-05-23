@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cargar Sesión de Golf a Firebase</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../nav.css" />
+    <script defer src="../login.js"></script>
+    <script defer type="module" src="../db.js"></script>
+  </head>
+  <body>
+    <nav>
+      <div class="logo" id="acceso">
+        <img src="../logo.jpg" alt="logo" />
+      </div>
+      <ul>
+        <li><a href="../index.html">Gestion de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+    <div class="menubar">
+      <ul>
+        <li><a href="../index.html">Gestion de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
+      </ul>
+    </div>
+
+    <div class="form-container">
+      <h2>Cargar Sesión de Golf</h2>
+      <form id="sessionForm">
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" name="nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="fecha">Fecha:</label>
+          <input type="date" id="fecha" name="fecha" required />
+        </div>
+        <div class="form-group">
+          <label for="csvFile">Seleccionar archivo CSV:</label>
+          <input
+            type="file"
+            id="csvFile"
+            name="csvFile"
+            accept=".csv"
+            required
+          />
+        </div>
+        <button type="submit">Cargar Sesión</button>
+      </form>
+      <p id="status" class="status"></p>
+    </div>
+    <div id="previewContainer" class="preview-container">
+      <h3>Previsualización de la Sesión</h3>
+      <table id="previewTable" class="preview-table">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <script type="module" src="script.js"></script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'94421be77f551e8c',t:'MTc0Nzk3NzY3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
