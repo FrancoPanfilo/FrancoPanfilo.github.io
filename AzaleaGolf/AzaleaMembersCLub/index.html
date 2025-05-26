@@ -14,13 +14,16 @@
     <!-- Encabezado -->
     <header class="header">
       <div class="logo">
-        <img src="logo.png" alt="Azalea Members Club Logo" />
+        <img
+          class="logoimg"
+          src="img/logo.jpg"
+          alt="Azalea Members Club Logo"
+        />
       </div>
       <nav class="nav">
         <ul>
           <li><a href="#">Inicio</a></li>
-          <li><a href="#">Sesiones</a></li>
-          <li><a href="#">Progreso</a></li>
+          <li><a href="Sesiones/index.html">Sesiones</a></li>
           <li><a href="#">Perfil</a></li>
           <li><a href="#" class="logout">Cerrar Sesión</a></li>
         </ul>
@@ -34,7 +37,7 @@
     <section class="welcome">
       <h1>Bienvenido al Azalea Members Club, Usuario 1</h1>
       <p>Explora tus sesiones de golf y mejora tu juego con nosotros.</p>
-      <a href="#sessions" class="btn">Ver Mis Sesiones</a>
+      <a href="Sesiones/index.html" class="btn">Ver Mis Sesiones</a>
     </section>
 
     <!-- Resumen de Progreso -->
@@ -64,25 +67,32 @@
           <tr>
             <th>Fecha</th>
             <th>Nº de Tiros</th>
+            <th>Palos Usados</th>
+            <th>Duracion</th>
             <th>Acción</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>2025-05-20</td>
+            <td>103</td>
             <td>10</td>
-            <td><a href="#" class="btn-table">Ver Detalles</a></td>
+            <td>1h 20m</td>
+            <td><a href="" class="btn-table">Ver Detalles</a></td>
           </tr>
           <tr>
             <td>2025-05-15</td>
-            <td>8</td>
+            <td>87</td>
+            <td>13</td>
+            <td>1h</td>
+
             <td><a href="#" class="btn-table">Ver Detalles</a></td>
           </tr>
         </tbody>
       </table>
     </section>
 
-    <!-- Estrellas del PGA Tour -->
+    <!--     
     <section class="pga-tour">
       <h2>Estrellas del PGA Tour</h2>
       <p>Inspírate con los mejores golfistas del mundo.</p>
@@ -125,12 +135,12 @@
         </div>
       </div>
     </section>
+    -->
 
     <!-- Pie de Página -->
     <footer class="footer">
       <p>Azalea Members Club © 2025. Todos los derechos reservados.</p>
       <ul class="footer-links">
-        <li><a href="#">Política de Privacidad</a></li>
         <li><a href="#">Contacto</a></li>
         <li><a href="#">Instagram</a></li>
       </ul>

@@ -1,0 +1,409 @@
+/* Paleta de colores */
+:root {
+  --pink-light: #280e18;
+  --pink-dark: #514549;
+  --blue-light: rgb(43, 41, 41);
+  --white: #ffffff;
+  --gray-light: #f4f4f4;
+}
+
+/* Estilos generales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  background-image: url("https://fsxlive.foresightsports.com/Content/images/Artboard_Web.jpg");
+  color: #333;
+}
+
+/* Encabezado */
+.header {
+  background-color: var(--pink-light);
+  padding: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  padding: 10px 20px;
+}
+.logo img {
+  height: 40px;
+}
+
+.nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav a {
+  color: var(--gray-light);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.nav a:hover {
+  color: var(--white);
+}
+
+.logout {
+  background-color: var(--pink-dark);
+  color: var(--white);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.logout:hover {
+  background-color: var(--blue-light);
+  color: var(--white);
+}
+
+/* Lista de Sesiones */
+#shotsTableContainer {
+  scrollbar-width: thin;
+}
+#shotsTableContainer::-webkit-scrollbar {
+  width: 10px;
+}
+#shotsTableContainer::-webkit-scrollbar-track {
+  background: var(--gray-light);
+}
+#shotsTableContainer::-webkit-scrollbar-thumb {
+  background: var(--pink-dark);
+  border-radius: 5px;
+}
+.sessions {
+  padding: 40px 20px;
+  background-color: var(--blue-light);
+}
+
+.sessions h2 {
+  font-size: 28px;
+  color: var(--gray-light);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sessions-list {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.session-item {
+  background-color: var(--gray-light);
+  border: 1px solid var(--pink-light);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.session-item:hover {
+  background-color: var(--pink-dark);
+  transform: translateY(-2px);
+}
+
+.session-item.active {
+  background-color: var(--pink-dark);
+  color: var(--white);
+}
+
+.session-item p {
+  font-size: 16px;
+  color: #333;
+}
+
+.session-item.active p {
+  color: var(--white);
+}
+
+/* Tabla de Tiros */
+.shots-table-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  overflow-x: auto;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.shots-table-container.active {
+  max-height: fit-content; /* Ajusta según el contenido */
+  opacity: 1;
+}
+
+.table-actions {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.table-actions button,
+.table-actions select {
+  background-color: var(--pink-dark);
+  color: var(--white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.table-actions button:hover,
+.table-actions select:hover {
+  background-color: var(--blue-light);
+}
+
+.table-actions select {
+  background-color: var(--pink-dark);
+  appearance: none;
+  padding-right: 30px;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.shots-table {
+  width: 100%;
+  border: var(--blue-light) !important;
+  margin-bottom: 20px;
+}
+
+.shots-table th,
+.shots-table td {
+  border: var(--blue-light) !important;
+  padding: 7px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.shots-table th {
+  background-color: var(--pink-light);
+  color: var(--white);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  white-space: wrap;
+  border: var(--blue-light) !important;
+}
+.shots-table tr {
+  height: 20px;
+}
+.shots-table th:hover {
+  background-color: var(--pink-dark);
+}
+
+.shots-table td {
+  background-color: var(--white);
+}
+
+.shots-table tr:hover td {
+  background-color: var(--pink-dark);
+  color: var(--white);
+}
+
+.shots-table .checkbox-column {
+  width: 50px;
+}
+
+.shots-table .sort-icon {
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+.shots-table .club-header {
+  background-color: var(--pink-dark);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 13px;
+  text-align: left;
+  padding: 10px;
+}
+.average-row .checkbox-column {
+  background-color: var(--blue-light) !important;
+  border: none !important;
+}
+.shots-table .average-row td {
+  background-color: #c7b6b6cc;
+  font-weight: 600;
+  font-size: 12px;
+  color: #333;
+  line-height: 10px;
+}
+.shots-table tbody tr {
+  line-height: 8px;
+}
+
+/* Contenedor del Mapa */
+#shotsMapContainer {
+  position: relative;
+  width: 333px;
+  height: 1000px;
+  margin: 20px auto;
+  background-color: #4caf50;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  user-select: none;
+}
+
+#shotsMapContainer.hidden {
+  display: none;
+}
+
+#shotsMapContainer svg {
+  width: 333px;
+  height: 1000px;
+  display: block;
+  margin: 0 auto;
+}
+
+.map-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.map-actions button {
+  background-color: var(--pink-dark);
+  color: var(--white);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.map-actions button:hover {
+  background-color: var(--blue-light);
+}
+
+.map-message {
+  text-align: center;
+  color: #333;
+  font-size: 14px;
+  padding: 20px;
+}
+
+/* Pie de Página */
+.footer {
+  background-color: var(--pink-light);
+  padding: 20px;
+  text-align: center;
+}
+
+.footer p {
+  color: var(--pink-dark);
+  margin-bottom: 10px;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.footer-links a {
+  color: var(--pink-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer-links a:hover {
+  color: var(--blue-light);
+}
+
+/* Responsividad */
+@media (max-width: 868px) {
+  .header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .nav ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sessions-list {
+    padding: 0 10px;
+  }
+
+  .session-item p {
+    font-size: 14px;
+  }
+
+  .shots-table-container {
+    padding: 0 10px;
+  }
+
+  .table-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-actions button,
+  .table-actions select {
+    width: 100%;
+  }
+
+  .shots-table th,
+  .shots-table td {
+    font-size: 11px;
+    padding: 8px;
+  }
+
+  .shots-table .checkbox-column {
+    width: 40px;
+  }
+
+  .shots-table .club-header {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .shots-table .average-row td {
+    font-size: 11px;
+    padding: 8px;
+  }
+
+  #shotsMapContainer {
+    padding: 10px;
+  }
+
+  #shotsMapContainer svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .map-actions {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .map-actions button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

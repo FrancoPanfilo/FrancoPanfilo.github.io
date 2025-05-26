@@ -1,8 +1,8 @@
 /* Paleta de colores */
 :root {
-  --pink-light: #f8b8d0;
-  --pink-dark: #d81b60;
-  --blue-light: #a5d6f7;
+  --pink-light: #280e18;
+  --pink-dark: #514549;
+  --blue-light: rgb(43, 41, 41);
   --white: #ffffff;
   --gray-light: #f4f4f4;
 }
@@ -16,22 +16,25 @@
 
 body {
   font-family: "Montserrat", sans-serif;
-  background-color: var(--white);
+  background-image: url("https://fsxlive.foresightsports.com/Content/images/Artboard_Web.jpg");
   color: #333;
 }
 
 /* Encabezado */
 .header {
   background-color: var(--pink-light);
-  padding: 20px;
+  padding: 0px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.logo {
+  padding: 10px 20px;
+}
 .logo img {
-  height: 50px;
+  height: 40px;
 }
 
 .nav ul {
@@ -41,14 +44,14 @@ body {
 }
 
 .nav a {
-  color: var(--pink-dark);
+  color: var(--gray-light);
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s;
 }
 
 .nav a:hover {
-  color: var(--blue-light);
+  color: var(--white);
 }
 
 .logout {
@@ -70,14 +73,14 @@ body {
 
 /* Bienvenida */
 .welcome {
-  background-color: var(--gray-light);
+  background-color: transparent;
   text-align: center;
   padding: 60px 20px;
 }
 
 .welcome h1 {
   font-size: 36px;
-  color: var(--pink-dark);
+  color: var(--gray-light);
   margin-bottom: 20px;
 }
 
@@ -109,7 +112,7 @@ body {
 
 .progress h2 {
   font-size: 28px;
-  color: var(--pink-dark);
+  color: var(--gray-light);
   margin-bottom: 30px;
 }
 
@@ -121,9 +124,9 @@ body {
 }
 
 .card {
-  background-color: var(--white);
-  border: 1px solid var(--pink-light);
-  border-radius: 8px;
+  background-color: #00000053;
+  border: none;
+  border-radius: 0px;
   padding: 20px;
   width: 200px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -137,7 +140,7 @@ body {
 
 .card h3 {
   font-size: 18px;
-  color: var(--pink-dark);
+  color: var(--gray-light);
   margin-bottom: 10px;
 }
 
@@ -149,12 +152,12 @@ body {
 /* Lista de Sesiones */
 .sessions {
   padding: 40px 20px;
-  background-color: var(--gray-light);
+  background-color: var(--blue-light);
 }
 
 .sessions h2 {
   font-size: 28px;
-  color: var(--pink-dark);
+  color: var(--gray-light);
   text-align: center;
   margin-bottom: 30px;
 }
@@ -164,28 +167,31 @@ body {
   max-width: 800px;
   margin: 0 auto;
   border-collapse: collapse;
-  background-color: var(--white);
 }
 
 .sessions-table th,
 .sessions-table td {
-  border: 1px solid var(--pink-light);
+  border: 1px solid transparent;
   padding: 12px;
   text-align: left;
 }
 
+.sessions-table td,
 .sessions-table th {
-  background-color: var(--blue-light);
+  border: 3px solid var(--blue-light);
+}
+.sessions-table th {
+  background-color: var(--pink-light);
   color: var(--white);
   font-weight: 600;
 }
 
-.sessions-table tr:nth-child(even) {
+.sessions-table tr {
   background-color: var(--gray-light);
 }
 
 .sessions-table tr:hover {
-  background-color: var(--pink-light);
+  background-color: var(--pink-dark);
 }
 
 .btn-table {
@@ -198,7 +204,7 @@ body {
 }
 
 .btn-table:hover {
-  background-color: var(--pink-dark);
+  background-color: black;
 }
 
 /* Estrellas del PGA Tour */
