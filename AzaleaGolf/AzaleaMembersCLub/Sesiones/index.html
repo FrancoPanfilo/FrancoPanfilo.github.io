@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sesiones de Golf</title>
     <link rel="stylesheet" href="styles.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
       rel="stylesheet"
@@ -16,7 +14,7 @@
     <header class="header">
       <div class="logo">
         <img
-          src="https://fsxlive.foresightsports.com/Content/images/FSXLive_Logo_Horiz_White.png"
+          src="https://fsxlive.foresightsports.com/Content/images/foresight_logo_white.png"
           alt="Logo"
         />
       </div>
@@ -29,12 +27,11 @@
       </nav>
     </header>
 
-    <section class="sessions">
+    <main class="sessions">
       <h2>Sesiones de Golf</h2>
       <div class="sessions-list" id="sessionsList"></div>
       <div class="shots-table-container" id="shotsTableContainer"></div>
-      <div id="shotsMapContainer" class="hidden"></div>
-    </section>
+    </main>
 
     <footer class="footer">
       <p>© 2025 Sesiones de Golf. Todos los derechos reservados.</p>
@@ -45,7 +42,8 @@
       </ul>
     </footer>
 
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script type="module" src="script.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
   </body>
 </html>

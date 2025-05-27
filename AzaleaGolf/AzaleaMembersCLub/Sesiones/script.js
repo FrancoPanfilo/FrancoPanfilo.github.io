@@ -35,7 +35,7 @@ const clubColors = [
   "#C0392B",
 ];
 
-// Función para formatear el nombre del palo (corto para leyenda)
+// Función para formatear el nombre del palo
 function formatClubName(clubName, short = false) {
   const clubNames = {
     Dr: short ? "Dr" : "Driver",
@@ -91,7 +91,7 @@ function formatClubName(clubName, short = false) {
   return clubNames[clubName] || clubName;
 }
 
-// Función para obtener el orden de los palos (driver primero)
+// Función para obtener el orden de los palos
 function getClubOrder(clubName) {
   const clubHierarchy = {
     Dr: 1,
@@ -152,7 +152,7 @@ let currentData = [];
 let currentSort = { column: null, ascending: true };
 let currentFilter = null;
 let selectedShots = new Set();
-let showAverageLines = false;
+let clubVisibility = {};
 
 // Función para calcular promedios de un palo
 function calculateClubAverages(club, shots) {
@@ -168,267 +168,10 @@ function calculateClubAverages(club, shots) {
       .filter((val) => !isNaN(val));
     if (values.length === 0) return "-";
     const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+    if (col === "efficiency") {
+      return avg.toFixed(2);
+    }
     return avg.toFixed(1);
-  });
-}
-
-// Función para obtener distancia máxima
-function getMaxDistance(data) {
-  const distances = data
-    .map((row) => parseFloat(row["total distance (yds)"]))
-    .filter((val) => !isNaN(val));
-  return distances.length > 0 ? Math.max(...distances) : 300; // Default 300 yds
-}
-
-// Función para generar datos del mapa
-function generateChartData(data) {
-  const groupedData = {};
-  data.forEach((row, index) => {
-    const club = row["club name"];
-    if (!groupedData[club]) groupedData[club] = [];
-    groupedData[club].push({ ...row, originalIndex: index });
-  });
-
-  const sortedClubs = Object.keys(groupedData).sort(
-    (a, b) => getClubOrder(a) - getClubOrder(b)
-  );
-  const filteredClubs = currentFilter
-    ? sortedClubs.filter((club) => club === currentFilter)
-    : sortedClubs;
-
-  console.log("Raw data for chart:", data); // Debug: Log raw data
-  const datasets = filteredClubs
-    .map((club, i) => {
-      const shots = groupedData[club].filter((row) =>
-        selectedShots.has(row.originalIndex)
-      );
-      const avgDistance =
-        shots
-          .map((row) => parseFloat(row["total distance (yds)"]))
-          .filter((val) => !isNaN(val))
-          .reduce((sum, val, _, { length }) => sum + val / length, 0) || 0;
-
-      const shotData = shots.map((row) => {
-        const offline = parseFloat(row["offline (yds)"]);
-        const distance = parseFloat(row["total distance (yds)"]);
-        console.log(
-          `Club: ${club}, Shot: ${row.originalIndex}, Offline: ${offline}, Distance: ${distance}`
-        ); // Debug: Log each shot
-        return {
-          x: isNaN(offline) ? 0 : offline,
-          y: isNaN(distance) ? 0 : distance,
-          club: club,
-          index: row.originalIndex,
-        };
-      });
-
-      return {
-        club: club,
-        label: formatClubName(club, true),
-        shots: shotData,
-        color: clubColors[i % clubColors.length],
-        avgDistance: showAverageLines ? avgDistance : null,
-      };
-    })
-    .filter((dataset) => dataset.shots.length > 0);
-
-  console.log("Generated datasets:", datasets); // Debug: Log final datasets
-  return datasets;
-}
-
-// Función para crear o actualizar el mapa con D3.js
-function updateShotsMap(data) {
-  const shotsMapContainer = d3.select("#shotsMapContainer");
-  if (!shotsMapContainer.node()) {
-    console.error("Contenedor #shotsMapContainer no encontrado");
-    return;
-  }
-
-  // Hide map if no data
-  if (!data || data.length === 0) {
-    shotsMapContainer.classed("hidden", true);
-    return;
-  }
-
-  const datasets = generateChartData(data);
-  if (datasets.length === 0) {
-    shotsMapContainer.classed("hidden", false);
-    shotsMapContainer.html(
-      '<p class="map-message">No hay tiros seleccionados para mostrar.</p>'
-    );
-    return;
-  }
-
-  shotsMapContainer.classed("hidden", false);
-  shotsMapContainer.html(`
-    <div class="map-actions">
-      <button onclick="exportChart()">Exportar PNG</button>
-      <button onclick="toggleAverageLines()">${
-        showAverageLines ? "Ocultar" : "Mostrar"
-      } Líneas Promedio</button>
-    </div>
-  `);
-
-  // SVG setup
-  const svgWidth = 333; // px
-  const svgHeight = 1000; // px
-  const margin = { top: 30, right: 30, bottom: 30, left: 30 };
-  const innerWidth = svgWidth - margin.left - margin.right;
-  const innerHeight = svgHeight - margin.top - margin.bottom;
-
-  // Calculate dimensions in yards
-  const maxDistance = getMaxDistance(data);
-  const mapHeightYards = maxDistance * 1.1; // Max distance + 10%
-  const mapWidthYards = mapHeightYards / 3; // Width = Height / 3
-  const xRange = mapWidthYards / 2; // Symmetric x-axis (e.g., -55 to 55 for 110 yards)
-
-  // Scales
-  const xScale = d3
-    .scaleLinear()
-    .domain([-xRange, xRange])
-    .range([0, innerWidth]); // 333px
-  const yScale = d3
-    .scaleLinear()
-    .domain([0, mapHeightYards])
-    .range([innerHeight, 0]); // 1000px
-
-  const svg = shotsMapContainer
-    .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight)
-    .attr("viewBox", `0 0 ${svgWidth} ${svgHeight}`)
-    .attr("preserveAspectRatio", "xMidYMid meet");
-
-  const g = svg
-    .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-  // Green background
-  g.append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", innerWidth)
-    .attr("height", innerHeight)
-    .attr("fill", "#4CAF50");
-
-  // Axes
-  const xAxis = d3
-    .axisBottom(xScale)
-    .tickSize(innerHeight)
-    .tickValues(d3.range(-Math.floor(xRange), Math.floor(xRange) + 1, 10))
-    .tickFormat(d3.format("d"));
-  const yAxis = d3
-    .axisLeft(yScale)
-    .tickSize(-innerWidth)
-    .tickValues(d3.range(0, Math.ceil(mapHeightYards / 10) * 10, 10))
-    .tickFormat(d3.format("d"));
-
-  g.append("g")
-    .attr("transform", `translate(0, ${innerHeight})`)
-    .call(xAxis)
-    .selectAll("text")
-    .style("font-family", "Montserrat, sans-serif")
-    .style("font-size", "10px");
-  g.append("g")
-    .call(yAxis)
-    .selectAll("text")
-    .style("font-family", "Montserrat, sans-serif")
-    .style("font-size", "10px");
-
-  // Center line (x=0)
-  g.append("line")
-    .attr("x1", xScale(0))
-    .attr("y1", 0)
-    .attr("x2", xScale(0))
-    .attr("y2", innerHeight)
-    .attr("stroke", "#333")
-    .attr("stroke-width", 2);
-
-  // Axis labels
-  g.append("text")
-    .attr("x", innerWidth / 2)
-    .attr("y", innerHeight + 25)
-    .attr("text-anchor", "middle")
-    .style("font-family", "Montserrat, sans-serif")
-    .style("font-size", "12px")
-    .style("fill", "#333")
-    .text("Desviación (yds)");
-  g.append("text")
-    .attr("transform", `rotate(-90) translate(${-innerHeight / 2}, -25)`)
-    .attr("text-anchor", "middle")
-    .style("font-family", "Montserrat, sans-serif")
-    .style("font-size", "12px")
-    .style("fill", "#333")
-    .text("Distancia (yds)");
-
-  // Points
-  datasets.forEach((dataset, i) => {
-    g.selectAll(`.point-${i}`)
-      .data(dataset.shots)
-      .enter()
-      .append("circle")
-      .attr("class", `point-${i}`)
-      .attr("cx", (d) => xScale(d.x))
-      .attr("cy", (d) => yScale(d.y))
-      .attr("r", 4)
-      .attr("fill", dataset.color)
-      .attr("stroke", "#000")
-      .attr("stroke-width", (d) => (selectedShots.has(d.index) ? 2 : 1))
-      .attr("opacity", (d) => (selectedShots.has(d.index) ? 1 : 0.6))
-      .on("click", (event, d) => {
-        updateFilter(d.club);
-        const checkbox = document.querySelector(`input[data-row="${d.index}"]`);
-        if (checkbox) {
-          checkbox.checked = !checkbox.checked;
-          updateShotSelection(checkbox);
-        }
-      });
-  });
-
-  // Average lines
-  if (showAverageLines) {
-    datasets.forEach((dataset) => {
-      if (dataset.avgDistance) {
-        g.append("line")
-          .attr("x1", 0)
-          .attr("x2", innerWidth)
-          .attr("y1", yScale(dataset.avgDistance))
-          .attr("y2", yScale(dataset.avgDistance))
-          .attr("stroke", dataset.color)
-          .attr("stroke-width", 1)
-          .attr("stroke-dasharray", "5,5");
-      }
-    });
-  }
-
-  // Legend
-  const legend = g.append("g").attr("transform", `translate(0, -20)`);
-  datasets.forEach((dataset, i) => {
-    const legendItem = legend
-      .append("g")
-      .attr("transform", `translate(${i * 80}, 0)`);
-    legendItem
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("width", 10)
-      .attr("height", 10)
-      .attr("fill", dataset.color);
-    legendItem
-      .append("text")
-      .attr("x", 15)
-      .attr("y", 8)
-      .style("font-family", "Montserrat, sans-serif")
-      .style("font-size", "10px")
-      .style("fill", "#333")
-      .text(dataset.label)
-      .on("click", () => {
-        const points = g.selectAll(`.point-${i}`);
-        points.style(
-          "display",
-          points.style("display") === "none" ? "block" : "none"
-        );
-      });
   });
 }
 
@@ -436,9 +179,7 @@ function updateShotsMap(data) {
 async function loadSessions() {
   const sessionsList = document.getElementById("sessionsList");
   const shotsTableContainer = document.getElementById("shotsTableContainer");
-  const shotsMapContainer = document.getElementById("shotsMapContainer");
   sessionsList.innerHTML = "<p>Cargando sesiones...</p>";
-  shotsMapContainer.classList.add("hidden");
 
   try {
     const nombre = "Miguel Reyes";
@@ -476,13 +217,15 @@ async function loadSessions() {
         currentSort = { column: null, ascending: true };
         currentFilter = null;
         selectedShots = new Set(currentData.map((_, i) => i));
-        showAverageLines = false;
-        displayShotsTable(session.datos, index);
+        clubVisibility = {};
+        currentData.forEach((row) => {
+          clubVisibility[row["club name"]] = true;
+        });
+        displayShotsTable(currentData, index);
       });
       sessionsList.appendChild(sessionItem);
     });
   } catch (error) {
-    console.error("Error al cargar sesiones:", error);
     sessionsList.innerHTML = "<p>Error al cargar sesiones.</p>";
   }
 }
@@ -490,17 +233,13 @@ async function loadSessions() {
 // Función para mostrar la tabla de tiros
 function displayShotsTable(data, sessionIndex) {
   const shotsTableContainer = document.getElementById("shotsTableContainer");
-  const shotsMapContainer = document.getElementById("shotsMapContainer");
 
   if (!data || data.length === 0) {
     shotsTableContainer.innerHTML = "<p>No hay datos para esta sesión.</p>";
     shotsTableContainer.classList.remove("active");
-    shotsMapContainer.classList.add("hidden");
-    updateShotsMap([]); // Limpiar mapa
     return;
   }
 
-  // Agrupar datos por palo
   const groupedData = {};
   data.forEach((row, index) => {
     const club = row["club name"];
@@ -508,17 +247,14 @@ function displayShotsTable(data, sessionIndex) {
     groupedData[club].push({ ...row, originalIndex: index });
   });
 
-  // Ordenar palos por longitud
   const sortedClubs = Object.keys(groupedData).sort(
     (a, b) => getClubOrder(a) - getClubOrder(b)
   );
 
-  // Aplicar filtro
   const filteredClubs = currentFilter
     ? sortedClubs.filter((club) => club === currentFilter)
     : sortedClubs;
 
-  // Aplicar ordenación por columna
   filteredClubs.forEach((club) => {
     if (currentSort.column) {
       groupedData[club].sort((a, b) => {
@@ -537,7 +273,6 @@ function displayShotsTable(data, sessionIndex) {
     }
   });
 
-  // Generar acciones
   const uniqueClubs = sortedClubs;
   const tableHTML = `
     <div class="table-actions">
@@ -586,7 +321,11 @@ function displayShotsTable(data, sessionIndex) {
               }">${formatClubName(club)}</th>
             </tr>
             <tr class="average-row">
-              <td class="checkbox-column">-</td>
+              <td class="checkbox-column">
+                <button class="toggle-club-btn" data-club="${club}" onclick="toggleClubShots('${club}')">
+                  ${clubVisibility[club] ? "−" : "+"}
+                </button>
+              </td>
               ${calculateClubAverages(club, groupedData[club])
                 .map((avg) => `<td>${avg}</td>`)
                 .join("")}
@@ -594,7 +333,7 @@ function displayShotsTable(data, sessionIndex) {
             ${groupedData[club]
               .map(
                 (row) => `
-                <tr>
+                <tr class="shot-row${clubVisibility[club] ? "" : " hidden"}">
                   <td class="checkbox-column"><input type="checkbox" data-row="${
                     row.originalIndex
                   }" onchange="updateShotSelection(this)" ${
@@ -619,10 +358,14 @@ function displayShotsTable(data, sessionIndex) {
 
   shotsTableContainer.innerHTML = tableHTML;
   shotsTableContainer.classList.add("active");
-  updateShotsMap(data);
 }
 
 // Funciones de acciones
+window.toggleClubShots = function (club) {
+  clubVisibility[club] = !clubVisibility[club];
+  displayShotsTable(currentData, 0);
+};
+
 window.toggleAllChecks = function (checked) {
   selectedShots = checked ? new Set(currentData.map((_, i) => i)) : new Set();
   displayShotsTable(currentData, 0);
@@ -641,6 +384,12 @@ window.updateShotSelection = function (checkbox) {
 window.updateFilter = function (value) {
   currentFilter = value || null;
   selectedShots = new Set(currentData.map((_, i) => i));
+  clubVisibility = {};
+  currentData.forEach((row) => {
+    if (!currentFilter || row["club name"] === currentFilter) {
+      clubVisibility[row["club name"]] = true;
+    }
+  });
   displayShotsTable(currentData, 0);
 };
 
@@ -650,11 +399,6 @@ window.sortTable = function (column) {
   } else {
     currentSort = { column, ascending: true };
   }
-  displayShotsTable(currentData, 0);
-};
-
-window.toggleAverageLines = function () {
-  showAverageLines = !showAverageLines;
   displayShotsTable(currentData, 0);
 };
 
@@ -714,35 +458,10 @@ window.exportToCSV = function () {
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute(
-    "download",
-    `sesion_tiros_${new Date().toISOString().slice(0, 10)}.csv`
-  );
+  link.setAttribute("download", "golf_shots.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 };
 
-window.exportChart = function () {
-  const svg = document.querySelector("#shotsMapContainer svg");
-  const serializer = new XMLSerializer();
-  const svgString = serializer.serializeToString(svg);
-  const canvas = document.createElement("canvas");
-  canvas.width = 333;
-  canvas.height = 1000;
-  const ctx = canvas.getContext("2d");
-  const img = new Image();
-  img.onload = function () {
-    ctx.drawImage(img, 0, 0);
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/png");
-    link.download = `mapa_tiros_${new Date().toISOString().slice(0, 10)}.png`;
-    link.click();
-  };
-  img.src = "data:image/svg+xml;base64," + btoa(svgString);
-};
-
-// Inicializar al cargar la página
-document.addEventListener("DOMContentLoaded", () => {
-  loadSessions();
-});
+loadSessions();

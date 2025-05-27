@@ -139,7 +139,7 @@ body {
 }
 
 .shots-table-container.active {
-  max-height: fit-content; /* Ajusta según el contenido */
+  max-height: fit-content;
   opacity: 1;
 }
 
@@ -180,13 +180,13 @@ body {
 
 .shots-table {
   width: 100%;
-  border: var(--blue-light) !important;
+  border-collapse: collapse;
   margin-bottom: 20px;
 }
 
 .shots-table th,
 .shots-table td {
-  border: var(--blue-light) !important;
+  border: 1px solid var(--blue-light);
   padding: 7px;
   text-align: center;
   font-size: 12px;
@@ -201,11 +201,8 @@ body {
   cursor: pointer;
   transition: background-color 0.3s;
   white-space: wrap;
-  border: var(--blue-light) !important;
 }
-.shots-table tr {
-  height: 20px;
-}
+
 .shots-table th:hover {
   background-color: var(--pink-dark);
 }
@@ -236,73 +233,56 @@ body {
   text-align: left;
   padding: 10px;
 }
+
 .average-row .checkbox-column {
-  background-color: var(--blue-light) !important;
-  border: none !important;
+  background-color: var(--blue-light);
+  border: none;
 }
+
 .shots-table .average-row td {
   background-color: #c7b6b6cc;
   font-weight: 600;
-  font-size: 12px;
+  font-size: 11px;
   color: #333;
-  line-height: 10px;
-}
-.shots-table tbody tr {
-  line-height: 8px;
 }
 
-/* Contenedor del Mapa */
-#shotsMapContainer {
-  position: relative;
-  width: 333px;
-  height: 1000px;
-  margin: 20px auto;
-  background-color: #4caf50;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  user-select: none;
-}
-
-#shotsMapContainer.hidden {
-  display: none;
-}
-
-#shotsMapContainer svg {
-  width: 333px;
-  height: 1000px;
-  display: block;
-  margin: 0 auto;
-}
-
-.map-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.map-actions button {
+/* Estilos para el botón de alternar visibilidad */
+.toggle-club-btn {
   background-color: var(--pink-dark);
   color: var(--white);
   border: none;
-  padding: 8px 16px;
+  padding: 5px;
   border-radius: 4px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
 }
 
-.map-actions button:hover {
+.toggle-club-btn:hover {
   background-color: var(--blue-light);
 }
 
-.map-message {
-  text-align: center;
-  color: #333;
-  font-size: 14px;
-  padding: 20px;
+/* Transición para las filas de tiros (acordeón) */
+.shot-row {
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out,
+    padding 0.3s ease-out;
+  max-height: 40px; /* Ajustado para la altura de la fila */
+  opacity: 1;
+  overflow: hidden;
+}
+
+.shot-row.hidden {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border: none; /* Elimina bordes para evitar espacios */
 }
 
 /* Pie de Página */
@@ -371,7 +351,7 @@ body {
   .shots-table th,
   .shots-table td {
     font-size: 11px;
-    padding: 8px;
+    padding: 5px;
   }
 
   .shots-table .checkbox-column {
@@ -379,31 +359,22 @@ body {
   }
 
   .shots-table .club-header {
-    font-size: 13px;
-    padding: 10px;
-  }
-
-  .shots-table .average-row td {
-    font-size: 11px;
+    font-size: 12px;
     padding: 8px;
   }
 
-  #shotsMapContainer {
-    padding: 10px;
+  .shots-table .average-row td {
+    font-size: 10px;
+    padding: 5px;
   }
 
-  #shotsMapContainer svg {
-    width: 100%;
-    height: auto;
-  }
-
-  .map-actions {
-    flex-direction: column;
-    align-items: flex-end;
-  }
-
-  .map-actions button {
-    padding: 6px 12px;
+  .toggle-club-btn {
+    width: 20px;
+    height: 20px;
     font-size: 12px;
+  }
+
+  .shot-row {
+    max-height: 35px; /* Ajustado para pantallas pequeñas */
   }
 }
