@@ -133,13 +133,10 @@ body {
   max-width: 1200px;
   margin: 20px auto;
   overflow-x: auto;
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  transition: opacity 0.5s ease-out;
 }
 
 .shots-table-container.active {
-  max-height: fit-content;
   opacity: 1;
 }
 
@@ -200,7 +197,6 @@ body {
   letter-spacing: 0.5px;
   cursor: pointer;
   transition: background-color 0.3s;
-  white-space: wrap;
 }
 
 .shots-table th:hover {
@@ -223,15 +219,6 @@ body {
 .shots-table .sort-icon {
   margin-left: 5px;
   font-size: 12px;
-}
-
-.shots-table .club-header {
-  background-color: var(--pink-dark);
-  color: var(--white);
-  font-weight: 700;
-  font-size: 13px;
-  text-align: left;
-  padding: 10px;
 }
 
 .average-row .checkbox-column {
@@ -270,19 +257,21 @@ body {
 
 /* Transición para las filas de tiros (acordeón) */
 .shot-row {
-  transition: max-height 0.3s ease-out, opacity 0.3s ease-out,
-    padding 0.3s ease-out;
-  max-height: 40px; /* Ajustado para la altura de la fila */
+  transition: all 0.5s ease-in-out;
   opacity: 1;
+  max-height: 40px;
   overflow: hidden;
 }
 
 .shot-row.hidden {
+  transition: all 0.5s ease-in-out;
+
   max-height: 0;
   opacity: 0;
   padding-top: 0;
   padding-bottom: 0;
-  border: none; /* Elimina bordes para evitar espacios */
+  border: none;
+  display: none;
 }
 
 /* Pie de Página */
@@ -358,11 +347,6 @@ body {
     width: 40px;
   }
 
-  .shots-table .club-header {
-    font-size: 12px;
-    padding: 8px;
-  }
-
   .shots-table .average-row td {
     font-size: 10px;
     padding: 5px;
@@ -375,6 +359,9 @@ body {
   }
 
   .shot-row {
-    max-height: 35px; /* Ajustado para pantallas pequeñas */
+    max-height: 35px;
   }
+}
+
+#scatterCanvas {
 }

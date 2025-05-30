@@ -1,6 +1,6 @@
 import { db, doc, getDoc } from "../db.js";
 
-// Orden fijo de columnas (sin club name)
+// Orden fijo de columnas (sin club name ni shot number)
 const fixedColumns = [
   "ball speed (mph)",
   "launch angle (deg)",
@@ -87,6 +87,7 @@ function formatClubName(clubName, short = false) {
     62: short ? "W62" : "Wedge 62°",
     63: short ? "W63" : "Wedge 63°",
     64: short ? "W64" : "Wedge 64°",
+    Putter: short ? "Warm Up" : "Warm Up",
   };
   return clubNames[clubName] || clubName;
 }
@@ -219,7 +220,7 @@ async function loadSessions() {
         selectedShots = new Set(currentData.map((_, i) => i));
         clubVisibility = {};
         currentData.forEach((row) => {
-          clubVisibility[row["club name"]] = true;
+          clubVisibility[row["club name"]] = false; // Inicialmente colapsado
         });
         displayShotsTable(currentData, index);
       });
@@ -288,11 +289,13 @@ function displayShotsTable(data, sessionIndex) {
           .join("")}
       </select>
       <button onclick="exportToCSV()">Exportar a CSV</button>
+      <button onclick="createScatterPlot()">Ver Dispersión de Tiros</button>
     </div>
     <table class="shots-table">
       <thead>
         <tr>
-          <th class="checkbox-column"><input type="checkbox" onchange="toggleAllChecks(this.checked)" checked></th>
+          <th class="checkbox-column"></th>
+          <th>Club / Shot Number</th>
           ${fixedColumns
             .map(
               (col) => `
@@ -315,17 +318,13 @@ function displayShotsTable(data, sessionIndex) {
         ${filteredClubs
           .map(
             (club) => `
-            <tr>
-              <th class="club-header" colspan="${
-                fixedColumns.length + 1
-              }">${formatClubName(club)}</th>
-            </tr>
             <tr class="average-row">
               <td class="checkbox-column">
                 <button class="toggle-club-btn" data-club="${club}" onclick="toggleClubShots('${club}')">
                   ${clubVisibility[club] ? "−" : "+"}
                 </button>
               </td>
+              <td>${formatClubName(club)}</td>
               ${calculateClubAverages(club, groupedData[club])
                 .map((avg) => `<td>${avg}</td>`)
                 .join("")}
@@ -339,6 +338,9 @@ function displayShotsTable(data, sessionIndex) {
                   }" onchange="updateShotSelection(this)" ${
                   selectedShots.has(row.originalIndex) ? "checked" : ""
                 }></td>
+                  <td>${
+                    row["shot number"] !== undefined ? row["shot number"] : ""
+                  }</td>
                   ${fixedColumns
                     .map(
                       (col) =>
@@ -354,6 +356,7 @@ function displayShotsTable(data, sessionIndex) {
           .join("")}
       </tbody>
     </table>
+    <canvas id="scatterCanvas" style="max-width: 100%; margin-top: 20px;"></canvas>
   `;
 
   shotsTableContainer.innerHTML = tableHTML;
@@ -387,7 +390,7 @@ window.updateFilter = function (value) {
   clubVisibility = {};
   currentData.forEach((row) => {
     if (!currentFilter || row["club name"] === currentFilter) {
-      clubVisibility[row["club name"]] = true;
+      clubVisibility[row["club name"]] = false;
     }
   });
   displayShotsTable(currentData, 0);
@@ -409,7 +412,7 @@ window.exportToCSV = function () {
         currentData.reduce((a, row) => ({ ...a, [row["club name"]]: true }), {})
       ).sort((a, b) => getClubOrder(a) - getClubOrder(b));
   let csvRows = [];
-  const headers = ["Club Name", ...fixedColumns]
+  const headers = ["Club / Shot Number", ...fixedColumns]
     .map((col) => col.toUpperCase())
     .join(",");
   csvRows.push(headers);
@@ -445,7 +448,7 @@ window.exportToCSV = function () {
     );
     shots.forEach((row) => {
       const rowData = [
-        formatClubName(club),
+        `"${String(row["shot number"] ?? "").replace(/"/g, '""')}"`,
         ...fixedColumns.map(
           (col) => `"${String(row[col] ?? "").replace(/"/g, '""')}"`
         ),
@@ -465,3 +468,5 @@ window.exportToCSV = function () {
 };
 
 loadSessions();
+
+export { currentData, selectedShots, clubColors, formatClubName };
