@@ -1,8 +1,8 @@
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
   onAuthStateChanged,
+  signOut,
   setPersistence,
   browserLocalPersistence,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
@@ -16,31 +16,36 @@ import {
 import { auth, db } from "./firebase.js";
 
 // Configurar persistencia de sesión
-setPersistence(auth, browserLocalPersistence).catch((error) => {
-  console.error("Error al configurar la persistencia:", error);
-});
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Persistencia configurada correctamente");
+  })
+  .catch((error) => {
+    console.error("Error al configurar persistencia:", error);
+  });
 
-// Función para verificar la ruta actual
+// Función para verificar si estamos en la página de login
 function isLoginPage() {
   return window.location.pathname.includes("login.html");
 }
 
-function isRegisterPage() {
-  return window.location.pathname.includes("register.html");
-}
-
+// Función para verificar si estamos en la página de sesiones
 function isSessionsPage() {
   return window.location.pathname.includes("Sesiones/index.html");
 }
 
-// Función para obtener el usuario actual de Firestore
-async function getCurrentUserData() {
+// Función para obtener datos del usuario actual
+export async function getCurrentUserData() {
   const user = auth.currentUser;
   if (!user) return null;
 
-  const userDocRef = doc(db, "Simulador", user.uid);
-  const userDoc = await getDoc(userDocRef);
-  return userDoc.exists() ? userDoc.data() : null;
+  try {
+    const userDoc = await getDoc(doc(db, "Simulador", user.uid));
+    return userDoc.exists() ? userDoc.data() : null;
+  } catch (error) {
+    console.error("Error al obtener datos del usuario:", error);
+    return null;
+  }
 }
 
 // Verificar si el usuario está autenticado
@@ -59,6 +64,37 @@ onAuthStateChanged(auth, (user) => {
     }
   }
 });
+
+// Manejar el formulario de login
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const errorMessage = document.getElementById("errorMessage");
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // La redirección se maneja automáticamente por onAuthStateChanged
+    } catch (error) {
+      console.error("Error en el login:", error);
+      let mensaje = "Error al iniciar sesión. ";
+      switch (error.code) {
+        case "auth/user-not-found":
+        case "auth/wrong-password":
+          mensaje += "Credenciales incorrectas.";
+          break;
+        case "auth/invalid-email":
+          mensaje += "El correo electrónico no es válido.";
+          break;
+        default:
+          mensaje += "Por favor, intente nuevamente.";
+      }
+      errorMessage.textContent = mensaje;
+    }
+  });
+}
 
 // Manejar el formulario de registro
 const registerForm = document.getElementById("registerForm");
@@ -137,55 +173,15 @@ if (registerForm) {
   });
 }
 
-// Manejar el formulario de login
-const loginForm = document.getElementById("loginForm");
-if (loginForm) {
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const errorMessage = document.getElementById("errorMessage");
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // La redirección se maneja automáticamente por onAuthStateChanged
-    } catch (error) {
-      console.error("Error de autenticación:", error);
-      let mensaje = "Error al iniciar sesión. ";
-      switch (error.code) {
-        case "auth/invalid-email":
-          mensaje += "El correo electrónico no es válido.";
-          break;
-        case "auth/user-disabled":
-          mensaje += "Esta cuenta ha sido deshabilitada.";
-          break;
-        case "auth/user-not-found":
-          mensaje += "No existe una cuenta con este correo electrónico.";
-          break;
-        case "auth/wrong-password":
-          mensaje += "La contraseña es incorrecta.";
-          break;
-        default:
-          mensaje += "Por favor, intente nuevamente.";
-      }
-      errorMessage.textContent = mensaje;
-    }
-  });
-}
-
 // Manejar el cierre de sesión
-const logoutButton = document.querySelector(".logout");
+const logoutButton = document.getElementById("logoutButton");
 if (logoutButton) {
-  logoutButton.addEventListener("click", async (e) => {
-    e.preventDefault();
+  logoutButton.addEventListener("click", async () => {
     try {
       await signOut(auth);
-      window.location.href = "../login.html";
+      // La redirección se maneja automáticamente por onAuthStateChanged
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
   });
 }
-
-// Exportar funciones y objetos necesarios
-export { auth, getCurrentUserData };
