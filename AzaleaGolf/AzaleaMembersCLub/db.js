@@ -1,7 +1,4 @@
-let qi10 = localStorage.getItem("qi10");
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import {
-  getFirestore,
   collection,
   addDoc,
   getDocs,
@@ -15,16 +12,11 @@ import {
   query,
   orderBy,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { db } from "./firebase.js";
 
-// Configuración de Firebase
-console.log(qi10);
-const firebaseConfig = {
-  projectId: qi10,
-};
-const app = initializeApp(firebaseConfig);
+let qi10 = localStorage.getItem("qi10");
 
-// Obtener Firestore
-const db = getFirestore(app);
+// Exportar funciones y objetos necesarios
 export {
   db,
   collection,

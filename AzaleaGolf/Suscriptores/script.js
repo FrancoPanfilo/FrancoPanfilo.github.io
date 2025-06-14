@@ -77,11 +77,49 @@ document.getElementById("csvFile").addEventListener("change", async (e) => {
   }
 });
 
+// Cargar usuarios al iniciar la página
+async function loadUsers() {
+  const status = document.getElementById("status");
+  const select = document.getElementById("nombre");
+  const userIdDiv = document.getElementById("userId");
+
+  try {
+    const simuladorRef = collection(db, "Simulador");
+    const querySnapshot = await getDocs(simuladorRef);
+
+    // Limpiar opciones existentes excepto la primera
+    while (select.options.length > 1) {
+      select.remove(1);
+    }
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const option = document.createElement("option");
+      option.value = doc.id;
+      option.textContent = `${data.nombre} ${data.apellido}`;
+      select.appendChild(option);
+    });
+
+    // Agregar evento change al select
+    select.addEventListener("change", () => {
+      const selectedOption = select.options[select.selectedIndex];
+      userIdDiv.textContent = selectedOption.value
+        ? `ID: ${selectedOption.value}`
+        : "";
+    });
+  } catch (error) {
+    status.textContent = `Error al cargar usuarios: ${error.message}`;
+  }
+}
+
+// Llamar a loadUsers cuando se carga la página
+document.addEventListener("DOMContentLoaded", loadUsers);
+
 // Manejar el envío del formulario
 document.getElementById("sessionForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const nombre = document.getElementById("nombre").value.trim();
+  const nombre = document.getElementById("nombre").value;
   const fecha = document.getElementById("fecha").value;
   const status = document.getElementById("status");
 

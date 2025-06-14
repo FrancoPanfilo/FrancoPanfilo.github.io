@@ -3,10 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simulador de Golf</title>
+    <title>Simulador de Golf - Sesiones</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script type="module" src="../firebase.js"></script>
+    <script type="module" src="../auth.js"></script>
     <script type="module" src="script.js"></script>
     <script type="module" src="heatmap.js"></script>
   </head>
@@ -21,16 +29,14 @@
       </div>
       <nav class="nav">
         <ul>
-          <li><a href="#">Inicio</a></li>
-          <li><a href="#">Estadísticas</a></li>
-          <li><a href="#">Perfil</a></li>
-          <li><a href="#" class="logout">Cerrar Sesión</a></li>
+          <li><a href="../index.html">Inicio</a></li>
+          <li><a href="#" class="auth-button">Cerrar Sesión</a></li>
         </ul>
       </nav>
     </header>
 
     <section class="sessions">
-      <h2>Sesiones de Miguel Reyes</h2>
+      <h2>Cargando sesiones...</h2>
       <div class="sessions-list" id="sessionsList"></div>
       <div class="shots-table-container" id="shotsTableContainer"></div>
     </section>
@@ -43,5 +49,71 @@
         <li><a href="#">Contacto</a></li>
       </ul>
     </footer>
+
+    <!-- Modal de YardageBook -->
+    <div id="yardageBookModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Crear YardageBook</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="session-selector">
+            <label
+              >Selecciona las sesiones para incluir en el YardageBook:</label
+            >
+            <div id="sessionCheckboxes"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="create-yardagebook">Crear YardageBook</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { auth } from "../auth.js";
+      import {
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+      import { exportSessionToPDF } from "./pdfExport.js";
+      import { createYardageBook } from "./yardageBook.js";
+      import {
+        currentData,
+        selectedShots,
+        clubColors,
+        formatClubName,
+      } from "./script.js";
+
+      // Verificar el estado de autenticación
+      onAuthStateChanged(auth, (user) => {
+        const authButton = document.querySelector(".auth-button");
+
+        if (!user) {
+          window.location.href = "../login.html";
+        } else {
+          // Configurar el botón de cerrar sesión
+          authButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+              await signOut(auth);
+              window.location.href = "../login.html";
+            } catch (error) {
+              console.error("Error al cerrar sesión:", error);
+              alert("Error al cerrar sesión. Por favor, intente nuevamente.");
+            }
+          });
+        }
+      });
+
+      // Hacer las funciones disponibles globalmente
+      window.exportSessionToPDF = exportSessionToPDF;
+      window.createYardageBook = createYardageBook;
+      window.currentData = currentData;
+      window.selectedShots = selectedShots;
+      window.clubColors = clubColors;
+      window.formatClubName = formatClubName;
+    </script>
   </body>
 </html>

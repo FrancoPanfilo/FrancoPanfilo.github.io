@@ -1,4 +1,8 @@
 import { db, doc, getDoc } from "../db.js";
+import { auth } from "../firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { exportSessionToPDF } from "./pdfExport.js";
+import { createYardageBook, handleSessionSelection } from "./yardageBook.js";
 
 // Orden fijo de columnas (sin club name ni shot number)
 const fixedColumns = [
@@ -155,6 +159,10 @@ let currentFilter = null;
 let selectedShots = new Set();
 let clubVisibility = {};
 
+// Estado global para YardageBook
+let yardageBookSessions = new Set();
+let deselectedShots = new Map(); // Map<sessionId, Set<shotIndex>>
+
 // Función para calcular promedios de un palo
 function calculateClubAverages(club, shots) {
   const selectedRows = shots.filter((row) =>
@@ -176,60 +184,74 @@ function calculateClubAverages(club, shots) {
   });
 }
 
-// Función para cargar y mostrar sesiones
-async function loadSessions() {
-  const sessionsList = document.getElementById("sessionsList");
-  const shotsTableContainer = document.getElementById("shotsTableContainer");
-  sessionsList.innerHTML = "<p>Cargando sesiones...</p>";
+// Función para obtener el nombre completo del usuario
+async function getUserFullName(uid) {
+  const userDocRef = doc(db, "Simulador", uid);
+  const userDoc = await getDoc(userDocRef);
+  if (userDoc.exists()) {
+    const userData = userDoc.data();
+    return `${userData.nombre} ${userData.apellido}`;
+  }
+  return "Usuario";
+}
 
-  try {
-    const nombre = "Miguel Reyes";
-    const userDocRef = doc(db, "Simulador", nombre);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      sessionsList.innerHTML = "<p>No se encontraron sesiones.</p>";
-      return;
+// Función para guardar los tiros deseleccionados
+function saveDeselectedShots(sessionId) {
+  const deselected = new Set();
+  currentData.forEach((_, index) => {
+    if (!selectedShots.has(index)) {
+      deselected.add(index);
     }
+  });
+  deselectedShots.set(sessionId, deselected);
+  localStorage.setItem(
+    "deselectedShots",
+    JSON.stringify(Array.from(deselectedShots.entries()))
+  );
+}
 
-    const sessions = userDoc.data().Sesiones || [];
-    if (sessions.length === 0) {
-      sessionsList.innerHTML = "<p>No hay sesiones registradas.</p>";
-      return;
-    }
-
-    sessions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
-    sessionsList.innerHTML = "";
-    sessions.forEach((session, index) => {
-      const sessionItem = document.createElement("div");
-      sessionItem.className = "session-item";
-      sessionItem.innerHTML = `
-        <p><strong>Fecha:</strong> ${session.fecha}</p>
-        <p><strong>Cantidad de tiros:</strong> ${session.stats.shotCount}</p>
-        <p><strong>Duración:</strong> ${session.stats.sessionTime}</p>
-      `;
-      sessionItem.addEventListener("click", () => {
-        document
-          .querySelectorAll(".session-item")
-          .forEach((item) => item.classList.remove("active"));
-        sessionItem.classList.add("active");
-        currentData = session.datos;
-        currentSort = { column: null, ascending: true };
-        currentFilter = null;
-        selectedShots = new Set(currentData.map((_, i) => i));
-        clubVisibility = {};
-        currentData.forEach((row) => {
-          clubVisibility[row["club name"]] = false; // Inicialmente colapsado
-        });
-        displayShotsTable(currentData, index);
-      });
-      sessionsList.appendChild(sessionItem);
-    });
-  } catch (error) {
-    sessionsList.innerHTML = "<p>Error al cargar sesiones.</p>";
+// Función para cargar los tiros deseleccionados
+function loadDeselectedShots() {
+  const saved = localStorage.getItem("deselectedShots");
+  if (saved) {
+    deselectedShots = new Map(JSON.parse(saved));
   }
 }
+
+// Función para mostrar el modal de YardageBook
+window.showYardageBookModal = function () {
+  const modal = document.getElementById("yardageBookModal");
+  const checkboxesContainer = document.getElementById("sessionCheckboxes");
+  checkboxesContainer.innerHTML = "";
+
+  // Obtener todas las sesiones
+  const user = auth.currentUser;
+  if (user) {
+    const userDocRef = doc(db, "Simulador", user.uid);
+    getDoc(userDocRef).then((userDoc) => {
+      if (userDoc.exists()) {
+        const sessions = userDoc.data().Sesiones || [];
+        sessions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        sessions.forEach((session, index) => {
+          const checkboxDiv = document.createElement("div");
+          checkboxDiv.className = "session-checkbox";
+          checkboxDiv.innerHTML = `
+            <input type="checkbox" id="session${index}" value="${index}" 
+              ${yardageBookSessions.has(index) ? "checked" : ""}>
+            <label for="session${index}">
+              Sesión del ${new Date(session.fecha).toLocaleDateString()} 
+              (${session.stats.shotCount} tiros)
+            </label>
+          `;
+          checkboxesContainer.appendChild(checkboxDiv);
+        });
+      }
+    });
+  }
+
+  modal.style.display = "block";
+};
 
 // Función para mostrar la tabla de tiros
 function displayShotsTable(data, sessionIndex) {
@@ -288,8 +310,18 @@ function displayShotsTable(data, sessionIndex) {
           )
           .join("")}
       </select>
-      <button onclick="exportToCSV()">Exportar a CSV</button>
-      <button onclick="createScatterPlot()">Ver Dispersión de Tiros</button>
+      <button onclick="exportToCSV()">
+        <i class="fas fa-file-csv"></i> Exportar a CSV
+      </button>
+      <button onclick="exportCurrentSessionToPDF()">
+        <i class="fas fa-file-pdf"></i> Exportar a PDF
+      </button>
+      <button onclick="window.showYardageBookModal()">
+        <i class="fas fa-book"></i> Crear YardageBook
+      </button>
+      <button onclick="createScatterPlot()">
+        <i class="fas fa-chart-scatter"></i> Ver Dispersión de Tiros
+      </button>
     </div>
     <table class="shots-table">
       <thead>
@@ -381,6 +413,14 @@ window.updateShotSelection = function (checkbox) {
   } else {
     selectedShots.delete(index);
   }
+  // Guardar los tiros deseleccionados cuando se cambia la selección
+  const activeSession = document.querySelector(".session-item.active");
+  if (activeSession) {
+    const sessionDate = activeSession
+      .querySelector("p")
+      .textContent.split(": ")[1];
+    saveDeselectedShots(sessionDate);
+  }
   displayShotsTable(currentData, 0);
 };
 
@@ -467,6 +507,150 @@ window.exportToCSV = function () {
   document.body.removeChild(link);
 };
 
+// Agregar event listeners para el modal de YardageBook
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("yardageBookModal");
+  const closeBtn = modal.querySelector(".close-modal");
+  const createBtn = modal.querySelector(".create-yardagebook");
+
+  closeBtn.onclick = () => {
+    modal.style.display = "none";
+  };
+
+  window.onclick = (event) => {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  };
+
+  createBtn.onclick = () => {
+    window.createYardageBook(yardageBookSessions, deselectedShots);
+    modal.style.display = "none";
+  };
+
+  // Cargar tiros deseleccionados al iniciar
+  loadDeselectedShots();
+});
+
+// Hacer las funciones disponibles globalmente
+window.exportSessionToPDF = exportSessionToPDF;
+window.createYardageBook = createYardageBook;
+window.showYardageBookModal = showYardageBookModal;
+
+// Función para cargar y mostrar sesiones
+async function loadSessions() {
+  const sessionsList = document.getElementById("sessionsList");
+  const shotsTableContainer = document.getElementById("shotsTableContainer");
+  sessionsList.innerHTML = "<p>Cargando sesiones...</p>";
+
+  try {
+    // Esperar a que auth.currentUser esté disponible
+    let user = auth.currentUser;
+    if (!user) {
+      // Si no hay usuario actual, esperar a que se resuelva la autenticación
+      await new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          unsubscribe();
+          resolve(user);
+        });
+      });
+      user = auth.currentUser;
+    }
+
+    console.log("=== INFORMACIÓN DEL USUARIO ===");
+    console.log("Usuario actual:", user);
+    console.log("UID del usuario:", user?.uid);
+    console.log("Email del usuario:", user?.email);
+
+    if (!user) {
+      sessionsList.innerHTML = "<p>No hay usuario autenticado.</p>";
+      return;
+    }
+
+    // Usar el UID del usuario para buscar en la colección Simulador
+    console.log("=== BÚSQUEDA EN FIRESTORE ===");
+    console.log(
+      "Buscando documento en colección 'Simulador' con ID:",
+      user.uid
+    );
+    const userDocRef = doc(db, "Simulador", user.uid);
+    const userDoc = await getDoc(userDocRef);
+    console.log("Documento encontrado:", userDoc.exists());
+
+    if (!userDoc.exists()) {
+      console.log("No se encontró el documento para el UID:", user.uid);
+      sessionsList.innerHTML = "<p>No se encontraron sesiones.</p>";
+      return;
+    }
+
+    const userData = userDoc.data();
+    console.log("=== DATOS DEL DOCUMENTO ===");
+    console.log("Datos del usuario:", userData);
+    console.log("Sesiones encontradas:", userData.Sesiones?.length || 0);
+
+    const sessions = userData.Sesiones || [];
+    if (sessions.length === 0) {
+      console.log("El documento existe pero no tiene sesiones");
+      sessionsList.innerHTML = "<p>No hay sesiones registradas.</p>";
+      return;
+    }
+
+    // Actualizar el título con el nombre del usuario
+    document.querySelector(
+      ".sessions h2"
+    ).textContent = `Sesiones de ${userData.nombre} ${userData.apellido}`;
+
+    sessions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    sessionsList.innerHTML = "";
+    sessions.forEach((session, index) => {
+      const sessionItem = document.createElement("div");
+      sessionItem.className = "session-item";
+      sessionItem.innerHTML = `
+        <p><strong>Fecha:</strong> ${session.fecha}</p>
+        <p><strong>Cantidad de tiros:</strong> ${session.stats.shotCount}</p>
+        <p><strong>Duración:</strong> ${session.stats.sessionTime}</p>
+      `;
+      sessionItem.addEventListener("click", () => {
+        document
+          .querySelectorAll(".session-item")
+          .forEach((item) => item.classList.remove("active"));
+        sessionItem.classList.add("active");
+        currentData = session.datos;
+        currentSort = { column: null, ascending: true };
+        currentFilter = null;
+
+        // Cargar tiros deseleccionados para esta sesión
+        const deselected = deselectedShots.get(session.fecha) || new Set();
+        selectedShots = new Set(
+          currentData
+            .map((_, i) => (!deselected.has(i) ? i : null))
+            .filter((i) => i !== null)
+        );
+
+        clubVisibility = {};
+        currentData.forEach((row) => {
+          clubVisibility[row["club name"]] = false;
+        });
+        displayShotsTable(currentData, index);
+      });
+      sessionsList.appendChild(sessionItem);
+    });
+  } catch (error) {
+    console.error("Error al cargar sesiones:", error);
+    sessionsList.innerHTML = "<p>Error al cargar sesiones.</p>";
+  }
+}
+
 loadSessions();
 
 export { currentData, selectedShots, clubColors, formatClubName };
+
+// Agregar función global para exportar la sesión actual
+window.exportCurrentSessionToPDF = async function () {
+  if (!currentData || currentData.length === 0) {
+    alert("No hay datos de sesión para exportar");
+    return;
+  }
+  await exportSessionToPDF(currentData, auth.currentUser);
+};

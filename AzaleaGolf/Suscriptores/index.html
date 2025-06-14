@@ -42,7 +42,10 @@
       <form id="sessionForm">
         <div class="form-group">
           <label for="nombre">Nombre:</label>
-          <input type="text" id="nombre" name="nombre" required />
+          <select id="nombre" name="nombre" required>
+            <option value="">Seleccione un usuario</option>
+          </select>
+          <div id="userId" class="user-id"></div>
         </div>
         <div class="form-group">
           <label for="fecha">Fecha:</label>

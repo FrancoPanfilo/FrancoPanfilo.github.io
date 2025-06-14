@@ -3,147 +3,161 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Azalea Members Club</title>
+    <title>Simulador de Golf</title>
     <link rel="stylesheet" href="styles.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <script type="module" src="auth.js"></script>
   </head>
   <body>
-    <!-- Encabezado -->
     <header class="header">
       <div class="logo">
-        <img
-          class="logoimg"
-          src="img/logo.jpg"
-          alt="Azalea Members Club Logo"
-        />
+        <img src="img/logo.jpg" class="logoimg" alt="Foresight Sports Logo" />
       </div>
       <nav class="nav">
         <ul>
           <li><a href="#">Inicio</a></li>
-          <li><a href="Sesiones/index.html">Sesiones</a></li>
-          <li><a href="#">Perfil</a></li>
-          <li><a href="#" class="logout">Cerrar Sesión</a></li>
+          <li><a href="#" class="auth-button">Iniciar Sesión</a></li>
         </ul>
       </nav>
-      <div class="user-info">
-        <span>Bienvenido, Usuario 1</span>
-      </div>
     </header>
 
-    <!-- Bienvenida -->
-    <section class="welcome">
-      <h1>Bienvenido al Azalea Members Club, Usuario 1</h1>
-      <p>Explora tus sesiones de golf y mejora tu juego con nosotros.</p>
-      <a href="Sesiones/index.html" class="btn">Ver Mis Sesiones</a>
-    </section>
-
-    <!-- Resumen de Progreso -->
-    <section class="progress">
-      <h2>Tu Progreso</h2>
-      <div class="progress-cards">
-        <div class="card">
-          <h3>Distancia Máxima</h3>
-          <p>275 yardas</p>
-        </div>
-        <div class="card">
-          <h3>Tendencia de Vuelo (Hierros)</h3>
-          <p>Fade</p>
-        </div>
-        <div class="card">
-          <h3>Palo Favorito</h3>
-          <p>Driver</p>
-        </div>
+    <main class="welcome">
+      <h1>Bienvenido al Simulador de Golf</h1>
+      <div id="guestContent">
+        <p>
+          Inicia sesión para acceder a tus estadísticas y sesiones de práctica.
+        </p>
+        <a href="login.html" class="btn">Iniciar Sesión</a>
       </div>
-    </section>
-
-    <!-- Lista de Sesiones -->
-    <section id="sessions" class="sessions">
-      <h2>Tus Sesiones de Golf</h2>
-      <table class="sessions-table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Nº de Tiros</th>
-            <th>Palos Usados</th>
-            <th>Duracion</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>2025-05-20</td>
-            <td>103</td>
-            <td>10</td>
-            <td>1h 20m</td>
-            <td><a href="" class="btn-table">Ver Detalles</a></td>
-          </tr>
-          <tr>
-            <td>2025-05-15</td>
-            <td>87</td>
-            <td>13</td>
-            <td>1h</td>
-
-            <td><a href="#" class="btn-table">Ver Detalles</a></td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!--     
-    <section class="pga-tour">
-      <h2>Estrellas del PGA Tour</h2>
-      <p>Inspírate con los mejores golfistas del mundo.</p>
-      <div class="pga-tour-grid">
-        <div class="pga-card">
-          <h3>Scottie Scheffler</h3>
-          <ul>
-            <li><strong>Driving Distance:</strong> 305.0 yds</li>
-            <li><strong>Scoring Average:</strong> 69.02</li>
-            <li><strong>Strokes Gained Approach:</strong> 1.235</li>
-            <li><strong>Birdies per Round:</strong> 4.50</li>
-          </ul>
-        </div>
-        <div class="pga-card">
-          <h3>Rory McIlroy</h3>
-          <ul>
-            <li><strong>Driving Distance:</strong> 319.3 yds</li>
-            <li><strong>Scoring Average:</strong> 69.219</li>
-            <li><strong>Strokes Gained Approach:</strong> 0.974</li>
-            <li><strong>Birdies per Round:</strong> 4.20</li>
-          </ul>
-        </div>
-        <div class="pga-card">
-          <h3>Collin Morikawa</h3>
-          <ul>
-            <li><strong>Driving Distance:</strong> 295.0 yds</li>
-            <li><strong>Scoring Average:</strong> 70.10</li>
-            <li><strong>Strokes Gained Approach:</strong> 1.100</li>
-            <li><strong>Birdies per Round:</strong> 3.90</li>
-          </ul>
-        </div>
-        <div class="pga-card">
-          <h3>Justin Thomas</h3>
-          <ul>
-            <li><strong>Driving Distance:</strong> 300.0 yds</li>
-            <li><strong>Scoring Average:</strong> 70.50</li>
-            <li><strong>Strokes Gained Approach:</strong> 0.850</li>
-            <li><strong>Birdies per Round:</strong> 4.80</li>
-          </ul>
-        </div>
+      <div id="userContent" style="display: none">
+        <section class="progress">
+          <h2>Resumen de Rendimiento</h2>
+          <div class="progress-cards">
+            <div class="card">
+              <h3>Total de Sesiones</h3>
+              <p id="totalSessions">-</p>
+            </div>
+            <div class="card">
+              <h3>Total de Tiros</h3>
+              <p id="totalShots">-</p>
+            </div>
+            <div class="card">
+              <h3>Última Sesión</h3>
+              <p id="lastSession">-</p>
+            </div>
+          </div>
+          <div style="margin-top: 30px">
+            <a href="Sesiones/index.html" class="btn">Ver Mis Sesiones</a>
+          </div>
+        </section>
       </div>
-    </section>
-    -->
+    </main>
 
-    <!-- Pie de Página -->
     <footer class="footer">
-      <p>Azalea Members Club © 2025. Todos los derechos reservados.</p>
+      <p>© 2025 Foresight Sports. Todos los derechos reservados.</p>
       <ul class="footer-links">
+        <li><a href="#">Política de Privacidad</a></li>
+        <li><a href="#">Términos de Servicio</a></li>
         <li><a href="#">Contacto</a></li>
-        <li><a href="#">Instagram</a></li>
       </ul>
     </footer>
+
+    <script type="module">
+      import { auth } from "./auth.js";
+      import {
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+      import { db, doc, getDoc } from "./db.js";
+
+      // Función para obtener el nombre completo del usuario
+      async function getUserFullName(uid) {
+        const userDocRef = doc(db, "Simulador", uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          return `${userData.nombre} ${userData.apellido}`;
+        }
+        return "Usuario";
+      }
+
+      // Función para cargar el resumen de rendimiento
+      async function loadPerformanceSummary(uid) {
+        const userDocRef = doc(db, "Simulador", uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          const sessions = userDoc.data().Sesiones || [];
+          const totalSessions = sessions.length;
+          const totalShots = sessions.reduce(
+            (sum, session) => sum + session.stats.shotCount,
+            0
+          );
+          const lastSession =
+            sessions.length > 0
+              ? new Date(sessions[0].fecha).toLocaleDateString()
+              : "No hay sesiones";
+
+          document.getElementById("totalSessions").textContent = totalSessions;
+          document.getElementById("totalShots").textContent = totalShots;
+          document.getElementById("lastSession").textContent = lastSession;
+        }
+      }
+
+      // Actualizar la interfaz según el estado de autenticación
+      onAuthStateChanged(auth, async (user) => {
+        const authButton = document.querySelector(".auth-button");
+        const guestContent = document.getElementById("guestContent");
+        const userContent = document.getElementById("userContent");
+
+        if (user) {
+          const nombreCompleto = await getUserFullName(user.uid);
+
+          // Mostrar contenido para usuario autenticado
+          guestContent.style.display = "none";
+          userContent.style.display = "block";
+
+          // Cargar resumen de rendimiento usando el UID
+          await loadPerformanceSummary(user.uid);
+
+          // Crear elemento para mostrar el nombre del usuario
+          const userInfo = document.createElement("span");
+          userInfo.className = "user-info";
+          userInfo.textContent = `Bienvenido, ${nombreCompleto}`;
+
+          // Insertar el nombre antes del botón de cerrar sesión
+          authButton.parentElement.insertBefore(userInfo, authButton);
+
+          authButton.textContent = "Cerrar Sesión";
+          authButton.href = "#";
+          authButton.classList.add("logout");
+
+          // Configurar el botón de cerrar sesión
+          authButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+              await signOut(auth);
+              window.location.href = "login.html";
+            } catch (error) {
+              console.error("Error al cerrar sesión:", error);
+              alert("Error al cerrar sesión. Por favor, intente nuevamente.");
+            }
+          });
+        } else {
+          // Mostrar contenido para invitado
+          guestContent.style.display = "block";
+          userContent.style.display = "none";
+
+          // Remover el nombre del usuario si existe
+          const userInfo = document.querySelector(".user-info");
+          if (userInfo) {
+            userInfo.remove();
+          }
+
+          authButton.textContent = "Iniciar Sesión";
+          authButton.href = "login.html";
+          authButton.classList.remove("logout");
+        }
+      });
+    </script>
   </body>
 </html>

@@ -67,8 +67,11 @@ body {
 }
 
 .user-info {
+  color: var(--gray-light);
   font-size: 14px;
-  color: var(--pink-dark);
+  margin-right: 15px;
+  padding: 8px 0;
+  font-weight: 500;
 }
 
 /* Bienvenida */
@@ -104,49 +107,63 @@ body {
   background-color: var(--pink-dark);
 }
 
-/* Resumen de Progreso */
+/* Estilos para el resumen de rendimiento */
 .progress {
-  padding: 40px 20px;
-  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .progress h2 {
-  font-size: 28px;
-  color: var(--gray-light);
-  margin-bottom: 30px;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .progress-cards {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
-  flex-wrap: wrap;
+  margin-bottom: 30px;
 }
 
 .card {
-  background-color: #00000053;
-  border: none;
-  border-radius: 0px;
+  background: white;
+  border-radius: 10px;
   padding: 20px;
-  width: 200px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  text-align: center;
+  transition: transform 0.2s;
 }
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card h3 {
-  font-size: 18px;
-  color: var(--gray-light);
+  color: var(--primary-color);
+  font-size: 1.1em;
   margin-bottom: 10px;
 }
 
 .card p {
-  font-size: 24px;
-  color: #555;
+  font-size: 1.8em;
+  font-weight: bold;
+  color: var(--secondary-color);
+  margin: 0;
+}
+
+/* Estilos para el contenido de usuario/invitado */
+#guestContent,
+#userContent {
+  text-align: center;
+  margin-top: 30px;
+}
+
+#guestContent p {
+  margin-bottom: 20px;
+  font-size: 1.1em;
+  color: var(--text-color);
 }
 
 /* Lista de Sesiones */
@@ -330,4 +347,99 @@ body {
   .pga-tour-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Estilos para el Login */
+.login-container {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--blue-light);
+}
+
+.login-box {
+  background-color: var(--white);
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-box h1 {
+  color: var(--pink-dark);
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: var(--pink-dark);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input {
+  padding: 12px;
+  border: 1px solid var(--pink-dark);
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--blue-light);
+}
+
+.login-button {
+  background-color: var(--pink-dark);
+  color: var(--white);
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: var(--blue-light);
+}
+
+.form-error {
+  color: #dc3545;
+  font-size: 14px;
+  text-align: center;
+  min-height: 20px;
+}
+
+.form-info {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.form-info p {
+  margin: 0;
+  line-height: 1.4;
 }
