@@ -38,7 +38,25 @@
     <section class="sessions">
       <h2>Cargando sesiones...</h2>
       <div class="sessions-list" id="sessionsList"></div>
+
+      <!-- Switch para alternar entre tabla y mapa de dispersión (por encima de la tabla) -->
+      <div class="switch-container" id="switchContainer" style="display: none">
+        <span id="label-table" class="switch-label active">Tabla de datos</span>
+        <label class="switch">
+          <input type="checkbox" id="toggleView" onchange="toggleViewMode()" />
+          <span class="slider"></span>
+        </label>
+        <span id="label-map" class="switch-label">Mapa de Dispersión</span>
+      </div>
+
+      <!-- Contenedor de la tabla -->
       <div class="shots-table-container" id="shotsTableContainer"></div>
+
+      <!-- Canvas para el mapa de dispersión (siempre presente) -->
+      <canvas
+        id="scatterCanvas"
+        style="max-width: 100%; margin-top: 20px"
+      ></canvas>
     </section>
 
     <footer class="footer">
@@ -114,6 +132,14 @@
       window.selectedShots = selectedShots;
       window.clubColors = clubColors;
       window.formatClubName = formatClubName;
+
+      // Asegurarnos de que la función esté disponible globalmente
+      window.updateShotSelectionAndPlot = async function (checkbox) {
+        await window.updateShotSelection(checkbox);
+        if (typeof createScatterPlot === "function") {
+          createScatterPlot();
+        }
+      };
     </script>
   </body>
 </html>

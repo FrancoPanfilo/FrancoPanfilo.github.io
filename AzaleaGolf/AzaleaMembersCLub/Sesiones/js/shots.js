@@ -54,8 +54,61 @@ export function displayShotsTable(data, sessionIndex) {
     });
   }
 
-  // Obtener clubs únicos
-  const uniqueClubs = [...new Set(data.map((row) => row["club name"]))];
+  // Inicializar clubVisibility con todos los palos ocultos
+  const clubVisibility = {};
+  const uniqueClubs = [...new Set(data.map((shot) => shot.club))];
+  uniqueClubs.forEach((club) => {
+    clubVisibility[club] = false;
+  });
+
+  // Función simplificada para toggle de visibilidad
+  window.toggleClubShots = function (club) {
+    // Ocultar todos los palos primero
+    Object.keys(clubVisibility).forEach((key) => {
+      if (key !== club) {
+        clubVisibility[key] = false;
+        const rows = document.querySelectorAll(
+          `tr.shot-row[data-club="${key}"]`
+        );
+        const averageRow = document.querySelector(
+          `tr.average-row[data-club="${key}"]`
+        );
+
+        rows.forEach((row) => {
+          row.style.display = "none";
+        });
+        if (averageRow) {
+          const arrowImg = averageRow.querySelector(".arrow-icon");
+          if (arrowImg) arrowImg.classList.remove("rotated");
+        }
+      }
+    });
+
+    // Toggle del palo seleccionado
+    clubVisibility[club] = !clubVisibility[club];
+    const rows = document.querySelectorAll(`tr.shot-row[data-club="${club}"]`);
+    const averageRow = document.querySelector(
+      `tr.average-row[data-club="${club}"]`
+    );
+
+    if (averageRow) {
+      rows.forEach((row) => {
+        row.style.display = clubVisibility[club] ? "table-row" : "none";
+      });
+      const arrowImg = averageRow.querySelector(".arrow-icon");
+      if (arrowImg) {
+        if (clubVisibility[club]) {
+          arrowImg.classList.add("rotated");
+        } else {
+          arrowImg.classList.remove("rotated");
+        }
+      }
+
+      if (clubVisibility[club]) {
+        averageRow.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  };
 
   // Crear HTML de la tabla
   const tableHTML = `
@@ -117,7 +170,7 @@ export function displayShotsTable(data, sessionIndex) {
                 onchange="updateShotSelection(this)"
                 ${selectedShots.has(index) ? "checked" : ""}>
             </td>
-            <td onclick="toggleClubVisibility('${
+            <td onclick="toggleClubShots('${
               row["club name"]
             }')" class="club-cell">
               ${formatClubName(row["club name"])}
@@ -164,12 +217,6 @@ export function toggleAllShots(checked) {
   } else {
     selectedShots.clear();
   }
-  displayShotsTable(currentData, 0);
-}
-
-// Función para alternar la visibilidad de un club
-export function toggleClubVisibility(club) {
-  clubVisibility[club] = !clubVisibility[club];
   displayShotsTable(currentData, 0);
 }
 

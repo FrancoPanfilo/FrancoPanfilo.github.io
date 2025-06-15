@@ -2,6 +2,7 @@ import { auth, db } from "../firebase.js";
 import {
   doc,
   getDoc,
+  updateDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { exportSessionToPDF } from "./pdfExport.js";
@@ -168,22 +169,64 @@ let deselectedShots = new Map(); // Map<sessionIndex, Set<shotIndex>>
 
 // Función para calcular promedios de un palo
 function calculateClubAverages(club, shots) {
+  // Filtrar solo los tiros seleccionados del palo específico
   const selectedRows = shots.filter((row) =>
     selectedShots.has(row.originalIndex)
   );
+
   if (selectedRows.length === 0) {
     return fixedColumns.map(() => "-");
   }
+
+  // Calcular promedios para cada columna
   return fixedColumns.map((col) => {
     const values = selectedRows
-      .map((row) => parseFloat(row[col]))
-      .filter((val) => !isNaN(val));
+      .map((row) => {
+        const value = parseFloat(row[col]);
+        return isNaN(value) ? null : value;
+      })
+      .filter((val) => val !== null);
+
     if (values.length === 0) return "-";
+
     const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+
+    // Solo el valor numérico, sin unidades
     if (col === "efficiency") {
       return avg.toFixed(2);
+    } else if (col.includes("angle") || col.includes("path")) {
+      return avg.toFixed(1);
+    } else if (col.includes("speed")) {
+      return avg.toFixed(1);
+    } else if (col.includes("spin")) {
+      return Math.round(avg);
+    } else if (
+      col.includes("distance") ||
+      col.includes("carry") ||
+      col.includes("total") ||
+      col.includes("height")
+    ) {
+      return Math.round(avg);
     }
     return avg.toFixed(1);
+  });
+}
+
+// Función para actualizar los promedios en la tabla
+function updateClubAverages() {
+  const averageRows = document.querySelectorAll(".average-row");
+  averageRows.forEach((row) => {
+    const club = row.dataset.club;
+    const clubShots = currentData.filter((shot) => shot["club name"] === club);
+    const averages = calculateClubAverages(club, clubShots);
+
+    // Actualizar las celdas de promedio
+    const cells = row.querySelectorAll(
+      "td:not(:first-child):not(:nth-child(2))"
+    );
+    cells.forEach((cell, index) => {
+      cell.textContent = averages[index];
+    });
   });
 }
 
@@ -281,6 +324,7 @@ window.showYardageBookModal = function () {
 // Función para mostrar la tabla de tiros
 function displayShotsTable(data, sessionIndex) {
   const shotsTableContainer = document.getElementById("shotsTableContainer");
+  if (!shotsTableContainer) return;
 
   if (!data || data.length === 0) {
     shotsTableContainer.innerHTML = "<p>No hay datos para esta sesión.</p>";
@@ -288,11 +332,15 @@ function displayShotsTable(data, sessionIndex) {
     return;
   }
 
+  // Inicializar clubVisibility y ocultar todas las filas de tiros
   const groupedData = {};
   data.forEach((row, index) => {
     const club = row["club name"];
     if (!groupedData[club]) groupedData[club] = [];
     groupedData[club].push({ ...row, originalIndex: index });
+    if (typeof clubVisibility[club] === "undefined") {
+      clubVisibility[club] = false;
+    }
   });
 
   const sortedClubs = Object.keys(groupedData).sort(
@@ -303,6 +351,7 @@ function displayShotsTable(data, sessionIndex) {
     ? sortedClubs.filter((club) => club === currentFilter)
     : sortedClubs;
 
+  // Ordenar los datos de cada palo si hay una columna de ordenamiento
   filteredClubs.forEach((club) => {
     if (currentSort.column) {
       groupedData[club].sort((a, b) => {
@@ -313,20 +362,23 @@ function displayShotsTable(data, sessionIndex) {
         return currentSort.ascending
           ? valA < valB
             ? -1
-            : 1
+            : valA > valB
+            ? 1
+            : 0
           : valA > valB
           ? -1
-          : 1;
+          : valA < valB
+          ? 1
+          : 0;
       });
     }
   });
 
-  const uniqueClubs = sortedClubs;
   const tableHTML = `
     <div class="table-actions">
       <select id="clubFilter" onchange="updateFilter(this.value)">
         <option value="">Filtrar por: Todos</option>
-        ${uniqueClubs
+        ${sortedClubs
           .map(
             (club) =>
               `<option value="${club}" ${
@@ -344,15 +396,15 @@ function displayShotsTable(data, sessionIndex) {
       <button onclick="window.showYardageBookModal()">
         <i class="fas fa-book"></i> Crear YardageBook
       </button>
-      <button onclick="createScatterPlot()">
-        <i class="fas fa-chart-scatter"></i> Ver Dispersión de Tiros
-      </button>
+      
     </div>
     <table class="shots-table">
       <thead>
         <tr>
-          <th class="checkbox-column"></th>
-          <th>Club / Shot Number</th>
+          <th class="checkbox-column">
+            
+          </th>
+          <th>Club</th>
           ${fixedColumns
             .map(
               (col) => `
@@ -375,26 +427,24 @@ function displayShotsTable(data, sessionIndex) {
         ${filteredClubs
           .map(
             (club) => `
-            <tr class="average-row">
-              <td class="checkbox-column">
-                <button class="toggle-club-btn" data-club="${club}" onclick="toggleClubShots('${club}')">
-                  ${clubVisibility[club] ? "−" : "+"}
-                </button>
-              </td>
-              <td>${formatClubName(club)}</td>
-              ${calculateClubAverages(club, groupedData[club])
-                .map((avg) => `<td>${avg}</td>`)
-                .join("")}
-            </tr>
+            ${averageRowHTML(
+              club,
+              calculateClubAverages(club, groupedData[club])
+            )}
             ${groupedData[club]
               .map(
                 (row) => `
-                <tr class="shot-row${clubVisibility[club] ? "" : " hidden"}">
-                  <td class="checkbox-column"><input type="checkbox" data-row="${
-                    row.originalIndex
-                  }" onchange="updateShotSelection(this)" ${
-                  selectedShots.has(row.originalIndex) ? "checked" : ""
-                }></td>
+                <tr class="shot-row${clubVisibility[club] ? "" : " hidden"}" 
+                    data-club="${club}"
+                    data-original-index="${row.originalIndex}">
+                  <td class="checkbox-column">
+                    <input type="checkbox" 
+                      data-original-index="${row.originalIndex}"
+                      onchange="updateShotSelection(${sessionIndex}, ${
+                  row.originalIndex
+                }, this.checked)"
+                      ${selectedShots.has(row.originalIndex) ? "checked" : ""}>
+                  </td>
                   <td>${
                     row["shot number"] !== undefined ? row["shot number"] : ""
                   }</td>
@@ -418,35 +468,262 @@ function displayShotsTable(data, sessionIndex) {
 
   shotsTableContainer.innerHTML = tableHTML;
   shotsTableContainer.classList.add("active");
-}
 
-// Funciones de acciones
-window.toggleClubShots = function (club) {
-  clubVisibility[club] = !clubVisibility[club];
-  displayShotsTable(currentData, 0);
-};
-
-window.toggleAllChecks = function (checked) {
-  selectedShots = checked ? new Set(currentData.map((_, i) => i)) : new Set();
-  displayShotsTable(currentData, 0);
-};
-
-window.updateShotSelection = function (checkbox) {
-  const index = parseInt(checkbox.dataset.row);
-  if (checkbox.checked) {
-    selectedShots.add(index);
-  } else {
-    selectedShots.delete(index);
-  }
-  // Guardar los tiros deseleccionados cuando se cambia la selección
+  // Actualizar el índice de la sesión activa
   const activeSession = document.querySelector(".session-item.active");
   if (activeSession) {
-    const sessionDate = activeSession
-      .querySelector("p")
-      .textContent.split(": ")[1];
-    saveDeselectedShots();
+    activeSession.dataset.index = sessionIndex;
   }
-  displayShotsTable(currentData, 0);
+}
+
+// Función para actualizar solo el estado visual de un checkbox
+function updateCheckboxState(originalIndex, checked) {
+  const checkbox = document.querySelector(
+    `input[data-original-index="${originalIndex}"]`
+  );
+  if (checkbox) {
+    checkbox.checked = checked;
+    const row = checkbox.closest("tr");
+    if (row) {
+      row.classList.toggle("selected", checked);
+    }
+  }
+}
+
+// Función para actualizar todos los checkboxes
+function updateAllCheckboxes() {
+  document
+    .querySelectorAll("input[data-original-index]")
+    .forEach((checkbox) => {
+      const originalIndex = parseInt(checkbox.dataset.originalIndex);
+      const isChecked = selectedShots.has(originalIndex);
+      checkbox.checked = isChecked;
+      const row = checkbox.closest("tr");
+      if (row) {
+        row.classList.toggle("selected", isChecked);
+      }
+    });
+}
+
+// Función para actualizar la selección de un tiro en Firebase
+async function updateShotSelectionInFirebase(
+  sessionIndex,
+  originalIndex,
+  selected
+) {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No hay usuario autenticado");
+
+    const userDocRef = doc(db, "Simulador", user.uid);
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists())
+      throw new Error("No se encontraron datos del usuario");
+
+    const userData = userDoc.data();
+    const sessions = userData.Sesiones || [];
+    if (!sessions[sessionIndex]) throw new Error("Sesión no encontrada");
+
+    // Verificar que el tiro existe
+    if (!sessions[sessionIndex].datos[originalIndex]) {
+      console.error("Tiro no encontrado en Firebase:", {
+        sessionIndex,
+        originalIndex,
+        totalTiros: sessions[sessionIndex].datos.length,
+      });
+      throw new Error("Tiro no encontrado");
+    }
+
+    // Actualizar el campo selected del tiro
+    sessions[sessionIndex].datos[originalIndex].selected = selected;
+
+    // Actualizar en Firebase
+    await updateDoc(userDocRef, {
+      Sesiones: sessions,
+    });
+
+    console.log(
+      `Tiro ${originalIndex} de la sesión ${sessionIndex} actualizado a ${selected}`
+    );
+  } catch (error) {
+    console.error("Error al actualizar la selección del tiro:", error);
+    throw error;
+  }
+}
+
+// Función optimizada para actualizar la selección
+window.updateShotSelection = async function (
+  sessionIndex,
+  originalIndex,
+  checked
+) {
+  try {
+    // Actualizar Firebase
+    await updateShotSelectionInFirebase(sessionIndex, originalIndex, checked);
+
+    // Actualizar estado local
+    if (checked) {
+      selectedShots.add(originalIndex);
+    } else {
+      selectedShots.delete(originalIndex);
+    }
+
+    // Actualizar solo el checkbox y la fila afectada
+    updateCheckboxState(originalIndex, checked);
+
+    // Actualizar los promedios del palo afectado
+    const affectedClub = currentData[originalIndex]["club name"];
+    const clubRow = document.querySelector(
+      `.average-row[data-club="${affectedClub}"]`
+    );
+    if (clubRow) {
+      const clubShots = currentData.filter(
+        (shot) => shot["club name"] === affectedClub
+      );
+      const averages = calculateClubAverages(affectedClub, clubShots);
+
+      // Actualizar las celdas de promedio
+      const cells = clubRow.querySelectorAll(
+        "td:not(:first-child):not(:nth-child(2))"
+      );
+      cells.forEach((cell, index) => {
+        cell.textContent = averages[index];
+      });
+    }
+
+    // Actualizar el gráfico de dispersión si existe
+    if (typeof createScatterPlot === "function") {
+      requestAnimationFrame(createScatterPlot);
+    }
+  } catch (error) {
+    console.error("Error al actualizar la selección:", error);
+    // Revertir el estado visual en caso de error
+    updateCheckboxState(originalIndex, !checked);
+    alert("Error al actualizar la selección. Por favor, intente nuevamente.");
+  }
+};
+
+// Función optimizada para toggle de todos los checkboxes
+window.toggleAllChecks = async function (checked) {
+  try {
+    const sessionIndex = parseInt(
+      document.querySelector(".session-item.active").dataset.index
+    );
+    const checkboxes = document.querySelectorAll("input[data-original-index]");
+    const updates = [];
+
+    // Preparar todas las actualizaciones
+    checkboxes.forEach((checkbox) => {
+      const originalIndex = parseInt(checkbox.dataset.originalIndex);
+      updates.push(
+        updateShotSelectionInFirebase(sessionIndex, originalIndex, checked)
+      );
+    });
+
+    // Ejecutar todas las actualizaciones en paralelo
+    await Promise.all(updates);
+
+    // Actualizar estado local
+    if (checked) {
+      checkboxes.forEach((checkbox) => {
+        selectedShots.add(parseInt(checkbox.dataset.originalIndex));
+      });
+    } else {
+      selectedShots.clear();
+    }
+
+    // Actualizar UI
+    updateAllCheckboxes();
+
+    // Actualizar todos los promedios
+    updateClubAverages();
+
+    // Actualizar gráfico si existe
+    if (typeof createScatterPlot === "function") {
+      requestAnimationFrame(createScatterPlot);
+    }
+  } catch (error) {
+    console.error("Error al actualizar todas las selecciones:", error);
+    alert(
+      "Error al actualizar las selecciones. Por favor, intente nuevamente."
+    );
+  }
+};
+
+// Función optimizada para toggle de palo
+window.toggleClubShots = function (club) {
+  // Ocultar todos los palos primero
+  Object.keys(clubVisibility).forEach((key) => {
+    if (key !== club) {
+      clubVisibility[key] = false;
+      const rows = document.querySelectorAll(`tr.shot-row[data-club="${key}"]`);
+      const averageRow = document.querySelector(
+        `tr.average-row[data-club="${key}"]`
+      );
+      rows.forEach((row) => {
+        row.classList.remove("visible");
+        row.classList.add("hidden");
+      });
+      if (averageRow) {
+        const arrowImg = averageRow.querySelector(".arrow-icon");
+        if (arrowImg) arrowImg.classList.remove("rotated");
+      }
+    }
+  });
+
+  // Toggle del palo seleccionado
+  clubVisibility[club] = !clubVisibility[club];
+  const rows = document.querySelectorAll(`tr.shot-row[data-club="${club}"]`);
+  const averageRow = document.querySelector(
+    `tr.average-row[data-club="${club}"]`
+  );
+  if (averageRow) {
+    rows.forEach((row) => {
+      if (clubVisibility[club]) {
+        row.classList.remove("hidden");
+        row.classList.add("visible");
+      } else {
+        row.classList.remove("visible");
+        row.classList.add("hidden");
+      }
+    });
+    const arrowImg = averageRow.querySelector(".arrow-icon");
+    if (arrowImg) {
+      if (clubVisibility[club]) {
+        arrowImg.classList.add("rotated");
+      } else {
+        arrowImg.classList.remove("rotated");
+      }
+    }
+    if (clubVisibility[club]) {
+      averageRow.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+};
+
+// Función optimizada para ordenar
+window.sortTable = function (column) {
+  if (currentSort.column === column) {
+    currentSort.ascending = !currentSort.ascending;
+  } else {
+    currentSort = { column, ascending: true };
+  }
+
+  // Actualizar solo los iconos de ordenamiento
+  document.querySelectorAll("th[data-column]").forEach((th) => {
+    const sortIcon = th.querySelector(".sort-icon");
+    if (th.dataset.column === column) {
+      sortIcon.textContent = currentSort.ascending ? "↑" : "↓";
+    } else {
+      sortIcon.textContent = "";
+    }
+  });
+
+  // Regenerar la tabla solo si es necesario
+  displayShotsTable(
+    currentData,
+    parseInt(document.querySelector(".session-item.active").dataset.index)
+  );
 };
 
 window.updateFilter = function (value) {
@@ -458,15 +735,6 @@ window.updateFilter = function (value) {
       clubVisibility[row["club name"]] = false;
     }
   });
-  displayShotsTable(currentData, 0);
-};
-
-window.sortTable = function (column) {
-  if (currentSort.column === column) {
-    currentSort.ascending = !currentSort.ascending;
-  } else {
-    currentSort = { column, ascending: true };
-  }
   displayShotsTable(currentData, 0);
 };
 
@@ -555,7 +823,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      await createYardageBook(yardageBookSessions, deselectedShots);
+      await createYardageBook(yardageBookSessions);
       modal.style.display = "none";
     } catch (error) {
       console.error("Error al crear el YardageBook:", error);
@@ -583,7 +851,6 @@ async function loadSessions() {
     // Esperar a que auth.currentUser esté disponible
     let user = auth.currentUser;
     if (!user) {
-      // Si no hay usuario actual, esperar a que se resuelva la autenticación
       await new Promise((resolve) => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           unsubscribe();
@@ -598,8 +865,6 @@ async function loadSessions() {
       return;
     }
 
-    // Usar el UID del usuario para buscar en la colección Simulador
-
     const userDocRef = doc(db, "Simulador", user.uid);
     const userDoc = await getDoc(userDocRef);
 
@@ -609,14 +874,13 @@ async function loadSessions() {
     }
 
     const userData = userDoc.data();
-
     const sessions = userData.Sesiones || [];
+
     if (sessions.length === 0) {
       sessionsList.innerHTML = "<p>No hay sesiones registradas.</p>";
       return;
     }
 
-    // Actualizar el título con el nombre del usuario
     document.querySelector(
       ".sessions h2"
     ).textContent = `Sesiones de ${userData.nombre} ${userData.apellido}`;
@@ -632,29 +896,43 @@ async function loadSessions() {
         <p><strong>Cantidad de tiros:</strong> ${session.stats.shotCount}</p>
         <p><strong>Duración:</strong> ${session.stats.sessionTime}</p>
       `;
+
       sessionItem.addEventListener("click", () => {
         document
           .querySelectorAll(".session-item")
           .forEach((item) => item.classList.remove("active"));
         sessionItem.classList.add("active");
-        currentData = session.datos;
+
+        // Asegurar que cada tiro tenga su índice original
+        currentData = session.datos.map((shot, idx) => ({
+          ...shot,
+          originalIndex: idx,
+        }));
+
         currentSort = { column: null, ascending: true };
         currentFilter = null;
 
-        // Cargar tiros deseleccionados para esta sesión
-        const deselected = deselectedShots.get(session.fecha) || new Set();
+        // Inicializar selectedShots basado en el campo selected de cada tiro
         selectedShots = new Set(
           currentData
-            .map((_, i) => (!deselected.has(i) ? i : null))
-            .filter((i) => i !== null)
+            .map((shot, idx) => (shot.selected !== false ? idx : null))
+            .filter((idx) => idx !== null)
         );
 
         clubVisibility = {};
         currentData.forEach((row) => {
-          clubVisibility[row["club name"]] = false;
+          clubVisibility[row["club name"]] = true;
         });
+
+        showSwitchContainer(true);
+        const toggle = document.getElementById("toggleView");
+        if (toggle) {
+          toggle.checked = false;
+          toggleViewMode();
+        }
         displayShotsTable(currentData, index);
       });
+
       sessionsList.appendChild(sessionItem);
     });
   } catch (error) {
@@ -696,8 +974,14 @@ window.exportCurrentSessionToPDF = async function () {
       currentData[0]?.["shot created date"]?.split(" ")[0] ||
       new Date().toISOString().split("T")[0];
 
+    // Preparar los datos con la propiedad selected
+    const dataWithSelection = currentData.map((shot, index) => ({
+      ...shot,
+      selected: selectedShots.has(index),
+    }));
+
     // Pasar los datos del usuario a exportSessionToPDF
-    await exportSessionToPDF(currentData, nombreCompleto, fechaSesion);
+    await exportSessionToPDF(dataWithSelection, nombreCompleto, fechaSesion);
   } catch (error) {
     console.error("Error al exportar sesión:", error);
     alert("Error al exportar la sesión. Por favor, intente nuevamente.");
@@ -800,3 +1084,88 @@ window.toggleShotSelection = function (sessionIndex, shotIndex) {
   // Guardar el estado de los tiros deseleccionados
   saveDeselectedShots();
 };
+
+async function loadSession(session, index) {
+  document
+    .querySelectorAll(".session-item")
+    .forEach((item) => item.classList.remove("active"));
+  const sessionItem = document.querySelector(`[data-session-index="${index}"]`);
+  if (sessionItem) sessionItem.classList.add("active");
+
+  // Asegurarnos de que cada tiro tenga su índice original
+  currentData = session.datos.map((shot, i) => ({
+    ...shot,
+    originalIndex: i,
+  }));
+
+  currentSort = { column: null, ascending: true };
+  currentFilter = null;
+
+  // Inicializar selectedShots basado en el campo selected de cada tiro
+  selectedShots = new Set(
+    currentData
+      .map((shot, i) => (shot.selected !== false ? i : null))
+      .filter((i) => i !== null)
+  );
+
+  clubVisibility = {};
+  currentData.forEach((row) => {
+    clubVisibility[row["club name"]] = false;
+  });
+
+  showSwitchContainer(true);
+  const toggle = document.getElementById("toggleView");
+  if (toggle) {
+    toggle.checked = false;
+    toggleViewMode();
+  }
+  displayShotsTable(currentData, index);
+}
+
+const averageRowHTML = (club, averages) => `
+  <tr class="average-row" data-club="${club}">
+    <td class="checkbox-column">
+      <button class="toggle-club-btn" data-club="${club}" onclick="toggleClubShots('${club}')" aria-label="Mostrar/ocultar tiros">
+        <img src="./arrow-down.png" class="arrow-icon" alt="Desplegar">
+      </button>
+    </td>
+    <td>${formatClubName(club)}</td>
+    ${averages.map((avg) => `<td>${avg}</td>`).join("")}
+  </tr>
+`;
+
+// Switch para alternar entre tabla y mapa de dispersión
+function toggleViewMode() {
+  const isMap = document.getElementById("toggleView").checked;
+  const labelTable = document.getElementById("label-table");
+  const labelMap = document.getElementById("label-map");
+  if (labelTable) labelTable.classList.toggle("active", !isMap);
+  if (labelMap) labelMap.classList.toggle("active", isMap);
+
+  const table = document.getElementById("shotsTableContainer");
+  const canvas = document.getElementById("scatterCanvas");
+  if (table) table.style.display = isMap ? "none" : "";
+  if (canvas) canvas.style.display = isMap ? "" : "none";
+
+  // Si se activa el mapa, dibuja el scatter plot si la función existe
+  if (isMap) {
+    createScatterPlot();
+  }
+}
+window.toggleViewMode = toggleViewMode;
+
+window.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("toggleView");
+  if (toggle) {
+    toggle.checked = false;
+    toggleViewMode();
+  }
+});
+
+// Función para mostrar el switch solo cuando hay sesión seleccionada
+function showSwitchContainer(show) {
+  const switchContainer = document.getElementById("switchContainer");
+  if (switchContainer) {
+    switchContainer.style.display = show ? "" : "none";
+  }
+}

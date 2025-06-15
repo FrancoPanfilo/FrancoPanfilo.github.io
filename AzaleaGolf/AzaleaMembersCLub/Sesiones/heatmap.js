@@ -282,14 +282,8 @@ function createScatterPlot() {
 window.createScatterPlot = createScatterPlot;
 
 // Call createScatterPlot when shots are updated
-window.updateShotSelection = function (checkbox) {
-  const index = parseInt(checkbox.dataset.row);
-  if (checkbox.checked) {
-    selectedShots.add(index);
-  } else {
-    selectedShots.delete(index);
-  }
-  displayShotsTable(currentData, 0);
+window.updateShotSelectionAndPlot = async function (checkbox) {
+  await window.updateShotSelection(checkbox);
   createScatterPlot();
 };
 
@@ -305,3 +299,38 @@ window.updateFilter = function (value) {
   displayShotsTable(currentData, 0);
   createScatterPlot();
 };
+
+// Actualizar la tabla HTML para usar la nueva función
+function updateTableHTML() {
+  const tableContainer = document.getElementById("shotsTable");
+  if (!tableContainer) return;
+
+  // ... código existente ...
+
+  // En la parte donde se generan las filas, actualizar el onchange:
+  const rows = filteredData
+    .map(
+      (row, index) => `
+    <tr>
+      <td>
+        <input type="checkbox" 
+               data-row="${index}" 
+               data-session="${currentSessionIndex}"
+               onchange="updateShotSelectionAndPlot(this)"
+               ${selectedShots.has(index) ? "checked" : ""}>
+      </td>
+      <td>${formatClubName(row["club name"])}</td>
+      ${fixedColumns
+        .map(
+          (col) => `
+        <td>${formatValue(row[col])}</td>
+      `
+        )
+        .join("")}
+    </tr>
+  `
+    )
+    .join("");
+
+  // ... resto del código existente ...
+}

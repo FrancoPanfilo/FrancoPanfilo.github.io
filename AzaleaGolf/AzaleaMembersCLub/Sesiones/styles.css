@@ -1,10 +1,14 @@
-/* Paleta de colores */
+/* Variables de color simplificadas */
 :root {
-  --pink-light: #280e18;
-  --pink-dark: #514549;
-  --blue-light: rgb(43, 41, 41);
-  --white: #ffffff;
-  --gray-light: #f4f4f4;
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3d3d3d;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --accent-primary: #4caf50;
+  --accent-hover: #66bb6a;
+  --border-color: #404040;
+  --shadow-color: rgba(0, 0, 0, 0.2);
 }
 
 /* Estilos generales */
@@ -16,357 +20,326 @@
 
 body {
   font-family: "Montserrat", sans-serif;
-  background-image: url("https://fsxlive.foresightsports.com/Content/images/Artboard_Web.jpg");
-  color: #333;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
 }
 
-/* Encabezado */
+/* Header */
 .header {
-  background-color: var(--pink-light);
-  padding: 0px;
+  background-color: var(--bg-secondary);
+  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 2px solid var(--accent-primary);
 }
 
 .logo {
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
 }
+
 .logo img {
-  height: 40px;
+  height: 45px;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  filter: brightness(0.9);
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+  filter: brightness(1);
 }
 
 .nav ul {
   list-style: none;
   display: flex;
-  gap: 20px;
+  gap: 2rem;
+  align-items: center;
 }
 
 .nav a {
-  color: var(--gray-light);
+  color: var(--text-primary);
   text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
 }
 
 .nav a:hover {
-  color: var(--white);
+  background-color: var(--accent-primary);
+  color: var(--bg-primary);
 }
 
 .logout {
-  background-color: var(--pink-dark);
-  color: var(--white);
-  padding: 8px 16px;
-  border-radius: 4px;
+  background-color: var(--accent-secondary);
+  color: var(--text-primary);
+  padding: 0.5rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  transition: var(--transition);
 }
 
 .logout:hover {
-  background-color: var(--blue-light);
-  color: var(--white);
-}
-
-/* Lista de Sesiones */
-#shotsTableContainer {
-  scrollbar-width: thin;
-}
-#shotsTableContainer::-webkit-scrollbar {
-  width: 10px;
-}
-#shotsTableContainer::-webkit-scrollbar-track {
-  background: var(--gray-light);
-}
-#shotsTableContainer::-webkit-scrollbar-thumb {
-  background: var(--pink-dark);
-  border-radius: 5px;
-}
-.sessions {
-  padding: 40px 20px;
-  background-color: var(--blue-light);
-}
-
-.sessions h2 {
-  font-size: 28px;
-  color: var(--gray-light);
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.sessions-list {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.session-item {
-  background-color: var(--gray-light);
-  border: 1px solid var(--pink-light);
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.session-item:hover {
-  background-color: var(--pink-dark);
+  background-color: var(--accent-primary);
   transform: translateY(-2px);
 }
 
+/* Sección de Sesiones */
+.sessions {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.sessions h2 {
+  font-size: 2rem;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.sessions-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.session-item {
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid var(--bg-tertiary);
+}
+
+.session-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-primary);
+  background-color: var(--bg-tertiary);
+}
+
 .session-item.active {
-  background-color: var(--pink-dark);
-  color: var(--white);
+  background-color: var(--accent-secondary);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
 }
 
 .session-item p {
-  font-size: 16px;
-  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
 }
 
-.session-item.active p {
-  color: var(--white);
+.session-item p:last-child {
+  margin-bottom: 0;
 }
 
-/* Tabla de Tiros */
-.shots-table-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 20px auto;
-  overflow-x: auto;
-  transition: opacity 0.5s ease-out;
-}
-
-.shots-table-container.active {
-  opacity: 1;
-}
-
-.table-actions {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.table-actions button,
-.table-actions select {
-  background-color: var(--pink-dark);
-  color: var(--white);
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 14px;
+.session-item strong {
+  color: var(--accent-primary);
   font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
 }
 
-.table-actions button:hover,
-.table-actions select:hover {
-  background-color: var(--blue-light);
+.session-item.active strong {
+  color: var(--text-primary);
 }
 
-.table-actions select {
-  background-color: var(--pink-dark);
-  appearance: none;
-  padding-right: 30px;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-}
-
+/* Estilos de la tabla */
 .shots-table {
   width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-.shots-table th,
-.shots-table td {
-  border: 1px solid var(--blue-light);
-  padding: 7px;
-  text-align: center;
-  font-size: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 .shots-table th {
-  background-color: var(--pink-light);
-  color: var(--white);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.shots-table th:hover {
-  background-color: var(--pink-dark);
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .shots-table td {
-  background-color: var(--white);
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
 }
 
-.shots-table tr:hover td {
-  background-color: var(--pink-dark);
-  color: var(--white);
+/* Estilos para las filas de tiros */
+.shot-row {
+  display: none;
+  background-color: var(--bg-secondary);
 }
 
-.shots-table .checkbox-column {
-  width: 50px;
+.shot-row.visible {
+  display: table-row;
 }
 
-.shots-table .sort-icon {
-  margin-left: 5px;
-  font-size: 12px;
-}
-
-.average-row .checkbox-column {
-  background-color: var(--blue-light);
-  border: none;
-}
-
-.shots-table .average-row td {
-  background-color: #c7b6b6cc;
-  font-weight: 600;
-  font-size: 11px;
-  color: #333;
-}
-
-/* Estilos para el botón de alternar visibilidad */
-.toggle-club-btn {
-  background-color: var(--pink-dark);
-  color: var(--white);
-  border: none;
-  padding: 5px;
-  border-radius: 4px;
-  font-size: 14px;
+/* Estilos para la fila de promedio */
+.average-row {
+  background-color: var(--bg-tertiary) !important;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+}
+
+.average-row:hover {
+  background-color: var(--accent-primary) !important;
+}
+
+.average-row td {
+  background-color: inherit !important;
+  color: var(--text-primary);
+  padding: 1rem;
+}
+
+/* Botón de toggle simplificado */
+.toggle-club-btn {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--text-primary);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  padding: 0;
+  transition: background 0.2s;
 }
 
 .toggle-club-btn:hover {
-  background-color: var(--blue-light);
+  background: rgba(255, 255, 255, 0.07);
 }
 
-/* Transición para las filas de tiros (acordeón) */
-.shot-row {
-  transition: all 0.5s ease-in-out;
-  opacity: 1;
-  max-height: 40px;
-  overflow: hidden;
+/* Contenedor de la tabla */
+.shots-table-container {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
 }
 
-.shot-row.hidden {
-  transition: all 0.5s ease-in-out;
-
-  max-height: 0;
-  opacity: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  border: none;
-  display: none;
+/* Estilos para los botones del heatmap */
+.heatmap-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
 }
 
-/* Pie de Página */
+.heatmap-btn {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.heatmap-btn:hover {
+  background-color: var(--accent-primary);
+}
+
+.heatmap-btn.active {
+  background-color: var(--accent-primary);
+}
+
+/* Estilos para las celdas de datos */
+.shots-table td[data-value] {
+  font-family: "Roboto Mono", monospace;
+  font-weight: 500;
+}
+
+/* Estilos para los valores positivos/negativos */
+.shots-table td[data-value^="-"] {
+  color: #f44336;
+}
+
+.shots-table td[data-value^="+"] {
+  color: #4caf50;
+}
+
+/* Scrollbar simplificado */
+.shots-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.shots-table-container::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.shots-table-container::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 4px;
+}
+
+.shots-table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+/* Footer */
 .footer {
-  background-color: var(--pink-light);
-  padding: 20px;
+  background-color: var(--bg-secondary);
+  padding: 2rem;
+  margin-top: 3rem;
   text-align: center;
+  border-top: 2px solid var(--accent-primary);
 }
 
 .footer p {
-  color: var(--pink-dark);
-  margin-bottom: 10px;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
 }
 
 .footer-links {
   list-style: none;
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 2rem;
 }
 
 .footer-links a {
-  color: var(--pink-dark);
+  color: var(--text-secondary);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
+  transition: var(--transition);
 }
 
 .footer-links a:hover {
-  color: var(--blue-light);
+  color: var(--accent-primary);
+  text-decoration: underline;
 }
 
-/* Responsividad */
-@media (max-width: 868px) {
-  .header {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .nav ul {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .sessions-list {
-    padding: 0 10px;
-  }
-
-  .session-item p {
-    font-size: 14px;
-  }
-
-  .shots-table-container {
-    padding: 0 10px;
-  }
-
-  .table-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .table-actions button,
-  .table-actions select {
-    width: 100%;
-  }
-
-  .shots-table th,
-  .shots-table td {
-    font-size: 11px;
-    padding: 5px;
-  }
-
-  .shots-table .checkbox-column {
-    width: 40px;
-  }
-
-  .shots-table .average-row td {
-    font-size: 10px;
-    padding: 5px;
-  }
-
-  .toggle-club-btn {
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-  }
-
-  .shot-row {
-    max-height: 35px;
-  }
-}
-
-#scatterCanvas {
-}
-
-/* Estilos para el modal de YardageBook */
+/* Modal de YardageBook */
 .modal {
   display: none;
   position: fixed;
@@ -374,79 +347,93 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
   z-index: 1000;
 }
 
 .modal-content {
-  position: relative;
-  background-color: var(--blue-light);
-  margin: 10% auto;
-  padding: 20px;
+  background-color: var(--bg-secondary);
+  margin: 5% auto;
+  padding: 2rem;
   width: 90%;
   max-width: 600px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  border: 1px solid var(--accent-primary);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--pink-dark);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--accent-primary);
 }
 
 .modal-header h3 {
-  color: var(--gray-light);
-  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .close-modal {
   background: none;
   border: none;
-  color: var(--gray-light);
-  font-size: 24px;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
   cursor: pointer;
-  padding: 0;
+  transition: var(--transition);
 }
 
 .close-modal:hover {
-  color: var(--white);
+  color: var(--error-color);
+  transform: scale(1.1);
 }
 
 .modal-body {
   max-height: 60vh;
   overflow-y: auto;
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
+  padding-right: 1rem;
 }
 
 .session-selector {
-  margin-bottom: 15px;
+  margin-bottom: 1.5rem;
 }
 
 .session-selector label {
   display: block;
-  color: var(--gray-light);
-  margin-bottom: 8px;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-weight: 500;
 }
 
 .session-checkbox {
   display: flex;
   align-items: center;
-  margin: 8px 0;
-  padding: 8px;
-  background-color: var(--pink-dark);
-  border-radius: 4px;
+  margin: 0.75rem 0;
+  padding: 1rem;
+  background-color: var(--bg-tertiary);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.session-checkbox:hover {
+  background-color: var(--accent-secondary);
 }
 
 .session-checkbox input[type="checkbox"] {
-  margin-right: 10px;
+  margin-right: 1rem;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-primary);
 }
 
 .session-checkbox label {
-  color: var(--white);
+  color: var(--text-primary);
   margin: 0;
   flex-grow: 1;
 }
@@ -454,64 +441,58 @@ body {
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 1rem;
 }
 
 .modal-footer button {
-  padding: 10px 20px;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.3s;
+  transition: var(--transition);
 }
 
 .create-yardagebook {
-  background-color: var(--pink-dark);
-  color: var(--white);
+  background-color: var(--accent-primary);
+  color: var(--text-primary);
 }
 
 .create-yardagebook:hover {
-  background-color: var(--blue-light);
+  background-color: var(--accent-secondary);
+  transform: translateY(-2px);
 }
 
-/* Estilos para los botones de exportación */
-.table-actions {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.table-actions button {
-  background-color: var(--pink-dark);
-  color: var(--white);
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.table-actions button:hover {
-  background-color: var(--blue-light);
-}
-
-.table-actions button i {
-  font-size: 16px;
-}
-
-/* Responsividad para el modal */
+/* Responsividad */
 @media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nav ul {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .sessions {
+    padding: 1rem;
+  }
+
+  .sessions-list {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
   .modal-content {
-    margin: 5% auto;
+    margin: 10% auto;
     width: 95%;
+    padding: 1.5rem;
   }
 
   .modal-footer {
@@ -521,4 +502,111 @@ body {
   .modal-footer button {
     width: 100%;
   }
+}
+
+.arrow-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s;
+  vertical-align: middle;
+  filter: grayscale(1) brightness(1.5);
+}
+
+.arrow-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.table-actions button,
+.table-actions select {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-primary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  margin-right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-actions button:hover,
+.table-actions select:hover {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-hover);
+}
+
+.table-actions button i {
+  font-size: 1.1rem;
+}
+
+/* Switch para alternar entre tabla y mapa de dispersión */
+.switch-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.switch-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.switch-label.active {
+  color: var(--accent-primary);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 56px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-tertiary);
+  border-radius: 34px;
+  transition: background 0.3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--accent-primary);
+  border-radius: 50%;
+  transition: transform 0.3s, background 0.3s;
+}
+
+input:checked + .slider {
+  background-color: var(--accent-primary);
+}
+
+input:checked + .slider:before {
+  transform: translateX(28px);
+  background-color: #fff;
 }
