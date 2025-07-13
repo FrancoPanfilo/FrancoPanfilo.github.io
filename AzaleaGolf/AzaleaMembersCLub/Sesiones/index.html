@@ -17,6 +17,7 @@
     <script type="module" src="../auth.js"></script>
     <script type="module" src="script.js"></script>
     <script type="module" src="heatmap.js"></script>
+    <script type="module" src="js/shots.js"></script>
   </head>
   <body>
     <header class="header">
@@ -52,10 +53,10 @@
       <!-- Contenedor de la tabla -->
       <div class="shots-table-container" id="shotsTableContainer"></div>
 
-      <!-- Canvas para el mapa de dispersión (siempre presente) -->
+      <!-- Canvas para el mapa de dispersión -->
       <canvas
         id="scatterCanvas"
-        style="max-width: 100%; margin-top: 20px"
+        style="max-width: 100%; margin-top: 20px; display: none"
       ></canvas>
     </section>
 
@@ -70,33 +71,16 @@
 
     <!-- Modal de YardageBook -->
     <div id="yardageBookModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Crear YardageBook</h3>
-          <button class="close-modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="session-selector">
-            <label
-              >Selecciona las sesiones para incluir en el YardageBook:</label
-            >
-            <div id="sessionCheckboxes"></div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="create-yardagebook">Crear YardageBook</button>
-        </div>
-      </div>
+      <!-- El contenido del modal se genera dinámicamente en JavaScript -->
     </div>
 
     <script type="module">
-      import { auth } from "../auth.js";
+      import { auth } from "../firebase.js";
       import {
         onAuthStateChanged,
         signOut,
       } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
       import { exportSessionToPDF } from "./pdfExport.js";
-      import { createYardageBook } from "./yardageBook.js";
       import {
         currentData,
         selectedShots,
@@ -127,17 +111,23 @@
 
       // Hacer las funciones disponibles globalmente
       window.exportSessionToPDF = exportSessionToPDF;
-      window.createYardageBook = createYardageBook;
       window.currentData = currentData;
       window.selectedShots = selectedShots;
       window.clubColors = clubColors;
       window.formatClubName = formatClubName;
 
-      // Asegurarnos de que la función esté disponible globalmente
+      // Asegurar que las funciones de heatmap estén disponibles
+      if (typeof window.createScatterPlot === "undefined") {
+        console.warn("⚠️ createScatterPlot no está disponible globalmente");
+      }
+
+      // Función para actualizar selección y plot
       window.updateShotSelectionAndPlot = async function (checkbox) {
-        await window.updateShotSelection(checkbox);
-        if (typeof createScatterPlot === "function") {
-          createScatterPlot();
+        if (typeof window.updateShotSelection === "function") {
+          await window.updateShotSelection(checkbox);
+        }
+        if (typeof window.createScatterPlot === "function") {
+          window.createScatterPlot();
         }
       };
     </script>

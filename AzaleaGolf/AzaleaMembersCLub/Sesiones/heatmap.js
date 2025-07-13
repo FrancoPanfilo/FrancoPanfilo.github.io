@@ -241,17 +241,24 @@ function createScatterPlot() {
     },
   });
 
+  // Crear o actualizar contenedor de controles del mapa
+  let controlsContainer = document.getElementById("scatterControls");
+  if (!controlsContainer) {
+    controlsContainer = document.createElement("div");
+    controlsContainer.id = "scatterControls";
+    controlsContainer.className = "scatter-controls";
+    canvas.parentNode.insertBefore(controlsContainer, canvas);
+  }
+
   // Add or update toggle button for carry/total distance
   let toggleButton = document.getElementById("scatterToggle");
   if (!toggleButton) {
     toggleButton = document.createElement("button");
     toggleButton.id = "scatterToggle";
-    toggleButton.style.margin = "10px 0";
-    toggleButton.style.padding = "8px 16px";
-    toggleButton.style.cursor = "pointer";
-    canvas.parentNode.insertBefore(toggleButton, canvas);
+    toggleButton.className = "scatter-control-btn";
+    controlsContainer.appendChild(toggleButton);
   }
-  toggleButton.textContent = `Cambiar a ${
+  toggleButton.innerHTML = `<i class="fas fa-exchange-alt"></i> Cambiar a ${
     isCarryMode ? "Total Distance" : "Carry"
   }`;
   toggleButton.onclick = () => {
@@ -264,18 +271,25 @@ function createScatterPlot() {
   if (!ellipseToggle) {
     ellipseToggle = document.createElement("button");
     ellipseToggle.id = "ellipseToggle";
-    ellipseToggle.style.margin = "10px 10px";
-    ellipseToggle.style.padding = "8px 16px";
-    ellipseToggle.style.cursor = "pointer";
-    canvas.parentNode.insertBefore(ellipseToggle, toggleButton.nextSibling);
+    ellipseToggle.className = "scatter-control-btn";
+    controlsContainer.appendChild(ellipseToggle);
   }
-  ellipseToggle.textContent = showEllipses
-    ? "Ocultar Elipses"
-    : "Mostrar Elipses";
+  ellipseToggle.innerHTML = `<i class="fas fa-circle"></i> ${
+    showEllipses ? "Ocultar Elipses" : "Mostrar Elipses"
+  }`;
   ellipseToggle.onclick = () => {
     showEllipses = !showEllipses;
     createScatterPlot();
   };
+
+  // Mostrar/ocultar controles según el estado del mapa
+  const isMapVisible = canvas.style.display !== "none";
+  controlsContainer.style.display = isMapVisible ? "flex" : "none";
+
+  // Si el mapa no está visible, ocultar los controles
+  if (!isMapVisible) {
+    controlsContainer.style.display = "none";
+  }
 }
 
 // Expose function to global scope
@@ -283,9 +297,16 @@ window.createScatterPlot = createScatterPlot;
 
 // Call createScatterPlot when shots are updated
 window.updateShotSelectionAndPlot = async function (checkbox) {
-  await window.updateShotSelection(checkbox);
-  createScatterPlot();
+  if (typeof window.updateShotSelection === "function") {
+    await window.updateShotSelection(checkbox);
+  }
+  if (typeof window.createScatterPlot === "function") {
+    window.createScatterPlot();
+  }
 };
+
+// Asegurar que la función esté disponible inmediatamente
+console.log("✅ createScatterPlot disponible globalmente");
 
 window.updateFilter = function (value) {
   currentFilter = value || null;

@@ -1,6 +1,9 @@
 // Importaciones
 import { auth, db } from "../../firebase.js";
-import { doc, getDoc } from "../../firebase/firestore.js";
+import {
+  doc,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { displayShotsTable } from "./shots.js";
 import { loadDeselectedShots } from "./storage.js";
 

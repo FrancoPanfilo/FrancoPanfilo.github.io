@@ -54,10 +54,39 @@ export function displayShotsTable(data, sessionIndex) {
     });
   }
 
+  // Agrupar datos por palo
+  const clubGroups = {};
+  filteredData.forEach((row, index) => {
+    const clubName = row["club name"];
+    if (!clubGroups[clubName]) {
+      clubGroups[clubName] = [];
+    }
+    clubGroups[clubName].push({ ...row, originalIndex: index });
+  });
+
+  // Calcular promedios por palo
+  const clubAverages = {};
+  Object.keys(clubGroups).forEach((clubName) => {
+    const shots = clubGroups[clubName];
+    clubAverages[clubName] = {};
+
+    fixedColumns.forEach((col) => {
+      const values = shots
+        .map((shot) => parseFloat(shot[col]))
+        .filter((val) => !isNaN(val));
+      if (values.length > 0) {
+        const average =
+          values.reduce((sum, val) => sum + val, 0) / values.length;
+        clubAverages[clubName][col] = average;
+      } else {
+        clubAverages[clubName][col] = null;
+      }
+    });
+  });
+
   // Inicializar clubVisibility con todos los palos ocultos
   const clubVisibility = {};
-  const uniqueClubs = [...new Set(data.map((shot) => shot.club))];
-  uniqueClubs.forEach((club) => {
+  Object.keys(clubGroups).forEach((club) => {
     clubVisibility[club] = false;
   });
 
@@ -115,7 +144,7 @@ export function displayShotsTable(data, sessionIndex) {
     <div class="table-actions">
       <select id="clubFilter" onchange="updateFilter(this.value)">
         <option value="">Filtrar por: Todos</option>
-        ${uniqueClubs
+        ${Object.keys(clubGroups)
           .map(
             (club) =>
               `<option value="${club}" ${
@@ -140,7 +169,7 @@ export function displayShotsTable(data, sessionIndex) {
     <table class="shots-table">
       <thead>
         <tr>
-          <th><input type="checkbox" id="selectAll" onchange="toggleAllShots(this.checked)"></th>
+          <th class="checkbox-column"><i class="fas fa-eye"></i></th>
           <th>Club</th>
           ${fixedColumns
             .map(
@@ -160,27 +189,45 @@ export function displayShotsTable(data, sessionIndex) {
         </tr>
       </thead>
       <tbody>
-        ${filteredData
-          .map(
-            (row, index) => `
-          <tr class="${clubVisibility[row["club name"]] ? "expanded" : ""}">
-            <td>
-              <input type="checkbox" 
-                data-row="${index}" 
-                onchange="updateShotSelection(this)"
-                ${selectedShots.has(index) ? "checked" : ""}>
-            </td>
-            <td onclick="toggleClubShots('${
-              row["club name"]
-            }')" class="club-cell">
-              ${formatClubName(row["club name"])}
-            </td>
-            ${fixedColumns
-              .map((col) => `<td>${formatValue(row[col], col)}</td>`)
+        ${Object.keys(clubGroups)
+          .map((clubName) => {
+            const shots = clubGroups[clubName];
+            const averages = clubAverages[clubName];
+
+            return `
+            <!-- Fila de promedio del palo -->
+            <tr class="average-row" data-club="${clubName}">
+              <td class="checkbox-column">
+                <button class="toggle-club-btn" onclick="toggleClubShots('${clubName}')">
+                  <img src="arrow-down.png" alt="Toggle" class="arrow-icon">
+                </button>
+              </td>
+              <td class="club-name-cell">${formatClubName(clubName)}</td>
+              ${fixedColumns
+                .map((col) => `<td>${formatValue(averages[col], col)}</td>`)
+                .join("")}
+            </tr>
+            <!-- Filas de tiros del palo -->
+            ${shots
+              .map(
+                (row, shotIndex) => `
+              <tr class="shot-row" data-club="${clubName}" style="display: none;">
+                <td class="checkbox-column">
+                  <input type="checkbox" 
+                    data-row="${row.originalIndex}" 
+                    onchange="updateShotSelection(this)"
+                    ${selectedShots.has(row.originalIndex) ? "checked" : ""}>
+                </td>
+                <td class="shot-number-cell">Tiro ${shotIndex + 1}</td>
+                ${fixedColumns
+                  .map((col) => `<td>${formatValue(row[col], col)}</td>`)
+                  .join("")}
+              </tr>
+            `
+              )
               .join("")}
-          </tr>
-        `
-          )
+          `;
+          })
           .join("")}
       </tbody>
     </table>
@@ -207,16 +254,6 @@ export function updateShotSelection(checkbox) {
     saveDeselectedShots(sessionDate);
   }
 
-  displayShotsTable(currentData, 0);
-}
-
-// Función para alternar la visibilidad de todos los tiros
-export function toggleAllShots(checked) {
-  if (checked) {
-    currentData.forEach((_, index) => selectedShots.add(index));
-  } else {
-    selectedShots.clear();
-  }
   displayShotsTable(currentData, 0);
 }
 
