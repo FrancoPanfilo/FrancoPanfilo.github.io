@@ -2975,24 +2975,18 @@ input:checked + .slider:before {
 @media (max-width: 600px) {
   .shots-table {
     width: 100%;
-    table-layout: fixed;
+    table-layout: auto !important;
   }
   .shots-table th,
   .shots-table td {
-    min-width: 0;
-    max-width: none;
-    width: auto;
-    white-space: normal;
-    word-break: break-word;
+    min-width: 0 !important;
+    max-width: none !important;
+    width: 1%;
+    white-space: nowrap;
+    word-break: keep-all;
     padding: 2px 2px;
     font-size: 0.7rem;
     text-align: center;
-  }
-  .shots-table th {
-    line-height: 1.1;
-  }
-  .shots-table-container {
-    overflow-x: hidden;
   }
 }
 
