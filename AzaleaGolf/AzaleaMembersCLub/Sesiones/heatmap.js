@@ -86,7 +86,7 @@ function createScatterPlot() {
   const isMobile = screenW <= 600;
   if (isMobile) {
     canvasWidth = Math.max(screenW, 320);
-    canvasHeight = Math.max(Math.round(screenH * 0.7), 320);
+    canvasHeight = Math.max(Math.round(screenH * 1.0), 500);
     yardsPerPixel = 350 / canvasWidth;
   } else if (screenW <= 1024) {
     canvasWidth = Math.min(screenW * 0.9, 900);

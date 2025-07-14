@@ -38,9 +38,15 @@
               </a>
             </li>
             <li class="nav-item">
+              <a href="index.html" class="nav-link">
+                <i class="fas fa-golf-ball"></i>
+                <span>Mis Sesiones</span>
+              </a>
+            </li>
+            <li class="nav-item">
               <a href="#" class="nav-link auth-button">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Cerrar Sesión</span>
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Iniciar Sesión</span>
               </a>
             </li>
           </ul>
@@ -102,6 +108,12 @@
         const authButton = document.querySelector(".auth-button");
 
         if (!user) {
+          // Restaurar botón de autenticación
+          authButton.innerHTML =
+            '<i class="fas fa-sign-in-alt"></i><span>Iniciar Sesión</span>';
+          authButton.href = "../login.html";
+          authButton.classList.remove("logout");
+
           window.location.href = "../login.html";
         } else {
           // Obtener datos del usuario
@@ -131,6 +143,12 @@
           } catch (error) {
             console.error("Error al obtener datos del usuario:", error);
           }
+
+          // Actualizar botón de autenticación
+          authButton.innerHTML =
+            '<i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>';
+          authButton.href = "#";
+          authButton.classList.add("logout");
 
           // Configurar el botón de cerrar sesión
           authButton.addEventListener("click", async (e) => {
@@ -165,6 +183,43 @@
           window.createScatterPlot();
         }
       };
+    </script>
+    <script>
+      // Menú móvil
+      const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
+      const nav = document.querySelector(".nav");
+
+      function toggleMobileMenu() {
+        mobileMenuToggle.classList.toggle("active");
+        nav.classList.toggle("active");
+        document.body.style.overflow = nav.classList.contains("active")
+          ? "hidden"
+          : "";
+      }
+
+      function closeMobileMenu() {
+        mobileMenuToggle.classList.remove("active");
+        nav.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      mobileMenuToggle.addEventListener("click", toggleMobileMenu);
+
+      // Cerrar menú al hacer clic en un enlace
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            closeMobileMenu();
+          }
+        });
+      });
+
+      // Cerrar menú al redimensionar la ventana
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) {
+          closeMobileMenu();
+        }
+      });
     </script>
   </body>
 </html>
