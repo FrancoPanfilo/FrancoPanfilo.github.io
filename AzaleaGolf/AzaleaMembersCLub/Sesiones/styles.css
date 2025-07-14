@@ -443,11 +443,18 @@ a:hover {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Ajuste para que la lista de sesiones y sus items no se desborden */
 .sessions-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+.session-item {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
 }
 
 .session-item {
@@ -572,6 +579,10 @@ a:hover {
    TABLA DE DISPAROS
    ======================================== */
 .shots-table-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: var(--border-radius-lg);
@@ -1792,7 +1803,7 @@ input:checked + .slider:before {
 }
 
 /* ========================================
-   MOBILE MEDIUM (360px - 479px)
+   MOBILE SMALL (360px - 479px)
    ======================================== */
 @media (max-width: 479px) and (min-width: 360px) {
   .header {
@@ -2300,16 +2311,19 @@ input:checked + .slider:before {
 @media (max-width: 600px) {
   #scatterCanvas {
     width: 100vw !important;
-    max-width: 100vw !important;
-    height: 80vw !important;
+    max-width: 100vw;
+    height: auto !important;
+    max-height: 75vh;
     min-height: 320px;
-    max-height: 90vh;
+    margin: 0 auto 12px auto;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
   }
   .scatter-container {
     padding: var(--spacing-xs);
+  }
+  .shots-table-container {
+    margin-top: 16px;
+    width: 100%;
   }
 }
 
@@ -2607,4 +2621,85 @@ input:checked + .slider:before {
   #columnSelectorModal .column-selector {
     max-height: 90px !important;
   }
+}
+
+@media (max-width: 600px) {
+  .sessions-list {
+    padding: 0;
+    margin: 0;
+    min-height: 340px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .session-item {
+    padding: 2px 2px;
+    min-height: 14px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-width: 600px) {
+  .shots-table {
+    width: 100%;
+    table-layout: fixed;
+  }
+  .shots-table th,
+  .shots-table td {
+    min-width: 0;
+    max-width: none;
+    width: auto;
+    white-space: normal;
+    word-break: break-word;
+    padding: 2px 2px;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+  .shots-table th {
+    line-height: 1.1;
+  }
+  .shots-table-container {
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 600px) {
+  .table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 8px 0;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  .table-actions button {
+    flex: 0 1 45%;
+    max-width: 140px;
+    min-width: 110px;
+    min-height: 28px;
+    font-size: 0.7rem;
+    padding: 4px 0;
+    border-radius: 8px;
+    margin: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  .table-actions button:nth-child(odd):last-child {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 60%;
+  }
+}
+
+.modal {
+  background: rgba(0, 0, 0, 0.85) !important;
 }

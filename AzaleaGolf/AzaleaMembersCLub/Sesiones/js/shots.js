@@ -11,7 +11,7 @@ import { calculateClubAverages } from "./stats.js";
 import { formatClubName } from "../../utils/constants.js";
 
 // Columnas fijas para mostrar
-const fixedColumns = [
+let fixedColumns = [
   "club speed",
   "ball speed",
   "smash factor",
@@ -34,9 +34,14 @@ const fixedColumns = [
   "launch angle",
 ];
 
+// Detectar si es móvil y limitar columnas
+if (window.innerWidth <= 600) {
+  fixedColumns = ["carry", "launch angle", "spin rate"];
+}
+
 // Función para mostrar la tabla de tiros
 export function displayShotsTable(data, sessionIndex) {
-  const tableContainer = document.getElementById("shotsTable");
+  const tableContainer = document.getElementById("shotsTableContainer");
   if (!tableContainer) return;
 
   // Filtrar datos si hay un filtro activo
@@ -276,10 +281,15 @@ export function sortTable(column) {
 
 // Función para formatear nombres de columnas
 function formatColumnName(column) {
-  return column
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  // Convierte snake_case o nombres con espacios en dos líneas
+  if (column.includes(" ")) {
+    const parts = column.split(" ");
+    return parts
+      .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+      .join("<br>");
+  }
+  // Si no tiene espacio, solo capitaliza
+  return column.charAt(0).toUpperCase() + column.slice(1);
 }
 
 // Función para formatear valores

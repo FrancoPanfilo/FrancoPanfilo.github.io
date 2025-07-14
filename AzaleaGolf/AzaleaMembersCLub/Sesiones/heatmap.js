@@ -82,11 +82,12 @@ function createScatterPlot() {
   // --- ADAPTACIÓN RESPONSIVE DEL CANVAS ---
   let canvasWidth, canvasHeight, yardsPerPixel;
   const screenW = window.innerWidth;
+  const screenH = window.innerHeight;
   const isMobile = screenW <= 600;
   if (isMobile) {
-    canvasWidth = Math.max(screenW * 0.98, 320);
+    canvasWidth = Math.max(screenW, 320);
+    canvasHeight = Math.max(Math.round(screenH * 0.7), 320);
     yardsPerPixel = 350 / canvasWidth;
-    canvasHeight = Math.round(canvasWidth * 0.8);
   } else if (screenW <= 1024) {
     canvasWidth = Math.min(screenW * 0.9, 900);
     yardsPerPixel = 350 / canvasWidth;
@@ -412,4 +413,11 @@ window.addEventListener("resize", function () {
       window.createScatterPlot();
     }
   }, 200);
+});
+
+// Redimensionar el canvas y redibujar el gráfico al cambiar el tamaño de la ventana
+window.addEventListener("resize", () => {
+  if (document.getElementById("scatterCanvas")) {
+    createScatterPlot();
+  }
 });
