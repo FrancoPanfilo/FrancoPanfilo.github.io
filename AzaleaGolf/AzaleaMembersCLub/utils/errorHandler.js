@@ -1,50 +1,25 @@
-/**
- * MANEJADOR DE ERRORES CENTRALIZADO
- *
- * Este módulo proporciona un sistema centralizado para manejar errores
- * en toda la aplicación. Incluye:
- * - Logging de errores
- * - Mostrar mensajes de error al usuario
- * - Manejo de errores de Firebase
- * - Errores de validación
- * - Errores de red
- */
-
 import { errorMessages } from "../config.js";
 
-/**
- * CLASE PRINCIPAL DE MANEJO DE ERRORES
- * Gestiona todos los errores de la aplicación de forma consistente
- */
 class ErrorHandler {
   constructor() {
-    // Configuración del manejador de errores
     this.config = {
-      showNotifications: true, // Mostrar notificaciones al usuario
-      logToConsole: true, // Log en consola para desarrollo
-      logToServer: false, // Log en servidor (para producción)
+      showNotifications: true,
+      logToConsole: true,
+      logToServer: false,
     };
 
-    // Inicializar el manejador
     this.init();
   }
 
-  /**
-   * INICIALIZAR EL MANEJADOR DE ERRORES
-   * Configura los listeners globales para capturar errores no manejados
-   */
   init() {
-    // Capturar errores no manejados de JavaScript
     window.addEventListener("error", (event) => {
       this.handleError(event.error || event.message, "unhandled");
     });
 
-    // Capturar promesas rechazadas no manejadas
     window.addEventListener("unhandledrejection", (event) => {
       this.handleError(event.reason, "promise");
     });
 
-    // Capturar errores de recursos (imágenes, scripts, etc.)
     window.addEventListener(
       "error",
       (event) => {
@@ -59,19 +34,10 @@ class ErrorHandler {
     );
   }
 
-  /**
-   * MANEJAR ERRORES DE FIREBASE AUTH
-   * Convierte códigos de error de Firebase en mensajes legibles
-   *
-   * @param {Error} error - Error de Firebase
-   * @param {string} context - Contexto donde ocurrió el error
-   * @returns {string} Mensaje de error traducido
-   */
   handleFirebaseAuthError(error, context = "auth") {
     const errorCode = error.code;
     let message = "Error desconocido";
 
-    // Mapear códigos de error de Firebase a mensajes en español
     switch (errorCode) {
       case "auth/user-not-found":
         message = errorMessages.auth.userNotFound;
@@ -105,14 +71,6 @@ class ErrorHandler {
     return message;
   }
 
-  /**
-   * MANEJAR ERRORES DE FIRESTORE
-   * Maneja errores específicos de la base de datos
-   *
-   * @param {Error} error - Error de Firestore
-   * @param {string} context - Contexto donde ocurrió el error
-   * @returns {string} Mensaje de error traducido
-   */
   handleFirestoreError(error, context = "firestore") {
     let message = "Error de base de datos";
 
@@ -140,26 +98,11 @@ class ErrorHandler {
     return message;
   }
 
-  /**
-   * MANEJAR ERRORES DE VALIDACIÓN
-   * Maneja errores de validación de formularios y datos
-   *
-   * @param {string} field - Campo que falló la validación
-   * @param {string} rule - Regla de validación que falló
-   * @param {string} context - Contexto de la validación
-   */
   handleValidationError(field, rule, context = "validation") {
     const message = `Error de validación en ${field}: ${rule}`;
     this.handleError(message, context);
   }
 
-  /**
-   * MANEJAR ERRORES DE RED
-   * Maneja errores de conexión y red
-   *
-   * @param {Error} error - Error de red
-   * @param {string} context - Contexto donde ocurrió el error
-   */
   handleNetworkError(error, context = "network") {
     let message = "Error de conexión";
 
@@ -175,14 +118,6 @@ class ErrorHandler {
     this.handleError(message, context);
   }
 
-  /**
-   * MANEJAR ERRORES DE EXPORTACIÓN
-   * Maneja errores específicos de exportación de datos
-   *
-   * @param {Error} error - Error de exportación
-   * @param {string} format - Formato de exportación (PDF, CSV)
-   * @param {string} context - Contexto de la exportación
-   */
   handleExportError(error, format, context = "export") {
     let message = "Error al exportar datos";
 
@@ -200,19 +135,9 @@ class ErrorHandler {
     this.handleError(message, context);
   }
 
-  /**
-   * MANEJAR ERRORES GENERALES
-   * Método principal para manejar cualquier tipo de error
-   *
-   * @param {Error|string} error - Error a manejar
-   * @param {string} context - Contexto donde ocurrió el error
-   * @param {Object} options - Opciones adicionales
-   */
   handleError(error, context = "general", options = {}) {
-    // Obtener el mensaje de error
     const message = typeof error === "string" ? error : error.message;
 
-    // Crear objeto de error estructurado
     const errorInfo = {
       message,
       context,
@@ -223,31 +148,20 @@ class ErrorHandler {
       ...options,
     };
 
-    // Log del error según configuración
     if (this.config.logToConsole) {
-      console.error(`[${context.toUpperCase()}] ${message}`, errorInfo);
+      }] ${message}`, errorInfo);
     }
 
-    // Mostrar notificación al usuario si está habilitado
     if (this.config.showNotifications) {
       this.showNotification(message, context);
     }
 
-    // Log en servidor (para producción)
     if (this.config.logToServer) {
       this.logToServer(errorInfo);
     }
   }
 
-  /**
-   * MOSTRAR NOTIFICACIÓN AL USUARIO
-   * Crea y muestra una notificación visual del error
-   *
-   * @param {string} message - Mensaje a mostrar
-   * @param {string} type - Tipo de notificación (error, warning, success)
-   */
   showNotification(message, type = "error") {
-    // Crear elemento de notificación
     const notification = document.createElement("div");
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -257,23 +171,18 @@ class ErrorHandler {
       </div>
     `;
 
-    // Agregar estilos si no existen
     this.addNotificationStyles();
 
-    // Agregar al DOM
     document.body.appendChild(notification);
 
-    // Mostrar con animación
     setTimeout(() => {
       notification.classList.add("show");
     }, 100);
 
-    // Configurar auto-eliminación
     const autoRemove = setTimeout(() => {
       this.removeNotification(notification);
     }, 5000);
 
-    // Configurar botón de cerrar
     const closeButton = notification.querySelector(".notification-close");
     closeButton.addEventListener("click", () => {
       clearTimeout(autoRemove);
@@ -281,12 +190,6 @@ class ErrorHandler {
     });
   }
 
-  /**
-   * ELIMINAR NOTIFICACIÓN
-   * Remueve una notificación del DOM con animación
-   *
-   * @param {HTMLElement} notification - Elemento de notificación a eliminar
-   */
   removeNotification(notification) {
     notification.classList.remove("show");
     setTimeout(() => {
@@ -296,13 +199,9 @@ class ErrorHandler {
     }, 300);
   }
 
-  /**
-   * AGREGAR ESTILOS DE NOTIFICACIÓN
-   * Inyecta los estilos CSS necesarios para las notificaciones
-   */
   addNotificationStyles() {
     if (document.getElementById("notification-styles")) {
-      return; // Los estilos ya existen
+      return;
     }
 
     const styles = document.createElement("style");
@@ -375,37 +274,21 @@ class ErrorHandler {
     document.head.appendChild(styles);
   }
 
-  /**
-   * LOG EN SERVIDOR
-   * Envía errores al servidor para análisis (para producción)
-   *
-   * @param {Object} errorInfo - Información del error
-   */
   async logToServer(errorInfo) {
     try {
-      // Aquí iría la lógica para enviar errores a un servicio de logging
-      // como Sentry, LogRocket, o un endpoint personalizado
-      console.log("Error logged to server:", errorInfo);
+      
     } catch (error) {
-      console.error("Failed to log error to server:", error);
+      
     }
   }
 
-  /**
-   * CONFIGURAR EL MANEJADOR
-   * Permite cambiar la configuración del manejador de errores
-   *
-   * @param {Object} config - Nueva configuración
-   */
   configure(config) {
     this.config = { ...this.config, ...config };
   }
 }
 
-// Crear instancia global del manejador de errores
 const errorHandler = new ErrorHandler();
 
-// Exportar funciones de conveniencia
 export const handleError = (error, context, options) =>
   errorHandler.handleError(error, context, options);
 export const handleFirebaseAuthError = (error, context) =>
@@ -422,5 +305,4 @@ export const showNotification = (message, type) =>
   errorHandler.showNotification(message, type);
 export const configureErrorHandler = (config) => errorHandler.configure(config);
 
-// Exportar la instancia principal
 export default errorHandler;

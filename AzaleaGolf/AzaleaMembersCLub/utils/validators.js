@@ -1,29 +1,7 @@
-/**
- * UTILIDADES DE VALIDACIÓN
- *
- * Este módulo proporciona funciones de validación reutilizables
- * para formularios y datos en toda la aplicación.
- *
- * Incluye validaciones para:
- * - Emails
- * - Contraseñas
- * - Nombres
- * - Datos de golf
- * - Formularios completos
- */
-
 import { validations } from "../config.js";
 import { handleValidationError } from "./errorHandler.js";
 
-/**
- * VALIDACIÓN DE EMAIL
- * Verifica que el email tenga un formato válido
- *
- * @param {string} email - Email a validar
- * @returns {Object} Resultado de la validación {isValid, message}
- */
 export function validateEmail(email) {
-  // Verificar que el email no esté vacío
   if (!email || email.trim() === "") {
     return {
       isValid: false,
@@ -31,7 +9,6 @@ export function validateEmail(email) {
     };
   }
 
-  // Verificar formato usando regex
   if (!validations.email.pattern.test(email)) {
     return {
       isValid: false,
@@ -45,15 +22,7 @@ export function validateEmail(email) {
   };
 }
 
-/**
- * VALIDACIÓN DE CONTRASEÑA
- * Verifica que la contraseña cumpla con los requisitos de seguridad
- *
- * @param {string} password - Contraseña a validar
- * @returns {Object} Resultado de la validación {isValid, message, strength}
- */
 export function validatePassword(password) {
-  // Verificar que la contraseña no esté vacía
   if (!password || password.trim() === "") {
     return {
       isValid: false,
@@ -62,7 +31,6 @@ export function validatePassword(password) {
     };
   }
 
-  // Verificar longitud mínima
   if (password.length < validations.password.minLength) {
     return {
       isValid: false,
@@ -71,7 +39,6 @@ export function validatePassword(password) {
     };
   }
 
-  // Calcular fortaleza de la contraseña
   let strength = 0;
   const checks = {
     length: password.length >= 8,
@@ -81,12 +48,10 @@ export function validatePassword(password) {
     special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
   };
 
-  // Sumar puntos por cada criterio cumplido
   Object.values(checks).forEach((check) => {
     if (check) strength += 20;
   });
 
-  // Determinar mensaje según fortaleza
   let message = "";
   if (strength < 40) {
     message =
@@ -104,16 +69,7 @@ export function validatePassword(password) {
   };
 }
 
-/**
- * VALIDACIÓN DE NOMBRE
- * Verifica que el nombre tenga un formato válido
- *
- * @param {string} name - Nombre a validar
- * @param {string} fieldName - Nombre del campo (para mensajes de error)
- * @returns {Object} Resultado de la validación {isValid, message}
- */
 export function validateName(name, fieldName = "nombre") {
-  // Verificar que el nombre no esté vacío
   if (!name || name.trim() === "") {
     return {
       isValid: false,
@@ -123,7 +79,6 @@ export function validateName(name, fieldName = "nombre") {
 
   const trimmedName = name.trim();
 
-  // Verificar longitud mínima
   if (trimmedName.length < validations.name.minLength) {
     return {
       isValid: false,
@@ -131,7 +86,6 @@ export function validateName(name, fieldName = "nombre") {
     };
   }
 
-  // Verificar longitud máxima
   if (trimmedName.length > validations.name.maxLength) {
     return {
       isValid: false,
@@ -139,7 +93,6 @@ export function validateName(name, fieldName = "nombre") {
     };
   }
 
-  // Verificar formato (solo letras y espacios)
   if (!validations.name.pattern.test(trimmedName)) {
     return {
       isValid: false,
@@ -153,14 +106,6 @@ export function validateName(name, fieldName = "nombre") {
   };
 }
 
-/**
- * VALIDACIÓN DE CONFIRMACIÓN DE CONTRASEÑA
- * Verifica que la confirmación coincida con la contraseña original
- *
- * @param {string} password - Contraseña original
- * @param {string} confirmPassword - Confirmación de contraseña
- * @returns {Object} Resultado de la validación {isValid, message}
- */
 export function validatePasswordConfirmation(password, confirmPassword) {
   if (!confirmPassword || confirmPassword.trim() === "") {
     return {
@@ -182,23 +127,14 @@ export function validatePasswordConfirmation(password, confirmPassword) {
   };
 }
 
-/**
- * VALIDACIÓN DE DATOS DE GOLF
- * Valida los datos específicos del simulador de golf
- *
- * @param {Object} shotData - Datos del tiro a validar
- * @returns {Object} Resultado de la validación {isValid, errors}
- */
 export function validateGolfShotData(shotData) {
   const errors = [];
 
-  // Validar que existan datos
   if (!shotData || typeof shotData !== "object") {
     errors.push("Datos de tiro inválidos");
     return { isValid: false, errors };
   }
 
-  // Validar campos requeridos
   const requiredFields = [
     "club name",
     "ball speed (mph)",
@@ -217,7 +153,6 @@ export function validateGolfShotData(shotData) {
     }
   });
 
-  // Validar rangos de valores
   const validations = {
     "ball speed (mph)": { min: 50, max: 200 },
     "launch angle (deg)": { min: 0, max: 90 },
@@ -244,23 +179,14 @@ export function validateGolfShotData(shotData) {
   };
 }
 
-/**
- * VALIDACIÓN DE SESIÓN DE GOLF
- * Valida una sesión completa de golf
- *
- * @param {Object} sessionData - Datos de la sesión
- * @returns {Object} Resultado de la validación {isValid, errors}
- */
 export function validateGolfSession(sessionData) {
   const errors = [];
 
-  // Validar estructura básica
   if (!sessionData || typeof sessionData !== "object") {
     errors.push("Datos de sesión inválidos");
     return { isValid: false, errors };
   }
 
-  // Validar campos requeridos de la sesión
   if (!sessionData.fecha) {
     errors.push("Fecha de sesión requerida");
   }
@@ -270,7 +196,6 @@ export function validateGolfSession(sessionData) {
   } else if (sessionData.datos.length === 0) {
     errors.push("La sesión debe contener al menos un tiro");
   } else {
-    // Validar cada tiro en la sesión
     sessionData.datos.forEach((shot, index) => {
       const shotValidation = validateGolfShotData(shot);
       if (!shotValidation.isValid) {
@@ -281,7 +206,6 @@ export function validateGolfSession(sessionData) {
     });
   }
 
-  // Validar estadísticas si existen
   if (sessionData.stats) {
     if (
       typeof sessionData.stats.shotCount !== "number" ||
@@ -304,19 +228,10 @@ export function validateGolfSession(sessionData) {
   };
 }
 
-/**
- * VALIDACIÓN DE FORMULARIO COMPLETO
- * Valida todos los campos de un formulario
- *
- * @param {Object} formData - Datos del formulario
- * @param {Object} validationRules - Reglas de validación por campo
- * @returns {Object} Resultado de la validación {isValid, errors, fieldErrors}
- */
 export function validateForm(formData, validationRules) {
   const errors = [];
   const fieldErrors = {};
 
-  // Validar cada campo según las reglas
   Object.entries(validationRules).forEach(([fieldName, rules]) => {
     const fieldValue = formData[fieldName];
     const fieldValidation = validateField(fieldValue, rules);
@@ -334,16 +249,7 @@ export function validateForm(formData, validationRules) {
   };
 }
 
-/**
- * VALIDACIÓN DE CAMPO INDIVIDUAL
- * Valida un campo específico según las reglas proporcionadas
- *
- * @param {any} value - Valor del campo
- * @param {Object} rules - Reglas de validación
- * @returns {Object} Resultado de la validación {isValid, message}
- */
 function validateField(value, rules) {
-  // Validación de campo requerido
   if (rules.required && (!value || value.toString().trim() === "")) {
     return {
       isValid: false,
@@ -351,12 +257,10 @@ function validateField(value, rules) {
     };
   }
 
-  // Si el campo no es requerido y está vacío, es válido
   if (!value || value.toString().trim() === "") {
     return { isValid: true, message: "" };
   }
 
-  // Validación de tipo
   if (rules.type) {
     const typeValidation = validateType(value, rules.type);
     if (!typeValidation.isValid) {
@@ -364,7 +268,6 @@ function validateField(value, rules) {
     }
   }
 
-  // Validación de longitud
   if (rules.minLength && value.toString().length < rules.minLength) {
     return {
       isValid: false,
@@ -379,7 +282,6 @@ function validateField(value, rules) {
     };
   }
 
-  // Validación de patrón (regex)
   if (rules.pattern && !rules.pattern.test(value)) {
     return {
       isValid: false,
@@ -387,7 +289,6 @@ function validateField(value, rules) {
     };
   }
 
-  // Validación de rango numérico
   if (rules.min !== undefined && parseFloat(value) < rules.min) {
     return {
       isValid: false,
@@ -402,7 +303,6 @@ function validateField(value, rules) {
     };
   }
 
-  // Validación personalizada
   if (rules.custom) {
     const customValidation = rules.custom(value);
     if (!customValidation.isValid) {
@@ -413,14 +313,6 @@ function validateField(value, rules) {
   return { isValid: true, message: "" };
 }
 
-/**
- * VALIDACIÓN DE TIPO DE DATO
- * Verifica que el valor sea del tipo especificado
- *
- * @param {any} value - Valor a validar
- * @param {string} type - Tipo esperado
- * @returns {Object} Resultado de la validación {isValid, message}
- */
 function validateType(value, type) {
   switch (type) {
     case "email":
@@ -468,71 +360,43 @@ function validateType(value, type) {
   return { isValid: true, message: "" };
 }
 
-/**
- * LIMPIAR MENSAJES DE ERROR
- * Remueve todos los mensajes de error de un formulario
- *
- * @param {HTMLElement} form - Elemento del formulario
- */
 export function clearFormErrors(form) {
-  // Remover mensajes de error existentes
   const errorElements = form.querySelectorAll(".error-message, .field-error");
   errorElements.forEach((element) => element.remove());
 
-  // Remover clases de error
   const errorFields = form.querySelectorAll(".error-field");
   errorFields.forEach((field) => field.classList.remove("error-field"));
 }
 
-/**
- * MOSTRAR ERRORES DE FORMULARIO
- * Muestra los errores de validación en el formulario
- *
- * @param {HTMLElement} form - Elemento del formulario
- * @param {Object} fieldErrors - Errores por campo
- */
 export function showFormErrors(form, fieldErrors) {
   Object.entries(fieldErrors).forEach(([fieldName, errorMessage]) => {
     const field = form.querySelector(`[name="${fieldName}"]`);
     if (field) {
-      // Agregar clase de error al campo
       field.classList.add("error-field");
 
-      // Crear elemento de mensaje de error
       const errorElement = document.createElement("div");
       errorElement.className = "error-message";
       errorElement.textContent = errorMessage;
 
-      // Insertar después del campo
       field.parentNode.insertBefore(errorElement, field.nextSibling);
     }
   });
 }
 
-/**
- * VALIDACIÓN EN TIEMPO REAL
- * Configura validación automática mientras el usuario escribe
- *
- * @param {HTMLElement} form - Elemento del formulario
- * @param {Object} validationRules - Reglas de validación
- */
 export function setupRealTimeValidation(form, validationRules) {
   Object.entries(validationRules).forEach(([fieldName, rules]) => {
     const field = form.querySelector(`[name="${fieldName}"]`);
     if (field) {
-      // Validar al perder el foco
       field.addEventListener("blur", () => {
         const value = field.value;
         const validation = validateField(value, rules);
 
-        // Limpiar error anterior
         const existingError = field.parentNode.querySelector(".error-message");
         if (existingError) {
           existingError.remove();
         }
         field.classList.remove("error-field");
 
-        // Mostrar nuevo error si existe
         if (!validation.isValid) {
           field.classList.add("error-field");
           const errorElement = document.createElement("div");
@@ -542,7 +406,6 @@ export function setupRealTimeValidation(form, validationRules) {
         }
       });
 
-      // Validar al escribir (con debounce)
       let timeout;
       field.addEventListener("input", () => {
         clearTimeout(timeout);
@@ -550,7 +413,6 @@ export function setupRealTimeValidation(form, validationRules) {
           const value = field.value;
           const validation = validateField(value, rules);
 
-          // Solo mostrar errores si el campo no está vacío
           if (value.trim() !== "" && !validation.isValid) {
             const existingError =
               field.parentNode.querySelector(".error-message");
@@ -572,7 +434,7 @@ export function setupRealTimeValidation(form, validationRules) {
             }
             field.classList.remove("error-field");
           }
-        }, 300); // Debounce de 300ms
+        }, 300);
       });
     }
   });

@@ -90,7 +90,7 @@ export async function loadSessions() {
       sessionsList.innerHTML = "<p>No se encontraron datos del usuario.</p>";
     }
   } catch (error) {
-    console.error("Error al cargar sesiones:", error);
+    
     sessionsList.innerHTML = "<p>Error al cargar las sesiones.</p>";
   }
 }

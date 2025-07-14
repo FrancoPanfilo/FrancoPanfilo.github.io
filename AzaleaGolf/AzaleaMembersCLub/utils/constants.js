@@ -1,22 +1,29 @@
-/**
- * CONSTANTES Y HELPERS GLOBALES
- *
- * Este archivo contiene todas las constantes, enumeraciones y funciones
- * helper que se utilizan en toda la aplicación.
- *
- * Incluye:
- * - Constantes de golf
- * - Enumeraciones
- * - Funciones helper
- * - Configuraciones
- */
+// Colores para los palos en gráficos
+export const clubColors = [
+  "#FF6B6B", // Rojo
+  "#4ECDC4", // Turquesa
+  "#45B7D1", // Azul claro
+  "#96CEB4", // Verde claro
+  "#FFEAA7", // Amarillo
+  "#DDA0DD", // Ciruela
+  "#98D8C8", // Verde azulado
+  "#F7DC6F", // Amarillo dorado
+  "#BB8FCE", // Violeta claro
+  "#85C1E9", // Azul cielo
+  "#F8C471", // Naranja claro
+  "#82E0AA", // Verde lima
+  "#F1948A", // Rosa salmón
+  "#85C1E9", // Azul claro
+  "#D7BDE2", // Lavanda
+  "#FAD7A0", // Melocotón
+  "#A9DFBF", // Verde menta
+  "#F9E79F", // Amarillo crema
+  "#D5A6BD", // Rosa pálido
+  "#A3E4D7", // Verde agua
+];
 
-/**
- * CONSTANTES DE GOLF
- * Valores específicos del deporte de golf
- */
+// Constantes de golf
 export const GOLF_CONSTANTS = {
-  // Palos de golf y sus rangos típicos
   CLUBS: {
     DRIVER: {
       name: "Driver",
@@ -140,7 +147,6 @@ export const GOLF_CONSTANTS = {
     },
   },
 
-  // Rangos de valores para métricas de golf
   METRICS: {
     BALL_SPEED: { min: 50, max: 200, unit: "mph" },
     LAUNCH_ANGLE: { min: 0, max: 90, unit: "deg" },
@@ -156,7 +162,6 @@ export const GOLF_CONSTANTS = {
     CLUB_PATH: { min: -20, max: 20, unit: "deg" },
   },
 
-  // Configuración de rangos de distancia para yardage books
   YARDAGE_RANGES: [
     { min: 0, max: 50, label: "0-50 yardas" },
     { min: 50, max: 100, label: "50-100 yardas" },
@@ -168,12 +173,8 @@ export const GOLF_CONSTANTS = {
   ],
 };
 
-/**
- * ENUMERACIONES
- * Valores constantes para diferentes estados y tipos
- */
+// Enumeraciones
 export const ENUMS = {
-  // Estados de autenticación
   AUTH_STATE: {
     UNKNOWN: "unknown",
     AUTHENTICATED: "authenticated",
@@ -181,28 +182,24 @@ export const ENUMS = {
     LOADING: "loading",
   },
 
-  // Tipos de usuario
   USER_ROLE: {
     PLAYER: "player",
     COACH: "coach",
     ADMIN: "admin",
   },
 
-  // Estados de sesión
   SESSION_STATUS: {
     ACTIVE: "active",
     COMPLETED: "completed",
     CANCELLED: "cancelled",
   },
 
-  // Tipos de exportación
   EXPORT_TYPE: {
     PDF: "pdf",
     CSV: "csv",
     EXCEL: "excel",
   },
 
-  // Estados de carga
   LOADING_STATE: {
     IDLE: "idle",
     LOADING: "loading",
@@ -210,7 +207,6 @@ export const ENUMS = {
     ERROR: "error",
   },
 
-  // Tipos de notificación
   NOTIFICATION_TYPE: {
     SUCCESS: "success",
     ERROR: "error",
@@ -218,13 +214,11 @@ export const ENUMS = {
     INFO: "info",
   },
 
-  // Direcciones de ordenamiento
   SORT_DIRECTION: {
     ASC: "asc",
     DESC: "desc",
   },
 
-  // Tipos de vista
   VIEW_TYPE: {
     TABLE: "table",
     GRID: "grid",
@@ -233,12 +227,8 @@ export const ENUMS = {
   },
 };
 
-/**
- * CONFIGURACIÓN DE COLUMNAS DE DATOS
- * Define las columnas disponibles para análisis
- */
+// Configuración de columnas de datos
 export const DATA_COLUMNS = {
-  // Columnas fijas (siempre presentes)
   FIXED: [
     "ball speed (mph)",
     "launch angle (deg)",
@@ -254,7 +244,6 @@ export const DATA_COLUMNS = {
     "club path (deg out-in-/in-out+)",
   ],
 
-  // Columnas opcionales
   OPTIONAL: [
     "club name",
     "shot number",
@@ -263,7 +252,6 @@ export const DATA_COLUMNS = {
     "player id",
   ],
 
-  // Configuración de columnas para exportación
   EXPORT: {
     PDF: {
       columns: [
@@ -290,36 +278,31 @@ export const DATA_COLUMNS = {
   },
 };
 
-/**
- * CONFIGURACIÓN DE COLORES
- * Paleta de colores para gráficos y visualizaciones
- */
+// Configuración de colores
 export const COLOR_PALETTE = {
-  // Colores principales para palos
   CLUB_COLORS: [
-    "#FF6B6B", // Driver - Rojo
-    "#4ECDC4", // Madera 1 - Turquesa
-    "#45B7D1", // Madera 3 - Azul claro
-    "#96CEB4", // Madera 5 - Verde claro
-    "#FFEEAD", // Híbrido 1 - Amarillo claro
-    "#D4A5A5", // Híbrido 2 - Rosa claro
-    "#9B59B6", // Hierro 1 - Púrpura
-    "#3498DB", // Hierro 2 - Azul
-    "#E74C3C", // Hierro 3 - Rojo
-    "#2ECC71", // Hierro 4 - Verde
-    "#F1C40F", // Hierro 5 - Amarillo
-    "#E67E22", // Hierro 6 - Naranja
-    "#1ABC9C", // Hierro 7 - Verde azulado
-    "#8E44AD", // Hierro 8 - Violeta
-    "#C0392B", // Hierro 9 - Rojo oscuro
-    "#27AE60", // PW - Verde oscuro
-    "#F39C12", // GW - Naranja claro
-    "#E74C3C", // SW - Rojo
-    "#9B59B6", // LW - Púrpura
-    "#34495E", // Putter - Gris oscuro
+    "#FF6B6B",
+    "#4ECDC4",
+    "#45B7D1",
+    "#96CEB4",
+    "#FFEEAD",
+    "#D4A5A5",
+    "#9B59B6",
+    "#3498DB",
+    "#E74C3C",
+    "#2ECC71",
+    "#F1C40F",
+    "#E67E22",
+    "#1ABC9C",
+    "#8E44AD",
+    "#C0392B",
+    "#27AE60",
+    "#F39C12",
+    "#E74C3C",
+    "#9B59B6",
+    "#34495E",
   ],
 
-  // Colores para estados
   STATE_COLORS: {
     success: "#27ae60",
     error: "#e74c3c",
@@ -328,28 +311,19 @@ export const COLOR_PALETTE = {
     neutral: "#95a5a6",
   },
 
-  // Colores para rangos de distancia
   DISTANCE_COLORS: {
-    short: "#27ae60", // Verde para distancias cortas
-    medium: "#f39c12", // Naranja para distancias medias
-    long: "#e74c3c", // Rojo para distancias largas
+    short: "#27ae60",
+    medium: "#f39c12",
+    long: "#e74c3c",
   },
 };
 
-/**
- * FUNCIONES HELPER
- * Funciones utilitarias reutilizables
- */
-
-/**
- * Formatear nombre de palo
- * Convierte códigos de palo en nombres legibles
- *
- * @param {string} clubCode - Código del palo
- * @param {boolean} short - Si retornar versión corta
- * @returns {string} Nombre formateado del palo
- */
+// Funciones helper
 export function formatClubName(clubCode, short = false) {
+  if (!clubCode || typeof clubCode !== "string") {
+    return clubCode || "Unknown";
+  }
+
   const club = GOLF_CONSTANTS.CLUBS[clubCode.toUpperCase()];
   if (club) {
     return short ? club.shortName : club.name;
@@ -357,13 +331,6 @@ export function formatClubName(clubCode, short = false) {
   return clubCode;
 }
 
-/**
- * Obtener color para un palo
- * Asigna un color específico a cada palo
- *
- * @param {string} clubCode - Código del palo
- * @returns {string} Color hexadecimal
- */
 export function getClubColor(clubCode) {
   const clubIndex = Object.keys(GOLF_CONSTANTS.CLUBS).indexOf(
     clubCode.toUpperCase()
@@ -373,30 +340,13 @@ export function getClubColor(clubCode) {
   ];
 }
 
-/**
- * Validar rango de valor
- * Verifica si un valor está dentro del rango esperado
- *
- * @param {number} value - Valor a validar
- * @param {string} metric - Métrica a validar
- * @returns {boolean} True si está en rango
- */
 export function validateMetricRange(value, metric) {
   const metricConfig = GOLF_CONSTANTS.METRICS[metric.toUpperCase()];
-  if (!metricConfig) return true; // Si no hay configuración, asumir válido
+  if (!metricConfig) return true;
 
   return value >= metricConfig.min && value <= metricConfig.max;
 }
 
-/**
- * Formatear número con unidades
- * Formatea un número con su unidad correspondiente
- *
- * @param {number} value - Valor numérico
- * @param {string} metric - Métrica
- * @param {number} decimals - Número de decimales
- * @returns {string} Valor formateado
- */
 export function formatMetric(value, metric, decimals = 1) {
   const metricConfig = GOLF_CONSTANTS.METRICS[metric.toUpperCase()];
   if (!metricConfig) return value.toString();
@@ -407,13 +357,6 @@ export function formatMetric(value, metric, decimals = 1) {
   return `${formattedValue} ${metricConfig.unit}`;
 }
 
-/**
- * Calcular rango de distancia
- * Determina el rango de distancia para un valor
- *
- * @param {number} distance - Distancia en yardas
- * @returns {string} Etiqueta del rango
- */
 export function getDistanceRange(distance) {
   const range = GOLF_CONSTANTS.YARDAGE_RANGES.find(
     (r) => distance >= r.min && distance <= r.max
@@ -421,27 +364,12 @@ export function getDistanceRange(distance) {
   return range ? range.label : "Fuera de rango";
 }
 
-/**
- * Obtener color por distancia
- * Asigna color según el rango de distancia
- *
- * @param {number} distance - Distancia en yardas
- * @returns {string} Color hexadecimal
- */
 export function getDistanceColor(distance) {
   if (distance < 100) return COLOR_PALETTE.DISTANCE_COLORS.short;
   if (distance < 200) return COLOR_PALETTE.DISTANCE_COLORS.medium;
   return COLOR_PALETTE.DISTANCE_COLORS.long;
 }
 
-/**
- * Formatear fecha
- * Formatea una fecha en formato legible
- *
- * @param {string|Date} date - Fecha a formatear
- * @param {string} format - Formato deseado
- * @returns {string} Fecha formateada
- */
 export function formatDate(date, format = "DD/MM/YYYY HH:mm") {
   const d = new Date(date);
 
@@ -467,13 +395,6 @@ export function formatDate(date, format = "DD/MM/YYYY HH:mm") {
   }
 }
 
-/**
- * Obtener tiempo relativo
- * Convierte una fecha en tiempo relativo (ej: "hace 2 horas")
- *
- * @param {Date} date - Fecha a convertir
- * @returns {string} Tiempo relativo
- */
 function getRelativeTime(date) {
   const now = new Date();
   const diff = now - date;
@@ -489,27 +410,12 @@ function getRelativeTime(date) {
   return formatDate(date, "DD/MM/YYYY");
 }
 
-/**
- * Generar ID único
- * Genera un identificador único
- *
- * @param {string} prefix - Prefijo opcional
- * @returns {string} ID único
- */
 export function generateId(prefix = "") {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substr(2, 5);
   return `${prefix}${timestamp}${random}`;
 }
 
-/**
- * Debounce
- * Limita la frecuencia de ejecución de una función
- *
- * @param {Function} func - Función a debounce
- * @param {number} wait - Tiempo de espera en ms
- * @returns {Function} Función debounced
- */
 export function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -522,14 +428,6 @@ export function debounce(func, wait) {
   };
 }
 
-/**
- * Throttle
- * Limita la frecuencia de ejecución de una función
- *
- * @param {Function} func - Función a throttle
- * @param {number} limit - Límite de tiempo en ms
- * @returns {Function} Función throttled
- */
 export function throttle(func, limit) {
   let inThrottle;
   return function () {
@@ -543,13 +441,6 @@ export function throttle(func, limit) {
   };
 }
 
-/**
- * Clonar objeto profundo
- * Crea una copia profunda de un objeto
- *
- * @param {any} obj - Objeto a clonar
- * @returns {any} Objeto clonado
- */
 export function deepClone(obj) {
   if (obj === null || typeof obj !== "object") return obj;
   if (obj instanceof Date) return new Date(obj.getTime());
@@ -565,61 +456,27 @@ export function deepClone(obj) {
   }
 }
 
-/**
- * Validar email
- * Verifica si un email tiene formato válido
- *
- * @param {string} email - Email a validar
- * @returns {boolean} True si es válido
- */
 export function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
-/**
- * Capitalizar primera letra
- * Capitaliza la primera letra de una cadena
- *
- * @param {string} str - Cadena a capitalizar
- * @returns {string} Cadena capitalizada
- */
 export function capitalize(str) {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-/**
- * Formatear número con separadores
- * Formatea un número con separadores de miles
- *
- * @param {number} num - Número a formatear
- * @param {string} locale - Locale para formateo
- * @returns {string} Número formateado
- */
 export function formatNumber(num, locale = "es-ES") {
   return new Intl.NumberFormat(locale).format(num);
 }
 
-/**
- * Obtener porcentaje
- * Calcula el porcentaje de un valor respecto a un total
- *
- * @param {number} value - Valor
- * @param {number} total - Total
- * @param {number} decimals - Decimales
- * @returns {string} Porcentaje formateado
- */
 export function getPercentage(value, total, decimals = 1) {
   if (total === 0) return "0%";
   const percentage = (value / total) * 100;
   return `${percentage.toFixed(decimals)}%`;
 }
 
-/**
- * CONFIGURACIÓN DE LOCALIZACIÓN
- * Configuraciones específicas por idioma/región
- */
+// Configuración de localización
 export const LOCALE_CONFIG = {
   "es-ES": {
     dateFormat: "DD/MM/YYYY",
@@ -639,10 +496,7 @@ export const LOCALE_CONFIG = {
   },
 };
 
-/**
- * CONFIGURACIÓN DE EXPORTACIÓN
- * Configuraciones para diferentes tipos de exportación
- */
+// Configuración de exportación
 export const EXPORT_CONFIG = {
   PDF: {
     pageSize: "A4",

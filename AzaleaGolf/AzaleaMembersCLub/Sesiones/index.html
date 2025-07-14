@@ -17,23 +17,40 @@
     <script type="module" src="../auth.js"></script>
     <script type="module" src="script.js"></script>
     <script type="module" src="heatmap.js"></script>
-    <script type="module" src="js/shots.js"></script>
+    <!-- <script type="module" src="js/shots.js"></script> -->
   </head>
   <body>
     <header class="header">
-      <div class="logo">
-        <img
-          src="../img/logo.jpg"
-          class="logoimg"
-          alt="Foresight Sports Logo"
-        />
+      <div class="header-container">
+        <div class="logo">
+          <img
+            src="../img/logo.jpg"
+            class="logoimg"
+            alt="Foresight Sports Logo"
+          />
+        </div>
+        <nav class="nav">
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a href="../index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link auth-button">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="mobile-menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
-      <nav class="nav">
-        <ul>
-          <li><a href="../index.html">Inicio</a></li>
-          <li><a href="#" class="auth-button">Cerrar Sesión</a></li>
-        </ul>
-      </nav>
     </header>
 
     <section class="sessions">
@@ -60,15 +77,6 @@
       ></canvas>
     </section>
 
-    <footer class="footer">
-      <p>© 2025 Foresight Sports. Todos los derechos reservados.</p>
-      <ul class="footer-links">
-        <li><a href="#">Política de Privacidad</a></li>
-        <li><a href="#">Términos de Servicio</a></li>
-        <li><a href="#">Contacto</a></li>
-      </ul>
-    </footer>
-
     <!-- Modal de YardageBook -->
     <div id="yardageBookModal" class="modal">
       <!-- El contenido del modal se genera dinámicamente en JavaScript -->
@@ -80,21 +88,50 @@
         onAuthStateChanged,
         signOut,
       } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-      import { exportSessionToPDF } from "./pdfExport.js";
       import {
-        currentData,
-        selectedShots,
-        clubColors,
-        formatClubName,
-      } from "./script.js";
+        getDoc,
+        doc,
+      } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+      import { db } from "../db.js";
+      import { exportSessionToPDF } from "./pdfExport.js";
+      import { currentData, selectedShots, formatClubName } from "./script.js";
+      import { clubColors } from "../utils/constants.js";
 
       // Verificar el estado de autenticación
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(auth, async (user) => {
         const authButton = document.querySelector(".auth-button");
 
         if (!user) {
           window.location.href = "../login.html";
         } else {
+          // Obtener datos del usuario
+          try {
+            const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+            const userData = userDoc.data();
+
+            // Crear o actualizar el mensaje de bienvenida
+            let userInfo = document.querySelector(".user-info");
+            if (!userInfo) {
+              userInfo = document.createElement("span");
+              userInfo.className = "user-info";
+              authButton.parentElement.insertBefore(userInfo, authButton);
+            }
+            async function getUserFullName(uid) {
+              const userDocRef = doc(db, "Simulador", uid);
+              const userDoc = await getDoc(userDocRef);
+              if (userDoc.exists()) {
+                const userData = userDoc.data();
+                return `${userData.nombre} ${userData.apellido}`;
+              }
+              return "Usuario";
+            }
+            const fullName = await getUserFullName(user.uid);
+
+            userInfo.textContent = `Bienvenido, ${fullName}`;
+          } catch (error) {
+            console.error("Error al obtener datos del usuario:", error);
+          }
+
           // Configurar el botón de cerrar sesión
           authButton.addEventListener("click", async (e) => {
             e.preventDefault();
@@ -102,7 +139,6 @@
               await signOut(auth);
               window.location.href = "../login.html";
             } catch (error) {
-              console.error("Error al cerrar sesión:", error);
               alert("Error al cerrar sesión. Por favor, intente nuevamente.");
             }
           });
@@ -118,7 +154,6 @@
 
       // Asegurar que las funciones de heatmap estén disponibles
       if (typeof window.createScatterPlot === "undefined") {
-        console.warn("⚠️ createScatterPlot no está disponible globalmente");
       }
 
       // Función para actualizar selección y plot

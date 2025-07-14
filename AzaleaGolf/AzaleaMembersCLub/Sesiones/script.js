@@ -3,10 +3,16 @@ import {
   doc,
   getDoc,
   updateDoc,
+  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { exportSessionToPDF } from "./pdfExport.js";
 import { createYardageBook, handleYardageBookError } from "./yardageBook.js";
+import {
+  formatClubName,
+  getClubColor,
+  clubColors,
+} from "../utils/constants.js";
 
 // Orden fijo de columnas (sin club name ni shot number)
 const fixedColumns = [
@@ -23,82 +29,6 @@ const fixedColumns = [
   "angle of attack (deg)",
   "club path (deg out-in-/in-out+)",
 ];
-
-// Paleta de colores para los palos
-const clubColors = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#45B7D1",
-  "#96CEB4",
-  "#FFEEAD",
-  "#D4A5A5",
-  "#9B59B6",
-  "#3498DB",
-  "#E74C3C",
-  "#2ECC71",
-  "#F1C40F",
-  "#E67E22",
-  "#1ABC9C",
-  "#8E44AD",
-  "#C0392B",
-];
-
-// Función para formatear el nombre del palo
-function formatClubName(clubName, short = false) {
-  const clubNames = {
-    Dr: short ? "Dr" : "Driver",
-    "1w": short ? "M1" : "Madera 1",
-    "2w": short ? "M2" : "Madera 2",
-    "3w": short ? "M3" : "Madera 3",
-    "4w": short ? "M4" : "Madera 4",
-    "5w": short ? "M5" : "Madera 5",
-    "6w": short ? "M6" : "Madera 6",
-    "7w": short ? "M7" : "Madera 7",
-    "8w": short ? "M8" : "Madera 8",
-    "9w": short ? "M9" : "Madera 9",
-    "1h": short ? "H1" : "Híbrido 1",
-    "2h": short ? "H2" : "Híbrido 2",
-    "3h": short ? "H3" : "Híbrido 3",
-    "4h": short ? "H4" : "Híbrido 4",
-    "5h": short ? "H5" : "Híbrido 5",
-    "6h": short ? "H6" : "Híbrido 6",
-    "7h": short ? "H7" : "Híbrido 7",
-    "8h": short ? "H8" : "Híbrido 8",
-    "1i": short ? "H1" : "Hierro 1",
-    "2i": short ? "H2" : "Hierro 2",
-    "3i": short ? "H3" : "Hierro 3",
-    "4i": short ? "H4" : "Hierro 4",
-    "5i": short ? "H5" : "Hierro 5",
-    "6i": short ? "H6" : "Hierro 6",
-    "7i": short ? "H7" : "Hierro 7",
-    "8i": short ? "H8" : "Hierro 8",
-    "9i": short ? "H9" : "Hierro 9",
-    Pw: short ? "PW" : "Pitching Wedge",
-    Gw: short ? "GW" : "Gap Wedge",
-    Sw: short ? "SW" : "Sand Wedge",
-    Lw: short ? "LW" : "Lob Wedge",
-    47: short ? "W47" : "Wedge 47°",
-    48: short ? "W48" : "Wedge 48°",
-    49: short ? "W49" : "Wedge 49°",
-    50: short ? "W50" : "Wedge 50°",
-    51: short ? "W51" : "Wedge 51°",
-    52: short ? "W52" : "Wedge 52°",
-    53: short ? "W53" : "Wedge 53°",
-    54: short ? "W54" : "Wedge 54°",
-    55: short ? "W55" : "Wedge 55°",
-    56: short ? "W56" : "Wedge 56°",
-    57: short ? "W57" : "Wedge 57°",
-    58: short ? "W58" : "Wedge 58°",
-    59: short ? "W59" : "Wedge 59°",
-    60: short ? "W60" : "Wedge 60°",
-    61: short ? "W61" : "Wedge 61°",
-    62: short ? "W62" : "Wedge 62°",
-    63: short ? "W63" : "Wedge 63°",
-    64: short ? "W64" : "Wedge 64°",
-    Putter: short ? "Warm Up" : "Warm Up",
-  };
-  return clubNames[clubName] || clubName;
-}
 
 // Función para obtener el orden de los palos
 function getClubOrder(clubName) {
@@ -432,13 +362,15 @@ function updateClubAverages() {
     const clubShots = currentData.filter((shot) => shot["club name"] === club);
     const averages = calculateClubAverages(club, clubShots);
 
-    // Actualizar las celdas de promedio
-    const cells = row.querySelectorAll(
-      "td:not(:first-child):not(:nth-child(2))"
-    );
-    cells.forEach((cell, index) => {
-      cell.textContent = averages[index];
-    });
+    // Actualizar las celdas de promedio (excluir checkbox y nombre del palo)
+    const cells = row.querySelectorAll("td");
+    // Empezar desde el índice 2 (después de checkbox y nombre del palo)
+    for (let i = 2; i < cells.length; i++) {
+      const averageIndex = i - 2;
+      if (averages[averageIndex] !== undefined) {
+        cells[i].textContent = averages[averageIndex];
+      }
+    }
   });
 }
 
@@ -455,10 +387,12 @@ async function getUserFullName(uid) {
 
 // Función para guardar las sesiones seleccionadas
 function saveSelectedSessions() {
-  localStorage.setItem(
-    "yardageBookSessions",
-    JSON.stringify(Array.from(yardageBookSessions))
-  );
+  try {
+    const sessionsArray = Array.from(yardageBookSessions);
+    localStorage.setItem("yardageBookSessions", JSON.stringify(sessionsArray));
+  } catch (error) {
+    // Error al guardar sesiones seleccionadas
+  }
 }
 
 // Función para guardar los tiros deseleccionados
@@ -470,10 +404,31 @@ function saveDeselectedShots() {
 }
 
 // Función para cargar las sesiones seleccionadas
-function loadSelectedSessions() {
+function loadSelectedSessions(sessionsLength = null) {
   const savedSessions = localStorage.getItem("yardageBookSessions");
+
   if (savedSessions) {
-    yardageBookSessions = new Set(JSON.parse(savedSessions));
+    try {
+      let sessionsArray = JSON.parse(savedSessions);
+      // Si se pasa la cantidad de sesiones, filtrar los índices inválidos
+      if (sessionsLength !== null) {
+        const filtered = sessionsArray.filter(
+          (idx) => idx >= 0 && idx < sessionsLength
+        );
+        if (filtered.length !== sessionsArray.length) {
+          sessionsArray = filtered;
+          localStorage.setItem(
+            "yardageBookSessions",
+            JSON.stringify(sessionsArray)
+          );
+        }
+      }
+      yardageBookSessions = new Set(sessionsArray);
+    } catch (error) {
+      yardageBookSessions = new Set();
+    }
+  } else {
+    yardageBookSessions = new Set();
   }
 }
 
@@ -604,17 +559,13 @@ function showResetConfirmation() {
 
 // Función para mostrar el modal de YardageBook
 async function showYardageBookModal() {
-  console.log("🚀 Abriendo modal de YardageBook...");
-
   // Verificar que las dependencias estén disponibles
   if (typeof auth === "undefined") {
-    console.error("❌ Firebase auth no está disponible");
     alert("Error: Firebase no está inicializado");
     return;
   }
 
   if (typeof db === "undefined") {
-    console.error("❌ Firebase db no está disponible");
     alert("Error: Base de datos no está inicializada");
     return;
   }
@@ -622,7 +573,6 @@ async function showYardageBookModal() {
   // Esperar a que el usuario esté autenticado
   let user = auth.currentUser;
   if (!user) {
-    console.log("⏳ Esperando autenticación del usuario...");
     try {
       await new Promise((resolve) => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -632,28 +582,21 @@ async function showYardageBookModal() {
       });
       user = auth.currentUser;
     } catch (error) {
-      console.error("❌ Error al esperar autenticación:", error);
       alert("Error al verificar autenticación");
       return;
     }
   }
 
   if (!user || !user.uid) {
-    console.error("❌ Usuario no autenticado o UID inválido");
     alert("Por favor, inicia sesión para crear un YardageBook");
     return;
   }
 
-  console.log("✅ Usuario autenticado:", user.email, "UID:", user.uid);
-
   const modal = document.getElementById("yardageBookModal");
   if (!modal) {
-    console.error("❌ No se encontró el modal yardageBookModal");
     alert("Error: Modal no encontrado. Recarga la página.");
     return;
   }
-
-  console.log("✅ Modal encontrado, creando contenido...");
 
   // Crear contenido del modal
   modal.innerHTML = `
@@ -720,12 +663,12 @@ async function showYardageBookModal() {
           <i class="fas fa-lightbulb"></i> Tip: Selecciona múltiples sesiones para obtener datos más precisos
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button onclick="createYardageBookFromModal()" class="create-yardagebook-btn" style="background: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+          <button onclick="createYardageBookFromModal()" class="create-yardagebook-btn">
             <i class="fas fa-download"></i> Descargar YardageBook
           </button>
 
-          <button onclick="closeYardageBookModal()" style="background: #6c757d; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
-            Cancelar
+          <button onclick="closeYardageBookModal()" class="cancel-btn">
+            <i class="fas fa-times"></i> Cancelar
           </button>
         </div>
       </div>
@@ -733,17 +676,16 @@ async function showYardageBookModal() {
   `;
 
   // Mostrar el modal
-  console.log("✅ Mostrando modal...");
   modal.style.display = "block";
   modal.classList.add("show");
 
+  // Cargar sesiones seleccionadas guardadas ANTES de cargar las sesiones
+  loadSelectedSessions();
+
   // Cargar sesiones
-  console.log("📋 Cargando sesiones...");
   try {
     await loadSessionsForYardageBook();
-    console.log("✅ Sesiones cargadas exitosamente");
   } catch (error) {
-    console.error("❌ Error al cargar sesiones:", error);
     const sessionsList = document.getElementById("yardageBookSessionsList");
     if (sessionsList) {
       sessionsList.innerHTML = `
@@ -757,12 +699,10 @@ async function showYardageBookModal() {
   }
 
   // Configurar sliders
-  console.log("🎛️ Configurando sliders...");
   try {
     setupYardageBookSliders();
-    console.log("✅ Sliders configurados exitosamente");
   } catch (error) {
-    console.error("❌ Error al configurar sliders:", error);
+    // Error al configurar sliders
   }
 
   // Agregar event listener para cerrar al hacer clic fuera del modal
@@ -776,17 +716,13 @@ async function showYardageBookModal() {
 
     modal.addEventListener("click", handleModalClick);
     modal.setAttribute("data-modal-initialized", "true");
-    console.log("✅ Event listener del modal agregado");
   }
 }
 
 // Función para cargar sesiones en el modal
 async function loadSessionsForYardageBook() {
-  console.log("🔍 Cargando sesiones para yardage book...");
-
   const user = auth.currentUser;
   if (!user) {
-    console.error("❌ No hay usuario autenticado");
     throw new Error("Usuario no autenticado");
   }
 
@@ -796,7 +732,9 @@ async function loadSessionsForYardageBook() {
 
     if (userDoc.exists()) {
       const sessions = userDoc.data().Sesiones || [];
-      console.log(`📊 Encontradas ${sessions.length} sesiones`);
+
+      // Limpiar índices inválidos al cargar sesiones seleccionadas
+      loadSelectedSessions(sessions.length);
 
       if (sessions.length === 0) {
         const sessionsList = document.getElementById("yardageBookSessionsList");
@@ -812,17 +750,46 @@ async function loadSessionsForYardageBook() {
         return;
       }
 
-      sessions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+      // Crear una copia ordenada de las sesiones
+      const sortedSessions = [...sessions].sort(
+        (a, b) => new Date(b.fecha) - new Date(a.fecha)
+      );
+
+      console.log(
+        `📊 Sesiones originales:`,
+        sessions.map((s, i) => ({
+          index: i,
+          fecha: s.fecha,
+          shotCount: s.stats?.shotCount,
+        }))
+      );
+      console.log(
+        `📊 Sesiones ordenadas:`,
+        sortedSessions.map((s, i) => ({
+          displayIndex: i,
+          fecha: s.fecha,
+          shotCount: s.stats?.shotCount,
+        }))
+      );
 
       const sessionsList = document.getElementById("yardageBookSessionsList");
       if (!sessionsList) {
-        console.error("❌ No se encontró el elemento yardageBookSessionsList");
         throw new Error("Elemento de lista no encontrado");
       }
 
       sessionsList.innerHTML = "";
 
-      sessions.forEach((session, index) => {
+      sortedSessions.forEach((session, displayIndex) => {
+        // Encontrar el índice original de la sesión
+        const originalIndex = sessions.findIndex(
+          (s) =>
+            s.fecha === session.fecha &&
+            s.stats?.shotCount === session.stats?.shotCount
+        );
+
+        console.log(
+          `🔍 Sesión ${displayIndex}: fecha=${session.fecha}, shotCount=${session.stats?.shotCount}, originalIndex=${originalIndex}`
+        );
         try {
           const shotCount =
             session.stats?.shotCount ||
@@ -852,91 +819,84 @@ async function loadSessionsForYardageBook() {
           const sessionDiv = document.createElement("div");
           sessionDiv.className = "session-item-yardagebook";
           sessionDiv.style.cssText = `
+          display: flex;
+          align-items: center;
+          padding: 12px 15px;
+          margin-bottom: 8px;
           background: #3d3d3d;
           border: 1px solid #404040;
-          border-radius: 8px;
-          padding: 15px;
-          margin-bottom: 10px;
-          transition: all 0.3s ease;
+          border-radius: 6px;
+          transition: all 0.2s ease;
           cursor: pointer;
         `;
 
+          // Verificar si esta sesión está seleccionada
+          const isSelected = yardageBookSessions.has(originalIndex);
+          console.log(
+            `🔍 Checkbox para sesión ${originalIndex}: ${
+              isSelected ? "✅ MARCADO" : "❌ DESMARCADO"
+            }`
+          );
+
           sessionDiv.innerHTML = `
-          <div class="session-header" style="display: flex; align-items: center; margin-bottom: 10px;">
-            <input type="checkbox" id="session${index}" 
-                   onchange="toggleSessionSelection(${index})"
-                   style="margin-right: 12px; transform: scale(1.2);">
-            <label for="session${index}" style="flex: 1; cursor: pointer;">
-              <strong style="color: #4caf50; font-size: 16px;">
-                📅 Sesión del ${new Date(session.fecha).toLocaleDateString(
-                  "es-ES",
-                  {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  }
-                )}
-              </strong>
-            </label>
-          </div>
-          <div class="session-details" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
-            <div style="text-align: center; padding: 8px; background: #2d2d2d; border-radius: 4px;">
-              <div style="color: #ff9800; font-weight: bold;">${shotCount}</div>
-              <div style="color: #b3b3b3; font-size: 12px;">Tiros Totales</div>
+          <input type="checkbox" id="session${originalIndex}" 
+                 onchange="toggleSessionSelection(${originalIndex})"
+                 ${isSelected ? "checked" : ""}>
+          <div style="flex: 1; display: flex; align-items: center; justify-content: space-between;">
+            <div style="flex: 1;">
+              <div style="color: #4caf50; font-weight: bold; font-size: 14px; margin-bottom: 2px;">
+                📅 ${new Date(session.fecha).toLocaleDateString("es-ES", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
+              <div style="color: #b3b3b3; font-size: 12px;">
+                <i class="fas fa-golf-ball"></i> ${
+                  clubsList || "No hay datos de palos"
+                }
+              </div>
             </div>
-            <div style="text-align: center; padding: 8px; background: #2d2d2d; border-radius: 4px;">
-              <div style="color: #4caf50; font-weight: bold;">${validShots}</div>
-              <div style="color: #b3b3b3; font-size: 12px;">Tiros Válidos</div>
-            </div>
-          </div>
-          <div class="session-clubs" style="margin-top: 10px; padding: 8px; background: #2d2d2d; border-radius: 4px;">
-            <div style="color: #2196f3; font-weight: bold; font-size: 12px; margin-bottom: 5px;">
-              <i class="fas fa-golf-ball"></i> Palos utilizados:
-            </div>
-            <div style="color: #b3b3b3; font-size: 12px;">
-              ${clubsList || "No hay datos de palos"}
+            <div style="display: flex; gap: 20px; align-items: center;">
+              <div style="text-align: center; min-width: 60px;">
+                <div style="color: #ff9800; font-weight: bold; font-size: 13px;">${shotCount}</div>
+                <div style="color: #b3b3b3; font-size: 11px;">Total</div>
+              </div>
+              <div style="text-align: center; min-width: 60px;">
+                <div style="color: #4caf50; font-weight: bold; font-size: 13px;">${validShots}</div>
+                <div style="color: #b3b3b3; font-size: 11px;">Válidos</div>
+              </div>
             </div>
           </div>
         `;
 
-          // Agregar efecto hover
+          // Agregar efecto hover más sutil
           sessionDiv.addEventListener("mouseenter", function () {
-            this.style.transform = "translateY(-2px)";
-            this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+            this.style.background = "#4a4a4a";
             this.style.borderColor = "#4caf50";
           });
 
           sessionDiv.addEventListener("mouseleave", function () {
-            this.style.transform = "translateY(0)";
-            this.style.boxShadow = "none";
+            this.style.background = "#3d3d3d";
             this.style.borderColor = "#404040";
           });
 
           sessionsList.appendChild(sessionDiv);
-        } catch (sessionError) {
-          console.error(`❌ Error al procesar sesión ${index}:`, sessionError);
-        }
+        } catch (sessionError) {}
       });
-
-      console.log("✅ Sesiones cargadas exitosamente en el modal");
     } else {
-      console.error("❌ No se encontró el documento del usuario");
       throw new Error("Documento de usuario no encontrado");
     }
   } catch (error) {
-    console.error("❌ Error al cargar sesiones:", error);
     throw error;
   }
 }
 
 // Función para crear el yardage book
 async function createYardageBookFromModal() {
-  console.log("🚀 Iniciando creación de YardageBook desde modal...");
-
   try {
     // Verificar que hay sesiones seleccionadas
     if (yardageBookSessions.size === 0) {
-      console.log("❌ No hay sesiones seleccionadas");
       alert(
         "Por favor, selecciona al menos una sesión para crear el YardageBook"
       );
@@ -945,7 +905,6 @@ async function createYardageBookFromModal() {
 
     // Verificar que la función createYardageBook esté disponible
     if (typeof createYardageBook !== "function") {
-      console.error("❌ La función createYardageBook no está disponible");
       alert("Error: Función de creación de YardageBook no disponible");
       return;
     }
@@ -955,7 +914,6 @@ async function createYardageBookFromModal() {
     const lateralSlider = document.getElementById("lateralSlider");
 
     if (!deviationSlider || !lateralSlider) {
-      console.error("❌ No se encontraron los sliders");
       alert("Error: Configuración de sliders no encontrada");
       return;
     }
@@ -963,26 +921,17 @@ async function createYardageBookFromModal() {
     const deviationPercentage = parseInt(deviationSlider.value || 75) / 100;
     const lateralPercentage = parseInt(lateralSlider.value || 75) / 100;
 
-    console.log("📚 Configuración del YardageBook:");
-    console.log("- Sesiones seleccionadas:", yardageBookSessions.size);
-    console.log("- Desviación:", deviationPercentage);
-    console.log("- Dispersión lateral:", lateralPercentage);
-
     // Obtener datos del usuario
     const user = auth.currentUser;
     if (!user) {
-      console.error("❌ No hay usuario autenticado");
       alert("No hay usuario autenticado");
       return;
     }
-
-    console.log("✅ Usuario autenticado:", user.email);
 
     const userDocRef = doc(db, "Simulador", user.uid);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
-      console.error("❌ No se encontraron datos del usuario");
       alert("No se encontraron datos del usuario");
       return;
     }
@@ -990,20 +939,45 @@ async function createYardageBookFromModal() {
     const userData = userDoc.data();
     const sessions = userData.Sesiones || [];
 
-    console.log("📊 Total de sesiones disponibles:", sessions.length);
-
-    // Filtrar sesiones seleccionadas
-    const selectedSessions = sessions.filter((session, index) =>
-      yardageBookSessions.has(index)
-    );
+    // Filtrar sesiones seleccionadas - SOLO las que están marcadas en el modal
 
     console.log(
-      "📋 Sesiones seleccionadas para YardageBook:",
-      selectedSessions.length
+      `📊 Sesiones disponibles:`,
+      sessions.map((s, i) => ({
+        index: i,
+        fecha: s.fecha,
+        shotCount: s.stats?.shotCount,
+      }))
+    );
+    console.log(
+      `📊 Índices en yardageBookSessions:`,
+      Array.from(yardageBookSessions)
     );
 
+    const selectedSessions = sessions.filter((session, index) => {
+      const isSelected = yardageBookSessions.has(index);
+      return isSelected;
+    });
+
+    console.log(
+      "- Fechas de sesiones seleccionadas:",
+      selectedSessions.map((s) => s.fecha)
+    );
+
+    // Validación adicional: mostrar detalles de cada sesión seleccionada
+
+    selectedSessions.forEach((session, index) => {
+      const validShots =
+        session.datos?.filter((shot) => shot.selected !== false)?.length || 0;
+      const totalShots = session.datos?.length || 0;
+      console.log(
+        `  Sesión ${index + 1}: ${new Date(
+          session.fecha
+        ).toLocaleDateString()} - ${validShots}/${totalShots} tiros válidos`
+      );
+    });
+
     if (selectedSessions.length === 0) {
-      console.error("❌ No se encontraron sesiones válidas");
       alert("No se encontraron sesiones válidas para crear el YardageBook");
       return;
     }
@@ -1015,7 +989,9 @@ async function createYardageBookFromModal() {
       button.disabled = true;
     }
 
-    console.log("🔄 Llamando a createYardageBook...");
+    console.log(
+      "✅ CONFIRMACIÓN: Solo se procesarán las sesiones seleccionadas en el modal"
+    );
 
     // Crear yardagebook con configuración personalizada
     await createYardageBook(
@@ -1023,8 +999,6 @@ async function createYardageBookFromModal() {
       deviationPercentage,
       lateralPercentage
     );
-
-    console.log("✅ YardageBook creado exitosamente");
 
     // Restaurar botón
     if (button) {
@@ -1039,9 +1013,6 @@ async function createYardageBookFromModal() {
     // Mostrar mensaje de éxito
     alert("YardageBook creado exitosamente");
   } catch (error) {
-    console.error("❌ Error al crear yardagebook:", error);
-    console.error("Stack trace:", error.stack);
-
     // Restaurar botón en caso de error
     const button = document.querySelector(".create-yardagebook-btn");
     if (button) {
@@ -1056,12 +1027,8 @@ async function createYardageBookFromModal() {
 
 // Función para configurar sliders
 function setupYardageBookSliders() {
-  console.log("🎛️ Iniciando configuración de sliders...");
   const deviationSlider = document.getElementById("deviationSlider");
   const lateralSlider = document.getElementById("lateralSlider");
-
-  console.log("Deviation slider encontrado:", !!deviationSlider);
-  console.log("Lateral slider encontrado:", !!lateralSlider);
 
   if (deviationSlider) {
     // Estilo del slider
@@ -1148,7 +1115,6 @@ function setupYardageBookSliders() {
     }
   `;
   document.head.appendChild(style);
-  console.log("✅ Estilos de sliders agregados al head");
 }
 
 // Función para cerrar el modal
@@ -1167,8 +1133,6 @@ function closeYardageBookModal() {
 
     // Restaurar el estado de la página principal si es necesario
     restoreMainPageState();
-
-    console.log("✅ Modal cerrado y limpiado correctamente");
   }
 }
 
@@ -1177,8 +1141,6 @@ function restoreMainPageState() {
   // Verificar si hay una sesión activa y restaurar su estado
   const activeSession = document.querySelector(".session-item.active");
   if (activeSession && currentData && currentData.length > 0) {
-    console.log("🔄 Restaurando estado de la página principal...");
-
     // Asegurar que la tabla de tiros esté visible
     const shotsTableContainer = document.getElementById("shotsTableContainer");
     if (shotsTableContainer) {
@@ -1187,8 +1149,6 @@ function restoreMainPageState() {
 
     // Asegurar que el switch esté visible
     showSwitchContainer(true);
-
-    console.log("✅ Estado de la página principal restaurado");
   }
 }
 
@@ -1209,9 +1169,8 @@ function displayShotsTable(data, sessionIndex) {
     const club = row["club name"];
     if (!groupedData[club]) groupedData[club] = [];
     groupedData[club].push({ ...row, originalIndex: index });
-    if (typeof clubVisibility[club] === "undefined") {
-      clubVisibility[club] = false;
-    }
+    // Asegurar que todos los palos estén replegados inicialmente
+    clubVisibility[club] = false;
   });
 
   const sortedClubs = Object.keys(groupedData).sort(
@@ -1250,13 +1209,13 @@ function displayShotsTable(data, sessionIndex) {
       <button onclick="showColumnSelector()" class="column-selector-btn">
         <i class="fas fa-columns"></i> Seleccionar Columnas
       </button>
-      <button onclick="exportToCSV()">
+      <button onclick="exportToCSV()" class="export-csv-btn">
         <i class="fas fa-file-csv"></i> Exportar a CSV
       </button>
-      <button onclick="exportCurrentSessionToPDF()">
+      <button onclick="exportCurrentSessionToPDF()" class="export-pdf-btn">
         <i class="fas fa-file-pdf"></i> Exportar a PDF
       </button>
-      <button onclick="showYardageBookModal()">
+      <button onclick="showYardageBookModal()" class="yardagebook-btn">
         <i class="fas fa-book"></i> Crear YardageBook
       </button>
     </div>
@@ -1291,9 +1250,15 @@ function displayShotsTable(data, sessionIndex) {
           </div>
         </div>
         <div class="modal-footer">
-          <button onclick="resetToDefaultColumns()" class="reset-btn">Restablecer</button>
-          <button onclick="applyColumnSelection()" class="apply-btn">Aplicar</button>
-          <button onclick="closeColumnSelector()" class="cancel-btn">Cancelar</button>
+          <button onclick="resetToDefaultColumns()" class="reset-btn">
+            <i class="fas fa-undo"></i> Restablecer
+          </button>
+          <button onclick="applyColumnSelection()" class="apply-btn">
+            <i class="fas fa-check"></i> Aplicar
+          </button>
+          <button onclick="closeColumnSelector()" class="cancel-btn">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
         </div>
       </div>
     </div>
@@ -1345,7 +1310,9 @@ function displayShotsTable(data, sessionIndex) {
                 }, this.checked)"
                       ${selectedShots.has(row.originalIndex) ? "checked" : ""}>
                   </td>
-                  <td class="shot-number-cell">${shotIndex + 1}</td>
+                  <td class="shot-number-cell">${
+                    row["shot number"] || shotIndex + 1
+                  }</td>
                   ${getActiveColumns()
                     .map((col) => {
                       const value = row[col];
@@ -1365,6 +1332,9 @@ function displayShotsTable(data, sessionIndex) {
 
   shotsTableContainer.innerHTML = tableHTML;
   shotsTableContainer.classList.add("active");
+
+  // Actualizar los promedios después de generar la tabla
+  updateClubAverages();
 
   // Actualizar el índice de la sesión activa
   const activeSession = document.querySelector(".session-item.active");
@@ -1421,18 +1391,33 @@ async function updateShotSelectionInFirebase(
     const sessions = userData.Sesiones || [];
     if (!sessions[sessionIndex]) throw new Error("Sesión no encontrada");
 
-    // Verificar que el tiro existe
-    if (!sessions[sessionIndex].datos[originalIndex]) {
+    // Obtener el shot number del tiro actual
+    const shotNumber = currentData[originalIndex]?.["shot number"];
+    if (!shotNumber) {
+      console.error(
+        "No se pudo obtener el shot number para el tiro:",
+        originalIndex
+      );
+      throw new Error("Shot number no encontrado");
+    }
+
+    // Buscar el tiro en Firebase por shot number
+    const firebaseIndex = sessions[sessionIndex].datos.findIndex(
+      (shot) => shot["shot number"] === shotNumber
+    );
+
+    if (firebaseIndex === -1) {
       console.error("Tiro no encontrado en Firebase:", {
         sessionIndex,
+        shotNumber,
         originalIndex,
         totalTiros: sessions[sessionIndex].datos.length,
       });
-      throw new Error("Tiro no encontrado");
+      throw new Error("Tiro no encontrado en Firebase");
     }
 
     // Actualizar el campo selected del tiro
-    sessions[sessionIndex].datos[originalIndex].selected = selected;
+    sessions[sessionIndex].datos[firebaseIndex].selected = selected;
 
     // Actualizar en Firebase
     await updateDoc(userDocRef, {
@@ -1440,10 +1425,9 @@ async function updateShotSelectionInFirebase(
     });
 
     console.log(
-      `Tiro ${originalIndex} de la sesión ${sessionIndex} actualizado a ${selected}`
+      `Tiro ${shotNumber} (índice ${firebaseIndex}) de la sesión ${sessionIndex} actualizado a ${selected}`
     );
   } catch (error) {
-    console.error("Error al actualizar la selección del tiro:", error);
     throw error;
   }
 }
@@ -1479,13 +1463,15 @@ window.updateShotSelection = async function (
       );
       const averages = calculateClubAverages(affectedClub, clubShots);
 
-      // Actualizar las celdas de promedio
-      const cells = clubRow.querySelectorAll(
-        "td:not(:first-child):not(:nth-child(2))"
-      );
-      cells.forEach((cell, index) => {
-        cell.textContent = averages[index];
-      });
+      // Actualizar las celdas de promedio (excluir checkbox y nombre del palo)
+      const cells = clubRow.querySelectorAll("td");
+      // Empezar desde el índice 2 (después de checkbox y nombre del palo)
+      for (let i = 2; i < cells.length; i++) {
+        const averageIndex = i - 2;
+        if (averages[averageIndex] !== undefined) {
+          cells[i].textContent = averages[averageIndex];
+        }
+      }
     }
 
     // Actualizar el gráfico de dispersión si existe
@@ -1493,7 +1479,6 @@ window.updateShotSelection = async function (
       requestAnimationFrame(createScatterPlot);
     }
   } catch (error) {
-    console.error("Error al actualizar la selección:", error);
     // Revertir el estado visual en caso de error
     updateCheckboxState(originalIndex, !checked);
     alert("Error al actualizar la selección. Por favor, intente nuevamente.");
@@ -1540,7 +1525,6 @@ window.toggleAllChecks = async function (checked) {
       requestAnimationFrame(createScatterPlot);
     }
   } catch (error) {
-    console.error("Error al actualizar todas las selecciones:", error);
     alert(
       "Error al actualizar las selecciones. Por favor, intente nuevamente."
     );
@@ -1562,8 +1546,12 @@ window.toggleClubShots = function (club) {
         row.classList.add("hidden");
       });
       if (averageRow) {
-        const arrowImg = averageRow.querySelector(".arrow-icon");
-        if (arrowImg) arrowImg.classList.remove("rotated");
+        averageRow.classList.remove("expanded");
+        // Rotar flecha hacia abajo
+        const arrow = averageRow.querySelector(".toggle-cell i");
+        if (arrow) {
+          arrow.style.transform = "rotate(0deg)";
+        }
       }
     }
   });
@@ -1584,16 +1572,20 @@ window.toggleClubShots = function (club) {
         row.classList.add("hidden");
       }
     });
-    const arrowImg = averageRow.querySelector(".arrow-icon");
-    if (arrowImg) {
-      if (clubVisibility[club]) {
-        arrowImg.classList.add("rotated");
-      } else {
-        arrowImg.classList.remove("rotated");
-      }
-    }
+
+    // Actualizar estado expandido de la fila de promedios y rotar flecha
+    const arrow = averageRow.querySelector(".toggle-cell i");
     if (clubVisibility[club]) {
+      averageRow.classList.add("expanded");
+      if (arrow) {
+        arrow.style.transform = "rotate(180deg)";
+      }
       averageRow.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      averageRow.classList.remove("expanded");
+      if (arrow) {
+        arrow.style.transform = "rotate(0deg)";
+      }
     }
   }
 };
@@ -1710,38 +1702,31 @@ window.createYardageBookFromModal = createYardageBookFromModal;
 
 // Función de prueba para diagnosticar problemas
 window.testYardageBookModal = function () {
-  console.log("🧪 Probando modal de YardageBook...");
-
   // Verificar que el modal existe
   const modal = document.getElementById("yardageBookModal");
   if (!modal) {
-    console.error("❌ Modal no encontrado");
     alert("Modal no encontrado. Verifica que el HTML esté cargado.");
     return;
   }
 
   // Verificar que las funciones están disponibles
   if (typeof showYardageBookModal !== "function") {
-    console.error("❌ showYardageBookModal no está disponible");
     alert("Función showYardageBookModal no está disponible");
     return;
   }
 
   if (typeof loadSessionsForYardageBook !== "function") {
-    console.error("❌ loadSessionsForYardageBook no está disponible");
     alert("Función loadSessionsForYardageBook no está disponible");
     return;
   }
 
   // Verificar Firebase
   if (typeof auth === "undefined") {
-    console.error("❌ Firebase auth no está disponible");
     alert("Firebase auth no está disponible");
     return;
   }
 
   if (typeof db === "undefined") {
-    console.error("❌ Firebase db no está disponible");
     alert("Firebase db no está disponible");
     return;
   }
@@ -1754,7 +1739,6 @@ window.testYardageBookModal = function () {
   try {
     showYardageBookModal();
   } catch (error) {
-    console.error("❌ Error al abrir modal:", error);
     alert("Error al abrir modal: " + error.message);
   }
 };
@@ -1817,12 +1801,24 @@ async function loadSessions() {
       const sessionItem = document.createElement("div");
       sessionItem.className = "session-item";
       sessionItem.innerHTML = `
-        <p><strong>Fecha:</strong> ${session.fecha}</p>
-        <p><strong>Cantidad de tiros:</strong> ${session.stats.shotCount}</p>
-        <p><strong>Duración:</strong> ${session.stats.sessionTime}</p>
+        <div class="session-header">
+          <div class="session-info">
+            <p><strong>Fecha:</strong> ${session.fecha}</p>
+            <p><strong>Cantidad de tiros:</strong> ${session.stats.shotCount}</p>
+            <p><strong>Duración:</strong> ${session.stats.sessionTime}</p>
+          </div>
+          <button class="delete-session-btn" onclick="deleteSession('${session.fecha}', event)" title="Eliminar sesión">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
       `;
 
-      sessionItem.addEventListener("click", () => {
+      sessionItem.addEventListener("click", (event) => {
+        // No activar la sesión si se hace clic en el botón de eliminar
+        if (event.target.closest(".delete-session-btn")) {
+          return;
+        }
+
         document
           .querySelectorAll(".session-item")
           .forEach((item) => item.classList.remove("active"));
@@ -1846,7 +1842,7 @@ async function loadSessions() {
 
         clubVisibility = {};
         currentData.forEach((row) => {
-          clubVisibility[row["club name"]] = true;
+          clubVisibility[row["club name"]] = false;
         });
 
         showSwitchContainer(true);
@@ -1861,7 +1857,6 @@ async function loadSessions() {
       sessionsList.appendChild(sessionItem);
     });
   } catch (error) {
-    console.error("Error al cargar sesiones:", error);
     sessionsList.innerHTML = "<p>Error al cargar sesiones.</p>";
   }
 }
@@ -1872,7 +1867,7 @@ if (!window.sessionsLoaded) {
   window.sessionsLoaded = true;
 }
 
-export { currentData, selectedShots, clubColors, formatClubName };
+export { currentData, selectedShots, formatClubName };
 
 // Agregar función global para exportar la sesión actual
 window.exportCurrentSessionToPDF = async function () {
@@ -1912,7 +1907,6 @@ window.exportCurrentSessionToPDF = async function () {
     // Pasar los datos del usuario a exportSessionToPDF
     await exportSessionToPDF(dataWithSelection, nombreCompleto, fechaSesion);
   } catch (error) {
-    console.error("Error al exportar sesión:", error);
     alert("Error al exportar la sesión. Por favor, intente nuevamente.");
   }
 };
@@ -1946,7 +1940,6 @@ async function loadUserSessions() {
 
     // ... resto del código existente ...
   } catch (error) {
-    console.error("Error al cargar sesiones:", error);
     alert("Error al cargar las sesiones. Por favor, intente nuevamente.");
   }
 }
@@ -1975,7 +1968,6 @@ async function loadSessionData(sessionId) {
     currentData = session.data;
     // ... resto del código existente ...
   } catch (error) {
-    console.error("Error al cargar datos de la sesión:", error);
     alert(
       "Error al cargar los datos de la sesión. Por favor, intente nuevamente."
     );
@@ -1984,12 +1976,23 @@ async function loadSessionData(sessionId) {
 
 // Función para manejar la selección de sesiones
 window.toggleSessionSelection = function (sessionIndex) {
+  console.log(
+    `📊 Estado actual de yardageBookSessions:`,
+    Array.from(yardageBookSessions)
+  );
+
   if (yardageBookSessions.has(sessionIndex)) {
     yardageBookSessions.delete(sessionIndex);
     deselectedShots.delete(sessionIndex);
   } else {
     yardageBookSessions.add(sessionIndex);
   }
+
+  console.log(
+    `📊 Nuevo estado de yardageBookSessions:`,
+    Array.from(yardageBookSessions)
+  );
+
   // Guardar el estado de las sesiones seleccionadas
   saveSelectedSessions();
 };
@@ -2044,9 +2047,7 @@ async function updateYardageBookStats() {
           estimatedClubs = uniqueClubs.size;
         }
       }
-    } catch (error) {
-      console.error("Error al calcular palos estimados:", error);
-    }
+    } catch (error) {}
   }
 
   const selectedCountElement = document.getElementById("selectedSessionsCount");
@@ -2069,9 +2070,6 @@ async function updateYardageBookStats() {
 // Función para actualizar la previsualización del yardagebook
 async function updateYardageBookPreview() {
   try {
-    console.log("🔄 Actualizando previsualización del yardagebook...");
-    console.log("Sesiones seleccionadas:", yardageBookSessions.size);
-
     if (yardageBookSessions.size > 0) {
       const preview = await generateYardageBookPreview();
       displayYardageBookPreview(preview);
@@ -2089,7 +2087,6 @@ async function updateYardageBookPreview() {
       }
     }
   } catch (error) {
-    console.error("Error al actualizar previsualización:", error);
     // No propagar el error para evitar que afecte el modal
   }
 }
@@ -2119,9 +2116,7 @@ async function calculateTotalShots() {
 
       return totalShots;
     }
-  } catch (error) {
-    console.error("Error al calcular tiros totales:", error);
-  }
+  } catch (error) {}
 
   return 0;
 }
@@ -2132,7 +2127,6 @@ async function previewYardageBook() {
     const preview = await generateYardageBookPreview();
     displayYardageBookPreview(preview);
   } catch (error) {
-    console.error("Error al previsualizar:", error);
     showErrorModal({
       title: "Error de Previsualización",
       message: "No se pudo generar la previsualización",
@@ -2343,7 +2337,6 @@ async function createAdvancedYardageBook() {
     // Mostrar mensaje de éxito
     showSuccessMessage("YardageBook creado exitosamente");
   } catch (error) {
-    console.error("Error al crear yardagebook:", error);
     const errorInfo = handleYardageBookError(error);
     showErrorModal(errorInfo);
   }
@@ -2445,6 +2438,10 @@ async function loadSession(session, index) {
       .filter((i) => i !== null)
   );
 
+  // Limpiar cualquier estado obsoleto
+  console.log(`Cargando sesión ${index} con ${currentData.length} tiros`);
+  console.log(`Tiros seleccionados inicialmente:`, Array.from(selectedShots));
+
   clubVisibility = {};
   currentData.forEach((row) => {
     clubVisibility[row["club name"]] = false;
@@ -2464,14 +2461,17 @@ async function loadSession(session, index) {
 }
 
 const averageRowHTML = (club, averages) => `
-  <tr class="average-row" data-club="${club}">
-    <td class="checkbox-column">
-      <button class="toggle-club-btn" data-club="${club}" onclick="toggleClubShots('${club}')" aria-label="Mostrar/ocultar tiros">
-        <img src="./arrow-down.png" class="arrow-icon" alt="Desplegar">
-      </button>
+  <tr class="average-row" onclick="toggleClubShots('${club}')" data-club="${club}">
+    <td class="toggle-cell">
+      <i class="fas fa-chevron-down"></i>
     </td>
     <td class="club-name-cell">${formatClubName(club)}</td>
-    ${averages.map((avg) => `<td>${avg}</td>`).join("")}
+    ${getActiveColumns()
+      .map((col, index) => {
+        const value = averages[index];
+        return `<td>${value}</td>`;
+      })
+      .join("")}
   </tr>
 `;
 
@@ -2502,7 +2502,6 @@ function toggleViewMode() {
 
   // Si se activa el mapa, dibuja el scatter plot
   if (isMap && typeof window.createScatterPlot === "function") {
-    console.log("🔄 Activando mapa de dispersión...");
     window.createScatterPlot();
 
     // Asegurar que los controles estén visibles
@@ -2513,8 +2512,6 @@ function toggleViewMode() {
       }
     }, 100);
   } else if (!isMap) {
-    console.log("📊 Mostrando tabla de datos...");
-
     // Ocultar controles del mapa
     const controls = document.getElementById("scatterControls");
     if (controls) {
@@ -2539,8 +2536,6 @@ function clearScatterControls() {
 
 // Inicialización cuando el DOM esté listo
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("🚀 Inicializando sistema de vistas...");
-
   const toggle = document.getElementById("toggleView");
   if (toggle) {
     toggle.checked = false;
@@ -2549,15 +2544,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Verificar que las funciones estén disponibles
   if (typeof window.createScatterPlot === "function") {
-    console.log("✅ createScatterPlot disponible");
   } else {
-    console.warn("⚠️ createScatterPlot no disponible");
   }
 
   if (typeof window.toggleViewMode === "function") {
-    console.log("✅ toggleViewMode disponible");
   } else {
-    console.warn("⚠️ toggleViewMode no disponible");
   }
 
   // Inicializar funciones del yardage book
@@ -2566,21 +2557,23 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // Función para inicializar el yardage book
 function initializeYardageBook() {
-  console.log("🔧 Inicializando YardageBook...");
-
   // Cargar preferencias guardadas
+  console.log(
+    `🔄 Inicializando YardageBook - Cargando sesiones seleccionadas...`
+  );
   loadSelectedSessions();
+  console.log(
+    `📊 Estado inicial de yardageBookSessions:`,
+    Array.from(yardageBookSessions)
+  );
   loadDeselectedShots();
   loadSelectedColumns();
 
   // Verificar que el modal existe
   const modal = document.getElementById("yardageBookModal");
   if (!modal) {
-    console.error("❌ Modal yardageBookModal no encontrado en el DOM");
     return;
   }
-
-  console.log("✅ Modal yardageBookModal encontrado");
 
   // Verificar que todas las funciones estén disponibles globalmente
   const requiredFunctions = [
@@ -2593,9 +2586,7 @@ function initializeYardageBook() {
 
   requiredFunctions.forEach((funcName) => {
     if (typeof window[funcName] === "function") {
-      console.log(`✅ ${funcName} disponible`);
     } else {
-      console.error(`❌ ${funcName} no disponible`);
     }
   });
 }
@@ -2619,6 +2610,7 @@ window.loadSelectedColumns = loadSelectedColumns;
 window.showSaveIndicator = showSaveIndicator;
 window.resetToDefaultColumns = resetToDefaultColumns;
 window.updateColumnCheckboxes = updateColumnCheckboxes;
+window.updateClubAverages = updateClubAverages;
 
 // Hacer disponibles las funciones de YardageBook globalmente
 window.showYardageBookModal = showYardageBookModal;
@@ -2628,10 +2620,7 @@ window.createAdvancedYardageBook = createAdvancedYardageBook;
 window.toggleAdvancedSessionSelection = toggleAdvancedSessionSelection;
 
 // Verificar que todas las funciones de YardageBook estén disponibles
-console.log("🔍 Verificando funciones de YardageBook...");
-console.log("showYardageBookModal:", typeof window.showYardageBookModal);
-console.log("closeYardageBookModal:", typeof window.closeYardageBookModal);
-console.log("previewYardageBook:", typeof window.previewYardageBook);
+
 console.log(
   "createAdvancedYardageBook:",
   typeof window.createAdvancedYardageBook
@@ -2640,3 +2629,61 @@ console.log(
   "toggleAdvancedSessionSelection:",
   typeof window.toggleAdvancedSessionSelection
 );
+
+// Función para eliminar una sesión
+window.deleteSession = async function (sessionFecha, event) {
+  event.stopPropagation(); // Evitar que se active la sesión
+
+  // Confirmar eliminación
+  const confirmDelete = confirm(
+    "¿Estás seguro de que quieres eliminar esta sesión? Esta acción no se puede deshacer."
+  );
+
+  if (!confirmDelete) {
+    return;
+  }
+
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error("No hay usuario autenticado");
+    }
+
+    // Obtener datos actuales del usuario
+    const userDocRef = doc(db, "Simulador", user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      throw new Error("No se encontraron datos del usuario");
+    }
+
+    const userData = userDoc.data();
+    const sessions = userData.Sesiones || [];
+
+    // Buscar la sesión por fecha
+    const sessionIndex = sessions.findIndex(
+      (session) => session.fecha === sessionFecha
+    );
+
+    if (sessionIndex === -1) {
+      throw new Error("No se encontró la sesión a eliminar");
+    }
+
+    // Eliminar la sesión del array
+    sessions.splice(sessionIndex, 1);
+
+    // Actualizar el documento en Firestore
+    await updateDoc(userDocRef, {
+      Sesiones: sessions,
+    });
+
+    // Mostrar mensaje de éxito
+    alert("Sesión eliminada exitosamente");
+
+    // Recargar las sesiones
+    loadSessions();
+  } catch (error) {
+    console.error("Error al eliminar la sesión:", error);
+    alert("Error al eliminar la sesión. Por favor, intente nuevamente.");
+  }
+};

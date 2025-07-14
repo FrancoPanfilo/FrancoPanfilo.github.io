@@ -3,66 +3,167 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Iniciar Sesión - Simulador de Golf</title>
+    <title>Iniciar Sesión - Azalea Golf Simulator</title>
     <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <script type="module" src="firebase.js"></script>
     <script type="module" src="auth.js"></script>
   </head>
   <body>
+    <!-- Header Moderno -->
     <header class="header">
-      <div class="logo">
-        <img src="img/logo.jpg" class="logoimg" alt="Foresight Sports Logo" />
+      <div class="header-container">
+        <div class="logo">
+          <a href="index.html">
+            <img src="img/logo.jpg" alt="Azalea Golf Simulator Logo" />
+          </a>
+        </div>
+        <nav class="nav">
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="register.html" class="nav-link auth-button">
+                <i class="fas fa-user-plus"></i>
+                <span>Registrarse</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="mobile-menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
     </header>
 
+    <!-- Formulario de Login Moderno -->
     <main class="login-container">
       <div class="login-box">
-        <h1>Iniciar Sesión</h1>
+        <div class="login-header">
+          <div class="login-icon">
+            <i class="fas fa-sign-in-alt"></i>
+          </div>
+          <h1>Iniciar Sesión</h1>
+          <p>Ingresa tus credenciales para acceder a tu cuenta</p>
+        </div>
+
         <form id="loginForm" class="login-form" autocomplete="on">
           <div class="form-group">
-            <label for="email">Correo Electrónico</label>
+            <label for="email">
+              <i class="fas fa-envelope"></i>
+              Correo Electrónico
+            </label>
             <input
               type="email"
               id="email"
               name="email"
+              class="form-control"
               required
-              placeholder="Ingrese su correo electrónico"
+              placeholder="ejemplo@correo.com"
               autocomplete="email"
             />
           </div>
+
           <div class="form-group">
-            <label for="password">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              placeholder="Ingrese su contraseña"
-              autocomplete="current-password"
-            />
+            <label for="password">
+              <i class="fas fa-lock"></i>
+              Contraseña
+            </label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                required
+                placeholder="Ingresa tu contraseña"
+                autocomplete="current-password"
+              />
+              <button type="button" class="password-toggle" id="passwordToggle">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
           </div>
+
           <div class="form-info">
-            <p>
-              Si es la primera vez que inicia sesión, la contraseña que ingrese
-              será su contraseña permanente.
-            </p>
+            <div class="info-card">
+              <i class="fas fa-info-circle"></i>
+              <p>
+                Si es la primera vez que inicia sesión, la contraseña que
+                ingrese será su contraseña permanente.
+              </p>
+            </div>
           </div>
+
           <div class="form-error" id="errorMessage"></div>
-          <button type="submit" class="login-button">Iniciar Sesión</button>
+
+          <button type="submit" class="btn btn-primary btn-lg login-button">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Iniciar Sesión</span>
+          </button>
         </form>
-        <p class="login-link">
-          ¿No tienes una cuenta? <a href="register.html">Registrarse</a>
-        </p>
+
+        <div class="login-footer">
+          <p class="login-link">
+            ¿No tienes una cuenta?
+            <a href="register.html" class="btn btn-outline btn-sm">
+              <i class="fas fa-user-plus"></i>
+              Registrarse
+            </a>
+          </p>
+          <a href="index.html" class="back-home">
+            <i class="fas fa-arrow-left"></i>
+            Volver al Inicio
+          </a>
+        </div>
       </div>
     </main>
 
-    <footer class="footer">
-      <p>© 2025 Foresight Sports. Todos los derechos reservados.</p>
-      <ul class="footer-links">
-        <li><a href="#">Política de Privacidad</a></li>
-        <li><a href="#">Términos de Servicio</a></li>
-        <li><a href="#">Contacto</a></li>
-      </ul>
-    </footer>
+    <script>
+      // Toggle de contraseña
+      document
+        .getElementById("passwordToggle")
+        .addEventListener("click", function () {
+          const passwordInput = document.getElementById("password");
+          const icon = this.querySelector("i");
+
+          if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+          } else {
+            passwordInput.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+          }
+        });
+
+      // Menú móvil
+      document
+        .querySelector(".mobile-menu-toggle")
+        .addEventListener("click", function () {
+          this.classList.toggle("active");
+          document.querySelector(".nav").classList.toggle("active");
+        });
+
+      // Cerrar menú al hacer click en un enlace
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          document
+            .querySelector(".mobile-menu-toggle")
+            .classList.remove("active");
+          document.querySelector(".nav").classList.remove("active");
+        });
+      });
+    </script>
   </body>
 </html>

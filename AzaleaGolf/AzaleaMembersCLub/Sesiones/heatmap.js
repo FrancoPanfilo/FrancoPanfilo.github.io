@@ -1,9 +1,5 @@
-import {
-  currentData,
-  selectedShots,
-  clubColors,
-  formatClubName,
-} from "./script.js";
+import { currentData, selectedShots, formatClubName } from "./script.js";
+import { clubColors } from "../utils/constants.js";
 
 // State for toggle modes
 let isCarryMode = true;
@@ -23,7 +19,6 @@ function calculateOfflineCarry(row) {
     carryYds < 0 ||
     Math.abs(offlineTotal) > 100
   ) {
-    console.warn(`Datos inválidos para el tiro: ${JSON.stringify(row)}`);
     return 0;
   }
 
@@ -81,9 +76,31 @@ function calculateEllipseParams(data) {
 function createScatterPlot() {
   const canvas = document.getElementById("scatterCanvas");
   if (!canvas) {
-    console.error('Canvas element with ID "scatterCanvas" not found.');
     return;
   }
+
+  // --- ADAPTACIÓN RESPONSIVE DEL CANVAS ---
+  let canvasWidth, canvasHeight, yardsPerPixel;
+  const screenW = window.innerWidth;
+  const isMobile = screenW <= 600;
+  if (isMobile) {
+    canvasWidth = Math.max(screenW * 0.98, 320);
+    yardsPerPixel = 350 / canvasWidth;
+    canvasHeight = Math.round(canvasWidth * 0.8);
+  } else if (screenW <= 1024) {
+    canvasWidth = Math.min(screenW * 0.9, 900);
+    yardsPerPixel = 350 / canvasWidth;
+    canvasHeight = Math.round(160 / yardsPerPixel);
+  } else {
+    canvasWidth = 1200;
+    yardsPerPixel = 350 / canvasWidth;
+    canvasHeight = Math.round(160 / yardsPerPixel);
+  }
+  canvas.style.width = canvasWidth + "px";
+  canvas.style.height = canvasHeight + "px";
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  // --- FIN ADAPTACIÓN RESPONSIVE ---
 
   // Get selected shots and group by club
   const groupedData = {};
@@ -107,42 +124,48 @@ function createScatterPlot() {
     canvas.style.display = "block";
   }
 
-  // Set canvas dimensions to ensure consistent scale
-  const canvasWidth = 1200;
-  const yardsPerPixel = 350 / canvasWidth;
-  const canvasHeight = Math.round(160 / yardsPerPixel);
-  canvas.style.width = `${canvasWidth}px`;
-  canvas.style.height = `${canvasHeight}px`;
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
-
-  // Prepare datasets for Chart.js
+  // --- PREPARAR DATASETS CON INVERSIÓN DE EJES EN MÓVIL ---
   const datasets = Object.keys(groupedData).map((club, index) => ({
     label: formatClubName(club),
-    data: groupedData[club].map((row) => ({
-      x:
+    data: groupedData[club].map((row) => {
+      const distance =
         parseFloat(
           isCarryMode ? row["carry (yds)"] : row["total distance (yds)"]
-        ) || 0,
-      y:
+        ) || 0;
+      const dispersion =
         -1 *
           parseFloat(
             isCarryMode
               ? calculateOfflineCarry(row)
               : row["offline (yds l-/r+)"]
-          ) || 0,
-      shotNumber: row["shot number"] || "N/A",
-    })),
+          ) || 0;
+      if (isMobile) {
+        // En móvil: distancia en Y, dispersión en X
+        return {
+          x: dispersion,
+          y: distance,
+          shotNumber: row["shot number"] || "N/A",
+        };
+      } else {
+        // Desktop/tablet: distancia en X, dispersión en Y
+        return {
+          x: distance,
+          y: dispersion,
+          shotNumber: row["shot number"] || "N/A",
+        };
+      }
+    }),
     backgroundColor: clubColors[index % clubColors.length],
     borderColor: clubColors[index % clubColors.length],
     pointRadius: 5,
     pointHoverRadius: 8,
   }));
 
-  // Prepare ellipse annotations
+  // --- AJUSTAR ELIPSES TAMBIÉN ---
   const annotations = showEllipses
     ? Object.keys(groupedData)
         .map((club, index) => {
+          // Usar los datos ya invertidos
           const ellipseParams = calculateEllipseParams(datasets[index].data);
           if (!ellipseParams) return null;
           return {
@@ -166,6 +189,24 @@ function createScatterPlot() {
         })
         .filter((ann) => ann !== null)
     : [];
+
+  // --- CONFIGURAR LOS EJES SEGÚN EL DISPOSITIVO ---
+  let xTitle, yTitle, xMin, xMax, yMin, yMax;
+  if (isMobile) {
+    xTitle = "Dispersión Lateral (yds i+/d-)";
+    yTitle = isCarryMode ? "Carry (yds)" : "Distancia Total (yds)";
+    xMin = -80;
+    xMax = 80;
+    yMin = 0;
+    yMax = 350;
+  } else {
+    xTitle = isCarryMode ? "Carry (yds)" : "Distancia Total (yds)";
+    yTitle = "Desviación Lateral (yds i+/d-)";
+    xMin = 0;
+    xMax = 350;
+    yMin = -80;
+    yMax = 80;
+  }
 
   // Create or update the chart
   if (window.scatterChart) {
@@ -197,17 +238,23 @@ function createScatterPlot() {
           callbacks: {
             label: function (context) {
               const dataPoint = context.raw;
-              const offlineDirection =
-                dataPoint.y >= 0 ? "Izquierda" : "Derecha";
+              let offlineDirection;
+              if (isMobile) {
+                offlineDirection = dataPoint.x >= 0 ? "Izquierda" : "Derecha";
+              } else {
+                offlineDirection = dataPoint.y >= 0 ? "Izquierda" : "Derecha";
+              }
               return [
                 `Club: ${context.dataset.label}`,
                 `Tiro: ${dataPoint.shotNumber}`,
-                `${
-                  isCarryMode ? "Carry" : "Distancia Total"
-                }: ${dataPoint.x.toFixed(1)} yds`,
-                `Desviación Lateral: ${Math.abs(dataPoint.y).toFixed(
-                  1
-                )} yds (${offlineDirection})`,
+                `${isCarryMode ? "Carry" : "Distancia Total"}: ${
+                  isMobile ? dataPoint.y.toFixed(1) : dataPoint.x.toFixed(1)
+                } yds`,
+                `Desviación Lateral: ${
+                  isMobile
+                    ? Math.abs(dataPoint.x).toFixed(1)
+                    : Math.abs(dataPoint.y).toFixed(1)
+                } yds (${offlineDirection})`,
               ];
             },
           },
@@ -220,22 +267,22 @@ function createScatterPlot() {
         x: {
           title: {
             display: true,
-            text: isCarryMode ? "Carry (yds)" : "Distancia Total (yds)",
+            text: xTitle,
           },
           grid: { display: true },
           ticks: { color: "#FFFFFF" },
-          min: 0,
-          max: 350,
+          min: xMin,
+          max: xMax,
         },
         y: {
           title: {
             display: true,
-            text: "Desviación Lateral (yds i+/d-)",
+            text: yTitle,
           },
           grid: { display: true },
           ticks: { color: "#FFFFFF" },
-          min: -80,
-          max: 80,
+          min: yMin,
+          max: yMax,
         },
       },
     },
@@ -306,7 +353,6 @@ window.updateShotSelectionAndPlot = async function (checkbox) {
 };
 
 // Asegurar que la función esté disponible inmediatamente
-console.log("✅ createScatterPlot disponible globalmente");
 
 window.updateFilter = function (value) {
   currentFilter = value || null;
@@ -355,3 +401,15 @@ function updateTableHTML() {
 
   // ... resto del código existente ...
 }
+
+// --- REDIBUJAR HEATMAP AL REDIMENSIONAR PANTALLA ---
+let resizeTimeout;
+window.addEventListener("resize", function () {
+  // Debounce para evitar redibujos excesivos
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (typeof window.createScatterPlot === "function") {
+      window.createScatterPlot();
+    }
+  }, 200);
+});

@@ -3,63 +3,396 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simulador de Golf</title>
+    <title>Azalea Golf Simulator - Análisis Profesional de Golf</title>
     <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <script type="module" src="auth.js"></script>
   </head>
   <body>
     <header class="header">
-      <div class="logo">
-        <img src="img/logo.jpg" class="logoimg" alt="Foresight Sports Logo" />
+      <div class="header-container">
+        <div class="logo">
+          <img src="img/logo.jpg" class="logoimg" alt="Foresight Sports Logo" />
+        </div>
+        <nav class="nav">
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a href="#inicio" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="Sesiones/index.html" class="nav-link">
+                <i class="fas fa-golf-ball"></i>
+                <span>Mis Sesiones</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link auth-button">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Iniciar Sesión</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="mobile-menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
-      <nav class="nav">
-        <ul>
-          <li><a href="#">Inicio</a></li>
-          <li><a href="#" class="auth-button">Iniciar Sesión</a></li>
-        </ul>
-      </nav>
     </header>
 
-    <main class="welcome">
-      <h1>Bienvenido al Simulador de Golf</h1>
-      <div id="guestContent">
-        <p>
-          Inicia sesión para acceder a tus estadísticas y sesiones de práctica.
-        </p>
-        <a href="login.html" class="btn">Iniciar Sesión</a>
-      </div>
-      <div id="userContent" style="display: none">
-        <section class="progress">
-          <h2>Resumen de Rendimiento</h2>
-          <div class="progress-cards">
-            <div class="card">
-              <h3>Total de Sesiones</h3>
-              <p id="totalSessions">-</p>
-            </div>
-            <div class="card">
-              <h3>Total de Tiros</h3>
-              <p id="totalShots">-</p>
-            </div>
-            <div class="card">
-              <h3>Última Sesión</h3>
-              <p id="lastSession">-</p>
-            </div>
+    <!-- Hero Section -->
+    <section id="inicio" class="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1 class="hero-title">
+            <span class="highlight">Azalea Golf Simulator</span>
+            <br />Análisis Profesional de Golf
+          </h1>
+          <p class="hero-subtitle">
+            Revoluciona tu juego con análisis detallado de cada tiro. Descubre
+            patrones, mejora tu precisión y alcanza tu máximo potencial.
+          </p>
+          <!-- Botones solo para invitados -->
+          <div id="heroButtons" class="hero-buttons">
+            <a href="register.html" class="btn btn-primary btn-lg">
+              <i class="fas fa-user-plus"></i> Registrarse Gratis
+            </a>
+            <a href="login.html" class="btn btn-outline btn-lg">
+              <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </a>
           </div>
-          <div style="margin-top: 30px">
-            <a href="Sesiones/index.html" class="btn">Ver Mis Sesiones</a>
+          <!-- Mensaje para usuarios autenticados -->
+          <div
+            id="heroUserMessage"
+            class="hero-user-message"
+            style="display: none"
+          >
+            <p class="hero-welcome-text">
+              ¡Bienvenido de vuelta! Accede a tu dashboard personal para ver tus
+              estadísticas y continuar mejorando tu juego.
+            </p>
+            <a href="#userDashboard" class="btn btn-primary btn-lg">
+              <i class="fas fa-chart-bar"></i> Ir a Mi Dashboard
+            </a>
           </div>
-        </section>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-number">12+</div>
+            <div class="stat-label">Métricas Analizadas</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Precisión</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Disponible</div>
+          </div>
+        </div>
       </div>
-    </main>
+    </section>
 
-    <footer class="footer">
-      <p>© 2025 Foresight Sports. Todos los derechos reservados.</p>
-      <ul class="footer-links">
-        <li><a href="#">Política de Privacidad</a></li>
-        <li><a href="#">Términos de Servicio</a></li>
-        <li><a href="#">Contacto</a></li>
-      </ul>
-    </footer>
+    <!-- Contenido para Invitados -->
+    <div id="guestContent">
+      <!-- Sección de Características -->
+      <section id="caracteristicas" class="features">
+        <div class="container">
+          <h2 class="section-title">¿Por qué elegir Azalea Golf Simulator?</h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <h3>Análisis Detallado</h3>
+              <p>
+                Analiza 12+ métricas por tiro incluyendo velocidad de bola,
+                ángulo de lanzamiento, spin y más.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-map-marked-alt"></i>
+              </div>
+              <h3>Mapas de Dispersión</h3>
+              <p>
+                Visualiza patrones de tus tiros con mapas de dispersión
+                interactivos y heatmaps.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-file-pdf"></i>
+              </div>
+              <h3>Reportes Profesionales</h3>
+              <p>
+                Genera reportes PDF detallados y yardage books personalizados
+                para tus torneos.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <h3>Acceso Móvil</h3>
+              <p>
+                Accede a tus estadísticas desde cualquier dispositivo con diseño
+                completamente responsivo.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <h3>Seguridad Total</h3>
+              <p>
+                Tus datos están protegidos con autenticación segura y
+                encriptación de nivel bancario.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-sync-alt"></i>
+              </div>
+              <h3>Sincronización Automática</h3>
+              <p>
+                Todos tus datos se sincronizan automáticamente entre
+                dispositivos en tiempo real.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de Métricas -->
+      <section class="metrics-section">
+        <div class="container">
+          <h2 class="section-title">Métricas que Analizamos</h2>
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <i class="fas fa-tachometer-alt"></i>
+              <h4>Ball Speed</h4>
+              <p>Velocidad de la bola al impacto</p>
+            </div>
+            <div class="metric-item">
+              <i class="fas fa-angle-up"></i>
+              <h4>Launch Angle</h4>
+              <p>Ángulo de lanzamiento</p>
+            </div>
+            <div class="metric-item">
+              <i class="fas fa-redo"></i>
+              <h4>Back Spin</h4>
+              <p>Rotación hacia atrás</p>
+            </div>
+            <div class="metric-item">
+              <i class="fas fa-arrows-alt-h"></i>
+              <h4>Side Spin</h4>
+              <p>Rotación lateral</p>
+            </div>
+            <div class="metric-item">
+              <i class="fas fa-ruler-horizontal"></i>
+              <h4>Carry</h4>
+              <p>Distancia en el aire</p>
+            </div>
+            <div class="metric-item">
+              <i class="fas fa-route"></i>
+              <h4>Total Distance</h4>
+              <p>Distancia total</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de Estadísticas Globales -->
+      <section id="estadisticas" class="global-stats">
+        <div class="container">
+          <h2 class="section-title">Estadísticas Globales</h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="totalUsers">1,250+</div>
+                <div class="stat-label">Golfistas Registrados</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-golf-ball"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="totalShots">2.5M+</div>
+                <div class="stat-label">Tiros Analizados</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="totalSessions">15,000+</div>
+                <div class="stat-label">Sesiones Completadas</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number">4.9/5</div>
+                <div class="stat-label">Calificación Promedio</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="cta-section">
+        <div class="container">
+          <div class="cta-content">
+            <h2>¿Listo para mejorar tu juego?</h2>
+            <p>
+              Únete a miles de golfistas que ya están mejorando su rendimiento
+              con Azalea Golf Simulator
+            </p>
+            <div class="cta-buttons">
+              <a href="register.html" class="btn btn-primary btn-lg">
+                <i class="fas fa-rocket"></i> Comenzar Ahora
+              </a>
+              <a href="login.html" class="btn btn-outline btn-lg">
+                <i class="fas fa-play"></i> Ver Demo
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Contenido para Usuarios Autenticados -->
+    <div id="userContent" style="display: none">
+      <!-- Dashboard del Usuario -->
+      <section id="userDashboard" class="user-dashboard">
+        <div class="container">
+          <div class="dashboard-header">
+            <h2>Tu Dashboard Personal</h2>
+            <p class="user-welcome" id="userWelcome">Bienvenido de vuelta</p>
+          </div>
+
+          <!-- Resumen de Rendimiento -->
+          <section class="performance-summary">
+            <h3>Resumen de Rendimiento</h3>
+            <div class="performance-cards">
+              <div class="perf-card">
+                <div class="perf-icon">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="perf-content">
+                  <h4>Total de Sesiones</h4>
+                  <div class="perf-number" id="userTotalSessions">-</div>
+                </div>
+              </div>
+              <div class="perf-card">
+                <div class="perf-icon">
+                  <i class="fas fa-golf-ball"></i>
+                </div>
+                <div class="perf-content">
+                  <h4>Total de Tiros</h4>
+                  <div class="perf-number" id="userTotalShots">-</div>
+                </div>
+              </div>
+              <div class="perf-card">
+                <div class="perf-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="perf-content">
+                  <h4>Última Sesión</h4>
+                  <div class="perf-number" id="userLastSession">-</div>
+                </div>
+              </div>
+              <div class="perf-card">
+                <div class="perf-icon">
+                  <i class="fas fa-trophy"></i>
+                </div>
+                <div class="perf-content">
+                  <h4>Mejor Distancia</h4>
+                  <div class="perf-number" id="userBestDistance">-</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Acceso Rápido -->
+          <section class="quick-access">
+            <h3>Acceso Rápido</h3>
+            <div class="quick-actions">
+              <a href="Sesiones/index.html" class="quick-action-card primary">
+                <div class="quick-icon">
+                  <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="quick-content">
+                  <h4>Mis Sesiones</h4>
+                  <p>
+                    Analiza tus sesiones de práctica y estadísticas detalladas
+                  </p>
+                </div>
+                <div class="quick-arrow">
+                  <i class="fas fa-arrow-right"></i>
+                </div>
+              </a>
+              <a href="Sesiones/index.html" class="quick-action-card">
+                <div class="quick-icon">
+                  <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="quick-content">
+                  <h4>Mapas de Dispersión</h4>
+                  <p>Visualiza patrones de tus tiros</p>
+                </div>
+                <div class="quick-arrow">
+                  <i class="fas fa-arrow-right"></i>
+                </div>
+              </a>
+              <a href="Sesiones/index.html" class="quick-action-card">
+                <div class="quick-icon">
+                  <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="quick-content">
+                  <h4>Exportar Reportes</h4>
+                  <p>Genera reportes PDF y yardage books</p>
+                </div>
+                <div class="quick-arrow">
+                  <i class="fas fa-arrow-right"></i>
+                </div>
+              </a>
+            </div>
+          </section>
+
+          <!-- Última Actividad -->
+          <section class="recent-activity">
+            <h3>Actividad Reciente</h3>
+            <div class="activity-list" id="activityList">
+              <div class="activity-item">
+                <div class="activity-icon">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="activity-content">
+                  <p>Cargando actividad reciente...</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
 
     <script type="module">
       import { auth } from "./auth.js";
@@ -82,25 +415,153 @@
 
       // Función para cargar el resumen de rendimiento
       async function loadPerformanceSummary(uid) {
-        const userDocRef = doc(db, "Simulador", uid);
-        const userDoc = await getDoc(userDocRef);
+        try {
+          const userDocRef = doc(db, "Simulador", uid);
+          const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists()) {
-          const sessions = userDoc.data().Sesiones || [];
-          const totalSessions = sessions.length;
-          const totalShots = sessions.reduce(
-            (sum, session) => sum + session.stats.shotCount,
-            0
-          );
-          const lastSession =
-            sessions.length > 0
-              ? new Date(sessions[0].fecha).toLocaleDateString()
-              : "No hay sesiones";
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const sessions = userData.Sesiones || [];
 
-          document.getElementById("totalSessions").textContent = totalSessions;
-          document.getElementById("totalShots").textContent = totalShots;
-          document.getElementById("lastSession").textContent = lastSession;
+            // Calcular total de sesiones (igual que en Mis Sesiones)
+            const totalSessions = sessions.length;
+
+            // Calcular total de tiros (igual que en Mis Sesiones)
+            let totalShots = 0;
+            sessions.forEach((session) => {
+              if (
+                session &&
+                session.stats &&
+                session.stats.shotCount !== undefined
+              ) {
+                totalShots += session.stats.shotCount;
+              }
+            });
+
+            // Calcular última sesión (ordenar igual que en Mis Sesiones)
+            let lastSession = "-";
+            if (sessions.length > 0) {
+              // Ordenar sesiones por fecha (más reciente primero) - igual que en Mis Sesiones
+              const sortedSessions = sessions.sort(
+                (a, b) => new Date(b.fecha) - new Date(a.fecha)
+              );
+              const lastSessionDate = new Date(sortedSessions[0].fecha);
+              lastSession = lastSessionDate.toLocaleDateString("es-ES", {
+                day: "2-digit",
+                month: "short",
+                year: "2-digit",
+              });
+            }
+
+            // Calcular mejor distancia (usar session.datos igual que en Mis Sesiones)
+            let bestDistance = 0;
+            sessions.forEach((session) => {
+              if (session.datos && Array.isArray(session.datos)) {
+                session.datos.forEach((tiro) => {
+                  if (tiro && tiro["total distance (yds)"]) {
+                    const distance = parseFloat(tiro["total distance (yds)"]);
+                    if (!isNaN(distance) && distance > bestDistance) {
+                      bestDistance = distance;
+                    }
+                  }
+                });
+              }
+            });
+
+            // Actualizar elementos del DOM
+            const totalSessionsElement =
+              document.getElementById("userTotalSessions");
+            const totalShotsElement = document.getElementById("userTotalShots");
+            const lastSessionElement =
+              document.getElementById("userLastSession");
+            const bestDistanceElement =
+              document.getElementById("userBestDistance");
+
+            if (totalSessionsElement) {
+              totalSessionsElement.textContent =
+                totalSessions > 0 ? totalSessions : "-";
+            }
+
+            if (totalShotsElement) {
+              totalShotsElement.textContent = totalShots > 0 ? totalShots : "-";
+            }
+
+            if (lastSessionElement) {
+              lastSessionElement.textContent = lastSession;
+            }
+
+            if (bestDistanceElement) {
+              bestDistanceElement.textContent =
+                bestDistance > 0 ? `${bestDistance.toFixed(1)} yds` : "-";
+            }
+
+            // Cargar actividad reciente
+            loadRecentActivity(sessions);
+          } else {
+            // Si no existe el documento, mostrar valores por defecto
+            document.getElementById("userTotalSessions").textContent = "-";
+            document.getElementById("userTotalShots").textContent = "-";
+            document.getElementById("userLastSession").textContent = "-";
+            document.getElementById("userBestDistance").textContent = "-";
+            loadRecentActivity([]);
+          }
+        } catch (error) {
+          // En caso de error, mostrar valores por defecto
+          document.getElementById("userTotalSessions").textContent = "-";
+          document.getElementById("userTotalShots").textContent = "-";
+          document.getElementById("userLastSession").textContent = "-";
+          document.getElementById("userBestDistance").textContent = "-";
+          loadRecentActivity([]);
         }
+      }
+
+      // Función para cargar actividad reciente
+      function loadRecentActivity(sessions) {
+        const activityList = document.getElementById("activityList");
+
+        if (!sessions || sessions.length === 0) {
+          activityList.innerHTML = `
+            <div class="activity-item">
+              <div class="activity-icon">
+                <i class="fas fa-info-circle"></i>
+              </div>
+              <div class="activity-content">
+                <p>No hay actividad reciente. ¡Comienza tu primera sesión!</p>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        // Ordenar sesiones por fecha (más reciente primero)
+        const sortedSessions = sessions.sort(
+          (a, b) => new Date(b.fecha) - new Date(a.fecha)
+        );
+        const recentSessions = sortedSessions.slice(0, 3);
+
+        activityList.innerHTML = recentSessions
+          .map((session, index) => {
+            const date = new Date(session.fecha).toLocaleDateString("es-ES", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            });
+            const shotCount = session.stats?.shotCount || 0;
+            const sessionTime = session.stats?.sessionTime || "N/A";
+
+            return `
+            <div class="activity-item">
+              <div class="activity-icon">
+                <i class="fas fa-golf-ball"></i>
+              </div>
+              <div class="activity-content">
+                <p><strong>Sesión completada</strong> - ${shotCount} tiros el ${date}</p>
+                <small>Duración: ${sessionTime}</small>
+              </div>
+            </div>
+          `;
+          })
+          .join("");
       }
 
       // Actualizar la interfaz según el estado de autenticación
@@ -108,6 +569,8 @@
         const authButton = document.querySelector(".auth-button");
         const guestContent = document.getElementById("guestContent");
         const userContent = document.getElementById("userContent");
+        const heroButtons = document.getElementById("heroButtons");
+        const heroUserMessage = document.getElementById("heroUserMessage");
 
         if (user) {
           const nombreCompleto = await getUserFullName(user.uid);
@@ -115,9 +578,22 @@
           // Mostrar contenido para usuario autenticado
           guestContent.style.display = "none";
           userContent.style.display = "block";
+          heroButtons.style.display = "none";
+          heroUserMessage.style.display = "block";
+
+          // Actualizar mensaje de bienvenida
+          document.getElementById(
+            "userWelcome"
+          ).textContent = `Bienvenido de vuelta, ${nombreCompleto}`;
 
           // Cargar resumen de rendimiento usando el UID
           await loadPerformanceSummary(user.uid);
+
+          // Remover mensaje de bienvenida anterior si existe
+          const existingUserInfo = document.querySelector(".user-info");
+          if (existingUserInfo) {
+            existingUserInfo.remove();
+          }
 
           // Crear elemento para mostrar el nombre del usuario
           const userInfo = document.createElement("span");
@@ -125,9 +601,13 @@
           userInfo.textContent = `Bienvenido, ${nombreCompleto}`;
 
           // Insertar el nombre antes del botón de cerrar sesión
-          authButton.parentElement.insertBefore(userInfo, authButton);
+          const navMenu = document.querySelector(".nav-menu");
+          const authItem = authButton.closest(".nav-item");
+          navMenu.insertBefore(userInfo, authItem);
 
-          authButton.textContent = "Cerrar Sesión";
+          // Actualizar botón de autenticación
+          authButton.innerHTML =
+            '<i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>';
           authButton.href = "#";
           authButton.classList.add("logout");
 
@@ -138,7 +618,6 @@
               await signOut(auth);
               window.location.href = "login.html";
             } catch (error) {
-              console.error("Error al cerrar sesión:", error);
               alert("Error al cerrar sesión. Por favor, intente nuevamente.");
             }
           });
@@ -146,6 +625,8 @@
           // Mostrar contenido para invitado
           guestContent.style.display = "block";
           userContent.style.display = "none";
+          heroButtons.style.display = "block";
+          heroUserMessage.style.display = "none";
 
           // Remover el nombre del usuario si existe
           const userInfo = document.querySelector(".user-info");
@@ -153,9 +634,83 @@
             userInfo.remove();
           }
 
-          authButton.textContent = "Iniciar Sesión";
+          // Restaurar botón de autenticación
+          authButton.innerHTML =
+            '<i class="fas fa-sign-in-alt"></i><span>Iniciar Sesión</span>';
           authButton.href = "login.html";
           authButton.classList.remove("logout");
+        }
+      });
+
+      // Smooth scrolling para navegación
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            // Si el usuario está autenticado y hace clic en "Ir a Mi Dashboard"
+            if (this.getAttribute("href") === "#userDashboard") {
+              // Asegurar que el contenido del usuario esté visible
+              const userContent = document.getElementById("userContent");
+              if (userContent.style.display === "none") {
+                userContent.style.display = "block";
+              }
+            }
+
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+
+            // Cerrar menú móvil si está abierto
+            closeMobileMenu();
+          }
+        });
+      });
+
+      // Menú móvil
+      const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
+      const nav = document.querySelector(".nav");
+
+      function toggleMobileMenu() {
+        mobileMenuToggle.classList.toggle("active");
+        nav.classList.toggle("active");
+        document.body.style.overflow = nav.classList.contains("active")
+          ? "hidden"
+          : "";
+      }
+
+      function closeMobileMenu() {
+        mobileMenuToggle.classList.remove("active");
+        nav.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      mobileMenuToggle.addEventListener("click", toggleMobileMenu);
+
+      // Cerrar menú al hacer clic en un enlace
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            closeMobileMenu();
+          }
+        });
+      });
+
+      // Cerrar menú al redimensionar la ventana
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) {
+          closeMobileMenu();
+        }
+      });
+
+      // Header scroll effect
+      window.addEventListener("scroll", () => {
+        const header = document.querySelector(".header");
+        if (window.scrollY > 50) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
         }
       });
     </script>

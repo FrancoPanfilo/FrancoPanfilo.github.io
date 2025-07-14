@@ -8,7 +8,7 @@ import {
 } from "./sessions.js";
 import { saveDeselectedShots } from "./storage.js";
 import { calculateClubAverages } from "./stats.js";
-import { formatClubName } from "./utils.js";
+import { formatClubName } from "../../utils/constants.js";
 
 // Columnas fijas para mostrar
 const fixedColumns = [
