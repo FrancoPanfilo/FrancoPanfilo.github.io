@@ -133,22 +133,20 @@ function createScatterPlot() {
         parseFloat(
           isCarryMode ? row["carry (yds)"] : row["total distance (yds)"]
         ) || 0;
-      const dispersion =
-        -1 *
-          parseFloat(
-            isCarryMode
-              ? calculateOfflineCarry(row)
-              : row["offline (yds l-/r+)"]
-          ) || 0;
+      let dispersionRaw =
+        parseFloat(
+          isCarryMode ? calculateOfflineCarry(row) : row["offline (yds l-/r+)"]
+        ) || 0;
+      let dispersion = isMobile ? dispersionRaw : -1 * dispersionRaw;
       if (isMobile) {
-        // En móvil: distancia en Y, dispersión en X
+        // En móvil: distancia en Y, dispersión en X (sin invertir)
         return {
           x: dispersion,
           y: distance,
           shotNumber: row["shot number"] || "N/A",
         };
       } else {
-        // Desktop/tablet: distancia en X, dispersión en Y
+        // Desktop/tablet: distancia en X, dispersión en Y (invertido)
         return {
           x: distance,
           y: dispersion,
@@ -158,8 +156,8 @@ function createScatterPlot() {
     }),
     backgroundColor: clubColors[index % clubColors.length],
     borderColor: clubColors[index % clubColors.length],
-    pointRadius: 5,
-    pointHoverRadius: 8,
+    pointRadius: 3, // Reducido el tamaño de los puntos
+    pointHoverRadius: 5, // Reducido el tamaño al hacer hover
   }));
 
   // --- AJUSTAR ELIPSES TAMBIÉN ---

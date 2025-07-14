@@ -21,7 +21,7 @@
   --secondary-color: #514549;
   --secondary-dark: #3a3235;
   --secondary-light: #6a5d61;
-  --accent-color: #4ecdc4;
+  --accent-color: #acc4ab;
   --accent-light: #6dd5cd;
   --accent-dark: #3db8b0;
 
@@ -266,6 +266,8 @@ a:hover {
 
 .nav-item {
   position: relative;
+  display: flex;
+  flex-direction: row;
 }
 
 .nav-link {
@@ -554,6 +556,7 @@ a:hover {
 
 /* Ajuste para que la lista de sesiones y sus items no se desborden */
 .sessions-list {
+  min-height: fit-content;
   width: 100%;
   max-width: 100vw;
   box-sizing: border-box;
@@ -577,24 +580,10 @@ a:hover {
   border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
-}
-
-.session-item::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent-color), var(--accent-light));
-  transform: scaleX(0);
-  transition: transform var(--transition-normal);
+  margin-bottom: 10px;
 }
 
 .session-item:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--accent-color);
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -603,14 +592,12 @@ a:hover {
 }
 
 .session-item.active {
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
   color: var(--text-white);
-  border-color: var(--accent-light);
+  border: 1px solid var(--accent-color);
 }
 
 .session-item.active::before {
   transform: scaleX(1);
-  background: linear-gradient(90deg, var(--accent-light), var(--text-white));
 }
 
 .session-item p {
@@ -692,7 +679,8 @@ a:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
+
   backdrop-filter: blur(10px);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
@@ -703,15 +691,14 @@ a:hover {
 }
 
 .shots-table {
+  margin-top: 10px;
   width: 100%;
   border-collapse: collapse;
-  background: transparent;
   color: var(--text-white);
 }
 
 .shots-table thead {
   background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
 }
 
 .shots-table th {
@@ -719,7 +706,6 @@ a:hover {
   text-align: left;
   font-weight: var(--font-weight-semibold);
   color: var(--text-white);
-  border-bottom: 2px solid var(--accent-color);
   position: sticky;
   top: 0;
   background: rgba(255, 255, 255, 0.1);
@@ -740,7 +726,7 @@ a:hover {
 }
 
 .checkbox-column {
-  width: 50px;
+  width: 30px;
   text-align: center;
   position: relative;
 }
@@ -1346,6 +1332,7 @@ input:checked + .slider:before {
   .table-actions button {
     padding: var(--spacing-md) var(--spacing-lg);
     font-size: var(--font-size-md);
+    background-color: var(--accent-color);
   }
 }
 
@@ -2711,7 +2698,6 @@ input:checked + .slider:before {
     padding: var(--spacing-xs) !important;
   }
   .sessions-list {
-    max-height: 180px !important;
     padding: var(--spacing-xs) !important;
     font-size: var(--font-size-xs);
   }

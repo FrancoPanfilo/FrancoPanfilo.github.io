@@ -1341,6 +1341,9 @@ function displayShotsTable(data, sessionIndex) {
   if (activeSession) {
     activeSession.dataset.index = sessionIndex;
   }
+
+  // Al mostrar la tabla, forzar el switch a modo tabla y ocultar el mapa
+  toggleViewMode(true);
 }
 
 // Función para actualizar solo el estado visual de un checkbox
@@ -1851,6 +1854,7 @@ async function loadSessions() {
           toggle.checked = false;
           toggleViewMode();
         }
+        toggleViewMode(true); // Forzar tabla
         displayShotsTable(currentData, index);
       });
 
@@ -2476,8 +2480,15 @@ const averageRowHTML = (club, averages) => `
 `;
 
 // Switch para alternar entre tabla y mapa de dispersión
-function toggleViewMode() {
-  const isMap = document.getElementById("toggleView").checked;
+function toggleViewMode(forceTable = false) {
+  const toggle = document.getElementById("toggleView");
+  if (!toggle) return;
+
+  // Si se fuerza la vista tabla, desactivar el switch
+  if (forceTable) {
+    toggle.checked = false;
+  }
+  const isMap = toggle.checked;
   const labelTable = document.getElementById("label-table");
   const labelMap = document.getElementById("label-map");
 
@@ -2503,8 +2514,6 @@ function toggleViewMode() {
   // Si se activa el mapa, dibuja el scatter plot
   if (isMap && typeof window.createScatterPlot === "function") {
     window.createScatterPlot();
-
-    // Asegurar que los controles estén visibles
     setTimeout(() => {
       const controls = document.getElementById("scatterControls");
       if (controls) {
