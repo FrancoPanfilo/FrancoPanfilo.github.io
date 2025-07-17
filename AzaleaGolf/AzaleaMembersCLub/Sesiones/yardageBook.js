@@ -470,7 +470,8 @@ export function handleYardageBookError(error) {
 export async function createYardageBook(
   selectedSessions,
   deviationPercentage = 0.75,
-  lateralPercentage = 0.75
+  lateralPercentage = 0.75,
+  formatoAconado = true
 ) {
   try {
     if (!Array.isArray(selectedSessions) || selectedSessions.length === 0) {
@@ -508,9 +509,11 @@ export async function createYardageBook(
       );
     });
 
-    Object.values(CLUB_CATEGORIES).forEach((category) => {
-      ajustarDispersion(clubStats, category);
-    });
+    if (formatoAconado) {
+      Object.values(CLUB_CATEGORIES).forEach((category) => {
+        ajustarDispersion(clubStats, category);
+      });
+    }
 
     delete clubStats.Putt;
 
@@ -539,7 +542,8 @@ export async function createYardageBook(
 export async function previewYardageBook(
   selectedSessions,
   deviationPercentage = 0.75,
-  lateralPercentage = 0.75
+  lateralPercentage = 0.75,
+  formatoAconado = true
 ) {
   try {
     if (!Array.isArray(selectedSessions) || selectedSessions.length === 0) {
@@ -577,9 +581,11 @@ export async function previewYardageBook(
       );
     });
 
-    Object.values(CLUB_CATEGORIES).forEach((category) => {
-      ajustarDispersion(clubStats, category);
-    });
+    if (formatoAconado) {
+      Object.values(CLUB_CATEGORIES).forEach((category) => {
+        ajustarDispersion(clubStats, category);
+      });
+    }
 
     delete clubStats.Putt;
 

@@ -349,7 +349,7 @@ function calculateClubAverages(club, shots) {
 function updateClubAverages() {
   document.querySelectorAll(".average-row").forEach((row) => {
     const club = row.dataset.club;
-    const clubShots = currentData.filter((shot) => shot["club name"] === club);
+    const clubShots = currentData.filter((shot) => shot["club name"] == club);
     const averages = calculateClubAverages(club, clubShots);
     const cells = row.querySelectorAll("td");
     for (let i = 2; i < cells.length; i++) {
@@ -469,6 +469,10 @@ async function showYardageBookModal() {
               <input type="range" id="lateralSlider" min="50" max="100" value="75">
               <small>Controla la precisión de la dispersión lateral</small>
             </div>
+            <div class="setting-group">
+              <label><input type="checkbox" id="aconadoCheckbox" checked> Formato aconado</label>
+              <small>Si está activado, la dispersión nunca decrece entre palos consecutivos</small>
+            </div>
           </div>
         </div>
         <div class="yardagebook-info">
@@ -525,36 +529,18 @@ async function loadSessionsForYardageBook() {
   updateClubListForYardageBook(sortedSessions);
   sessionsList.innerHTML = "";
   sortedSessions.forEach((session, index) => {
-    const shotCount = session.datos?.length || 0;
     const validShots = session.datos?.filter(isShotSelected).length || 0;
-    const uniqueClubs = new Set(
-      session.datos
-        ?.filter(
-          (shot) =>
-            shot["club name"] &&
-            shot["club name"] !== "Putter" &&
-            isShotSelected(shot)
-        )
-        .map((shot) => formatClubName(shot["club name"]))
-    );
     const sessionDiv = document.createElement("div");
     sessionDiv.className = "session-item-yardagebook";
     sessionDiv.innerHTML = `
-      <input type="checkbox" id="session${index}" onchange="toggleSessionSelection(${index})" checked>
-      <div>
-        <div>📅 ${new Date(session.fecha).toLocaleDateString("es-ES", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}</div>
-        <div><i class="fas fa-golf-ball"></i> ${
-          [...uniqueClubs].join(", ") || "No hay datos"
-        }</div>
-        <div>
-          <div>${shotCount}</div><div>Total</div>
-          <div>${validShots}</div><div>Válidos</div>
-        </div>
-      </div>
+      <label class="session-row-yardagebook">
+        <input type="checkbox" id="session${index}" onchange="toggleSessionSelection(${index})" checked>
+        <span class="session-date">${new Date(session.fecha).toLocaleDateString(
+          "es-ES",
+          { year: "numeric", month: "short", day: "numeric" }
+        )}</span>
+        <span class="session-valid-shots">${validShots} tiros válidos</span>
+      </label>
     `;
     sessionsList.appendChild(sessionDiv);
   });
@@ -574,6 +560,7 @@ async function createYardageBookFromModal() {
     parseInt(document.getElementById("deviationSlider")?.value || 75) / 100;
   const lateralPercentage =
     parseInt(document.getElementById("lateralSlider")?.value || 75) / 100;
+  const formatoAconado = document.getElementById("aconadoCheckbox")?.checked;
   const user = auth.currentUser;
   if (!user) return;
   const userDocRef = doc(db, "Simulador", user.uid);
@@ -596,7 +583,8 @@ async function createYardageBookFromModal() {
   await createYardageBook(
     filteredSessions,
     deviationPercentage,
-    lateralPercentage
+    lateralPercentage,
+    formatoAconado
   );
   if (button) {
     button.innerHTML = '<i class="fas fa-download"></i> Descargar YardageBook';
