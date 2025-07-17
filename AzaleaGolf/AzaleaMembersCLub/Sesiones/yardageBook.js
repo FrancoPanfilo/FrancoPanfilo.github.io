@@ -89,46 +89,12 @@ class YardageBookError extends Error {
 // ============= FUNCIONES DE PROCESAMIENTO DE DATOS =============
 function procesarSesion(session, sessionIndex) {
   try {
-    console.log(
-      `🔍 procesarSesion - Procesando sesión ${sessionIndex}:`,
-      session.fecha
-    );
-
     const selectedShots = session.datos.filter(
-      (shot) => shot.selected !== false
-    );
-
-    console.log(
-      `📊 Tiros en sesión: ${
-        session.datos?.length || 0
-      }, tiros seleccionados: ${selectedShots.length}`
+      (shot) => shot.TiroDesactivado !== true
     );
 
     if (selectedShots.length === 0) {
       return { shots: [] };
-    }
-
-    // Mostrar todos los campos disponibles en el primer tiro para debug
-    if (selectedShots.length > 0) {
-      console.log(
-        `🔍 Campos disponibles en el primer tiro de sesión ${sessionIndex}:`,
-        Object.keys(selectedShots[0])
-      );
-
-      // Verificar específicamente el campo offline
-      const primerTiro = selectedShots[0];
-      console.log(
-        `🔍 Campo 'offline' en primer tiro:`,
-        primerTiro["offline (yds l-/r+)"]
-      );
-      console.log(
-        `🔍 Tipo de dato 'offline':`,
-        typeof primerTiro["offline (yds l-/r+)"]
-      );
-      console.log(
-        `🔍 Campo 'offline' parseado:`,
-        parseFloat(primerTiro["offline (yds l-/r+)"])
-      );
     }
 
     const shots = selectedShots.map((shot, shotIndex) => {
@@ -136,12 +102,6 @@ function procesarSesion(session, sessionIndex) {
       const sideSpin = parseFloat(shot["side spin (rpm l-/r+)"]) || 0;
       const backSpin = parseFloat(shot["back spin (rpm)"]) || 0;
       const offline = parseFloat(shot["offline (yds l-/r+)"]) || 0;
-
-      // Log detallado para los primeros 3 tiros
-      if (shotIndex < 3) {
-        console.log(`offline (yds l-/r+): "${shot["offline (yds l-/r+)"]}"`);
-        console.log(`offline parseado: ${offline}`);
-      }
 
       return {
         club: shot["club name"] || "Unknown",
@@ -165,14 +125,6 @@ function procesarSesion(session, sessionIndex) {
     const offlineValues = shots.map((s) => s.offline);
     const allZero = offlineValues.every((v) => v === 0);
 
-    console.log(
-      `🔍 Valores de offline en sesión ${sessionIndex}:`,
-      offlineValues.slice(0, 5)
-    ); // Solo mostrar los primeros 5
-
-    console.log(
-      `✅ Sesión ${sessionIndex} procesada: ${shots.length} tiros válidos`
-    );
     return { shots };
   } catch (error) {
     return { shots: [] };
@@ -185,28 +137,10 @@ function agruparTirosPorPalo(sessions) {
   sessions.forEach((session, sessionIndex) => {
     const shots = Array.isArray(session.shots) ? session.shots : [];
 
-    // Verificar datos de offline en esta sesión
-    if (shots.length > 0) {
-      const offlineValues = shots.map((s) => s.offline);
-      console.log(
-        `🔍 Valores de offline en sesión ${sessionIndex}:`,
-        offlineValues.slice(0, 3)
-      ); // Solo primeros 3
-    }
-
     shots.forEach((shot, shotIndex) => {
       const clubName = shot.club;
       if (!clubName) return;
-
       if (!shotsByClub[clubName]) shotsByClub[clubName] = [];
-
-      // Log para verificar que offline se mantiene al agrupar
-      if (shotIndex < 2) {
-        // Solo primeros 2 tiros por sesión
-        console.log(
-          `🔍 Agrupando tiro ${shotIndex} del palo ${clubName}: offline=${shot.offline}`
-        );
-      }
 
       shotsByClub[clubName].push({
         carry: shot.carry,
@@ -222,27 +156,6 @@ function agruparTirosPorPalo(sessions) {
     });
   });
 
-  console.log(
-    "📊 Palos encontrados en sesiones seleccionadas:",
-    Object.keys(shotsByClub)
-  );
-  console.log(
-    "📈 Total de tiros por palo:",
-    Object.fromEntries(
-      Object.entries(shotsByClub).map(([club, shots]) => [club, shots.length])
-    )
-  );
-
-  // Verificar datos de offline por palo
-  Object.keys(shotsByClub).forEach((club) => {
-    const offlineValues = shotsByClub[club].map((s) => s.offline);
-    const allZero = offlineValues.every((v) => v === 0);
-    console.log(
-      `🔍 Palo ${club}: todos offline son 0 = ${allZero}, valores:`,
-      offlineValues.slice(0, 3)
-    );
-  });
-
   return shotsByClub;
 }
 
@@ -252,13 +165,6 @@ function calcularEstadisticasClub(
   deviationPercentage = 0.75,
   lateralPerc = 0.75
 ) {
-  console.log(
-    `🔍 calcularEstadisticasClub - Iniciando cálculo para ${shots.length} tiros`
-  );
-  console.log(
-    `📊 Parámetros: deviationPercentage=${deviationPercentage}, lateralPerc=${lateralPerc}`
-  );
-
   let carryValues,
     variation = "-",
     maxRight = 0,
@@ -273,16 +179,8 @@ function calcularEstadisticasClub(
     );
     const limit = Math.floor(shots.length * deviationPercentage);
     carryValues = closestShots.slice(0, limit).map((s) => s.carry);
-    console.log(
-      `📊 Múltiples tiros (≥5): avgCarry=${avgCarry.toFixed(
-        1
-      )}, limit=${limit}, carryValues=${carryValues.map((v) => v.toFixed(1))}`
-    );
   } else {
     carryValues = shots.map((s) => s.carry);
-    console.log(
-      `📊 Pocos tiros (<5): carryValues=${carryValues.map((v) => v.toFixed(1))}`
-    );
   }
 
   if (shots.length > 1) {
@@ -292,50 +190,22 @@ function calcularEstadisticasClub(
     const maxCarry = Math.max(...carryValues);
     variation = `±${((maxCarry - minCarry) / 2).toFixed(0)}`;
 
-    console.log(
-      `📊 Cálculo de variación: avgCarry=${avgCarry.toFixed(
-        1
-      )}, minCarry=${minCarry.toFixed(1)}, maxCarry=${maxCarry.toFixed(
-        1
-      )}, variation=${variation}`
-    );
-
     // CÁLCULO DE DISPERSIÓN LATERAL
 
     const offlineValues = shots.map((s) => s.offline);
-    console.log(
-      `📊 Valores offline originales:`,
-      offlineValues.map((v) => v.toFixed(1))
-    );
 
     const offlineValuesSorted = offlineValues.sort((a, b) => a - b);
-    console.log(
-      `📊 Valores offline ordenados:`,
-      offlineValuesSorted.map((v) => v.toFixed(1))
-    );
 
     const lateralLimit = Math.floor(offlineValues.length * lateralPerc);
-    console.log(
-      `📊 Lateral limit: ${offlineValues.length} * ${lateralPerc} = ${lateralLimit}`
-    );
 
     const selectedOffline = shots
       .map((s) => s.offline)
       .sort((a, b) => Math.abs(a) - Math.abs(b))
       .slice(0, lateralLimit);
 
-    console.log(
-      `📊 Valores offline seleccionados (por valor absoluto):`,
-      selectedOffline.map((v) => v.toFixed(1))
-    );
-
     maxLeft = Math.abs(Math.min(...selectedOffline)).toFixed(0);
     maxRight = Math.max(...selectedOffline).toFixed(0);
     if (maxRight < 0) maxRight = 0;
-
-    console.log(
-      `📊 Resultados dispersión lateral: maxLeft=${maxLeft}, maxRight=${maxRight}`
-    );
   } else {
   }
 
@@ -411,8 +281,8 @@ async function rellenarPDF2(
     let index = 0;
     Object.keys(orderedClubs).forEach((clubName) => {
       const clubCode = orderedClubs[clubName];
-      if (clubStats[clubCode]) {
-        const dato = clubStats[clubCode];
+      if (clubStats[clubCode] || clubStats[clubName]) {
+        const dato = clubStats[clubCode] || clubStats[clubName];
         const yPos = yBase - index * stepY;
         index++;
 
@@ -603,36 +473,6 @@ export async function createYardageBook(
   lateralPercentage = 0.75
 ) {
   try {
-    console.log(
-      "- Fechas de sesiones:",
-      selectedSessions.map((s) => s.fecha)
-    );
-    console.log(
-      `📊 Parámetros de cálculo: deviationPercentage=${deviationPercentage}, lateralPercentage=${lateralPercentage}`
-    );
-
-    // Verificar datos de offline en las sesiones originales
-    selectedSessions.forEach((session, index) => {
-      // Log para depuración
-      console.log(`Sesión ${index}:`);
-      if (session.datos && session.datos.length > 0) {
-        const primerTiro = session.datos[0];
-        console.log(
-          `   - Campo 'offline' existe:`,
-          "offline (yds l-/r+)" in primerTiro
-        );
-        console.log(
-          `   - Tipo de dato 'offline':`,
-          typeof primerTiro["offline (yds l-/r+)"]
-        );
-        // Verificar algunos tiros más
-        const offlineValues = session.datos
-          .slice(0, 3)
-          .map((t) => t["offline (yds l-/r+)"]);
-        console.log(`   - Primeros valores offline:`, offlineValues);
-      }
-    });
-
     if (!Array.isArray(selectedSessions) || selectedSessions.length === 0) {
       throw new YardageBookError(
         "No hay sesiones válidas para crear el YardageBook",
@@ -649,10 +489,6 @@ export async function createYardageBook(
       (session) => session.shots.length > 0
     );
 
-    console.log(
-      `📊 Sesiones válidas después del procesamiento: ${validSessions.length}`
-    );
-
     if (validSessions.length === 0) {
       throw new YardageBookError(
         "No hay tiros válidos en las sesiones seleccionadas",
@@ -665,9 +501,6 @@ export async function createYardageBook(
 
     const clubStats = {};
     Object.keys(shotsByClub).forEach((club) => {
-      console.log(
-        `📊 Calculando estadísticas para palo: ${club} (${shotsByClub[club].length} tiros)`
-      );
       clubStats[club] = calcularEstadisticasClub(
         shotsByClub[club],
         deviationPercentage,

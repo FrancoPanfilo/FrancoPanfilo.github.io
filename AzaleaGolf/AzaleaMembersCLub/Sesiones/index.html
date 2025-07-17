@@ -60,7 +60,7 @@
     </header>
 
     <section class="sessions">
-      <h2>Cargando sesiones...</h2>
+      <h2 id="mensaje">Cargando sesiones...</h2>
       <div class="sessions-list" id="sessionsList"></div>
 
       <!-- Switch para alternar entre tabla y mapa de dispersión (por encima de la tabla) -->
@@ -100,7 +100,7 @@
       } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
       import { db } from "../db.js";
       import { exportSessionToPDF } from "./pdfExport.js";
-      import { currentData, selectedShots, formatClubName } from "./script.js";
+      import { currentData, formatClubName } from "./script.js";
       import { clubColors } from "../utils/constants.js";
 
       // Verificar el estado de autenticación
@@ -166,9 +166,13 @@
       // Hacer las funciones disponibles globalmente
       window.exportSessionToPDF = exportSessionToPDF;
       window.currentData = currentData;
-      window.selectedShots = selectedShots;
       window.clubColors = clubColors;
       window.formatClubName = formatClubName;
+
+      // Función local para verificar si un tiro está seleccionado
+      function isShotSelected(shot) {
+        return shot.TiroDesactivado !== true;
+      }
 
       // Asegurar que las funciones de heatmap estén disponibles
       if (typeof window.createScatterPlot === "undefined") {
@@ -180,7 +184,10 @@
           await window.updateShotSelection(checkbox);
         }
         if (typeof window.createScatterPlot === "function") {
-          window.createScatterPlot();
+          const canvas = document.getElementById("scatterCanvas");
+          if (canvas && canvas.style.display !== "none") {
+            window.createScatterPlot();
+          }
         }
       };
     </script>

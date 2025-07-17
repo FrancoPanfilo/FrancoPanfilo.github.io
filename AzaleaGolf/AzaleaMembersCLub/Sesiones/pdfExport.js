@@ -3,6 +3,7 @@ import {
   doc as firestoreDoc,
   getDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { GOLF_CONSTANTS } from "../utils/constants.js";
 
 // Función para calcular promedios
 function calculateAverages(clubData) {
@@ -116,46 +117,10 @@ async function addContentToPDF(
     });
   });
 
-  const clubOrder = [
-    "Dr",
-    "2w",
-    "3w",
-    "4w",
-    "5w",
-    "7w",
-    "9w",
-    "1h",
-    "2h",
-    "3h",
-    "4h",
-    "5h",
-    "6h",
-    "7h",
-    "8h",
-    "9h",
-    "1i",
-    "2i",
-    "3i",
-    "4i",
-    "5i",
-    "6i",
-    "7i",
-    "8i",
-    "9i",
-    "PW",
-    "GW",
-    "SW",
-    "LW",
-    "50",
-    "52",
-    "54",
-    "56",
-    "58",
-    "60",
-    "62",
-    "64",
-    "Putt",
-  ];
+  // Obtener el orden correcto de los palos desde GOLF_CONSTANTS
+  const clubOrder = Object.values(GOLF_CONSTANTS.CLUBS).map(
+    (club) => club.shortName
+  );
 
   let y = 40;
 
@@ -170,6 +135,8 @@ async function addContentToPDF(
   y += 2 + texto.length * 5;
 
   // Generar tablas por palo
+  let shotCount = 0;
+  // Recorre todos los clubs presentes en los datos, no solo los de clubOrder
   clubOrder.forEach((clubName) => {
     if (clubsData[clubName]) {
       const clubData = clubsData[clubName];
@@ -299,6 +266,8 @@ async function addContentToPDF(
         pdfDoc.setFontSize(8);
         pdfDoc.setFont("helvetica", "normal");
         pdfDoc.setTextColor(0, 0, 0);
+
+        shotCount++;
 
         const shotValues = [
           ` `,
@@ -468,16 +437,16 @@ async function addContentToPDF(
     // Crear heatmap directamente en el PDF con fondo blanco
     await createPDFHeatmap(pdfDoc, sessionData, y);
   } catch (error) {
-    console.log("Error al agregar el heatmap:", error);
+    // console.log("Error al agregar el heatmap:", error);
   }
 }
 
 // Función principal para exportar a PDF
 async function exportSessionToPDF(sessionData, nombreCompleto, fechaSesion) {
   try {
-    // Filtrar solo los tiros seleccionados
-    const selectedShots = sessionData.filter((shot) => shot.selected);
-    if (selectedShots.length === 0) {
+    // Filtrar solo los tiros que no están deseleccionados
+    const visibleShots = sessionData.filter((shot) => shot.selected !== false);
+    if (visibleShots.length === 0) {
       throw new Error("No hay tiros seleccionados para exportar");
     }
 
@@ -490,7 +459,7 @@ async function exportSessionToPDF(sessionData, nombreCompleto, fechaSesion) {
     pdfDoc.setFontSize(10);
 
     // Agregar contenido al PDF
-    await addContentToPDF(pdfDoc, selectedShots, nombreCompleto, fechaSesion);
+    await addContentToPDF(pdfDoc, visibleShots, nombreCompleto, fechaSesion);
 
     // Insertar logo en la primera página después del contenido
     try {
@@ -504,8 +473,6 @@ async function exportSessionToPDF(sessionData, nombreCompleto, fechaSesion) {
           reader.readAsDataURL(logoBlob);
         });
 
-        console.log("Logo cargado como base64");
-
         // Crear imagen desde base64 de forma síncrona
         const logo = new Image();
 
@@ -515,8 +482,6 @@ async function exportSessionToPDF(sessionData, nombreCompleto, fechaSesion) {
           logo.onerror = reject;
           logo.src = logoBase64;
         });
-
-        console.log("Logo cargado exitosamente:", logo.width, "x", logo.height);
 
         // Calcular dimensiones del logo
         const maxLogoWidth = pdfDoc.internal.pageSize.getWidth() / 4;
@@ -533,20 +498,16 @@ async function exportSessionToPDF(sessionData, nombreCompleto, fechaSesion) {
           logoWidth = logoHeight * logoAspectRatio;
         }
 
-        console.log("Agregando logo al PDF:", logoWidth, "x", logoHeight);
-
         // Ir a la primera página específicamente
         pdfDoc.setPage(1);
 
         // Agregar el logo al PDF en la esquina superior izquierda
         pdfDoc.addImage(logo, "JPEG", 5, 5, logoWidth, logoHeight);
-
-        console.log("Logo agregado exitosamente al PDF en la primera página");
       } else {
-        console.log("No se pudo cargar el logo, continuando sin él");
+        // console.log("No se pudo cargar el logo, continuando sin él");
       }
     } catch (error) {
-      console.log("Error al cargar el logo:", error);
+      // console.log("Error al cargar el logo:", error);
     }
 
     // Guardar el PDF
@@ -719,9 +680,15 @@ async function createPDFHeatmap(pdfDoc, sessionData, y) {
     }
   });
 
+  // Log para depuración: clubs y cantidad de tiros
+  console.log("Palos presentes en heatmap PDF:", Object.keys(groupedData));
+  Object.entries(groupedData).forEach(([club, tiros]) => {
+    console.log(`Palo: ${club}, tiros: ${tiros.length}`);
+  });
+  console.log("Total de tiros en heatmap:", sessionData.length);
+
   // Verificar si hay datos para mostrar
   if (Object.keys(groupedData).length === 0) {
-    console.log("No hay datos de tiros para mostrar en el heatmap");
     return;
   }
 
@@ -800,9 +767,11 @@ async function createPDFHeatmap(pdfDoc, sessionData, y) {
   const xAxisY = worldToScreen(0, 0).y;
   pdfDoc.line(chartX, xAxisY, chartX + chartWidth, xAxisY);
 
-  // Eje Y (desviación lateral)
+  // Eje Y (desviación lateral) - línea central más gruesa
   const yAxisX = worldToScreen(0, 0).x;
+  pdfDoc.setLineWidth(1.2); // Más gruesa
   pdfDoc.line(yAxisX, chartY, yAxisX, chartY + chartHeight);
+  pdfDoc.setLineWidth(0.3); // Restaurar grosor
 
   // Dibujar etiquetas de ejes
   pdfDoc.setFont("helvetica", "normal");
@@ -840,7 +809,11 @@ async function createPDFHeatmap(pdfDoc, sessionData, y) {
   );
 
   // Dibujar puntos y elipses por cada palo
-  Object.keys(groupedData).forEach((club, clubIndex) => {
+  const clubOrder = Object.values(GOLF_CONSTANTS.CLUBS).map(
+    (club) => club.shortName
+  );
+  clubOrder.forEach((club, clubIndex) => {
+    if (!groupedData[club]) return;
     const clubData = groupedData[club];
     const color = clubColors[clubIndex % clubColors.length];
     const rgb = hexToRgb(color);
@@ -856,13 +829,20 @@ async function createPDFHeatmap(pdfDoc, sessionData, y) {
       (p) => p.x >= 0 && p.x <= 350 && p.y >= -80 && p.y <= 80
     );
 
+    // Log para depuración de puntos
+    console.log(
+      `Palo: ${club}, puntos válidos en heatmap:`,
+      validPoints.length,
+      validPoints
+    );
+
     if (validPoints.length === 0) return;
 
-    // Dibujar puntos
+    // Dibujar puntos (círculos más pequeños)
     pdfDoc.setFillColor(rgb.r, rgb.g, rgb.b);
     validPoints.forEach((point) => {
       const screenPoint = worldToScreen(point.x, point.y);
-      pdfDoc.circle(screenPoint.x, screenPoint.y, 1, "F");
+      pdfDoc.circle(screenPoint.x, screenPoint.y, 0.7, "F"); // Radio más pequeño
     });
   });
 
@@ -918,6 +898,7 @@ async function createPDFHeatmap(pdfDoc, sessionData, y) {
       62: 47,
       63: 48,
       64: 49,
+      Putter: 1000, // Warm Up siempre al final
     };
     return clubHierarchy[clubName] || 999;
   }
@@ -949,8 +930,6 @@ async function createPDFHeatmap(pdfDoc, sessionData, y) {
     pdfDoc.setTextColor(0, 0, 0);
     pdfDoc.text(formatClubName(club), itemX + 10, itemY + 4);
   });
-
-  console.log("Heatmap creado exitosamente en el PDF");
 }
 
 export { exportSessionToPDF };

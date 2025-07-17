@@ -1,9 +1,14 @@
-import { currentData, selectedShots, formatClubName } from "./script.js";
+import { currentData, formatClubName } from "./script.js";
 import { clubColors } from "../utils/constants.js";
 
 // State for toggle modes
 let isCarryMode = true;
 let showEllipses = false;
+
+// Función local para verificar si un tiro está seleccionado
+function isShotSelected(shot) {
+  return shot.TiroDesactivado !== true;
+}
 
 // Function to calculate offline carry
 function calculateOfflineCarry(row) {
@@ -106,7 +111,7 @@ function createScatterPlot() {
   // Get selected shots and group by club
   const groupedData = {};
   currentData.forEach((row, index) => {
-    if (selectedShots.has(index)) {
+    if (isShotSelected(row)) {
       const club = row["club name"];
       if (!groupedData[club] && club != "Putter") {
         groupedData[club] = [];
@@ -309,7 +314,10 @@ function createScatterPlot() {
   }`;
   toggleButton.onclick = () => {
     isCarryMode = !isCarryMode;
-    createScatterPlot();
+    const canvas = document.getElementById("scatterCanvas");
+    if (canvas && canvas.style.display !== "none") {
+      createScatterPlot();
+    }
   };
 
   // Add or update toggle button for ellipses
@@ -325,7 +333,10 @@ function createScatterPlot() {
   }`;
   ellipseToggle.onclick = () => {
     showEllipses = !showEllipses;
-    createScatterPlot();
+    const canvas = document.getElementById("scatterCanvas");
+    if (canvas && canvas.style.display !== "none") {
+      createScatterPlot();
+    }
   };
 
   // Mostrar/ocultar controles según el estado del mapa
@@ -341,13 +352,16 @@ function createScatterPlot() {
 // Expose function to global scope
 window.createScatterPlot = createScatterPlot;
 
-// Call createScatterPlot when shots are updated
+// Call createScatterPlot when shots are updated (only if visible)
 window.updateShotSelectionAndPlot = async function (checkbox) {
   if (typeof window.updateShotSelection === "function") {
     await window.updateShotSelection(checkbox);
   }
   if (typeof window.createScatterPlot === "function") {
-    window.createScatterPlot();
+    const canvas = document.getElementById("scatterCanvas");
+    if (canvas && canvas.style.display !== "none") {
+      window.createScatterPlot();
+    }
   }
 };
 
@@ -363,7 +377,10 @@ window.updateFilter = function (value) {
     }
   });
   displayShotsTable(currentData, 0);
-  createScatterPlot();
+  const canvas = document.getElementById("scatterCanvas");
+  if (canvas && canvas.style.display !== "none") {
+    createScatterPlot();
+  }
 };
 
 // Actualizar la tabla HTML para usar la nueva función
@@ -408,14 +425,18 @@ window.addEventListener("resize", function () {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     if (typeof window.createScatterPlot === "function") {
-      window.createScatterPlot();
+      const canvas = document.getElementById("scatterCanvas");
+      if (canvas && canvas.style.display !== "none") {
+        window.createScatterPlot();
+      }
     }
   }, 200);
 });
 
 // Redimensionar el canvas y redibujar el gráfico al cambiar el tamaño de la ventana
 window.addEventListener("resize", () => {
-  if (document.getElementById("scatterCanvas")) {
+  const canvas = document.getElementById("scatterCanvas");
+  if (canvas && canvas.style.display !== "none") {
     createScatterPlot();
   }
 });

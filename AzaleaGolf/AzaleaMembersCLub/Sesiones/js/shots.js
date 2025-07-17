@@ -74,7 +74,6 @@ export function displayShotsTable(data, sessionIndex) {
   Object.keys(clubGroups).forEach((clubName) => {
     const shots = clubGroups[clubName];
     clubAverages[clubName] = {};
-
     fixedColumns.forEach((col) => {
       const values = shots
         .map((shot) => parseFloat(shot[col]))
@@ -167,7 +166,7 @@ export function displayShotsTable(data, sessionIndex) {
       <button onclick="showYardageBookModal()">
         <i class="fas fa-book"></i> Crear YardageBook
       </button>
-      <button onclick="createScatterPlot()">
+      <button onclick="showScatterPlot()">
         <i class="fas fa-chart-scatter"></i> Ver Dispersión de Tiros
       </button>
     </div>
@@ -219,9 +218,9 @@ export function displayShotsTable(data, sessionIndex) {
               <tr class="shot-row" data-club="${clubName}" style="display: none;">
                 <td class="checkbox-column">
                   <input type="checkbox" 
-                    data-row="${row.originalIndex}" 
+                    data-row="${shotIndex + 1}" 
                     onchange="updateShotSelection(this)"
-                    ${selectedShots.has(row.originalIndex) ? "checked" : ""}>
+                    ${selectedShots.has(shotIndex + 1) ? "checked" : ""}>
                 </td>
                 <td class="shot-number-cell">Tiro ${shotIndex + 1}</td>
                 ${fixedColumns

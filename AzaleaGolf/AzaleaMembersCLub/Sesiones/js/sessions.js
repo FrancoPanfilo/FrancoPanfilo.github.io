@@ -35,7 +35,7 @@ export async function loadSessions() {
       const sessions = userData.Sesiones || [];
 
       // Actualizar título
-      titleElement.textContent = `Sesiones de ${userData.nombre} ${userData.apellido}`;
+      titleElement.textContent = `Bienvenido, ${userData.nombre} ${userData.apellido}`;
 
       if (sessions.length === 0) {
         sessionsList.innerHTML = "<p>No hay sesiones disponibles.</p>";
@@ -90,7 +90,6 @@ export async function loadSessions() {
       sessionsList.innerHTML = "<p>No se encontraron datos del usuario.</p>";
     }
   } catch (error) {
-    
     sessionsList.innerHTML = "<p>Error al cargar las sesiones.</p>";
   }
 }
