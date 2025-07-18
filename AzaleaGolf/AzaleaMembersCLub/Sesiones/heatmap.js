@@ -85,22 +85,31 @@ function createScatterPlot() {
   }
 
   // --- ADAPTACIÓN RESPONSIVE DEL CANVAS ---
-  let canvasWidth, canvasHeight, yardsPerPixel;
+  let canvasWidth, canvasHeight, xMin, xMax, yMin, yMax;
   const screenW = window.innerWidth;
   const screenH = window.innerHeight;
   const isMobile = screenW <= 600;
   if (isMobile) {
-    canvasWidth = Math.max(screenW, 320);
-    canvasHeight = Math.max(Math.round(screenH * 1.0), 500);
-    yardsPerPixel = 350 / canvasWidth;
-  } else if (screenW <= 1024) {
-    canvasWidth = Math.min(screenW * 0.9, 900);
-    yardsPerPixel = 350 / canvasWidth;
-    canvasHeight = Math.round(160 / yardsPerPixel);
+    // Rango de dispersión lateral (offline) y distancia
+    xMin = -80;
+    xMax = 80;
+    yMin = 0;
+    yMax = 350;
+    // Relación de aspecto: (yMax-yMin)/(xMax-xMin)
+    const aspectRatio = (yMax - yMin) / (xMax - xMin);
+    // Definir ancho en función de la pantalla, pero mantener la proporción
+    canvasWidth = Math.max(Math.min(screenW * 0.8, 320), 200); // ancho entre 200 y 320px aprox
+    canvasHeight = Math.round(canvasWidth * aspectRatio);
   } else {
-    canvasWidth = 1200;
-    yardsPerPixel = 350 / canvasWidth;
-    canvasHeight = Math.round(160 / yardsPerPixel);
+    // Rango de distancia y dispersión lateral
+    xMin = 0;
+    xMax = 350;
+    yMin = -100;
+    yMax = 100;
+    // Relación de aspecto: (yMax-yMin)/(xMax-xMin)
+    const aspectRatio = (yMax - yMin) / (xMax - xMin);
+    canvasWidth = Math.floor(screenW * 0.7); // 70% del ancho de la pantalla
+    canvasHeight = Math.round(canvasWidth * aspectRatio);
   }
   canvas.style.width = canvasWidth + "px";
   canvas.style.height = canvasHeight + "px";
@@ -195,21 +204,13 @@ function createScatterPlot() {
     : [];
 
   // --- CONFIGURAR LOS EJES SEGÚN EL DISPOSITIVO ---
-  let xTitle, yTitle, xMin, xMax, yMin, yMax;
+  let xTitle, yTitle;
   if (isMobile) {
     xTitle = "Dispersión Lateral (yds i+/d-)";
     yTitle = isCarryMode ? "Carry (yds)" : "Distancia Total (yds)";
-    xMin = -80;
-    xMax = 80;
-    yMin = 0;
-    yMax = 350;
   } else {
     xTitle = isCarryMode ? "Carry (yds)" : "Distancia Total (yds)";
     yTitle = "Desviación Lateral (yds i+/d-)";
-    xMin = 0;
-    xMax = 350;
-    yMin = -80;
-    yMax = 80;
   }
 
   // Create or update the chart

@@ -173,15 +173,17 @@ function showColumnSelector() {
   const existingModal = document.getElementById("columnSelectorModal");
   if (existingModal) existingModal.remove();
 
+  const maxSelectable = getMaxSelectableColumns();
+
   const modalHTML = `
     <div id="columnSelectorModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
           <h3>Seleccionar Columnas</h3>
           <div class="column-count">
-            <span id="selectedColumnsCount">${selectedColumns.size}</span> de ${
-    fixedColumns.length
-  } columnas seleccionadas
+            <span id="selectedColumnsCount">${
+              selectedColumns.size
+            }</span> de ${maxSelectable} columnas permitidas
           </div>
           <button class="close-modal" onclick="closeColumnSelector()">&times;</button>
         </div>
@@ -200,6 +202,9 @@ function showColumnSelector() {
             `
               )
               .join("")}
+          </div>
+          <div id="columnLimitMsg" style="color: #ffb3b3; display: none; margin-top: 8px; text-align: center; font-size: 0.9em;">
+            ¡Has alcanzado el máximo de columnas visibles para tu pantalla!
           </div>
         </div>
         <div class="modal-footer">
@@ -233,6 +238,18 @@ function showColumnSelector() {
   const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
   checkboxes.forEach((checkbox) => {
     checkbox.addEventListener("click", (event) => event.stopPropagation());
+    checkbox.addEventListener("change", (event) => {
+      const checkedCount = Array.from(checkboxes).filter(
+        (cb) => cb.checked
+      ).length;
+      if (checkedCount > maxSelectable) {
+        checkbox.checked = false;
+        document.getElementById("columnLimitMsg").style.display = "block";
+        setTimeout(() => {
+          document.getElementById("columnLimitMsg").style.display = "none";
+        }, 2000);
+      }
+    });
   });
 }
 
@@ -364,15 +381,7 @@ function saveSelectedColumns() {
   showSaveIndicator();
 }
 
-// Load selected columns
-function loadSelectedColumns() {
-  const savedColumns = localStorage.getItem("selectedColumns");
-  if (savedColumns) {
-    selectedColumns = new Set(JSON.parse(savedColumns));
-  }
-}
-
-// Show save indicator
+// Restaurar showSaveIndicator para feedback visual al guardar columnas
 function showSaveIndicator() {
   let indicator = document.getElementById("saveIndicator");
   if (!indicator) {
@@ -392,15 +401,40 @@ function showSaveIndicator() {
   }, 2000);
 }
 
-// Reset to default columns
-function resetToDefaultColumns() {
-  selectedColumns = new Set([
+// === Selección de columnas por defecto según dispositivo ===
+function getDefaultColumns() {
+  if (window.innerWidth <= 600) {
+    return new Set(["carry (yds)", "back spin (rpm)", "efficiency"]);
+  }
+  // Por defecto, las columnas de escritorio
+  return new Set([
     "carry (yds)",
     "peak height (yds)",
     "club speed (mph)",
     "efficiency",
     "club path (deg out-in-/in-out+)",
   ]);
+}
+
+// Modifica la carga inicial de columnas seleccionadas
+function loadSelectedColumns() {
+  if (window.innerWidth <= 600) {
+    // Siempre usar solo las columnas móviles en móviles
+    selectedColumns = getDefaultColumns();
+    saveSelectedColumns(); // Opcional: actualiza el localStorage para mantener coherencia
+    return;
+  }
+  const savedColumns = localStorage.getItem("selectedColumns");
+  if (savedColumns) {
+    selectedColumns = new Set(JSON.parse(savedColumns));
+  } else {
+    selectedColumns = getDefaultColumns();
+  }
+}
+
+// Modifica el reset para que también use el set adecuado
+function resetToDefaultColumns() {
+  selectedColumns = getDefaultColumns();
   saveSelectedColumns();
   updateColumnCheckboxes();
   showResetConfirmation();
@@ -423,9 +457,9 @@ function showResetConfirmation() {
     indicator = document.createElement("div");
     indicator.id = "saveIndicator";
     indicator.className = "save-indicator";
+    indicator.innerHTML = '<i class="fas fa-undo"></i> Columnas restablecidas';
     document.body.appendChild(indicator);
   }
-  indicator.innerHTML = '<i class="fas fa-undo"></i> Columnas restablecidas';
   indicator.style.display = "block";
   indicator.style.opacity = "1";
   setTimeout(() => {
@@ -678,7 +712,7 @@ function displayShotsTable(data, sessionIndex) {
       <thead>
         <tr>
           <th class="checkbox-column"><i class="fas fa-eye"></i></th>
-          <th>Tiro</th>
+          <th class="shot-number-cell">Tiro</th>
           ${getActiveColumns()
             .map(
               (col) => `
@@ -1258,6 +1292,20 @@ const averageRowHTML = (club, averages) => `
       .join("")}
   </tr>
 `;
+
+// === NUEVO: Cálculo de máximo de columnas seleccionables ===
+function getMaxSelectableColumns() {
+  // Usa el ancho del contenedor de la tabla si existe, si no, el ancho de la ventana
+  const tableContainer = document.getElementById("shotsTableContainer");
+  const anchoTabla = tableContainer
+    ? tableContainer.offsetWidth
+    : window.innerWidth;
+  const anchoColumnaDato = 120; // Debe coincidir con el CSS
+  const anchoFijo = 28 + 60; // checkbox + número de tiro
+  const maxColumnas = Math.floor((anchoTabla - anchoFijo) / anchoColumnaDato);
+  // Siempre al menos 1 columna
+  return Math.max(1, maxColumnas);
+}
 
 // Global function assignments
 Object.assign(window, {
