@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Club Atlético Mármol</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <h1>Club Atlético Mármol</h1>
+      <p>Pasión, historia y fútbol amateur</p>
+    </header>
+    <div class="container">
+      <section class="stats">
+        <h2>Resumen del equipo</h2>
+        <div class="stats-grid" id="statsGrid"></div>
+      </section>
+      <section class="records">
+        <h2>Rachas y Récords</h2>
+        <div id="recordsContent"></div>
+      </section>
+      <section class="head-to-head">
+        <h2>Enfrentamientos destacados</h2>
+        <ul>
+          <li>Más victorias contra: <strong id="mostWins"></strong></li>
+          <li>Más empates contra: <strong id="mostDraws"></strong></li>
+          <li>Más derrotas contra: <strong id="mostLosses"></strong></li>
+        </ul>
+      </section>
+      <section class="cards-visual">
+        <h2>Tarjetas acumuladas</h2>
+        <div class="cards-bar">
+          <div id="yellowBar" class="bar yellow"></div>
+          <div id="redBar" class="bar red"></div>
+        </div>
+        <div class="cards-labels">
+          <span id="yellowLabel"></span>
+          <span id="redLabel"></span>
+        </div>
+      </section>
+      <section class="experience">
+        <h2>Progreso de experiencia y títulos</h2>
+        <div id="experienceContent"></div>
+      </section>
+      <section class="achievements" id="achievementsSection">
+        <h2>Logros</h2>
+        <div id="achievementsContent"></div>
+      </section>
+      <section class="players">
+        <h2>Plantilla actual</h2>
+        <input
+          type="text"
+          id="playerFilter"
+          placeholder="Buscar jugador..."
+          aria-label="Buscar jugador"
+        />
+        <div class="players-grid" id="playersGrid"></div>
+      </section>
+      <section class="matches">
+        <h2>Historial de partidos recientes</h2>
+        <div class="match-filters">
+          <button data-filter="all" class="active">Todos</button>
+          <button data-filter="Won">Ganados</button>
+          <button data-filter="Drawn">Empatados</button>
+          <button data-filter="Lost">Perdidos</button>
+        </div>
+        <div style="overflow-x: auto">
+          <table id="matchesTable">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Rival</th>
+                <th>Resultado</th>
+                <th>Marcador</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+    <footer>
+      <span id="leagueStatus"></span>
+    </footer>
+    <script src="main.js"></script>
+  </body>
+</html>
