@@ -6,7 +6,7 @@
 
 /* Leaderboard Table */
 .leaderboard-table-wrapper {
-  background: var(--color-fondo, #e6ffe6);
+  background: #fff;
   border-radius: 12px;
   padding: 18px 10px;
   margin-bottom: 20px;
@@ -23,6 +23,7 @@
 .leaderboard-table thead tr {
   background: var(--color-primario, #1a3a1a);
   color: var(--color-secundario, #fff);
+  transition: background 0.3s;
 }
 .leaderboard-table th,
 .leaderboard-table td {
@@ -30,21 +31,22 @@
   border-bottom: 1px solid #cccccc;
   text-align: center;
   font-size: 1rem;
+  background: #fff;
 }
 .leaderboard-table th {
   font-weight: 600;
   letter-spacing: 1px;
 }
 .leaderboard-table tbody tr.leader {
-  background: var(--color-primario, #1a3a1a);
-  color: var(--color-secundario, #fff);
+  background: #f5f5f5;
+  color: #1a3a1a;
   font-weight: bold;
 }
-.leaderboard-table tbody tr:nth-child(even):not(.leader) {
-  background: var(--color-fondo, #e6ffe6);
+.leaderboard-table tbody tr {
+  background: #fff;
 }
 .leaderboard-table tbody tr:hover {
-  background: #e7f7e7;
+  background: #f0f6f0;
   transition: background 0.2s;
 }
 .leaderboard-table .par { color: #d4b100; font-weight: bold; }
@@ -65,17 +67,19 @@
 .scorecard-horizontal {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
   margin-top: 10px;
   margin-bottom: 10px;
-  font-size: 0.95rem;
+  font-size: 0.97rem;
   background: transparent;
+  table-layout: fixed;
 }
 .scorecard-horizontal th, .scorecard-horizontal td {
-  padding: 6px 10px;
+  padding: 8px 6px;
   border: 1px solid #cdcdcd;
   text-align: center;
   background: #fff;
+  min-width: 45px;
+  word-break: break-word;
 }
 .scorecard-horizontal th {
   background: var(--color-primario, #1a3a1a);
@@ -83,18 +87,126 @@
   font-weight: 500;
 }
 .scorecard-horizontal tr:nth-child(even) th {
-  background: var(--color-fondo, #e6ffe6);
+  background: #f4f8f4;
   color: #222;
 }
 
+/* Responsive Scorecard */
+@media (max-width: 1200px) {
+  #scorecard-modal > div {
+    max-width: 98vw;
+    width: 98vw;
+  }
+  .scorecard-horizontal th, .scorecard-horizontal td {
+    min-width: 38px;
+    font-size: 0.92rem;
+    padding: 6px 4px;
+  }
+}
 @media (max-width: 900px) {
-  .scorecard-horizontal, .leaderboard-table { font-size: 0.88rem; min-width: 500px;}
+  .scorecard-horizontal, .leaderboard-table { font-size: 0.87rem; min-width: 100%; }
   .leaderboard-table th, .leaderboard-table td {padding: 7px 7px;}
+  #scorecard-modal > div {
+    max-width: 100vw;
+    width: 100vw;
+    padding: 10px;
+  }
 }
 @media (max-width: 700px) {
-  .scorecard-horizontal, .leaderboard-table { min-width: 350px; font-size: 0.80rem;}
+  .scorecard-horizontal, .leaderboard-table { font-size: 0.80rem; }
+  .scorecard-horizontal, .scorecard-horizontal thead, .scorecard-horizontal tbody, .scorecard-horizontal tr {
+    display: block;
+    width: 100%;
+  }
+  .scorecard-horizontal tr {
+    margin-bottom: 6px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .scorecard-horizontal th, .scorecard-horizontal td {
+    width: 20%;
+    min-width: 60px;
+    flex: 1 0 20%;
+    box-sizing: border-box;
+    font-size: 0.85em;
+    padding: 4px 2px;
+  }
+  .scorecard-horizontal th:first-child, .scorecard-horizontal td:first-child {
+    width: 100%;
+    flex-basis: 100%;
+    background: #f5f5f5;
+    font-weight: bold;
+  }
+}
+@media (max-width: 500px) {
+  .scorecard-horizontal th, .scorecard-horizontal td {
+    font-size: 0.77em;
+    min-width: 44px;
+    padding: 3px 1px;
+  }
 }
 
+/* Modal base */
+#torneo-modal, #scorecard-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.7);
+  align-items: center;
+  justify-content: center;
+}
+#torneo-modal .modal-content,
+#scorecard-modal > div {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  padding: 36px 24px 24px 24px;
+  max-width: 1200px;
+  width: 98vw;
+  margin: 32px auto;
+  box-shadow: 0 6px 32px rgba(30,60,30,0.12);
+  overflow-x: auto;
+}
+#torneo-modal .modal-header {
+  border-bottom: 2px solid var(--color-primario, #1a3a1a);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+}
+
+/* Estado del torneo */
+.torneo-header {
+  min-height: 120px;
+  border-radius: 12px 12px 0 0;
+  background: var(--color-fondo, #e6ffe6) center/cover no-repeat;
+  position: relative;
+}
+.torneo-header:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,rgba(0,0,0,0.09) 0%,rgba(0,0,0,0.14) 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.torneo-estado {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.96em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  margin: 7px 0 0 0;
+  background: var(--color-primario, #1a3a1a);
+  color: var(--color-secundario, #fff);
+  letter-spacing: 0.5px;
+}
+
+.torneo-estado.activo    { background: #228b22; color: #fff; }
+.torneo-estado.finalizado{ background: #b40000; color: #fff; }
+.torneo-estado.proximo   { background: #d4b100; color: #333; }
+
+/* Utilitarios */
 .no-tarjetas-text, .no-torneos, .loading-spinner, .error-message {
   text-align: center;
   margin: 2em 0;
@@ -142,67 +254,6 @@
   color: #b40000;
 }
 
-/* Modal base */
-#torneo-modal, #scorecard-modal {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0; top: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.7);
-  align-items: center;
-  justify-content: center;
-}
-#torneo-modal .modal-content,
-#scorecard-modal > div {
-  position: relative;
-  background: #fff;
-  border-radius: 18px;
-  padding: 36px 24px 24px 24px;
-  max-width: 1000px;
-  width: 96vw;
-  margin: 32px auto;
-  box-shadow: 0 6px 32px rgba(30,60,30,0.12);
-  overflow-x: auto;
-}
-#torneo-modal .modal-header {
-  border-bottom: 2px solid var(--color-primario, #1a3a1a);
-  margin-bottom: 18px;
-  padding-bottom: 12px;
-}
-
-.torneo-header {
-  min-height: 120px;
-  border-radius: 12px 12px 0 0;
-  background: var(--color-fondo, #e6ffe6) center/cover no-repeat;
-  position: relative;
-}
-.torneo-header:before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg,rgba(0,0,0,0.09) 0%,rgba(0,0,0,0.14) 100%);
-  border-radius: 12px 12px 0 0;
-}
-
-/* Estado del torneo */
-.torneo-estado {
-  display: inline-block;
-  font-weight: 700;
-  font-size: 0.96em;
-  padding: 4px 16px;
-  border-radius: 16px;
-  margin: 7px 0 0 0;
-  background: var(--color-primario, #1a3a1a);
-  color: var(--color-secundario, #fff);
-  letter-spacing: 0.5px;
-}
-
-.torneo-estado.activo    { background: #228b22; color: #fff; }
-.torneo-estado.finalizado{ background: #b40000; color: #fff; }
-.torneo-estado.proximo   { background: #d4b100; color: #333; }
-
-/* Utilitarios */
 ::-webkit-scrollbar {
   width: 8px; background: #e6ffe6;
 }
