@@ -324,7 +324,7 @@ window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
       "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;";
     document.body.appendChild(scorecardModal);
   }
-  scorecardModal.innerHTML = `<div style="background:#fff;padding:30px;max-width:1000px;border-radius:10px;text-align:center;position:relative;">${html}</div>`;
+  scorecardModal.innerHTML = `<div style="background:#fff;padding:30px;border-radius:10px;text-align:center;position:relative;">${html}</div>`;
   scorecardModal.style.display = "flex";
   scorecardModal.onclick = function (e) {
     if (e.target === scorecardModal) scorecardModal.style.display = "none";
