@@ -257,12 +257,11 @@ function showTorneoDetails(torneo) {
           <td>${tarjeta.score_bruto ?? ""}</td>
           <td class="${colorClass}">${netoRelativo}</td>
           <td>
-            <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de score de ${tarjeta.nombre_usuario}" onclick="mostrarTarjetaDetalle('${encodeURIComponent(
-              torneo.id
-            )}', ${index});return false;">
-              <i class="fas fa-clipboard-list"></i>
-            </a>
-          </td>
+  <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de score de ${tarjeta.nombre_usuario}"
+     onclick="mostrarTarjetaDetalle('${encodeURIComponent(torneo.id)}', '${encodeURIComponent(tarjeta.id_usuario)}');return false;">
+    <i class="fas fa-clipboard-list"></i>
+  </a>
+</td>
         </tr>
       `;
     });
@@ -279,8 +278,10 @@ function showTorneoDetails(torneo) {
 // Tarjeta horizontal por jugador (scorecard)
 window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
   const torneo = torneos.find((t) => t.id === decodeURIComponent(torneoId));
-  if (!torneo || !torneo.tarjetas || !torneo.tarjetas[tarjetaIndex]) return;
-  const tarjeta = torneo.tarjetas[tarjetaIndex];
+  if (!torneo || !torneo.tarjetas) return;
+  // Busca la tarjeta por id, ajusta el campo si usas otro identificador
+  const tarjeta = torneo.tarjetas.find(t => t.id == decodeURIComponent(tarjetaId));
+  if (!tarjeta) return;
   const scores = tarjeta.scores || [];
   const yardas = torneo.cancha ? torneo.cancha.yardaje_por_hoyo || [] : [];
   const pares = torneo.cancha ? torneo.cancha.par_por_hoyo || [] : [];
