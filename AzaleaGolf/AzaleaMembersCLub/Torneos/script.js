@@ -306,10 +306,17 @@ window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
     const par = pares[s.hoyo-1] ?? null;
     if (par === null) return `<td>${s.golpes ?? ""}</td>`;
     let contenido = s.golpes ?? "";
-    if (s.golpes < par) {
-      contenido = `<span class="score-circulo">${contenido}</span>`;
-    } else if (s.golpes > par) {
-      contenido = `<span class="score-cuadrado">${contenido}</span>`;
+    if (typeof s.golpes !== "number") return `<td>${contenido}</td>`;
+    const diff = s.golpes - par;
+    // Máximo de 3 círculos o cuadrados
+    if (diff < 0) {
+      // Bajo par
+      const level = Math.max(diff, -3) * -1; // 1, 2, 3
+      contenido = `<span class="score-circulo score-circulo-${level}">${contenido}</span>`;
+    } else if (diff > 0) {
+      // Sobre par
+      const level = Math.min(diff, 3); // 1, 2, 3
+      contenido = `<span class="score-cuadrado score-cuadrado-${level}">${contenido}</span>`;
     }
     return `<td>${contenido}</td>`;
   }).join("")}
