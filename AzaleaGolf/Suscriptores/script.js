@@ -115,6 +115,29 @@ async function loadUsers() {
 // Llamar a loadUsers cuando se carga la página
 document.addEventListener("DOMContentLoaded", loadUsers);
 
+document.addEventListener("DOMContentLoaded", function () {
+  const select = document.getElementById("accionSelect");
+  const formSesion = document.getElementById("form-sesion-container");
+  const formTarjeta = document.getElementById("form-tarjeta-container");
+  const formTorneo = document.getElementById("form-torneo-container");
+
+  function mostrarFormulario(accion) {
+    formSesion.style.display = "none";
+    formTarjeta.style.display = "none";
+    formTorneo.style.display = "none";
+    if (accion === "sesion") formSesion.style.display = "";
+    if (accion === "tarjeta") formTarjeta.style.display = "";
+    if (accion === "torneo") formTorneo.style.display = "";
+  }
+
+  select.addEventListener("change", function () {
+    mostrarFormulario(this.value);
+  });
+
+  // Mostrar el formulario inicial
+  mostrarFormulario(select.value);
+});
+
 // Manejar el envío del formulario
 document.getElementById("sessionForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -158,6 +181,219 @@ document.getElementById("sessionForm").addEventListener("submit", async (e) => {
     status.textContent = `Error al guardar en Firebase: ${error.message}`;
   }
 });
+
+// --- POBLAR SELECTS DE TORNEO Y USUARIO ---
+async function poblarSelectTorneos() {
+  const selectTorneo = document.getElementById("select-torneo");
+  if (!selectTorneo) return;
+  selectTorneo.innerHTML = '<option value="">Selecciona un torneo</option>';
+  try {
+    const torneosRef = collection(db, "Torneos");
+    const snapshot = await getDocs(torneosRef);
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const option = document.createElement("option");
+      option.value = doc.id;
+      option.textContent = data.nombre || doc.id;
+      selectTorneo.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error al cargar torneos:", error);
+  }
+}
+
+async function poblarSelectUsuarios() {
+  const selectUsuario = document.getElementById("select-usuario");
+  if (!selectUsuario) return;
+  selectUsuario.innerHTML = '<option value="">Selecciona un usuario</option>';
+  try {
+    const usuariosRef = collection(db, "Simulador"); // Cambia a "Usuarios" si corresponde
+    const snapshot = await getDocs(usuariosRef);
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const option = document.createElement("option");
+      option.value = doc.id;
+      option.textContent = data.nombre
+        ? `${data.nombre} ${data.apellido || ""}`
+        : doc.id;
+      selectUsuario.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error al cargar usuarios:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  poblarSelectTorneos();
+  poblarSelectUsuarios();
+});
+
+// --- GUARDAR FORMULARIO DE TORNEO ---
+document.getElementById("torneoForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const datos = {
+    nombre: form.nombre.value,
+    fecha_inicio: form.fecha_inicio.value,
+    fecha_fin: form.fecha_fin.value,
+    formato: form.formato.value,
+    cancha: {
+      nombre: form.cancha_nombre.value,
+      tee_salida: form.tee_salida.value,
+      par_por_hoyo: Array.from({ length: 18 }, (_, i) =>
+        parseInt(form[`par_hoyo_${i + 1}`].value)
+      ),
+      yardaje_por_hoyo: Array.from({ length: 18 }, (_, i) =>
+        parseInt(form[`yardas_hoyo_${i + 1}`].value)
+      ),
+      dureza_fairways: form.dureza_fairways.value,
+      velocidad_greens: parseFloat(form.velocidad_greens.value),
+      dureza_greens: form.dureza_greens.value,
+      velocidad_viento: parseFloat(form.velocidad_viento.value),
+      direccion_viento: form.direccion_viento.value,
+    },
+    porcentaje_handicap: parseFloat(form.porcentaje_handicap.value),
+    premio: {
+      descripcion: form.premio_descripcion.value,
+      distribucion: Array.from(document.querySelectorAll(".premio-item")).map(
+        (row) => ({
+          posicion: parseInt(row.querySelector(".premio-posicion").value),
+          recompensa: row.querySelector(".premio-recompensa").value,
+        })
+      ),
+    },
+    reglas: Array.from(document.querySelectorAll(".regla-item")).map(
+      (row) => row.value
+    ),
+    fotos: {
+      portada: form.foto_portada.value,
+      galeria: Array.from(document.querySelectorAll(".galeria-item")).map(
+        (row) => row.value
+      ),
+    },
+    colores: {
+      primario: form.color_primario.value,
+      secundario: form.color_secundario.value,
+      fondo: form.color_fondo.value,
+    },
+    notas_admin: form.notas_admin.value,
+    estado: form.estado.value,
+    fecha_creacion: new Date().toISOString(),
+    fecha_actualizacion: new Date().toISOString(),
+    tarjetas: [],
+  };
+  try {
+    await addDoc(collection(db, "Torneos"), datos);
+    alert("Torneo guardado correctamente");
+    form.reset();
+    poblarSelectTorneos();
+  } catch (error) {
+    alert("Error al guardar torneo: " + error.message);
+  }
+});
+
+// --- GUARDAR FORMULARIO DE TARJETA ---
+document
+  .getElementById("tarjetaForm")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const torneoId = form.torneo.value;
+    const usuarioId = form.usuario.value;
+    if (!torneoId || !usuarioId) {
+      alert("Selecciona torneo y usuario");
+      return;
+    }
+    // Obtener el nombre del usuario seleccionado
+    const usuarioSelect = form.usuario;
+    const nombreUsuario =
+      usuarioSelect.options[usuarioSelect.selectedIndex].textContent;
+    const handicap = parseFloat(form.handicap.value);
+    // Calcular scores
+    const scores = Array.from({ length: 18 }, (_, i) => ({
+      hoyo: i + 1,
+      golpes: parseInt(form[`golpes_${i + 1}`].value),
+      fairway: form[`fairway_${i + 1}`].checked,
+      green: form[`green_${i + 1}`].checked,
+    }));
+    const score_bruto = scores.reduce(
+      (acc, curr) => acc + (isNaN(curr.golpes) ? 0 : curr.golpes),
+      0
+    );
+    const score_neto = score_bruto - handicap;
+    const tarjeta = {
+      id_usuario: usuarioId,
+      nombre_usuario: nombreUsuario,
+      handicap: handicap,
+      scores: scores,
+      score_bruto: score_bruto,
+      score_neto: score_neto,
+      fecha_envio: form.fecha_envio.value,
+    };
+    try {
+      // Buscar el torneo y agregar la tarjeta al array "tarjetas"
+      const torneoRef = doc(db, "Torneos", torneoId);
+      const torneoSnap = await getDoc(torneoRef);
+      if (!torneoSnap.exists()) throw new Error("Torneo no encontrado");
+      const torneoData = torneoSnap.data();
+      // Verificar si ya existe una tarjeta para ese usuario
+      if ((torneoData.tarjetas || []).some((t) => t.id_usuario === usuarioId)) {
+        alert("Ya existe una tarjeta para este usuario en este torneo");
+        return;
+      }
+      await updateDoc(torneoRef, {
+        tarjetas: arrayUnion(tarjeta),
+        fecha_actualizacion: new Date().toISOString(),
+      });
+      alert("Tarjeta guardada correctamente");
+      form.reset();
+    } catch (error) {
+      alert("Error al guardar tarjeta: " + error.message);
+    }
+  });
+
+// --- FUNCIONES PARA AGREGAR FILAS DINÁMICAS EN PREMIOS, REGLAS Y GALERÍA ---
+window.agregarPremio = function () {
+  const lista = document.getElementById("premios-lista");
+  const div = document.createElement("div");
+  div.className = "premio-item";
+  div.innerHTML = `Posición: <input type="number" class="premio-posicion" min="1" required style="width:50px;"> Recompensa: <input type="text" class="premio-recompensa" required> <button type="button" onclick="this.parentNode.remove()">Eliminar</button>`;
+  lista.appendChild(div);
+};
+window.agregarRegla = function () {
+  const lista = document.getElementById("reglas-lista");
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "regla-item";
+  input.required = false;
+  input.placeholder = "Regla específica";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "Eliminar";
+  btn.onclick = function () {
+    input.remove();
+    btn.remove();
+  };
+  lista.appendChild(input);
+  lista.appendChild(btn);
+};
+window.agregarFotoGaleria = function () {
+  const lista = document.getElementById("galeria-lista");
+  const input = document.createElement("input");
+  input.type = "url";
+  input.className = "galeria-item";
+  input.required = false;
+  input.placeholder = "URL de la foto";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "Eliminar";
+  btn.onclick = function () {
+    input.remove();
+    btn.remove();
+  };
+  lista.appendChild(input);
+  lista.appendChild(btn);
+};
 
 // Función para parsear el CSV
 function parseCSV(csvData) {
@@ -371,3 +607,34 @@ async function saveToFirestore(nombre, fecha, sessionData, sessionStats) {
     });
   }
 }
+
+// --- ACTUALIZAR SCORE BRUTO Y NETO EN FORMULARIO DE TARJETA ---
+function actualizarScoresTarjeta() {
+  const form = document.getElementById("tarjetaForm");
+  if (!form) return;
+  let score_bruto = 0;
+  for (let i = 1; i <= 18; i++) {
+    const golpesInput = form[`golpes_${i}`];
+    const val = parseInt(golpesInput?.value);
+    if (!isNaN(val)) score_bruto += val;
+  }
+  const handicap = parseFloat(form.handicap.value) || 0;
+  const score_neto = score_bruto - handicap;
+  form.score_bruto.value = score_bruto;
+  form.score_neto.value = score_neto;
+}
+
+// Asignar eventos a los inputs de golpes y handicap
+function asignarEventosTarjeta() {
+  const form = document.getElementById("tarjetaForm");
+  if (!form) return;
+  for (let i = 1; i <= 18; i++) {
+    const golpesInput = form[`golpes_${i}`];
+    if (golpesInput) {
+      golpesInput.addEventListener("input", actualizarScoresTarjeta);
+    }
+  }
+  form.handicap.addEventListener("input", actualizarScoresTarjeta);
+}
+
+document.addEventListener("DOMContentLoaded", asignarEventosTarjeta);

@@ -1,0 +1,427 @@
+/**
+ * ESTILOS PARA LA SECCIÓN DE TORNEOS
+ */
+
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+.nav-item {
+  display: flex;
+}
+/* Encabezado de sección */
+.section-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-header h1 {
+  font-size: var(--font-size-xxxl);
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.section-header p {
+  font-size: var(--font-size-lg);
+  color: var(--text-muted);
+}
+
+/* Filtros de torneos */
+.torneos-filter {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-lg);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.filter-group label {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-color);
+}
+
+.filter-group select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background-color: var(--background-light);
+  color: var(--text-color);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Contenedor de torneos */
+.torneos-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+/* Tarjeta de torneo */
+.torneo-card {
+  background-color: var(--background-light);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.torneo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.torneo-header {
+  position: relative;
+  padding: var(--spacing-lg);
+  background-size: cover;
+  background-position: center;
+  color: var(--text-white);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.torneo-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.7)
+  );
+  z-index: 1;
+}
+
+.torneo-header > * {
+  position: relative;
+  z-index: 2;
+}
+
+.torneo-estado {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.torneo-estado.proximo {
+  background-color: var(--info-color);
+}
+
+.torneo-estado.activo {
+  background-color: var(--success-color);
+}
+
+.torneo-estado.finalizado {
+  background-color: var(--text-muted);
+}
+
+.torneo-nombre {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-xs);
+}
+
+.torneo-fecha {
+  font-size: var(--font-size-md);
+  opacity: 0.9;
+}
+
+.torneo-body {
+  padding: var(--spacing-lg);
+}
+
+.torneo-info {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.torneo-cancha,
+.torneo-formato {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-color);
+}
+
+.torneo-cancha i,
+.torneo-formato i {
+  color: var(--accent-color);
+}
+
+.torneo-leaderboard h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-md);
+  color: var(--text-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.leaderboard-container {
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-color);
+}
+
+.leaderboard-item {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: var(--border-width) solid var(--border-color);
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-item:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.leaderboard-position {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.leaderboard-player {
+  font-weight: var(--font-weight-medium);
+}
+
+.leaderboard-score {
+  text-align: right;
+}
+
+.score-bruto {
+  font-weight: var(--font-weight-bold);
+  margin-right: var(--spacing-xs);
+}
+
+.score-neto {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.torneo-footer {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width) solid var(--border-color);
+  text-align: center;
+}
+
+/* Modal de detalles del torneo */
+#torneo-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: fit-content;
+  background-color: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  transition: all var(--transition-normal);
+  backdrop-filter: blur(2px);
+}
+
+/* Eliminada la clase .modal.active ya que ahora el modal se muestra por defecto */
+
+.modal-content {
+  background-color: var(--background-light);
+  margin: 5% auto;
+  width: 90%;
+  max-width: 1000px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7); /* Sombra más pronunciada */
+  animation: modalFadeIn 0.3s;
+  border: 2px solid rgba(255, 255, 255, 0.1); /* Borde más visible */
+}
+
+.modal-header {
+  padding: var(--spacing-lg);
+  border-bottom: var(--border-width) solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--primary-color);
+}
+
+.close-modal {
+  color: var(--text-muted);
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: var(--text-color);
+}
+
+.modal-image {
+  height: 200px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  --torneo-color-primario: var(--color-primary);
+  --torneo-color-secundario: var(--color-secondary);
+}
+
+.modal-image::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+}
+
+.modal-body {
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-xl);
+}
+
+.modal-info-container {
+  padding-bottom: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.modal-info-section h3 {
+  margin-bottom: var(--spacing-md);
+  color: var(--primary-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.info-value {
+  font-weight: var(--font-weight-medium);
+}
+
+.reglas-list {
+  padding-left: var(--spacing-lg);
+}
+
+.reglas-list li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.modal-leaderboard-section h3 {
+  margin-bottom: var(--spacing-md);
+  color: var(--primary-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.modal-leaderboard-container {
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-color);
+}
+
+/* Spinner de carga */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xxl);
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+}
+
+.loading-spinner i {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .torneos-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .torneos-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 2% auto;
+  }
+
+  .modal-image {
+    height: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .torneos-container {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-body {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-image {
+    height: 150px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.5rem;
+  }
+}

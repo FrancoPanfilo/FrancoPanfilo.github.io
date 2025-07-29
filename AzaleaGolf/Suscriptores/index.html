@@ -37,7 +37,16 @@
       </ul>
     </div>
 
-    <div class="form-container">
+    <div style="margin-bottom: 20px">
+      <label for="accionSelect"><strong>Selecciona una acción:</strong></label>
+      <select id="accionSelect">
+        <option value="sesion">Cargar Sesión</option>
+        <option value="tarjeta">Cargar Tarjeta</option>
+        <option value="torneo">Cargar Torneo</option>
+      </select>
+    </div>
+
+    <div id="form-sesion-container" class="accion-form">
       <h2>Cargar Sesión de Golf</h2>
       <form id="sessionForm">
         <div class="form-group">
@@ -64,6 +73,659 @@
         <button type="submit">Cargar Sesión</button>
       </form>
       <p id="status" class="status"></p>
+    </div>
+    <div id="form-tarjeta-container" class="accion-form" style="display: none">
+      <h2>Cargar Tarjeta</h2>
+      <form id="tarjetaForm">
+        <label
+          >Torneo*:<br />
+          <select id="select-torneo" name="torneo" required>
+            <option value="">Selecciona un torneo</option>
+          </select> </label
+        ><br />
+        <label
+          >Usuario*:<br />
+          <select id="select-usuario" name="usuario" required>
+            <option value="">Selecciona un usuario</option>
+          </select> </label
+        ><br />
+        <label
+          >Handicap*:<br />
+          <input type="number" name="handicap" step="0.1" required /> </label
+        ><br />
+        <fieldset>
+          <legend>Scores por hoyo</legend>
+          <div style="overflow-x: auto">
+            <table style="min-width: 700px">
+              <thead>
+                <tr>
+                  <th>Hoyo</th>
+                  <th>Golpes*</th>
+                  <th>Fairway acertado</th>
+                  <th>Green en regulación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- 18 hoyos -->
+                <tr>
+                  <td>1</td>
+                  <td>
+                    <input type="number" name="golpes_1" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_1" /></td>
+                  <td><input type="checkbox" name="green_1" /></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>
+                    <input type="number" name="golpes_2" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_2" /></td>
+                  <td><input type="checkbox" name="green_2" /></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>
+                    <input type="number" name="golpes_3" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_3" /></td>
+                  <td><input type="checkbox" name="green_3" /></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>
+                    <input type="number" name="golpes_4" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_4" /></td>
+                  <td><input type="checkbox" name="green_4" /></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>
+                    <input type="number" name="golpes_5" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_5" /></td>
+                  <td><input type="checkbox" name="green_5" /></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>
+                    <input type="number" name="golpes_6" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_6" /></td>
+                  <td><input type="checkbox" name="green_6" /></td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>
+                    <input type="number" name="golpes_7" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_7" /></td>
+                  <td><input type="checkbox" name="green_7" /></td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>
+                    <input type="number" name="golpes_8" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_8" /></td>
+                  <td><input type="checkbox" name="green_8" /></td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>
+                    <input type="number" name="golpes_9" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_9" /></td>
+                  <td><input type="checkbox" name="green_9" /></td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>
+                    <input type="number" name="golpes_10" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_10" /></td>
+                  <td><input type="checkbox" name="green_10" /></td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td>
+                    <input type="number" name="golpes_11" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_11" /></td>
+                  <td><input type="checkbox" name="green_11" /></td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>
+                    <input type="number" name="golpes_12" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_12" /></td>
+                  <td><input type="checkbox" name="green_12" /></td>
+                </tr>
+                <tr>
+                  <td>13</td>
+                  <td>
+                    <input type="number" name="golpes_13" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_13" /></td>
+                  <td><input type="checkbox" name="green_13" /></td>
+                </tr>
+                <tr>
+                  <td>14</td>
+                  <td>
+                    <input type="number" name="golpes_14" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_14" /></td>
+                  <td><input type="checkbox" name="green_14" /></td>
+                </tr>
+                <tr>
+                  <td>15</td>
+                  <td>
+                    <input type="number" name="golpes_15" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_15" /></td>
+                  <td><input type="checkbox" name="green_15" /></td>
+                </tr>
+                <tr>
+                  <td>16</td>
+                  <td>
+                    <input type="number" name="golpes_16" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_16" /></td>
+                  <td><input type="checkbox" name="green_16" /></td>
+                </tr>
+                <tr>
+                  <td>17</td>
+                  <td>
+                    <input type="number" name="golpes_17" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_17" /></td>
+                  <td><input type="checkbox" name="green_17" /></td>
+                </tr>
+                <tr>
+                  <td>18</td>
+                  <td>
+                    <input type="number" name="golpes_18" min="1" required />
+                  </td>
+                  <td><input type="checkbox" name="fairway_18" /></td>
+                  <td><input type="checkbox" name="green_18" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </fieldset>
+        <label
+          >Score bruto total*:<br />
+          <input
+            type="number"
+            name="score_bruto"
+            id="score_bruto"
+            readonly
+            required
+          /> </label
+        ><br />
+        <label
+          >Score neto total*:<br />
+          <input
+            type="number"
+            name="score_neto"
+            id="score_neto"
+            readonly
+            required
+          /> </label
+        ><br />
+        <label
+          >Fecha de envío*:<br />
+          <input type="datetime-local" name="fecha_envio" required /> </label
+        ><br />
+        <button type="submit">Guardar Tarjeta</button>
+      </form>
+    </div>
+    <div id="form-torneo-container" class="accion-form" style="display: none">
+      <h2>Cargar Torneo</h2>
+      <form id="torneoForm">
+        <label
+          >Nombre del torneo*:<br />
+          <input type="text" name="nombre" required /> </label
+        ><br />
+        <label
+          >Fecha de inicio*:<br />
+          <input type="datetime-local" name="fecha_inicio" required /> </label
+        ><br />
+        <label
+          >Fecha de fin*:<br />
+          <input type="datetime-local" name="fecha_fin" required /> </label
+        ><br />
+        <label
+          >Formato*:<br />
+          <select name="formato" required>
+            <option value="">Selecciona</option>
+            <option>Stroke Play</option>
+            <option>Stableford</option>
+            <option>Match Play</option>
+            <option>Scramble</option>
+          </select> </label
+        ><br />
+        <fieldset>
+          <legend>Cancha</legend>
+          <label
+            >Nombre*:<br />
+            <input type="text" name="cancha_nombre" required /> </label
+          ><br />
+          <label
+            >Tee de salida*:<br />
+            <input type="text" name="tee_salida" required /> </label
+          ><br />
+          <label
+            >Par por hoyo*:<br />
+            <div style="display: flex; flex-wrap: wrap; gap: 2px">
+              <!-- 18 inputs -->
+              <input
+                type="number"
+                name="par_hoyo_1"
+                min="3"
+                max="6"
+                required
+                placeholder="1"
+              />
+              <input
+                type="number"
+                name="par_hoyo_2"
+                min="3"
+                max="6"
+                required
+                placeholder="2"
+              />
+              <input
+                type="number"
+                name="par_hoyo_3"
+                min="3"
+                max="6"
+                required
+                placeholder="3"
+              />
+              <input
+                type="number"
+                name="par_hoyo_4"
+                min="3"
+                max="6"
+                required
+                placeholder="4"
+              />
+              <input
+                type="number"
+                name="par_hoyo_5"
+                min="3"
+                max="6"
+                required
+                placeholder="5"
+              />
+              <input
+                type="number"
+                name="par_hoyo_6"
+                min="3"
+                max="6"
+                required
+                placeholder="6"
+              />
+              <input
+                type="number"
+                name="par_hoyo_7"
+                min="3"
+                max="6"
+                required
+                placeholder="7"
+              />
+              <input
+                type="number"
+                name="par_hoyo_8"
+                min="3"
+                max="6"
+                required
+                placeholder="8"
+              />
+              <input
+                type="number"
+                name="par_hoyo_9"
+                min="3"
+                max="6"
+                required
+                placeholder="9"
+              />
+              <input
+                type="number"
+                name="par_hoyo_10"
+                min="3"
+                max="6"
+                required
+                placeholder="10"
+              />
+              <input
+                type="number"
+                name="par_hoyo_11"
+                min="3"
+                max="6"
+                required
+                placeholder="11"
+              />
+              <input
+                type="number"
+                name="par_hoyo_12"
+                min="3"
+                max="6"
+                required
+                placeholder="12"
+              />
+              <input
+                type="number"
+                name="par_hoyo_13"
+                min="3"
+                max="6"
+                required
+                placeholder="13"
+              />
+              <input
+                type="number"
+                name="par_hoyo_14"
+                min="3"
+                max="6"
+                required
+                placeholder="14"
+              />
+              <input
+                type="number"
+                name="par_hoyo_15"
+                min="3"
+                max="6"
+                required
+                placeholder="15"
+              />
+              <input
+                type="number"
+                name="par_hoyo_16"
+                min="3"
+                max="6"
+                required
+                placeholder="16"
+              />
+              <input
+                type="number"
+                name="par_hoyo_17"
+                min="3"
+                max="6"
+                required
+                placeholder="17"
+              />
+              <input
+                type="number"
+                name="par_hoyo_18"
+                min="3"
+                max="6"
+                required
+                placeholder="18"
+              />
+            </div> </label
+          ><br />
+          <label
+            >Yardaje por hoyo*:<br />
+            <div style="display: flex; flex-wrap: wrap; gap: 2px">
+              <!-- 18 inputs -->
+              <input
+                type="number"
+                name="yardas_hoyo_1"
+                min="50"
+                max="700"
+                required
+                placeholder="1"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_2"
+                min="50"
+                max="700"
+                required
+                placeholder="2"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_3"
+                min="50"
+                max="700"
+                required
+                placeholder="3"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_4"
+                min="50"
+                max="700"
+                required
+                placeholder="4"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_5"
+                min="50"
+                max="700"
+                required
+                placeholder="5"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_6"
+                min="50"
+                max="700"
+                required
+                placeholder="6"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_7"
+                min="50"
+                max="700"
+                required
+                placeholder="7"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_8"
+                min="50"
+                max="700"
+                required
+                placeholder="8"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_9"
+                min="50"
+                max="700"
+                required
+                placeholder="9"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_10"
+                min="50"
+                max="700"
+                required
+                placeholder="10"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_11"
+                min="50"
+                max="700"
+                required
+                placeholder="11"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_12"
+                min="50"
+                max="700"
+                required
+                placeholder="12"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_13"
+                min="50"
+                max="700"
+                required
+                placeholder="13"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_14"
+                min="50"
+                max="700"
+                required
+                placeholder="14"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_15"
+                min="50"
+                max="700"
+                required
+                placeholder="15"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_16"
+                min="50"
+                max="700"
+                required
+                placeholder="16"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_17"
+                min="50"
+                max="700"
+                required
+                placeholder="17"
+              />
+              <input
+                type="number"
+                name="yardas_hoyo_18"
+                min="50"
+                max="700"
+                required
+                placeholder="18"
+              />
+            </div> </label
+          ><br />
+          <label
+            >Dureza de fairways*:<br />
+            <select name="dureza_fairways" required>
+              <option value="">Selecciona</option>
+              <option>Suave</option>
+              <option>Media</option>
+              <option>Firme</option>
+            </select> </label
+          ><br />
+          <label
+            >Velocidad de greens* (pies):<br />
+            <input
+              type="number"
+              name="velocidad_greens"
+              step="0.1"
+              required
+            /> </label
+          ><br />
+          <label
+            >Dureza de greens*:<br />
+            <select name="dureza_greens" required>
+              <option value="">Selecciona</option>
+              <option>Suave</option>
+              <option>Media</option>
+              <option>Firme</option>
+            </select> </label
+          ><br />
+          <label
+            >Velocidad del viento*:<br />
+            <input type="number" name="velocidad_viento" required /> </label
+          ><br />
+          <label
+            >Dirección del viento*:<br />
+            <input type="text" name="direccion_viento" required /> </label
+          ><br />
+        </fieldset>
+        <label
+          >Porcentaje de handicap*:<br />
+          <input
+            type="number"
+            name="porcentaje_handicap"
+            min="0"
+            max="100"
+            required
+          /> </label
+        ><br />
+        <fieldset>
+          <legend>Premio (opcional)</legend>
+          <label
+            >Descripción general:<br />
+            <input type="text" name="premio_descripcion" /> </label
+          ><br />
+          <div id="premios-lista">
+            <!-- Aquí se agregan premios dinámicamente -->
+          </div>
+          <button type="button" onclick="agregarPremio()">
+            Agregar premio
+          </button>
+        </fieldset>
+        <fieldset>
+          <legend>Reglas específicas (opcional)</legend>
+          <div id="reglas-lista">
+            <!-- Aquí se agregan reglas dinámicamente -->
+          </div>
+          <button type="button" onclick="agregarRegla()">Agregar regla</button>
+        </fieldset>
+        <fieldset>
+          <legend>Fotos (opcional)</legend>
+          <label
+            >Foto de portada (URL):<br />
+            <input type="url" name="foto_portada" /> </label
+          ><br />
+          <div id="galeria-lista">
+            <!-- Aquí se agregan URLs dinámicamente -->
+          </div>
+          <button type="button" onclick="agregarFotoGaleria()">
+            Agregar foto a galería
+          </button>
+        </fieldset>
+        <fieldset>
+          <legend>Colores (opcional)</legend>
+          <label
+            >Color primario:<br />
+            <input type="color" name="color_primario" /> </label
+          ><br />
+          <label
+            >Color secundario:<br />
+            <input type="color" name="color_secundario" /> </label
+          ><br />
+          <label
+            >Color de fondo:<br />
+            <input type="color" name="color_fondo" /> </label
+          ><br />
+        </fieldset>
+        <label
+          >Notas del administrador (opcional):<br />
+          <textarea name="notas_admin"></textarea></label
+        ><br />
+        <label
+          >Estado*:<br />
+          <select name="estado" required>
+            <option value="">Selecciona</option>
+            <option>Próximo</option>
+            <option>Activo</option>
+            <option>Finalizado</option>
+          </select> </label
+        ><br />
+        <button type="submit">Guardar Torneo</button>
+      </form>
     </div>
     <div id="previewContainer" class="preview-container">
       <h3>Previsualización de la Sesión</h3>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <!-- Fondo del cielo -->
+  <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+    <stop offset="100%" style="stop-color:#E0F7FA;stop-opacity:1" />
+  </linearGradient>
+  <rect width="800" height="400" fill="url(#skyGradient)" />
+  
+  <!-- Campo de golf -->
+  <linearGradient id="grassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#7CB342;stop-opacity:1" />
+    <stop offset="100%" style="stop-color:#558B2F;stop-opacity:1" />
+  </linearGradient>
+  <path d="M0,150 C100,120 200,180 300,150 C400,120 500,180 600,150 C700,120 800,180 800,150 L800,400 L0,400 Z" fill="url(#grassGradient)" />
+  
+  <!-- Bunker de arena -->
+  <ellipse cx="200" cy="250" rx="50" ry="20" fill="#F5DEB3" />
+  
+  <!-- Green -->
+  <ellipse cx="600" cy="280" rx="80" ry="40" fill="#66BB6A" />
+  
+  <!-- Bandera -->
+  <line x1="600" y1="280" x2="600" y2="200" stroke="#424242" stroke-width="2" />
+  <path d="M600,200 L630,210 L600,220 Z" fill="#D32F2F" />
+  
+  <!-- Árboles -->
+  <g transform="translate(100, 180)">
+    <rect x="-5" y="0" width="10" height="30" fill="#795548" />
+    <ellipse cx="0" cy="-10" rx="20" ry="25" fill="#2E7D32" />
+  </g>
+  
+  <g transform="translate(400, 160)">
+    <rect x="-6" y="0" width="12" height="40" fill="#795548" />
+    <ellipse cx="0" cy="-15" rx="25" ry="30" fill="#2E7D32" />
+  </g>
+  
+  <g transform="translate(700, 170)">
+    <rect x="-5" y="0" width="10" height="35" fill="#795548" />
+    <ellipse cx="0" cy="-12" rx="22" ry="28" fill="#2E7D32" />
+  </g>
+  
+  <!-- Pelota de golf -->
+  <circle cx="350" cy="220" r="5" fill="white" stroke="#BDBDBD" stroke-width="0.5" />
+  
+  <!-- Nubes -->
+  <g opacity="0.8">
+    <ellipse cx="150" cy="80" rx="40" ry="20" fill="white" />
+    <ellipse cx="180" cy="70" rx="30" ry="15" fill="white" />
+    <ellipse cx="120" cy="70" rx="25" ry="12" fill="white" />
+  </g>
+  
+  <g opacity="0.7">
+    <ellipse cx="550" cy="60" rx="50" ry="25" fill="white" />
+    <ellipse cx="590" cy="50" rx="35" ry="18" fill="white" />
+    <ellipse cx="510" cy="50" rx="30" ry="15" fill="white" />
+  </g>
+  
+  <!-- Sol -->
+  <circle cx="700" cy="80" r="30" fill="#FFD54F" />
+  <g opacity="0.6">
+    <line x1="700" y1="30" x2="700" y2="10" stroke="#FFD54F" stroke-width="3" />
+    <line x1="700" y1="130" x2="700" y2="150" stroke="#FFD54F" stroke-width="3" />
+    <line x1="650" y1="80" x2="630" y2="80" stroke="#FFD54F" stroke-width="3" />
+    <line x1="750" y1="80" x2="770" y2="80" stroke="#FFD54F" stroke-width="3" />
+    <line x1="665" y1="45" x2="650" y2="30" stroke="#FFD54F" stroke-width="3" />
+    <line x1="735" y1="115" x2="750" y2="130" stroke="#FFD54F" stroke-width="3" />
+    <line x1="665" y1="115" x2="650" y2="130" stroke="#FFD54F" stroke-width="3" />
+    <line x1="735" y1="45" x2="750" y2="30" stroke="#FFD54F" stroke-width="3" />
+  </g>
+  
+  <!-- Texto de Azalea Golf -->
+  <text x="400" y="350" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#FFFFFF" stroke="#000000" stroke-width="0.5">AZALEA GOLF SIMULATOR</text>
+</svg>

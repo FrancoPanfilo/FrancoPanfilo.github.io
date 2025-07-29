@@ -571,7 +571,9 @@ a:hover {
   color: var(--text-white);
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 .club-name-cell {
   font-weight: var(--font-weight-semibold);

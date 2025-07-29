@@ -703,10 +703,10 @@ function displayShotsTable(data, sessionIndex) {
   });
   shotsTableContainer.innerHTML = `
     <div class="table-actions">
-      <button onclick="showColumnSelector()"><i class="fas fa-columns"></i> Seleccionar Columnas</button>
-      <button onclick="exportToCSV()"><i class="fas fa-file-csv"></i> Exportar a CSV</button>
-      <button onclick="exportCurrentSessionToPDF()"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
-      <button onclick="showYardageBookModal()"><i class="fas fa-book"></i> Crear YardageBook</button>
+      <button class="scatter-control-btn" onclick="showColumnSelector()"><i class="fas fa-columns"></i> Seleccionar Columnas</button>
+      <button class="scatter-control-btn" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> Exportar a CSV</button>
+      <button class="scatter-control-btn" onclick="exportCurrentSessionToPDF()"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+      <button class="scatter-control-btn" onclick="showYardageBookModal()"><i class="fas fa-book"></i> Crear YardageBook</button>
     </div>
     <table class="shots-table">
       <thead>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Torneos - Azalea Golf Simulator</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script type="module" src="../auth.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <img
+            src="../img/logo.jpg"
+            class="logoimg"
+            alt="Foresight Sports Logo"
+          />
+        </div>
+        <nav class="nav">
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a href="../index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="../Sesiones/index.html" class="nav-link">
+                <i class="fas fa-golf-ball"></i>
+                <span>Mis Sesiones</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="index.html" class="nav-link active">
+                <i class="fas fa-trophy"></i>
+                <span>Torneos</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="../login.html" class="nav-link auth-button">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Iniciar Sesión</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="mobile-menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="section-header">
+        <h1>Torneos</h1>
+        <p>Explora los torneos disponibles y sus clasificaciones</p>
+      </div>
+
+      <div class="torneos-filter">
+        <div class="filter-group">
+          <label for="estado-filter">Estado:</label>
+          <select id="estado-filter">
+            <option value="todos">Todos</option>
+            <option value="Próximo">Próximos</option>
+            <option value="Activo">Activos</option>
+            <option value="Finalizado">Finalizados</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="torneos-container" class="torneos-container">
+        <!-- Los torneos se cargarán aquí dinámicamente -->
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Cargando torneos...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template para cada torneo -->
+    <template id="torneo-template">
+      <div class="torneo-card">
+        <div class="torneo-header">
+          <div class="torneo-estado"></div>
+          <h2 class="torneo-nombre"></h2>
+          <p class="torneo-fecha"></p>
+        </div>
+        <div class="torneo-body">
+          <div class="torneo-info">
+            <div class="torneo-cancha">
+              <i class="fas fa-flag"></i>
+              <span class="cancha-nombre"></span>
+            </div>
+            <div class="torneo-formato">
+              <i class="fas fa-golf-ball"></i>
+              <span class="formato-nombre"></span>
+            </div>
+          </div>
+          <div class="torneo-leaderboard">
+            <h3>Leaderboard</h3>
+            <div class="leaderboard-container">
+              <!-- El leaderboard se cargará aquí dinámicamente -->
+            </div>
+          </div>
+        </div>
+        <div class="torneo-footer">
+          <button class="btn btn-primary btn-ver-detalles">
+            <i class="fas fa-eye"></i> Ver Detalles
+          </button>
+        </div>
+      </div>
+    </template>
+
+    <!-- Template para cada jugador en el leaderboard -->
+    <template id="leaderboard-item-template">
+      <div class="leaderboard-item">
+        <div class="leaderboard-position"></div>
+        <div class="leaderboard-player">
+          <span class="player-name"></span>
+        </div>
+        <div class="leaderboard-score">
+          <span class="score-bruto"></span>
+          <span class="score-neto"></span>
+        </div>
+      </div>
+    </template>
+
+    <!-- Modal de detalles del torneo -->
+    <div id="torneo-modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-torneo-nombre"></h2>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div id="modal-torneo-imagen" class="modal-image"></div>
+        <div class="modal-body">
+          <div class="modal-info-container">
+            <div class="modal-info-section">
+              <h3>Información del Torneo</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Fecha de inicio:</span>
+                  <span id="modal-fecha-inicio" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Fecha de fin:</span>
+                  <span id="modal-fecha-fin" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Formato:</span>
+                  <span id="modal-formato" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Estado:</span>
+                  <span id="modal-estado" class="info-value"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-info-section">
+              <h3>Información de la Cancha</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Nombre:</span>
+                  <span id="modal-cancha-nombre" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Tee de salida:</span>
+                  <span id="modal-tee-salida" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Dureza de fairways:</span>
+                  <span id="modal-dureza-fairways" class="info-value"></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Velocidad de greens:</span>
+                  <span id="modal-velocidad-greens" class="info-value"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-info-section">
+              <h3>Reglas Específicas</h3>
+              <ul id="modal-reglas" class="reglas-list"></ul>
+            </div>
+          </div>
+
+          <div class="modal-leaderboard-section">
+            <h3>Leaderboard Completo</h3>
+            <div
+              id="modal-leaderboard"
+              class="modal-leaderboard-container"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+    <!-- Eliminado script modal-fix.js -->
+  </body>
+</html>
