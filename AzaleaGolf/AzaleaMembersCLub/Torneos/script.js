@@ -2,31 +2,34 @@ import { db, collection, getDocs, getDoc, doc, query, orderBy } from "../db.js";
 import { auth } from "../firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-// Referencias a elementos del DOM
 const torneosContainer = document.getElementById("torneos-container");
 const torneoTemplate = document.getElementById("torneo-template");
 const estadoFilter = document.getElementById("estado-filter");
 const modal = document.getElementById("torneo-modal");
 const closeModal = document.querySelector(".close-modal");
 
-// Variables globales
 let torneos = [];
 let currentUser = null;
 
-// Formateo de fechas
+// Funciones de fecha
 function formatDate(dateString) {
   const options = { day: "2-digit", month: "short", year: "numeric" };
   return new Date(dateString).toLocaleDateString("es-ES", options);
 }
 function formatDateTime(dateString) {
   const options = {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    day: "2-digit", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit"
   };
   return new Date(dateString).toLocaleString("es-ES", options);
+}
+
+// Score neto relativo al par
+function formatNetoRelativo(scoreNeto, parTotal) {
+  const diff = scoreNeto - parTotal;
+  if (diff === 0) return "Par";
+  if (diff > 0) return `+${diff}`;
+  return `${diff}`;
 }
 
 // Cargar torneos desde Firebase
@@ -75,7 +78,6 @@ async function loadTorneos() {
   }
 }
 
-// Filtrar torneos
 function filterTorneos() {
   const filtroEstado = estadoFilter.value;
   torneosContainer.innerHTML = "";
@@ -97,7 +99,7 @@ function filterTorneos() {
   torneosFiltrados.forEach(renderTorneo);
 }
 
-// Renderizar un torneo (solo detalles básicos y botón de detalles)
+// Renderizar solo detalles básicos y botón de detalles
 function renderTorneo(torneo) {
   const torneoCard = torneoTemplate.content.cloneNode(true);
   const torneoHeader = torneoCard.querySelector(".torneo-header");
@@ -150,7 +152,7 @@ function renderTorneo(torneo) {
   torneosContainer.appendChild(torneoCard);
 }
 
-// Mostrar detalles del torneo en el modal (Leaderboard formato tabla Masters)
+// Leaderboard tipo Masters (score neto relativo al par)
 function showTorneoDetails(torneo) {
   if (!modal) {
     console.error("Elemento modal no encontrado en el DOM");
@@ -217,10 +219,15 @@ function showTorneoDetails(torneo) {
     reglasContainer.appendChild(li);
   }
 
-  // Leaderboard como tabla tipo Masters (único leaderboard)
+  // Leaderboard tipo tabla Masters
   const leaderboardContainer = document.getElementById("modal-leaderboard");
   leaderboardContainer.innerHTML = "";
   if (torneo.tarjetas && torneo.tarjetas.length > 0) {
+    // Calculamos par total de la cancha
+    const parTotal = torneo.cancha && torneo.cancha.par_por_hoyo
+      ? torneo.cancha.par_por_hoyo.reduce((acc, v) => acc + v, 0)
+      : 0;
+
     const tarjetasOrdenadas = [...torneo.tarjetas].sort(
       (a, b) => a.score_neto - b.score_neto
     );
@@ -237,9 +244,12 @@ function showTorneoDetails(torneo) {
       </thead>
       <tbody>`;
     tarjetasOrdenadas.forEach((tarjeta, index) => {
+      // Score neto relativo al par
+      const netoRelativo = formatNetoRelativo(tarjeta.score_neto, parTotal);
       let colorClass = "text-yellow-600";
-      if (tarjeta.score_neto < 0) colorClass = "text-green-600";
-      if (tarjeta.score_neto > 0) colorClass = "text-red-600";
+      if (netoRelativo === "Par") colorClass = "text-yellow-600";
+      else if(netoRelativo.startsWith("-")) colorClass = "text-green-600";
+      else colorClass = "text-red-600";
       const leaderClass =
         index === 0
           ? "leader"
@@ -252,7 +262,7 @@ function showTorneoDetails(torneo) {
           <td class="py-3 px-6">${tarjeta.nombre_usuario}</td>
           <td class="py-3 px-6 text-center">${tarjeta.handicap ?? ""}</td>
           <td class="py-3 px-6 text-center">${tarjeta.score_bruto ?? ""}</td>
-          <td class="py-3 px-6 text-center ${colorClass}">${tarjeta.score_neto ?? ""}</td>
+          <td class="py-3 px-6 text-center ${colorClass}">${netoRelativo}</td>
           <td class="py-3 px-6 text-center">
             <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de score de ${tarjeta.nombre_usuario}" onclick="mostrarTarjetaDetalle('${encodeURIComponent(
               torneo.id
@@ -273,30 +283,46 @@ function showTorneoDetails(torneo) {
   modal.style.display = "block";
 }
 
-// Mostrar detalle de la tarjeta de score (scorecard) en modal aparte
+// Tarjeta horizontal por jugador (scorecard)
 window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
   const torneo = torneos.find((t) => t.id === decodeURIComponent(torneoId));
   if (!torneo || !torneo.tarjetas || !torneo.tarjetas[tarjetaIndex]) return;
   const tarjeta = torneo.tarjetas[tarjetaIndex];
+  const scores = tarjeta.scores || [];
+  const yardas = torneo.cancha ? torneo.cancha.yardaje_por_hoyo || [] : [];
+  const pares = torneo.cancha ? torneo.cancha.par_por_hoyo || [] : [];
 
+  // Armado de tabla horizontal
   let html = `<h3>Tarjeta de ${tarjeta.nombre_usuario}</h3>
+    <div style="overflow-x:auto">
     <table border="1" style="margin:10px 0;width:100%;text-align:center">
       <tr>
         <th>Hoyo</th>
+        ${scores.map(s => `<td>${s.hoyo}</td>`).join("")}
+      </tr>
+      <tr>
+        <th>Yardas</th>
+        ${scores.map(s => `<td>${yardas[s.hoyo-1] ?? ""}</td>`).join("")}
+      </tr>
+      <tr>
+        <th>Par</th>
+        ${scores.map(s => `<td>${pares[s.hoyo-1] ?? ""}</td>`).join("")}
+      </tr>
+      <tr>
         <th>Golpes</th>
+        ${scores.map(s => `<td>${s.golpes ?? ""}</td>`).join("")}
+      </tr>
+      <tr>
         <th>Fairway</th>
-        <th>Green</th>
-      </tr>`;
-  (tarjeta.scores || []).forEach((s) => {
-    html += `<tr>
-      <td>${s.hoyo}</td>
-      <td>${s.golpes}</td>
-      <td>${s.fairway ? "✔️" : "❌"}</td>
-      <td>${s.green ? "✔️" : "❌"}</td>
-    </tr>`;
-  });
-  html += "</table>";
-  html += `<button onclick="document.getElementById('scorecard-modal').style.display='none'" class="btn btn-secondary" style="margin-top:10px">Cerrar</button>`;
+        ${scores.map(s => `<td>${s.fairway ? "✔️" : "❌"}</td>`).join("")}
+      </tr>
+      <tr>
+        <th>Green Reg.</th>
+        ${scores.map(s => `<td>${s.green ? "✔️" : "❌"}</td>`).join("")}
+      </tr>
+    </table>
+    </div>
+    <button onclick="document.getElementById('scorecard-modal').style.display='none'" class="btn btn-secondary" style="margin-top:10px">Cerrar</button>`;
 
   let scorecardModal = document.getElementById("scorecard-modal");
   if (!scorecardModal) {
@@ -306,14 +332,13 @@ window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
       "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;";
     document.body.appendChild(scorecardModal);
   }
-  scorecardModal.innerHTML = `<div style="background:#fff;padding:30px;max-width:400px;border-radius:10px;text-align:center;position:relative;">${html}</div>`;
+  scorecardModal.innerHTML = `<div style="background:#fff;padding:30px;max-width:1000px;border-radius:10px;text-align:center;position:relative;">${html}</div>`;
   scorecardModal.style.display = "flex";
   scorecardModal.onclick = function (e) {
     if (e.target === scorecardModal) scorecardModal.style.display = "none";
   };
 };
 
-// Cerrar modal torneo
 if (closeModal) {
   closeModal.addEventListener("click", (event) => {
     event.preventDefault();
@@ -325,10 +350,8 @@ window.addEventListener("click", (event) => {
   if (modal && event.target === modal) modal.style.display = "none";
 });
 
-// Evento filtro
 estadoFilter.addEventListener("change", filterTorneos);
 
-// Estado de autenticación
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   const authButton = document.querySelector(".auth-button");
@@ -352,7 +375,6 @@ onAuthStateChanged(auth, (user) => {
   loadTorneos();
 });
 
-// Menú móvil
 const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
 const navMenu = document.querySelector(".nav-menu");
 mobileMenuToggle.addEventListener("click", () => {
