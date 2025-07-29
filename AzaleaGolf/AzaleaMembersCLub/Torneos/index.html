@@ -104,12 +104,22 @@
               <span class="formato-nombre"></span>
             </div>
           </div>
-          <div class="torneo-leaderboard">
-            <h3>Leaderboard</h3>
-            <div class="leaderboard-container">
-              <!-- El leaderboard se cargará aquí dinámicamente -->
-            </div>
-          </div>
+         <table class="w-full border-collapse shadow-lg" role="grid" aria-label="Leaderboard de golf">
+    <thead>
+        <tr class="bg-green-900 text-white">
+            <th class="py-3 px-6">Nombre</th>
+            <th class="py-3 px-6">Handicap</th>
+            <th class="py-3 px-6">Score Bruto</th>
+            <th class="py-3 px-6">Score Neto</th>
+            <th class="py-3 px-6" aria-hidden="true"></th>
+        </tr>
+    </thead>
+    <tbody id="leaderboard-body">
+        <!-- Aquí se cargarán las filas -->
+    </tbody>
+</table>
+<!-- Puedes colocar aquí un modal o div para mostrar el detalle de la tarjeta al hacer clic en el icono -->
+<div id="detalle-tarjeta-modal" style="display:none;"></div>
         </div>
         <div class="torneo-footer">
           <button class="btn btn-primary btn-ver-detalles">
