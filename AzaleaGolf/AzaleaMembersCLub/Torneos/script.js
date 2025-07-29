@@ -5,9 +5,6 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/f
 // Referencias a elementos del DOM
 const torneosContainer = document.getElementById("torneos-container");
 const torneoTemplate = document.getElementById("torneo-template");
-const leaderboardItemTemplate = document.getElementById(
-  "leaderboard-item-template"
-);
 const estadoFilter = document.getElementById("estado-filter");
 const modal = document.getElementById("torneo-modal");
 const closeModal = document.querySelector(".close-modal");
@@ -100,7 +97,7 @@ function filterTorneos() {
   torneosFiltrados.forEach(renderTorneo);
 }
 
-// Renderizar un torneo
+// Renderizar un torneo (solo detalles básicos y botón de detalles)
 function renderTorneo(torneo) {
   const torneoCard = torneoTemplate.content.cloneNode(true);
   const torneoHeader = torneoCard.querySelector(".torneo-header");
@@ -109,9 +106,6 @@ function renderTorneo(torneo) {
   const torneoFecha = torneoCard.querySelector(".torneo-fecha");
   const canchaNombre = torneoCard.querySelector(".cancha-nombre");
   const formatoNombre = torneoCard.querySelector(".formato-nombre");
-  const leaderboardContainer = torneoCard.querySelector(
-    ".leaderboard-container"
-  );
   const btnVerDetalles = torneoCard.querySelector(".btn-ver-detalles");
 
   if (torneo.fotos && torneo.fotos.portada) {
@@ -146,39 +140,6 @@ function renderTorneo(torneo) {
     ? torneo.cancha.nombre
     : "Cancha no especificada";
   formatoNombre.textContent = torneo.formato || "Formato no especificado";
-
-  if (torneo.tarjetas && torneo.tarjetas.length > 0) {
-    const tarjetasOrdenadas = [...torneo.tarjetas].sort(
-      (a, b) => a.score_neto - b.score_neto
-    );
-    const tarjetasMostradas = tarjetasOrdenadas.slice(0, 5);
-
-    tarjetasMostradas.forEach((tarjeta, index) => {
-      const leaderboardItem = leaderboardItemTemplate.content.cloneNode(true);
-      leaderboardItem.querySelector(".leaderboard-position").textContent =
-        index + 1;
-      leaderboardItem.querySelector(".player-name").textContent =
-        tarjeta.nombre_usuario;
-      leaderboardItem.querySelector(".score-bruto").textContent =
-        tarjeta.score_bruto;
-      leaderboardItem.querySelector(
-        ".score-neto"
-      ).textContent = `(${tarjeta.score_neto})`;
-      leaderboardContainer.appendChild(leaderboardItem);
-    });
-
-    if (tarjetasOrdenadas.length > 5) {
-      const verMasItem = document.createElement("div");
-      verMasItem.className = "leaderboard-item ver-mas";
-      verMasItem.innerHTML = `<div class="ver-mas-text">Ver todos (${tarjetasOrdenadas.length})</div>`;
-      leaderboardContainer.appendChild(verMasItem);
-    }
-  } else {
-    const noTarjetasItem = document.createElement("div");
-    noTarjetasItem.className = "leaderboard-item no-tarjetas";
-    noTarjetasItem.innerHTML = `<div class="no-tarjetas-text">No hay participantes registrados</div>`;
-    leaderboardContainer.appendChild(noTarjetasItem);
-  }
 
   btnVerDetalles.addEventListener("click", (event) => {
     event.preventDefault();
@@ -256,11 +217,10 @@ function showTorneoDetails(torneo) {
     reglasContainer.appendChild(li);
   }
 
-  // Leaderboard como tabla tipo Masters
+  // Leaderboard como tabla tipo Masters (único leaderboard)
   const leaderboardContainer = document.getElementById("modal-leaderboard");
   leaderboardContainer.innerHTML = "";
   if (torneo.tarjetas && torneo.tarjetas.length > 0) {
-    // Ordena por score neto
     const tarjetasOrdenadas = [...torneo.tarjetas].sort(
       (a, b) => a.score_neto - b.score_neto
     );
