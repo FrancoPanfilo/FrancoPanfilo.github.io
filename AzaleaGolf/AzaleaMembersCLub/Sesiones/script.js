@@ -1053,86 +1053,74 @@ function exportToCSV() {
   document.body.removeChild(link);
 }
 
-// Load sessions
+let currentPage = 0;
+
 async function loadSessions() {
   const sessionsList = document.getElementById("sessionsList");
   sessionsList.innerHTML = "";
   const mensajeElement = document.getElementById("mensaje");
   loadSelectedColumns();
   loadSelectedSessions();
-  const user =
-    auth.currentUser ||
-    (await new Promise((resolve) => onAuthStateChanged(auth, resolve)));
+  const user = auth.currentUser || (await new Promise((resolve) => onAuthStateChanged(auth, resolve)));
   if (!user) {
     sessionsList.innerHTML = "<p>No hay usuario autenticado.</p>";
-    if (mensajeElement)
-      mensajeElement.textContent = "No hay usuario autenticado.";
+    if (mensajeElement) mensajeElement.textContent = "No hay usuario autenticado.";
     return;
   }
   const userDocRef = doc(db, "Simulador", user.uid);
   const userDoc = await getDoc(userDocRef);
   if (!userDoc.exists()) {
     sessionsList.innerHTML = "<p>No se encontraron sesiones.</p>";
-    if (mensajeElement)
-      mensajeElement.textContent = "No se encontraron sesiones.";
+    if (mensajeElement) mensajeElement.textContent = "No se encontraron sesiones.";
     return;
   }
   const userData = userDoc.data();
   let sessions = userData.Sesiones || [];
   sessions = sessions.map((s, idx) => ({ ...s, _firebaseIndex: idx }));
   sessions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-  if (mensajeElement)
-    mensajeElement.textContent = `Sesiones de ${userData.nombre} ${userData.apellido}`;
+  if (mensajeElement) mensajeElement.textContent = `Sesiones de ${userData.nombre} ${userData.apellido}`;
+  renderSessionsPage(sessions);
+}
+
+function renderSessionsPage(sessions) {
+  const sessionsList = document.getElementById("sessionsList");
+  const start = currentPage * 3;
+  const end = start + 3;
+  const pageSessions = sessions.slice(start, end);
   sessionsList.innerHTML = "";
-  sessions.forEach((session, visualIndex) => {
+  pageSessions.forEach((session, visualIndex) => {
     const sessionItem = document.createElement("div");
     sessionItem.className = "session-item";
     sessionItem.innerHTML = `
       <div class="session-header">
         <div class="session-info">
           <p><strong>Fecha:</strong> ${session.fecha}</p>
-          ${
-            session.datos && session.datos.length > 0
-              ? `<p><strong>Tiros:</strong> ${session.datos.length}</p>`
-              : ""
-          }
+          ${session.datos && session.datos.length > 0 ? `<p><strong>Tiros:</strong> ${session.datos.length}</p>` : ""}
           ${session.id ? `<p><strong>ID:</strong> ${session.id}</p>` : ""}
           <p><strong>Duración:</strong> ${session.stats?.sessionTime || "-"}</p>
         </div>
-        <button class="delete-session-btn" onclick="deleteSession('${
-          session.fecha
-        }', event)" title="Eliminar sesión">
+        <button class="delete-session-btn" onclick="deleteSession('${session.fecha}', event)" title="Eliminar sesión">
           <i class="fas fa-trash"></i>
         </button>
       </div>
     `;
     sessionItem.addEventListener("click", async (event) => {
       if (event.target.closest(".delete-session-btn")) return;
-      document
-        .querySelectorAll(".session-item")
-        .forEach((item) => item.classList.remove("active"));
+      document.querySelectorAll(".session-item").forEach((item) => item.classList.remove("active"));
       sessionItem.classList.add("active");
       try {
-        const userDocRef = doc(db, "Simulador", user.uid);
+        const userDocRef = doc(db, "Simulador", auth.currentUser.uid);
         const userDoc = await getDoc(userDocRef);
         const userData = userDoc.data();
         const sessionData = userData.Sesiones[session._firebaseIndex];
-        currentData = sessionData.datos.map((shot, idx) => ({
-          ...shot,
-          originalIndex: idx,
-        }));
+        currentData = sessionData.datos.map((shot, idx) => ({ ...shot, originalIndex: idx }));
       } catch (error) {
-        currentData = session.datos.map((shot, idx) => ({
-          ...shot,
-          originalIndex: idx,
-        }));
+        currentData = session.datos.map((shot, idx) => ({ ...shot, originalIndex: idx }));
       }
       currentSort = { column: null, ascending: true };
       currentFilter = null;
       clubVisibility = {};
-      currentData.forEach((row) => {
-        clubVisibility[row["club name"]] = false;
-      });
+      currentData.forEach((row) => { clubVisibility[row["club name"]] = false; });
       showSwitchContainer(true);
       const toggle = document.getElementById("toggleView");
       if (toggle) {
@@ -1142,6 +1130,45 @@ async function loadSessions() {
       displayShotsTable(currentData, session._firebaseIndex);
     });
     sessionsList.appendChild(sessionItem);
+  });
+  renderPaginationControls(sessions);
+}
+
+function renderPaginationControls(sessions) {
+  const sessionsList = document.getElementById("sessionsList");
+  const paginationContainer = document.createElement("div");
+  paginationContainer.className = "pagination-controls";
+  const totalPages = Math.ceil(sessions.length / 3);
+  paginationContainer.innerHTML = `
+    <button class="pagination-btn" onclick="goToPreviousPage()" ${currentPage === 0 ? "disabled" : ""}>
+      <i class="fas fa-chevron-left"></i> Anterior
+    </button>
+    <span class="pagination-info">Página ${currentPage + 1} de ${totalPages}</span>
+    <button class="pagination-btn" onclick="goToNextPage()" ${currentPage >= totalPages - 1 ? "disabled" : ""}>
+      Siguiente <i class="fas fa-chevron-right"></i>
+    </button>
+  `;
+  sessionsList.parentElement.appendChild(paginationContainer);
+}
+
+function goToPreviousPage() {
+  if (currentPage > 0) {
+    currentPage--;
+    loadSessions();
+  }
+}
+
+function goToNextPage() {
+  const user = auth.currentUser;
+  if (!user) return;
+  const userDocRef = doc(db, "Simulador", user.uid);
+  getDoc(userDocRef).then((userDoc) => {
+    const sessions = userDoc.data().Sesiones || [];
+    const totalPages = Math.ceil(sessions.length / 3);
+    if (currentPage < totalPages - 1) {
+      currentPage++;
+      loadSessions();
+    }
   });
 }
 
