@@ -276,11 +276,10 @@ function showTorneoDetails(torneo) {
 }
 
 // Tarjeta horizontal por jugador (scorecard)
-window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
+window.mostrarTarjetaDetalle = function (torneoId, idUsuario) {
   const torneo = torneos.find((t) => t.id === decodeURIComponent(torneoId));
   if (!torneo || !torneo.tarjetas) return;
-  // Busca la tarjeta por id, ajusta el campo si usas otro identificador
-  const tarjeta = torneo.tarjetas.find(t => t.id == decodeURIComponent(tarjetaId));
+  const tarjeta = torneo.tarjetas.find(t => t.id_usuario == decodeURIComponent(idUsuario));
   if (!tarjeta) return;
   const scores = tarjeta.scores || [];
   const yardas = torneo.cancha ? torneo.cancha.yardaje_por_hoyo || [] : [];
