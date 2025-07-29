@@ -11,7 +11,6 @@ const closeModal = document.querySelector(".close-modal");
 let torneos = [];
 let currentUser = null;
 
-// Funciones de fecha
 function formatDate(dateString) {
   const options = { day: "2-digit", month: "short", year: "numeric" };
   return new Date(dateString).toLocaleDateString("es-ES", options);
@@ -23,8 +22,6 @@ function formatDateTime(dateString) {
   };
   return new Date(dateString).toLocaleString("es-ES", options);
 }
-
-// Score neto relativo al par
 function formatNetoRelativo(scoreNeto, parTotal) {
   const diff = scoreNeto - parTotal;
   if (diff === 0) return "Par";
@@ -32,7 +29,6 @@ function formatNetoRelativo(scoreNeto, parTotal) {
   return `${diff}`;
 }
 
-// Cargar torneos desde Firebase
 async function loadTorneos() {
   try {
     torneosContainer.innerHTML = `
@@ -99,7 +95,6 @@ function filterTorneos() {
   torneosFiltrados.forEach(renderTorneo);
 }
 
-// Renderizar solo detalles básicos y botón de detalles
 function renderTorneo(torneo) {
   const torneoCard = torneoTemplate.content.cloneNode(true);
   const torneoHeader = torneoCard.querySelector(".torneo-header");
@@ -118,16 +113,9 @@ function renderTorneo(torneo) {
   }
 
   if (torneo.colores) {
-    if (torneo.colores.primario)
-      torneoHeader.style.setProperty(
-        "--torneo-color-primario",
-        torneo.colores.primario
-      );
-    if (torneo.colores.secundario)
-      torneoHeader.style.setProperty(
-        "--torneo-color-secundario",
-        torneo.colores.secundario
-      );
+    torneoCard.firstElementChild.style.setProperty('--torneo-color-primario', torneo.colores.primario || "#1a3a1a");
+    torneoCard.firstElementChild.style.setProperty('--torneo-color-secundario', torneo.colores.secundario || "#fff");
+    torneoCard.firstElementChild.style.setProperty('--torneo-color-fondo', torneo.colores.fondo || "#e6ffe6");
   }
 
   torneoEstado.textContent = torneo.estado || "Próximo";
@@ -152,12 +140,22 @@ function renderTorneo(torneo) {
   torneosContainer.appendChild(torneoCard);
 }
 
-// Leaderboard tipo Masters (score neto relativo al par)
+// Leaderboard tipo Masters (score neto relativo al par y colores personalizados)
 function showTorneoDetails(torneo) {
   if (!modal) {
     console.error("Elemento modal no encontrado en el DOM");
     return;
   }
+
+  // Colores personalizados
+  const colores = torneo.colores || {};
+  const colorPrimario = colores.primario || '#1a3a1a';
+  const colorSecundario = colores.secundario || '#fff';
+  const colorFondo = colores.fondo || '#e6ffe6';
+
+  modal.style.setProperty('--torneo-color-primario', colorPrimario);
+  modal.style.setProperty('--torneo-color-secundario', colorSecundario);
+  modal.style.setProperty('--torneo-color-fondo', colorFondo);
 
   // Info básica
   document.getElementById("modal-torneo-nombre").textContent = torneo.nombre;
@@ -219,11 +217,11 @@ function showTorneoDetails(torneo) {
     reglasContainer.appendChild(li);
   }
 
-  // Leaderboard tipo tabla Masters
+  // Leaderboard tipo tabla Masters (único leaderboard)
   const leaderboardContainer = document.getElementById("modal-leaderboard");
   leaderboardContainer.innerHTML = "";
   if (torneo.tarjetas && torneo.tarjetas.length > 0) {
-    // Calculamos par total de la cancha
+    // Par total de la cancha
     const parTotal = torneo.cancha && torneo.cancha.par_por_hoyo
       ? torneo.cancha.par_por_hoyo.reduce((acc, v) => acc + v, 0)
       : 0;
@@ -231,39 +229,34 @@ function showTorneoDetails(torneo) {
     const tarjetasOrdenadas = [...torneo.tarjetas].sort(
       (a, b) => a.score_neto - b.score_neto
     );
-    let tabla = `<table class="w-full border-collapse shadow-lg leaderboard-table" role="grid" aria-label="Leaderboard de golf">
+    let tabla = `<div class="leaderboard-table-wrapper" style="--color-primario:${colorPrimario};--color-secundario:${colorSecundario};--color-fondo:${colorFondo};">
+      <table class="leaderboard-table" role="grid" aria-label="Leaderboard de golf">
       <thead>
-          <tr class="bg-green-900 text-white">
-              <th class="py-3 px-6">Pos</th>
-              <th class="py-3 px-6">Nombre</th>
-              <th class="py-3 px-6">Handicap</th>
-              <th class="py-3 px-6">Score Bruto</th>
-              <th class="py-3 px-6">Score Neto</th>
-              <th class="py-3 px-6" aria-hidden="true"></th>
+          <tr>
+              <th>Pos</th>
+              <th>Nombre</th>
+              <th>Handicap</th>
+              <th>Score Bruto</th>
+              <th>Score Neto</th>
+              <th aria-hidden="true"></th>
           </tr>
       </thead>
       <tbody>`;
     tarjetasOrdenadas.forEach((tarjeta, index) => {
-      // Score neto relativo al par
       const netoRelativo = formatNetoRelativo(tarjeta.score_neto, parTotal);
-      let colorClass = "text-yellow-600";
-      if (netoRelativo === "Par") colorClass = "text-yellow-600";
-      else if(netoRelativo.startsWith("-")) colorClass = "text-green-600";
-      else colorClass = "text-red-600";
-      const leaderClass =
-        index === 0
-          ? "leader"
-          : index % 2 === 0
-          ? "bg-gray-100 hover:bg-gray-200"
-          : "bg-white hover:bg-gray-50";
+      let colorClass = "par";
+      if (netoRelativo === "Par") colorClass = "par";
+      else if(netoRelativo.startsWith("-")) colorClass = "menos";
+      else colorClass = "mas";
+      const leaderClass = index === 0 ? "leader" : "";
       tabla += `
         <tr class="${leaderClass}">
-          <td class="py-3 px-6">${index + 1}</td>
-          <td class="py-3 px-6">${tarjeta.nombre_usuario}</td>
-          <td class="py-3 px-6 text-center">${tarjeta.handicap ?? ""}</td>
-          <td class="py-3 px-6 text-center">${tarjeta.score_bruto ?? ""}</td>
-          <td class="py-3 px-6 text-center ${colorClass}">${netoRelativo}</td>
-          <td class="py-3 px-6 text-center">
+          <td>${index + 1}</td>
+          <td>${tarjeta.nombre_usuario}</td>
+          <td>${tarjeta.handicap ?? ""}</td>
+          <td>${tarjeta.score_bruto ?? ""}</td>
+          <td class="${colorClass}">${netoRelativo}</td>
+          <td>
             <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de score de ${tarjeta.nombre_usuario}" onclick="mostrarTarjetaDetalle('${encodeURIComponent(
               torneo.id
             )}', ${index});return false;">
@@ -273,7 +266,7 @@ function showTorneoDetails(torneo) {
         </tr>
       `;
     });
-    tabla += "</tbody></table>";
+    tabla += "</tbody></table></div>";
     leaderboardContainer.innerHTML = tabla;
   } else {
     leaderboardContainer.innerHTML =
@@ -292,10 +285,9 @@ window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
   const yardas = torneo.cancha ? torneo.cancha.yardaje_por_hoyo || [] : [];
   const pares = torneo.cancha ? torneo.cancha.par_por_hoyo || [] : [];
 
-  // Armado de tabla horizontal
   let html = `<h3>Tarjeta de ${tarjeta.nombre_usuario}</h3>
     <div style="overflow-x:auto">
-    <table border="1" style="margin:10px 0;width:100%;text-align:center">
+    <table class="scorecard-horizontal">
       <tr>
         <th>Hoyo</th>
         ${scores.map(s => `<td>${s.hoyo}</td>`).join("")}
