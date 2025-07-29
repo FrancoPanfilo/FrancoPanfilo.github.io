@@ -1,5 +1,4 @@
 import { db, collection, getDocs, getDoc, doc, query, orderBy } from "../db.js";
-
 import { auth } from "../firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
@@ -13,26 +12,15 @@ const estadoFilter = document.getElementById("estado-filter");
 const modal = document.getElementById("torneo-modal");
 const closeModal = document.querySelector(".close-modal");
 
-// Verificar si los elementos críticos existen
-console.log("Modal encontrado:", modal ? "Sí" : "No");
-console.log("Close modal encontrado:", closeModal ? "Sí" : "No");
-console.log("Torneo template encontrado:", torneoTemplate ? "Sí" : "No");
-console.log(
-  "Leaderboard template encontrado:",
-  leaderboardItemTemplate ? "Sí" : "No"
-);
-
 // Variables globales
 let torneos = [];
 let currentUser = null;
 
-// Función para formatear fechas
+// Formateo de fechas
 function formatDate(dateString) {
   const options = { day: "2-digit", month: "short", year: "numeric" };
   return new Date(dateString).toLocaleDateString("es-ES", options);
 }
-
-// Función para formatear fechas con hora
 function formatDateTime(dateString) {
   const options = {
     day: "2-digit",
@@ -44,7 +32,7 @@ function formatDateTime(dateString) {
   return new Date(dateString).toLocaleString("es-ES", options);
 }
 
-// Función para cargar los torneos desde Firebase
+// Cargar torneos desde Firebase
 async function loadTorneos() {
   try {
     torneosContainer.innerHTML = `
@@ -53,7 +41,6 @@ async function loadTorneos() {
         <p>Cargando torneos...</p>
       </div>
     `;
-
     const torneosRef = collection(db, "Torneos");
     const q = query(torneosRef, orderBy("fecha_inicio", "desc"));
     const querySnapshot = await getDocs(q);
@@ -91,7 +78,7 @@ async function loadTorneos() {
   }
 }
 
-// Función para filtrar torneos
+// Filtrar torneos
 function filterTorneos() {
   const filtroEstado = estadoFilter.value;
   torneosContainer.innerHTML = "";
@@ -113,7 +100,7 @@ function filterTorneos() {
   torneosFiltrados.forEach(renderTorneo);
 }
 
-// Función para renderizar un torneo
+// Renderizar un torneo
 function renderTorneo(torneo) {
   const torneoCard = torneoTemplate.content.cloneNode(true);
   const torneoHeader = torneoCard.querySelector(".torneo-header");
@@ -167,7 +154,6 @@ function renderTorneo(torneo) {
     const tarjetasMostradas = tarjetasOrdenadas.slice(0, 5);
 
     tarjetasMostradas.forEach((tarjeta, index) => {
-      console.log(tarjeta);
       const leaderboardItem = leaderboardItemTemplate.content.cloneNode(true);
       leaderboardItem.querySelector(".leaderboard-position").textContent =
         index + 1;
@@ -195,7 +181,6 @@ function renderTorneo(torneo) {
   }
 
   btnVerDetalles.addEventListener("click", (event) => {
-    console.log("Botón Ver Detalles clickeado para torneo:", torneo.nombre);
     event.preventDefault();
     event.stopPropagation();
     showTorneoDetails(torneo);
@@ -204,15 +189,14 @@ function renderTorneo(torneo) {
   torneosContainer.appendChild(torneoCard);
 }
 
-// Función para mostrar detalles del torneo en el modal
+// Mostrar detalles del torneo en el modal (Leaderboard formato tabla Masters)
 function showTorneoDetails(torneo) {
-  console.log("Intentando mostrar modal para torneo:", torneo.nombre);
   if (!modal) {
     console.error("Elemento modal no encontrado en el DOM");
     return;
   }
 
-  // Configurar información básica
+  // Info básica
   document.getElementById("modal-torneo-nombre").textContent = torneo.nombre;
   document.getElementById("modal-fecha-inicio").textContent = formatDateTime(
     torneo.fecha_inicio
@@ -224,8 +208,6 @@ function showTorneoDetails(torneo) {
     torneo.formato || "No especificado";
   document.getElementById("modal-estado").textContent =
     torneo.estado || "No especificado";
-
-  // Configurar imagen de portada
   const modalImage = document.getElementById("modal-torneo-imagen");
   if (modalImage) {
     modalImage.style.backgroundImage =
@@ -244,11 +226,9 @@ function showTorneoDetails(torneo) {
           torneo.colores.secundario
         );
     }
-  } else {
-    console.error("Elemento modal-torneo-imagen no encontrado");
   }
 
-  // Configurar información de la cancha
+  // Info de la cancha
   if (torneo.cancha) {
     document.getElementById("modal-cancha-nombre").textContent =
       torneo.cancha.nombre || "No especificado";
@@ -261,7 +241,7 @@ function showTorneoDetails(torneo) {
     } pies`;
   }
 
-  // Configurar reglas
+  // Reglas
   const reglasContainer = document.getElementById("modal-reglas");
   reglasContainer.innerHTML = "";
   if (torneo.reglas && torneo.reglas.length > 0) {
@@ -276,65 +256,119 @@ function showTorneoDetails(torneo) {
     reglasContainer.appendChild(li);
   }
 
-  // Configurar leaderboard completo
+  // Leaderboard como tabla tipo Masters
   const leaderboardContainer = document.getElementById("modal-leaderboard");
   leaderboardContainer.innerHTML = "";
   if (torneo.tarjetas && torneo.tarjetas.length > 0) {
+    // Ordena por score neto
     const tarjetasOrdenadas = [...torneo.tarjetas].sort(
       (a, b) => a.score_neto - b.score_neto
     );
+    let tabla = `<table class="w-full border-collapse shadow-lg leaderboard-table" role="grid" aria-label="Leaderboard de golf">
+      <thead>
+          <tr class="bg-green-900 text-white">
+              <th class="py-3 px-6">Pos</th>
+              <th class="py-3 px-6">Nombre</th>
+              <th class="py-3 px-6">Handicap</th>
+              <th class="py-3 px-6">Score Bruto</th>
+              <th class="py-3 px-6">Score Neto</th>
+              <th class="py-3 px-6" aria-hidden="true"></th>
+          </tr>
+      </thead>
+      <tbody>`;
     tarjetasOrdenadas.forEach((tarjeta, index) => {
-      const leaderboardItem = leaderboardItemTemplate.content.cloneNode(true);
-      leaderboardItem.querySelector(".leaderboard-position").textContent =
-        index + 1;
-      leaderboardItem.querySelector(".player-name").textContent =
-        tarjeta.nombre_usuario;
-      leaderboardItem.querySelector(".score-bruto").textContent =
-        tarjeta.score_bruto;
-      leaderboardItem.querySelector(
-        ".score-neto"
-      ).textContent = `(${tarjeta.score_neto})`;
-      leaderboardContainer.appendChild(leaderboardItem);
+      let colorClass = "text-yellow-600";
+      if (tarjeta.score_neto < 0) colorClass = "text-green-600";
+      if (tarjeta.score_neto > 0) colorClass = "text-red-600";
+      const leaderClass =
+        index === 0
+          ? "leader"
+          : index % 2 === 0
+          ? "bg-gray-100 hover:bg-gray-200"
+          : "bg-white hover:bg-gray-50";
+      tabla += `
+        <tr class="${leaderClass}">
+          <td class="py-3 px-6">${index + 1}</td>
+          <td class="py-3 px-6">${tarjeta.nombre_usuario}</td>
+          <td class="py-3 px-6 text-center">${tarjeta.handicap ?? ""}</td>
+          <td class="py-3 px-6 text-center">${tarjeta.score_bruto ?? ""}</td>
+          <td class="py-3 px-6 text-center ${colorClass}">${tarjeta.score_neto ?? ""}</td>
+          <td class="py-3 px-6 text-center">
+            <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de score de ${tarjeta.nombre_usuario}" onclick="mostrarTarjetaDetalle('${encodeURIComponent(
+              torneo.id
+            )}', ${index});return false;">
+              <i class="fas fa-clipboard-list"></i>
+            </a>
+          </td>
+        </tr>
+      `;
     });
+    tabla += "</tbody></table>";
+    leaderboardContainer.innerHTML = tabla;
   } else {
-    const noTarjetasItem = document.createElement("div");
-    noTarjetasItem.className = "leaderboard-item no-tarjetas";
-    noTarjetasItem.innerHTML = `<div class="no-tarjetas-text">No hay participantes registrados</div>`;
-    leaderboardContainer.appendChild(noTarjetasItem);
+    leaderboardContainer.innerHTML =
+      '<div class="no-tarjetas-text">No hay participantes registrados</div>';
   }
 
-  // Mostrar el modal
   modal.style.display = "block";
-  console.log(
-    "Modal debería estar visible. Estilo actual:",
-    modal.style.display
-  );
 }
 
-// Evento para cerrar el modal
+// Mostrar detalle de la tarjeta de score (scorecard) en modal aparte
+window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
+  const torneo = torneos.find((t) => t.id === decodeURIComponent(torneoId));
+  if (!torneo || !torneo.tarjetas || !torneo.tarjetas[tarjetaIndex]) return;
+  const tarjeta = torneo.tarjetas[tarjetaIndex];
+
+  let html = `<h3>Tarjeta de ${tarjeta.nombre_usuario}</h3>
+    <table border="1" style="margin:10px 0;width:100%;text-align:center">
+      <tr>
+        <th>Hoyo</th>
+        <th>Golpes</th>
+        <th>Fairway</th>
+        <th>Green</th>
+      </tr>`;
+  (tarjeta.scores || []).forEach((s) => {
+    html += `<tr>
+      <td>${s.hoyo}</td>
+      <td>${s.golpes}</td>
+      <td>${s.fairway ? "✔️" : "❌"}</td>
+      <td>${s.green ? "✔️" : "❌"}</td>
+    </tr>`;
+  });
+  html += "</table>";
+  html += `<button onclick="document.getElementById('scorecard-modal').style.display='none'" class="btn btn-secondary" style="margin-top:10px">Cerrar</button>`;
+
+  let scorecardModal = document.getElementById("scorecard-modal");
+  if (!scorecardModal) {
+    scorecardModal = document.createElement("div");
+    scorecardModal.id = "scorecard-modal";
+    scorecardModal.style =
+      "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;";
+    document.body.appendChild(scorecardModal);
+  }
+  scorecardModal.innerHTML = `<div style="background:#fff;padding:30px;max-width:400px;border-radius:10px;text-align:center;position:relative;">${html}</div>`;
+  scorecardModal.style.display = "flex";
+  scorecardModal.onclick = function (e) {
+    if (e.target === scorecardModal) scorecardModal.style.display = "none";
+  };
+};
+
+// Cerrar modal torneo
 if (closeModal) {
   closeModal.addEventListener("click", (event) => {
-    console.log("Botón cerrar modal clickeado");
     event.preventDefault();
     event.stopPropagation();
     if (modal) modal.style.display = "none";
   });
-} else {
-  console.error("Elemento closeModal no encontrado");
 }
-
-// Cerrar modal al hacer clic fuera del contenido
 window.addEventListener("click", (event) => {
-  if (modal && event.target === modal) {
-    console.log("Clic fuera del contenido del modal");
-    modal.style.display = "none";
-  }
+  if (modal && event.target === modal) modal.style.display = "none";
 });
 
-// Evento para filtrar torneos
+// Evento filtro
 estadoFilter.addEventListener("change", filterTorneos);
 
-// Verificar estado de autenticación
+// Estado de autenticación
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   const authButton = document.querySelector(".auth-button");
@@ -358,7 +392,7 @@ onAuthStateChanged(auth, (user) => {
   loadTorneos();
 });
 
-// Manejar el menú móvil
+// Menú móvil
 const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
 const navMenu = document.querySelector(".nav-menu");
 mobileMenuToggle.addEventListener("click", () => {
