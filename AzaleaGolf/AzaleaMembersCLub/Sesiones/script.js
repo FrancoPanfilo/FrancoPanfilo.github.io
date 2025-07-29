@@ -300,6 +300,7 @@ let selectedColumns = new Set([
 let yardageBookSessions = new Set();
 let sortedSessions = [];
 let selectedClubsForYardageBook = new Set();
+let currentPage = 0; // Added for pagination
 
 // Check if shot is selected
 function isShotSelected(shot) {
@@ -381,7 +382,7 @@ function saveSelectedColumns() {
   showSaveIndicator();
 }
 
-// Restaurar showSaveIndicator para feedback visual al guardar columnas
+// Show save indicator for visual feedback
 function showSaveIndicator() {
   let indicator = document.getElementById("saveIndicator");
   if (!indicator) {
@@ -401,12 +402,11 @@ function showSaveIndicator() {
   }, 2000);
 }
 
-// === Selección de columnas por defecto según dispositivo ===
+// Default columns based on device
 function getDefaultColumns() {
   if (window.innerWidth <= 600) {
     return new Set(["carry (yds)", "back spin (rpm)", "efficiency"]);
   }
-  // Por defecto, las columnas de escritorio
   return new Set([
     "carry (yds)",
     "peak height (yds)",
@@ -416,12 +416,11 @@ function getDefaultColumns() {
   ]);
 }
 
-// Modifica la carga inicial de columnas seleccionadas
+// Load selected columns
 function loadSelectedColumns() {
   if (window.innerWidth <= 600) {
-    // Siempre usar solo las columnas móviles en móviles
     selectedColumns = getDefaultColumns();
-    saveSelectedColumns(); // Opcional: actualiza el localStorage para mantener coherencia
+    saveSelectedColumns();
     return;
   }
   const savedColumns = localStorage.getItem("selectedColumns");
@@ -432,7 +431,7 @@ function loadSelectedColumns() {
   }
 }
 
-// Modifica el reset para que también use el set adecuado
+// Reset to default columns
 function resetToDefaultColumns() {
   selectedColumns = getDefaultColumns();
   saveSelectedColumns();
@@ -1053,35 +1052,40 @@ function exportToCSV() {
   document.body.removeChild(link);
 }
 
-let currentPage = 0;
-
+// Load sessions with pagination
 async function loadSessions() {
   const sessionsList = document.getElementById("sessionsList");
   sessionsList.innerHTML = "";
   const mensajeElement = document.getElementById("mensaje");
   loadSelectedColumns();
   loadSelectedSessions();
-  const user = auth.currentUser || (await new Promise((resolve) => onAuthStateChanged(auth, resolve)));
+  const user =
+    auth.currentUser ||
+    (await new Promise((resolve) => onAuthStateChanged(auth, resolve)));
   if (!user) {
     sessionsList.innerHTML = "<p>No hay usuario autenticado.</p>";
-    if (mensajeElement) mensajeElement.textContent = "No hay usuario autenticado.";
+    if (mensajeElement)
+      mensajeElement.textContent = "No hay usuario autenticado.";
     return;
   }
   const userDocRef = doc(db, "Simulador", user.uid);
   const userDoc = await getDoc(userDocRef);
   if (!userDoc.exists()) {
     sessionsList.innerHTML = "<p>No se encontraron sesiones.</p>";
-    if (mensajeElement) mensajeElement.textContent = "No se encontraron sesiones.";
+    if (mensajeElement)
+      mensajeElement.textContent = "No se encontraron sesiones.";
     return;
   }
   const userData = userDoc.data();
   let sessions = userData.Sesiones || [];
   sessions = sessions.map((s, idx) => ({ ...s, _firebaseIndex: idx }));
   sessions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-  if (mensajeElement) mensajeElement.textContent = `Sesiones de ${userData.nombre} ${userData.apellido}`;
+  if (mensajeElement)
+    mensajeElement.textContent = `Sesiones de ${userData.nombre} ${userData.apellido}`;
   renderSessionsPage(sessions);
 }
 
+// Render sessions for the current page
 function renderSessionsPage(sessions) {
   const sessionsList = document.getElementById("sessionsList");
   const start = currentPage * 3;
@@ -1095,32 +1099,48 @@ function renderSessionsPage(sessions) {
       <div class="session-header">
         <div class="session-info">
           <p><strong>Fecha:</strong> ${session.fecha}</p>
-          ${session.datos && session.datos.length > 0 ? `<p><strong>Tiros:</strong> ${session.datos.length}</p>` : ""}
+          ${
+            session.datos && session.datos.length > 0
+              ? `<p><strong>Tiros:</strong> ${session.datos.length}</p>`
+              : ""
+          }
           ${session.id ? `<p><strong>ID:</strong> ${session.id}</p>` : ""}
           <p><strong>Duración:</strong> ${session.stats?.sessionTime || "-"}</p>
         </div>
-        <button class="delete-session-btn" onclick="deleteSession('${session.fecha}', event)" title="Eliminar sesión">
+        <button class="delete-session-btn" onclick="deleteSession('${
+          session.fecha
+        }', event)" title="Eliminar sesión">
           <i class="fas fa-trash"></i>
         </button>
       </div>
     `;
     sessionItem.addEventListener("click", async (event) => {
       if (event.target.closest(".delete-session-btn")) return;
-      document.querySelectorAll(".session-item").forEach((item) => item.classList.remove("active"));
+      document
+        .querySelectorAll(".session-item")
+        .forEach((item) => item.classList.remove("active"));
       sessionItem.classList.add("active");
       try {
-        const userDocRef = doc(db, "Simulador", auth.currentUser.uid);
+        const userDocRef = doc(db, "Simulador", user.uid);
         const userDoc = await getDoc(userDocRef);
         const userData = userDoc.data();
         const sessionData = userData.Sesiones[session._firebaseIndex];
-        currentData = sessionData.datos.map((shot, idx) => ({ ...shot, originalIndex: idx }));
+        currentData = sessionData.datos.map((shot, idx) => ({
+          ...shot,
+          originalIndex: idx,
+        }));
       } catch (error) {
-        currentData = session.datos.map((shot, idx) => ({ ...shot, originalIndex: idx }));
+        currentData = session.datos.map((shot, idx) => ({
+          ...shot,
+          originalIndex: idx,
+        }));
       }
       currentSort = { column: null, ascending: true };
       currentFilter = null;
       clubVisibility = {};
-      currentData.forEach((row) => { clubVisibility[row["club name"]] = false; });
+      currentData.forEach((row) => {
+        clubVisibility[row["club name"]] = false;
+      });
       showSwitchContainer(true);
       const toggle = document.getElementById("toggleView");
       if (toggle) {
@@ -1134,23 +1154,33 @@ function renderSessionsPage(sessions) {
   renderPaginationControls(sessions);
 }
 
+// Render pagination controls
 function renderPaginationControls(sessions) {
+  // Remove existing pagination controls
+  const existingControls = document.querySelector(".pagination-controls");
+  if (existingControls) existingControls.remove();
+  
   const sessionsList = document.getElementById("sessionsList");
   const paginationContainer = document.createElement("div");
   paginationContainer.className = "pagination-controls";
   const totalPages = Math.ceil(sessions.length / 3);
   paginationContainer.innerHTML = `
-    <button class="pagination-btn" onclick="goToPreviousPage()" ${currentPage === 0 ? "disabled" : ""}>
+    <button class="pagination-btn" onclick="window.goToPreviousPage()" ${
+      currentPage === 0 ? "disabled" : ""
+    }>
       <i class="fas fa-chevron-left"></i> Anterior
     </button>
     <span class="pagination-info">Página ${currentPage + 1} de ${totalPages}</span>
-    <button class="pagination-btn" onclick="goToNextPage()" ${currentPage >= totalPages - 1 ? "disabled" : ""}>
+    <button class="pagination-btn" onclick="window.goToNextPage()" ${
+      currentPage >= totalPages - 1 ? "disabled" : ""
+    }>
       Siguiente <i class="fas fa-chevron-right"></i>
     </button>
   `;
   sessionsList.parentElement.appendChild(paginationContainer);
 }
 
+// Go to previous page
 function goToPreviousPage() {
   if (currentPage > 0) {
     currentPage--;
@@ -1158,6 +1188,7 @@ function goToPreviousPage() {
   }
 }
 
+// Go to next page
 function goToNextPage() {
   const user = auth.currentUser;
   if (!user) return;
@@ -1306,6 +1337,11 @@ async function deleteSession(sessionFecha, event) {
   sessions.splice(sessionIndex, 1);
   await updateDoc(userDocRef, { Sesiones: sessions });
   alert("Sesión eliminada exitosamente");
+  // Adjust currentPage if necessary
+  const totalPages = Math.ceil(sessions.length / 3);
+  if (currentPage >= totalPages && currentPage > 0) {
+    currentPage--;
+  }
   loadSessions();
 }
 
@@ -1320,17 +1356,15 @@ const averageRowHTML = (club, averages) => `
   </tr>
 `;
 
-// === NUEVO: Cálculo de máximo de columnas seleccionables ===
+// Calculate max selectable columns
 function getMaxSelectableColumns() {
-  // Usa el ancho del contenedor de la tabla si existe, si no, el ancho de la ventana
   const tableContainer = document.getElementById("shotsTableContainer");
   const anchoTabla = tableContainer
     ? tableContainer.offsetWidth
     : window.innerWidth;
-  const anchoColumnaDato = 120; // Debe coincidir con el CSS
-  const anchoFijo = 28 + 60; // checkbox + número de tiro
+  const anchoColumnaDato = 120;
+  const anchoFijo = 28 + 60;
   const maxColumnas = Math.floor((anchoTabla - anchoFijo) / anchoColumnaDato);
-  // Siempre al menos 1 columna
   return Math.max(1, maxColumnas);
 }
 
@@ -1369,6 +1403,8 @@ Object.assign(window, {
     }
   },
   deleteSession,
+  goToPreviousPage,
+  goToNextPage,
 });
 
 // Initialize on DOM load
