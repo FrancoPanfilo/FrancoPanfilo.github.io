@@ -300,10 +300,20 @@ window.mostrarTarjetaDetalle = function (torneoId, tarjetaIndex) {
         <th>Par</th>
         ${scores.map(s => `<td>${pares[s.hoyo-1] ?? ""}</td>`).join("")}
       </tr>
-      <tr>
-        <th>Golpes</th>
-        ${scores.map(s => `<td>${s.golpes ?? ""}</td>`).join("")}
-      </tr>
+<tr>
+  <th>Golpes</th>
+  ${scores.map((s, idx) => {
+    const par = pares[s.hoyo-1] ?? null;
+    if (par === null) return `<td>${s.golpes ?? ""}</td>`;
+    let contenido = s.golpes ?? "";
+    if (s.golpes < par) {
+      contenido = `<span class="score-circulo">${contenido}</span>`;
+    } else if (s.golpes > par) {
+      contenido = `<span class="score-cuadrado">${contenido}</span>`;
+    }
+    return `<td>${contenido}</td>`;
+  }).join("")}
+</tr>
       <tr>
         <th>Fairway</th>
         ${scores.map(s => `<td>${s.fairway ? "✔️" : "❌"}</td>`).join("")}
