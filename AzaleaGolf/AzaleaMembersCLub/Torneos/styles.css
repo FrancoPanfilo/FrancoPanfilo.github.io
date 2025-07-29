@@ -254,6 +254,7 @@
   background-color: var(--background-light);
   margin: 5% auto;
   width: 90%;
+  max-width: 1000px;
   border-radius: var(--border-radius-lg);
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7); /* Sombra más pronunciada */
   animation: modalFadeIn 0.3s;
