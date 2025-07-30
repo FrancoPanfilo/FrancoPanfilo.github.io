@@ -1148,6 +1148,9 @@ function renderSessionsPage(sessions) {
         toggleViewMode();
       }
       displayShotsTable(currentData, session._firebaseIndex);
+      document
+        .getElementById("shotsTableContainer")
+        .scrollIntoView({ behavior: "smooth" });
     });
     sessionsList.appendChild(sessionItem);
   });
@@ -1159,7 +1162,7 @@ function renderPaginationControls(sessions) {
   // Remove existing pagination controls
   const existingControls = document.querySelector(".pagination-controls");
   if (existingControls) existingControls.remove();
-  
+
   const sessionsList = document.getElementById("sessionsList");
   const paginationContainer = document.createElement("div");
   paginationContainer.className = "pagination-controls";
@@ -1170,7 +1173,9 @@ function renderPaginationControls(sessions) {
     }>
       <i class="fas fa-chevron-left"></i> Anterior
     </button>
-    <span class="pagination-info">Página ${currentPage + 1} de ${totalPages}</span>
+    <span class="pagination-info">Página ${
+      currentPage + 1
+    } de ${totalPages}</span>
     <button class="pagination-btn" onclick="window.goToNextPage()" ${
       currentPage >= totalPages - 1 ? "disabled" : ""
     }>
