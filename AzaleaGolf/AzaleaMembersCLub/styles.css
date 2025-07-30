@@ -267,6 +267,10 @@ a:hover {
 /* ========================================
    NAVEGACIÓN PRINCIPAL
    ======================================== */
+.login-box::before {
+  height: 0px !important;
+}
+
 .nav {
   display: flex;
   align-items: center;
