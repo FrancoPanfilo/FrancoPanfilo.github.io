@@ -274,17 +274,6 @@ function applyColumnSelection() {
   closeColumnSelector();
 }
 
-// Close modal (shared for column and yardage book modals)
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.classList.remove("show");
-    setTimeout(() => {
-      modal.remove();
-    }, 200);
-  }
-}
-
 // Global state
 let currentData = [];
 let currentSort = { column: null, ascending: true };
@@ -470,71 +459,107 @@ function showResetConfirmation() {
 }
 
 // Show yardage book modal
+// Mostrar el modal de YardageBook
 async function showYardageBookModal() {
   if (!auth.currentUser) {
     alert("Por favor, inicia sesión para crear un YardageBook");
     return;
   }
-  const modal = document.getElementById("yardageBookModal");
-  if (!modal) return;
-  modal.innerHTML = `
-    <div class="modal-content yardagebook-modal">
-      <div class="modal-header">
-        <h3>📚 Crear YardageBook Personalizado</h3>
-        <button class="close-modal" onclick="closeYardageBookModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="sessions-section">
-          <h4><i class="fas fa-list"></i> Selecciona las sesiones</h4>
-          <div id="yardageBookSessionsList" class="sessions-list"></div>
-          <div id="clubListYardageBook"></div>
+
+  // Eliminar modal existente si lo hay
+  const existingModal = document.getElementById("yardageBookModal");
+  if (existingModal) existingModal.remove();
+
+  // Crear el modal dinámicamente
+  const modalHTML = `
+    <div id="yardageBookModal" class="modal" role="dialog" aria-labelledby="yardageBookModalTitle" aria-modal="true">
+      <div class="modal-content yardagebook-modal">
+        <div class="modal-header">
+          <h3 id="yardageBookModalTitle"><i class="fas fa-list-check"></i>Crear YardageBook Personalizado</h3>
+          <button class="close-modal" onclick="closeYardageBookModal()">&times;</button>
         </div>
-        <div class="advanced-settings">
-          <h4><i class="fas fa-cogs"></i> Ajustes Avanzados</h4>
-          <div class="settings-grid">
-            <div class="setting-group">
-              <label>Porcentaje de Desviación: <span id="deviationValue">75%</span></label>
-              <input type="range" id="deviationSlider" min="50" max="100" value="75">
-              <small>Controla qué tan estrictos son los cálculos de distancia</small>
-            </div>
-            <div class="setting-group">
-              <label>Dispersión Lateral: <span id="lateralValue">75%</span></label>
-              <input type="range" id="lateralSlider" min="50" max="100" value="75">
-              <small>Controla la precisión de la dispersión lateral</small>
-            </div>
-            <div class="setting-group">
-              <label><input type="checkbox" id="aconadoCheckbox" checked> Formato aconado</label>
-              <small>Si está activado, la dispersión nunca decrece entre palos consecutivos</small>
+        <div class="modal-body">
+          <div class="sessions-section">
+            <h4><i class="fas fa-list"></i> Selecciona las sesiones</h4>
+            <div id="yardageBookSessionsList" class="sessions-list"></div>
+            <div id="clubListYardageBook"></div>
+          </div>
+          <div class="advanced-settings">
+            <h4><i class="fas fa-cogs"></i> Ajustes Avanzados</h4>
+            <div class="settings-grid">
+              <div class="setting-group">
+                <label>Porcentaje de Desviación: <span id="deviationValue">75%</span></label>
+                <input type="range" id="deviationSlider" min="50" max="100" value="75">
+                <small>Controla qué tan estrictos son los cálculos de distancia</small>
+              </div>
+              <div class="setting-group">
+                <label>Dispersión Lateral: <span id="lateralValue">75%</span></label>
+                <input type="range" id="lateralSlider" min="50" max="100" value="75">
+                <small>Controla la precisión de la dispersión lateral</small>
+              </div>
+              <div class="setting-group">
+                <label><input type="checkbox" id="aconadoCheckbox" checked> Formato aconado</label>
+                <small>Si está activado, la dispersión nunca decrece entre palos consecutivos</small>
+              </div>
             </div>
           </div>
+          <div class="yardagebook-info">
+            <h5><i class="fas fa-info-circle"></i> Información</h5>
+            <p>El YardageBook incluirá las distancias promedio calculadas con los parámetros de precisión seleccionados.</p>
+          </div>
         </div>
-        <div class="yardagebook-info">
-          <h5><i class="fas fa-info-circle"></i> Información</h5>
-          <p>El YardageBook incluirá las distancias promedio calculadas con los parámetros de precisión seleccionados.</p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <div><i class="fas fa-lightbulb"></i> Tip: Selecciona múltiples sesiones para datos más precisos</div>
-        <div>
-          <button onclick="createYardageBookFromModal()" class="create-yardagebook-btn">
-            <i class="fas fa-download"></i> Descargar YardageBook
-          </button>
-          <button onclick="closeYardageBookModal()" class="cancel-btn">
-            <i class="fas fa-times"></i> Cancelar
-          </button>
+        <div class="modal-footer">
+          <div><i class="fas fa-lightbulb"></i> Tip: Selecciona múltiples sesiones para datos más precisos</div>
+          <div>
+            <button onclick="createYardageBookFromModal()" class="create-yardagebook-btn">
+              <i class="fas fa-download"></i> Descargar YardageBook
+            </button>
+            <button onclick="closeYardageBookModal()" class="cancel-btn">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
         </div>
       </div>
     </div>
   `;
-  modal.style.display = "block";
-  modal.classList.add("show");
-  await loadSessionsForYardageBook();
-  setupYardageBookSliders();
+
+  // Insertar el modal en el DOM
+  document.body.insertAdjacentHTML("beforeend", modalHTML);
+  const modal = document.getElementById("yardageBookModal");
+
+  // Mostrar el modal con animación
+  setTimeout(() => {
+    modal.style.display = "flex";
+    modal.classList.add("show");
+  }, 10);
+
+  // Añadir evento para cerrar al hacer clic fuera del modal
   modal.addEventListener("click", (event) => {
     if (event.target === modal) {
       closeYardageBookModal();
     }
   });
+
+  // Cargar sesiones y configurar sliders
+  await loadSessionsForYardageBook();
+  setupYardageBookSliders();
+}
+
+// Cerrar el modal de YardageBook
+function closeYardageBookModal() {
+  closeModal("yardageBookModal");
+  restoreMainPageState();
+}
+
+// Cerrar modal genérico
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove("show");
+    setTimeout(() => {
+      modal.remove();
+    }, 20);
+  }
 }
 
 // Load sessions for yardage book modal
@@ -650,12 +675,6 @@ function setupYardageBookSliders() {
       });
     }
   });
-}
-
-// Close yardage book modal
-function closeYardageBookModal() {
-  closeModal("yardageBookModal");
-  restoreMainPageState();
 }
 
 // Restore main page state

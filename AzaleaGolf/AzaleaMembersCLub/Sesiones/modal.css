@@ -1,0 +1,399 @@
+/* Modal container */
+.modal-content.yardagebook-modal {
+  background-color: #1f2937;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  max-width: 90vw;
+  max-width: 900px;
+  width: 100%;
+  margin: 80px auto;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  color: #e5e7eb;
+  overflow: hidden;
+  z-index: 200000;
+  opacity: 0;
+  animation: simpleFade 0.3s ease forwards;
+}
+
+/* Animación de fade simple */
+@keyframes simpleFade {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal al cerrar */
+.modal:not(.show) .modal-content.yardagebook-modal {
+  opacity: 0;
+}
+
+/* Resto del CSS sin cambios */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #111827;
+  border-bottom: 1px solid #374151;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem; /* Reducido para móviles */
+  font-weight: 600;
+  color: #f9fafb;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 1.25rem; /* Reducido para móviles */
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.close-modal:hover {
+  color: #f9fafb;
+  transform: scale(1.1);
+}
+
+/* Modal body */
+.modal-body {
+  padding: 1rem;
+  max-height: 55vh; /* Reducido para dejar espacio en pantallas pequeñas */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #1f2937;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px; /* Más delgado para móviles */
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Sessions section */
+.sessions-section h4 {
+  font-size: 1.1rem; /* Reducido para móviles */
+  font-weight: 500;
+  color: #f9fafb;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.session-item-yardagebook {
+  padding: 0.5rem;
+  border-radius: 8px;
+  background-color: #374151;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.session-item-yardagebook:hover {
+  background-color: #4b5563;
+  transform: translateX(4px);
+}
+
+.session-row-yardagebook {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem; /* Reducido para móviles */
+  color: #d1d5db;
+}
+
+.session-row-yardagebook input[type="checkbox"] {
+  accent-color: #60a5fa;
+  width: 1.1rem; /* Reducido para móviles */
+  height: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.session-row-yardagebook input[type="checkbox"]:hover {
+  transform: scale(1.1);
+}
+
+.session-date,
+.session-valid-shots {
+  flex: 1;
+  white-space: nowrap; /* Evita que el texto se desborde */
+}
+
+/* Club list */
+#clubListYardageBook {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(100px, 1fr)
+  ); /* Columnas más estrechas */
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#clubListYardageBook label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  background-color: #374151;
+  font-size: 0.9rem; /* Reducido para móviles */
+  color: #d1d5db;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#clubListYardageBook label:hover {
+  background-color: #4b5563;
+  transform: translateX(4px);
+}
+
+#clubListYardageBook input[type="checkbox"] {
+  accent-color: #60a5fa;
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+#clubListYardageBook input[type="checkbox"]:hover {
+  transform: scale(1.1);
+}
+
+/* Advanced settings */
+.advanced-settings h4 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #f9fafb;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.setting-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #d1d5db;
+}
+
+.setting-group input[type="range"] {
+  width: 100%;
+  accent-color: #60a5fa;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.setting-group input[type="range"]:hover {
+  transform: scale(1.02);
+}
+
+.setting-group small {
+  font-size: 0.8rem; /* Reducido para móviles */
+  color: #9ca3af;
+}
+
+.setting-group input[type="checkbox"] {
+  accent-color: #60a5fa;
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.setting-group input[type="checkbox"]:hover {
+  transform: scale(1.1);
+}
+
+/* YardageBook info */
+.yardagebook-info h5 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #f9fafb;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.yardagebook-info p {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  line-height: 1.4;
+}
+
+/* Modal footer */
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #111827;
+  border-top: 1px solid #374151;
+}
+
+.modal-footer div:first-child {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.create-yardagebook-btn,
+.cancel-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.create-yardagebook-btn {
+  background-color: #60a5fa;
+  color: #ffffff;
+}
+
+.create-yardagebook-btn:hover {
+  background-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.cancel-btn {
+  background-color: #4b5563;
+  color: #e5e7eb;
+  margin-left: 0.5rem;
+}
+
+.cancel-btn:hover {
+  background-color: #6b7280;
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments for small screens (e.g., iPhone 12) */
+@media (max-width: 400px) {
+  .modal-content.yardagebook-modal {
+    margin: 60px 0.5rem; /* Reducido para pantallas muy pequeñas */
+    max-width: 95vw;
+  }
+
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .close-modal {
+    font-size: 1.1rem;
+  }
+
+  .modal-body {
+    padding: 0.75rem;
+    max-height: 50vh; /* Más espacio para el contenido */
+  }
+
+  .sessions-section h4,
+  .advanced-settings h4 {
+    font-size: 1rem;
+  }
+
+  .session-row-yardagebook {
+    font-size: 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .session-row-yardagebook input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  #clubListYardageBook {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(80px, 1fr)
+    ); /* Columnas más estrechas */
+  }
+
+  #clubListYardageBook label {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+  }
+
+  #clubListYardageBook input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .setting-group label {
+    font-size: 0.85rem;
+  }
+
+  .setting-group small {
+    font-size: 0.75rem;
+  }
+
+  .setting-group input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .yardagebook-info h5 {
+    font-size: 0.9rem;
+  }
+
+  .yardagebook-info p {
+    font-size: 0.8rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  .modal-footer div:first-child {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .create-yardagebook-btn,
+  .cancel-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}
