@@ -17,8 +17,11 @@ function formatDate(dateString) {
 }
 function formatDateTime(dateString) {
   const options = {
-    day: "2-digit", month: "short", year: "numeric",
-    hour: "2-digit", minute: "2-digit"
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   };
   return new Date(dateString).toLocaleString("es-ES", options);
 }
@@ -27,6 +30,22 @@ function formatNetoRelativo(scoreNeto, parTotal) {
   if (diff === 0) return "Par";
   if (diff > 0) return `+${diff}`;
   return `${diff}`;
+}
+
+function calcularDistanciaTotal(cancha) {
+  if (
+    !cancha ||
+    !cancha.yardaje_por_hoyo ||
+    !Array.isArray(cancha.yardaje_por_hoyo)
+  ) {
+    return "N/A";
+  }
+
+  const distanciaTotal = cancha.yardaje_por_hoyo.reduce((total, yardas) => {
+    return total + (parseInt(yardas) || 0);
+  }, 0);
+
+  return distanciaTotal > 0 ? `${distanciaTotal.toLocaleString()} yds` : "N/A";
 }
 
 async function loadTorneos() {
@@ -102,6 +121,7 @@ function renderTorneo(torneo) {
   const torneoNombre = torneoCard.querySelector(".torneo-nombre");
   const torneoFecha = torneoCard.querySelector(".torneo-fecha");
   const canchaNombre = torneoCard.querySelector(".cancha-nombre");
+  const canchaDistancia = torneoCard.querySelector(".cancha-distancia");
   const formatoNombre = torneoCard.querySelector(".formato-nombre");
   const btnVerDetalles = torneoCard.querySelector(".btn-ver-detalles");
 
@@ -113,9 +133,18 @@ function renderTorneo(torneo) {
   }
 
   if (torneo.colores) {
-    torneoCard.firstElementChild.style.setProperty('--torneo-color-primario', torneo.colores.primario || "#1a3a1a");
-    torneoCard.firstElementChild.style.setProperty('--torneo-color-secundario', torneo.colores.secundario || "#fff");
-    torneoCard.firstElementChild.style.setProperty('--torneo-color-fondo', torneo.colores.fondo || "#e6ffe6");
+    torneoCard.firstElementChild.style.setProperty(
+      "--torneo-color-primario",
+      torneo.colores.primario || "#1a3a1a"
+    );
+    torneoCard.firstElementChild.style.setProperty(
+      "--torneo-color-secundario",
+      torneo.colores.secundario || "#fff"
+    );
+    torneoCard.firstElementChild.style.setProperty(
+      "--torneo-color-fondo",
+      torneo.colores.fondo || "#e6ffe6"
+    );
   }
 
   torneoEstado.textContent = torneo.estado || "Próximo";
@@ -129,6 +158,7 @@ function renderTorneo(torneo) {
   canchaNombre.textContent = torneo.cancha
     ? torneo.cancha.nombre
     : "Cancha no especificada";
+  canchaDistancia.textContent = calcularDistanciaTotal(torneo.cancha);
   formatoNombre.textContent = torneo.formato || "Formato no especificado";
 
   btnVerDetalles.addEventListener("click", (event) => {
@@ -149,20 +179,20 @@ function showTorneoDetails(torneo) {
 
   // Colores personalizados
   const colores = torneo.colores || {};
-  const colorPrimario = colores.primario || '#1a3a1a';
-  const colorSecundario = colores.secundario || '#fff';
-  const colorFondo = colores.fondo || '#e6ffe6';
+  const colorPrimario = colores.primario || "#1a3a1a";
+  const colorSecundario = colores.secundario || "#fff";
+  const colorFondo = colores.fondo || "#e6ffe6";
 
-  modal.style.setProperty('--torneo-color-primario', colorPrimario);
-  modal.style.setProperty('--torneo-color-secundario', colorSecundario);
-  modal.style.setProperty('--torneo-color-fondo', colorFondo);
+  modal.style.setProperty("--torneo-color-primario", colorPrimario);
+  modal.style.setProperty("--torneo-color-secundario", colorSecundario);
+  modal.style.setProperty("--torneo-color-fondo", colorFondo);
 
   // Info básica
   document.getElementById("modal-torneo-nombre").textContent = torneo.nombre;
-  document.getElementById("modal-fecha-inicio").textContent = formatDateTime(
+  document.getElementById("modal-fecha-inicio").textContent = formatDate(
     torneo.fecha_inicio
   );
-  document.getElementById("modal-fecha-fin").textContent = formatDateTime(
+  document.getElementById("modal-fecha-fin").textContent = formatDate(
     torneo.fecha_fin
   );
   document.getElementById("modal-formato").textContent =
@@ -200,6 +230,8 @@ function showTorneoDetails(torneo) {
     document.getElementById("modal-velocidad-greens").textContent = `${
       torneo.cancha.velocidad_greens || "No especificado"
     } pies`;
+    document.getElementById("modal-distancia-total").textContent =
+      calcularDistanciaTotal(torneo.cancha);
   }
 
   // Reglas
@@ -222,9 +254,10 @@ function showTorneoDetails(torneo) {
   leaderboardContainer.innerHTML = "";
   if (torneo.tarjetas && torneo.tarjetas.length > 0) {
     // Par total de la cancha
-    const parTotal = torneo.cancha && torneo.cancha.par_por_hoyo
-      ? torneo.cancha.par_por_hoyo.reduce((acc, v) => acc + v, 0)
-      : 0;
+    const parTotal =
+      torneo.cancha && torneo.cancha.par_por_hoyo
+        ? torneo.cancha.par_por_hoyo.reduce((acc, v) => acc + v, 0)
+        : 0;
 
     const tarjetasOrdenadas = [...torneo.tarjetas].sort(
       (a, b) => a.score_neto - b.score_neto
@@ -233,11 +266,11 @@ function showTorneoDetails(torneo) {
       <table class="leaderboard-table" role="grid" aria-label="Leaderboard de golf">
       <thead>
           <tr>
-              <th>Pos</th>
+              <th>#</th>
               <th>Nombre</th>
-              <th>Handicap</th>
-              <th>Score Bruto</th>
-              <th>Score Neto</th>
+              <th>Hcp</th>
+              <th>Score</th>
+              <th>Neto</th>
               <th aria-hidden="true"></th>
           </tr>
       </thead>
@@ -246,7 +279,7 @@ function showTorneoDetails(torneo) {
       const netoRelativo = formatNetoRelativo(tarjeta.score_neto, parTotal);
       let colorClass = "par";
       if (netoRelativo === "Par") colorClass = "par";
-      else if(netoRelativo.startsWith("-")) colorClass = "menos";
+      else if (netoRelativo.startsWith("-")) colorClass = "menos";
       else colorClass = "mas";
       const leaderClass = index === 0 ? "leader" : "";
       tabla += `
@@ -257,8 +290,12 @@ function showTorneoDetails(torneo) {
           <td>${tarjeta.score_bruto ?? ""}</td>
           <td class="${colorClass}">${netoRelativo}</td>
           <td>
-  <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de score de ${tarjeta.nombre_usuario}"
-     onclick="mostrarTarjetaDetalle('${encodeURIComponent(torneo.id)}', '${encodeURIComponent(tarjeta.id_usuario)}');return false;">
+  <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de score de ${
+    tarjeta.nombre_usuario
+  }"
+     onclick="mostrarTarjetaDetalle('${encodeURIComponent(
+       torneo.id
+     )}', '${encodeURIComponent(tarjeta.id_usuario)}');return false;">
     <i class="fas fa-clipboard-list"></i>
   </a>
 </td>
@@ -272,79 +309,197 @@ function showTorneoDetails(torneo) {
       '<div class="no-tarjetas-text">No hay participantes registrados</div>';
   }
 
+  // Agregar funcionalidad de colapso para móviles
+  initializeCollapsibleSections();
+
+  // Mostrar el modal
   modal.style.display = "block";
+  modal.style.visibility = "visible";
+  modal.style.opacity = "1";
+  modal.style.zIndex = "99999";
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+}
+
+// Función para inicializar las secciones colapsables
+function initializeCollapsibleSections() {
+  const collapsibleHeaders = document.querySelectorAll(".collapsible-header");
+
+  // Remover event listeners anteriores para evitar duplicados
+  collapsibleHeaders.forEach((header) => {
+    const newHeader = header.cloneNode(true);
+    header.parentNode.replaceChild(newHeader, header);
+  });
+
+  // Obtener headers actualizados después del clonado
+  const updatedHeaders = document.querySelectorAll(".collapsible-header");
+
+  updatedHeaders.forEach((header) => {
+    header.addEventListener("click", function () {
+      const section = this.closest(".collapsible-section");
+      const isExpanded = section.classList.contains("expanded");
+
+      // En móviles, alternar la clase expanded
+      if (window.innerWidth <= 768) {
+        if (isExpanded) {
+          section.classList.remove("expanded");
+        } else {
+          section.classList.add("expanded");
+        }
+      }
+    });
+  });
+
+  // Configurar estado inicial basado en el tamaño de pantalla
+  handleResponsiveCollapse();
+}
+
+// Función para manejar el colapso responsivo
+function handleResponsiveCollapse() {
+  const allSections = document.querySelectorAll(".collapsible-section");
+
+  if (window.innerWidth > 768) {
+    // En desktop, siempre expandir todas las secciones
+    allSections.forEach((section) => {
+      section.classList.add("expanded");
+    });
+  } else {
+    // En móviles, colapsar todas por defecto
+    allSections.forEach((section) => {
+      section.classList.remove("expanded");
+    });
+  }
 }
 
 // Tarjeta horizontal por jugador (scorecard)
 window.mostrarTarjetaDetalle = function (torneoId, idUsuario) {
   const torneo = torneos.find((t) => t.id === decodeURIComponent(torneoId));
   if (!torneo || !torneo.tarjetas) return;
-  const tarjeta = torneo.tarjetas.find(t => t.id_usuario == decodeURIComponent(idUsuario));
+  const tarjeta = torneo.tarjetas.find(
+    (t) => t.id_usuario == decodeURIComponent(idUsuario)
+  );
   if (!tarjeta) return;
   const scores = tarjeta.scores || [];
   const yardas = torneo.cancha ? torneo.cancha.yardaje_por_hoyo || [] : [];
   const pares = torneo.cancha ? torneo.cancha.par_por_hoyo || [] : [];
 
-  let html = `<h3>Tarjeta de ${tarjeta.nombre_usuario}</h3>
-    <div style="overflow-x:auto">
-    <table class="scorecard-horizontal">
-      <tr>
-        <th>Hoyo</th>
-        ${scores.map(s => `<td>${s.hoyo}</td>`).join("")}
-      </tr>
-      <tr>
-        <th>Yardas</th>
-        ${scores.map(s => `<td>${yardas[s.hoyo-1] ?? ""}</td>`).join("")}
-      </tr>
-      <tr>
-        <th>Par</th>
-        ${scores.map(s => `<td>${pares[s.hoyo-1] ?? ""}</td>`).join("")}
-      </tr>
-<tr>
-  <th>Golpes</th>
-  ${scores.map((s, idx) => {
-    const par = pares[s.hoyo-1] ?? null;
-    if (par === null) return `<td>${s.golpes ?? ""}</td>`;
-    let contenido = s.golpes ?? "";
-    if (typeof s.golpes !== "number") return `<td>${contenido}</td>`;
-    const diff = s.golpes - par;
-    // Máximo de 3 círculos o cuadrados
-    if (diff < 0) {
-      // Bajo par
-      const level = Math.max(diff, -3) * -1; // 1, 2, 3
-      contenido = `<span class="score-circulo score-circulo-${level}">${contenido}</span>`;
-    } else if (diff > 0) {
-      // Sobre par
-      const level = Math.min(diff, 3); // 1, 2, 3
-      contenido = `<span class="score-cuadrado score-cuadrado-${level}">${contenido}</span>`;
-    }
-    return `<td>${contenido}</td>`;
-  }).join("")}
-</tr>
-      <tr>
-        <th>Fairway</th>
-        ${scores.map(s => `<td>${s.fairway ? "✔️" : "❌"}</td>`).join("")}
-      </tr>
-      <tr>
-        <th>Green Reg.</th>
-        ${scores.map(s => `<td>${s.green ? "✔️" : "❌"}</td>`).join("")}
-      </tr>
-    </table>
+  // Dividir scores en dos mitades: hoyos 1-9 y 10-18
+  const firstHalf = scores.slice(0, 9);
+  const secondHalf = scores.slice(9, 18);
+
+  // Función para generar una tabla de 9 hoyos
+  const generateHalfTable = (holeScores, startHole) => {
+    const yardasHalf = holeScores.map((s) => yardas[s.hoyo - 1] ?? 0);
+    const paresHalf = holeScores.map((s) => pares[s.hoyo - 1] ?? 0);
+    const totalYardas = yardasHalf.reduce((a, b) => a + b, 0);
+    const totalPar = paresHalf.reduce((a, b) => a + b, 0);
+    const totalGolpes = holeScores.reduce(
+      (total, s) => total + (s.golpes ?? 0),
+      0
+    );
+
+    return `
+      <div class="scorecard-half-section">
+        <div class="scorecard-horizontal-wrapper">
+          <table class="scorecard-horizontal">
+            <thead>
+              <tr>
+                <th>Hoyo</th>
+                ${holeScores
+                  .map((s, i) => `<th>${startHole + i}</th>`)
+                  .join("")}
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Yardas</th>
+                ${holeScores
+                  .map((s) => `<td>${yardas[s.hoyo - 1] ?? "-"}</td>`)
+                  .join("")}
+                <td><strong>${totalYardas.toLocaleString()}</strong></td>
+              </tr>
+              <tr>
+                <th>Par</th>
+                ${holeScores
+                  .map((s) => `<td>${pares[s.hoyo - 1] ?? "-"}</td>`)
+                  .join("")}
+                <td><strong>${totalPar}</strong></td>
+              </tr>
+              <tr>
+                <th>Golpes</th>
+                ${holeScores
+                  .map((s, idx) => {
+                    const par = pares[s.hoyo - 1] ?? null;
+                    if (par === null) return `<td>${s.golpes ?? "-"}</td>`;
+                    let contenido = s.golpes ?? "-";
+                    if (typeof s.golpes !== "number")
+                      return `<td>${contenido}</td>`;
+                    const diff = s.golpes - par;
+                    let scoreClass = "";
+                    if (diff < 0)
+                      scoreClass =
+                        "score-circulo score-circulo-" + Math.abs(diff);
+                    if (diff > 0)
+                      scoreClass = "score-cuadrado score-cuadrado-" + diff;
+                    return `<td><span class="${scoreClass}">${contenido}</span></td>`;
+                  })
+                  .join("")}
+                <td><strong>${totalGolpes}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  };
+
+  let html = `
+    <div class="scorecard-modal-header">
+      <h3>Tarjeta de ${tarjeta.nombre_usuario}</h3>
+      <div class="scorecard-player-info">
+        <span>Handicap: <strong>${tarjeta.handicap ?? "N/A"}</strong></span>
+        <span>Score Neto: <strong>${tarjeta.score_neto ?? "N/A"}</strong></span>
+        <span>Score Bruto: <strong>${
+          tarjeta.score_bruto ?? "N/A"
+        }</strong></span>
+      </div>
     </div>
-    <button onclick="document.getElementById('scorecard-modal').style.display='none'" class="btn btn-secondary" style="margin-top:10px">Cerrar</button>`;
+    
+    <div class="scorecard-tables-container">
+      ${generateHalfTable(firstHalf, 1)}
+      ${generateHalfTable(secondHalf, 10)}
+    </div>
+    
+    <button id="scorecard-modal-close" class="btn">Cerrar</button>
+  `;
 
   let scorecardModal = document.getElementById("scorecard-modal");
   if (!scorecardModal) {
     scorecardModal = document.createElement("div");
     scorecardModal.id = "scorecard-modal";
-    scorecardModal.style =
-      "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;";
+    scorecardModal.className = "scorecard-modal";
     document.body.appendChild(scorecardModal);
   }
-  scorecardModal.innerHTML = `<div style="background:#fff;padding:30px;border-radius:10px;text-align:center;position:relative;">${html}</div>`;
+
+  scorecardModal.innerHTML = `<div class="scorecard-modal-content">${html}</div>`;
   scorecardModal.style.display = "flex";
-  scorecardModal.onclick = function (e) {
-    if (e.target === scorecardModal) scorecardModal.style.display = "none";
+
+  const closeBtn = document.getElementById("scorecard-modal-close");
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      scorecardModal.style.display = "none";
+    };
+  }
+
+  scorecardModal.onclick = (e) => {
+    if (e.target === scorecardModal) {
+      scorecardModal.style.display = "none";
+    }
   };
 };
 
@@ -384,9 +539,48 @@ onAuthStateChanged(auth, (user) => {
   loadTorneos();
 });
 
+// Menú móvil
 const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
-const navMenu = document.querySelector(".nav-menu");
-mobileMenuToggle.addEventListener("click", () => {
+const nav = document.querySelector(".nav");
+
+function toggleMobileMenu() {
   mobileMenuToggle.classList.toggle("active");
-  navMenu.classList.toggle("active");
+  nav.classList.toggle("active");
+  document.body.style.overflow = nav.classList.contains("active")
+    ? "hidden"
+    : "";
+}
+
+function closeMobileMenu() {
+  mobileMenuToggle.classList.remove("active");
+  nav.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+mobileMenuToggle.addEventListener("click", toggleMobileMenu);
+
+// Cerrar menú al hacer clic en un enlace
+document.querySelectorAll(".nav-link").forEach((link) => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth <= 768) {
+      closeMobileMenu();
+    }
+  });
+});
+
+// Cerrar menú al redimensionar la ventana
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 768) {
+    closeMobileMenu();
+  }
+});
+
+// Header scroll effect
+window.addEventListener("scroll", () => {
+  const header = document.querySelector(".header");
+  if (window.scrollY > 50) {
+    header.classList.add("scrolled");
+  } else {
+    header.classList.remove("scrolled");
+  }
 });

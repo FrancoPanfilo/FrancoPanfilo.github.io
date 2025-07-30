@@ -1675,6 +1675,7 @@ input:checked + .slider:before {
   }
 }
 .pagination-controls {
+  flex-wrap: nowrap;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1720,10 +1721,6 @@ input:checked + .slider:before {
 }
 
 @media (max-width: 600px) {
-  .pagination-controls {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
   .pagination-btn {
     font-size: var(--font-size-xs);
     padding: var(--spacing-xs) var(--spacing-sm);

@@ -282,6 +282,7 @@ a:hover {
 }
 
 .nav-item {
+  display: flex;
   position: relative;
 }
 

@@ -44,6 +44,12 @@
               </a>
             </li>
             <li class="nav-item">
+              <a href="../Torneos/index.html" class="nav-link">
+                <i class="fas fa-trophy"></i>
+                <span>Torneos</span>
+              </a>
+            </li>
+            <li class="nav-item">
               <a href="#" class="nav-link auth-button">
                 <i class="fas fa-sign-in-alt"></i>
                 <span>Iniciar Sesión</span>
@@ -62,8 +68,10 @@
     <section class="sessions">
       <h2 id="mensaje">Cargando sesiones...</h2>
       <div class="sessions-list" id="sessionsList"></div>
+    </section>
+    <!-- Switch para alternar entre tabla y mapa de dispersión (por encima de la tabla) -->
 
-      <!-- Switch para alternar entre tabla y mapa de dispersión (por encima de la tabla) -->
+    <section class="sessions">
       <div class="switch-container" id="switchContainer" style="display: none">
         <span id="label-table" class="switch-label active">Tabla de datos</span>
         <label class="switch">
@@ -72,7 +80,6 @@
         </label>
         <span id="label-map" class="switch-label">Mapa de Dispersión</span>
       </div>
-
       <!-- Contenedor de la tabla -->
       <div class="shots-table-container" id="shotsTableContainer"></div>
 
@@ -81,13 +88,11 @@
         id="scatterCanvas"
         style="max-width: 100%; margin-top: 20px; display: none"
       ></canvas>
+      <!-- Modal de YardageBook -->
+      <div id="yardageBookModal" class="modal">
+        <!-- El contenido del modal se genera dinámicamente en JavaScript -->
+      </div>
     </section>
-
-    <!-- Modal de YardageBook -->
-    <div id="yardageBookModal" class="modal">
-      <!-- El contenido del modal se genera dinámicamente en JavaScript -->
-    </div>
-
     <script type="module">
       import { auth } from "../firebase.js";
       import {

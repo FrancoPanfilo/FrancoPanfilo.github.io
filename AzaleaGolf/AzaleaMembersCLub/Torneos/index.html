@@ -37,7 +37,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="index.html" class="nav-link active">
+              <a href="" class="nav-link">
                 <i class="fas fa-trophy"></i>
                 <span>Torneos</span>
               </a>
@@ -99,27 +99,18 @@
               <i class="fas fa-flag"></i>
               <span class="cancha-nombre"></span>
             </div>
+            <div class="torneo-distancia">
+              <i class="fas fa-ruler-horizontal"></i>
+              <span class="cancha-distancia"></span>
+            </div>
             <div class="torneo-formato">
               <i class="fas fa-golf-ball"></i>
               <span class="formato-nombre"></span>
             </div>
           </div>
-         <table class="w-full border-collapse shadow-lg" role="grid" aria-label="Leaderboard de golf">
-    <thead>
-        <tr class="bg-green-900 text-white">
-            <th class="py-3 px-6">Nombre</th>
-            <th class="py-3 px-6">Handicap</th>
-            <th class="py-3 px-6">Score Bruto</th>
-            <th class="py-3 px-6">Score Neto</th>
-            <th class="py-3 px-6" aria-hidden="true"></th>
-        </tr>
-    </thead>
-    <tbody id="leaderboard-body">
-        <!-- Aquí se cargarán las filas -->
-    </tbody>
-</table>
-<!-- Puedes colocar aquí un modal o div para mostrar el detalle de la tarjeta al hacer clic en el icono -->
-<div id="detalle-tarjeta-modal" style="display:none;"></div>
+
+          <!-- Puedes colocar aquí un modal o div para mostrar el detalle de la tarjeta al hacer clic en el icono -->
+          <div id="detalle-tarjeta-modal" style="display: none"></div>
         </div>
         <div class="torneo-footer">
           <button class="btn btn-primary btn-ver-detalles">
@@ -144,67 +135,89 @@
     </template>
 
     <!-- Modal de detalles del torneo -->
-    <div id="torneo-modal" style="display: none">
+    <div id="torneo-modal" class="modal" style="display: none">
       <div class="modal-content">
         <div class="modal-header">
           <h2 id="modal-torneo-nombre"></h2>
-          <span class="close-modal">&times;</span>
+          <button class="close-modal">&times;</button>
         </div>
-        <div id="modal-torneo-imagen" class="modal-image"></div>
-        <div class="modal-body">
+        <div class="modal-body1">
           <div class="modal-info-container">
-            <div class="modal-info-section">
-              <h3>Información del Torneo</h3>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="info-label">Fecha de inicio:</span>
-                  <span id="modal-fecha-inicio" class="info-value"></span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Fecha de fin:</span>
-                  <span id="modal-fecha-fin" class="info-value"></span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Formato:</span>
-                  <span id="modal-formato" class="info-value"></span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Estado:</span>
-                  <span id="modal-estado" class="info-value"></span>
+            <div id="modal-torneo-imagen" class="modal-image"></div>
+
+            <!-- Sección colapsable: Información del Torneo -->
+            <div class="collapsible-section">
+              <div class="collapsible-header">
+                <h3>Información del Torneo</h3>
+                <i class="fas fa-chevron-down collapsible-icon"></i>
+              </div>
+              <div class="collapsible-content">
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Fecha de inicio:</span>
+                    <span id="modal-fecha-inicio" class="info-value"></span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Fecha de fin:</span>
+                    <span id="modal-fecha-fin" class="info-value"></span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Formato:</span>
+                    <span id="modal-formato" class="info-value"></span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Estado:</span>
+                    <span id="modal-estado" class="info-value"></span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="modal-info-section">
-              <h3>Información de la Cancha</h3>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="info-label">Nombre:</span>
-                  <span id="modal-cancha-nombre" class="info-value"></span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Tee de salida:</span>
-                  <span id="modal-tee-salida" class="info-value"></span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Dureza de fairways:</span>
-                  <span id="modal-dureza-fairways" class="info-value"></span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">Velocidad de greens:</span>
-                  <span id="modal-velocidad-greens" class="info-value"></span>
+            <!-- Sección colapsable: Información de la Cancha -->
+            <div class="collapsible-section">
+              <div class="collapsible-header">
+                <h3>Información de la Cancha</h3>
+                <i class="fas fa-chevron-down collapsible-icon"></i>
+              </div>
+              <div class="collapsible-content">
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Nombre:</span>
+                    <span id="modal-cancha-nombre" class="info-value"></span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Tee de salida:</span>
+                    <span id="modal-tee-salida" class="info-value"></span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Dureza de fairways:</span>
+                    <span id="modal-dureza-fairways" class="info-value"></span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Velocidad de greens:</span>
+                    <span id="modal-velocidad-greens" class="info-value"></span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Distancia total:</span>
+                    <span id="modal-distancia-total" class="info-value"></span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="modal-info-section">
-              <h3>Reglas Específicas</h3>
-              <ul id="modal-reglas" class="reglas-list"></ul>
+            <!-- Sección colapsable: Reglas Específicas -->
+            <div class="collapsible-section">
+              <div class="collapsible-header">
+                <h3>Reglas Específicas</h3>
+                <i class="fas fa-chevron-down collapsible-icon"></i>
+              </div>
+              <div class="collapsible-content">
+                <ul id="modal-reglas" class="reglas-list"></ul>
+              </div>
             </div>
           </div>
-
           <div class="modal-leaderboard-section">
-            <h3>Leaderboard Completo</h3>
+            <h3>Leaderboard</h3>
             <div
               id="modal-leaderboard"
               class="modal-leaderboard-container"
