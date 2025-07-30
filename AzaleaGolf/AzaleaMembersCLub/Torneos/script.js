@@ -269,7 +269,7 @@ function showTorneoDetails(torneo) {
               <th>#</th>
               <th>Nombre</th>
               <th>Hcp</th>
-              <th>Score</th>
+              <th>Gross</th>
               <th>Neto</th>
               <th aria-hidden="true"></th>
           </tr>
@@ -464,9 +464,7 @@ window.mostrarTarjetaDetalle = function (torneoId, idUsuario) {
       <div class="scorecard-player-info">
         <span>Handicap: <strong>${tarjeta.handicap ?? "N/A"}</strong></span>
         <span>Score Neto: <strong>${tarjeta.score_neto ?? "N/A"}</strong></span>
-        <span>Score Bruto: <strong>${
-          tarjeta.score_bruto ?? "N/A"
-        }</strong></span>
+        <span>Gross: <strong>${tarjeta.score_bruto ?? "N/A"}</strong></span>
       </div>
     </div>
     
