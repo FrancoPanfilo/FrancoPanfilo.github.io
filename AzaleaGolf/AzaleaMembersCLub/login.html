@@ -116,24 +116,6 @@
             icon.classList.add("fa-eye");
           }
         });
-
-      // Menú móvil
-      document
-        .querySelector(".mobile-menu-toggle")
-        .addEventListener("click", function () {
-          this.classList.toggle("active");
-          document.querySelector(".nav").classList.toggle("active");
-        });
-
-      // Cerrar menú al hacer click en un enlace
-      document.querySelectorAll(".nav-link").forEach((link) => {
-        link.addEventListener("click", () => {
-          document
-            .querySelector(".mobile-menu-toggle")
-            .classList.remove("active");
-          document.querySelector(".nav").classList.remove("active");
-        });
-      });
     </script>
   </body>
 </html>

@@ -4,6 +4,8 @@ import {
   getDoc,
   updateDoc,
   deleteDoc,
+  collection,
+  getDocs,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { exportSessionToPDF } from "./pdfExport.js";
@@ -289,7 +291,8 @@ let selectedColumns = new Set([
 let yardageBookSessions = new Set();
 let sortedSessions = [];
 let selectedClubsForYardageBook = new Set();
-let currentPage = 0; // Added for pagination
+let currentPage = 0;
+let selectedUserUid = null;
 
 // Check if shot is selected
 function isShotSelected(shot) {
@@ -459,18 +462,15 @@ function showResetConfirmation() {
 }
 
 // Show yardage book modal
-// Mostrar el modal de YardageBook
 async function showYardageBookModal() {
   if (!auth.currentUser) {
     alert("Por favor, inicia sesión para crear un YardageBook");
     return;
   }
 
-  // Eliminar modal existente si lo hay
   const existingModal = document.getElementById("yardageBookModal");
   if (existingModal) existingModal.remove();
 
-  // Crear el modal dinámicamente
   const modalHTML = `
     <div id="yardageBookModal" class="modal" role="dialog" aria-labelledby="yardageBookModalTitle" aria-modal="true">
       <div class="modal-content yardagebook-modal">
@@ -523,24 +523,20 @@ async function showYardageBookModal() {
     </div>
   `;
 
-  // Insertar el modal en el DOM
   document.body.insertAdjacentHTML("beforeend", modalHTML);
   const modal = document.getElementById("yardageBookModal");
 
-  // Mostrar el modal con animación
   setTimeout(() => {
     modal.style.display = "flex";
     modal.classList.add("show");
   }, 10);
 
-  // Añadir evento para cerrar al hacer clic fuera del modal
   modal.addEventListener("click", (event) => {
     if (event.target === modal) {
       closeYardageBookModal();
     }
   });
 
-  // Cargar sesiones y configurar sliders
   await loadSessionsForYardageBook();
   setupYardageBookSliders();
 }
@@ -566,7 +562,7 @@ function closeModal(modalId) {
 async function loadSessionsForYardageBook() {
   const user = auth.currentUser;
   if (!user) throw new Error("Usuario no autenticado");
-  const userDocRef = doc(db, "Simulador", user.uid);
+  const userDocRef = doc(db, "Simulador", selectedUserUid || user.uid);
   const userDoc = await getDoc(userDocRef);
   const sessionsList = document.getElementById("yardageBookSessionsList");
   if (!userDoc.exists()) {
@@ -621,7 +617,7 @@ async function createYardageBookFromModal() {
   const formatoAconado = document.getElementById("aconadoCheckbox")?.checked;
   const user = auth.currentUser;
   if (!user) return;
-  const userDocRef = doc(db, "Simulador", user.uid);
+  const userDocRef = doc(db, "Simulador", selectedUserUid || user.uid);
   const userDoc = await getDoc(userDocRef);
   const userData = userDoc.data();
   const selectedSessions = getSelectedSessionsSorted();
@@ -758,9 +754,8 @@ function displayShotsTable(data, sessionIndex) {
               calculateClubAverages(club, groupedData[club])
             )}
             ${groupedData[club]
-              .map((row, shotIndex) => {
-                console.log("Tiro mostrado en tabla:", row);
-                return `
+              .map(
+                (row, shotIndex) => `
                 <tr class="shot-row${clubVisibility[club] ? "" : " hidden"}"
                     data-club="${club}"
                     data-original-index="${row.originalIndex}">
@@ -777,8 +772,8 @@ function displayShotsTable(data, sessionIndex) {
                     .map((col) => `<td>${formatValue(row[col], col, row)}</td>`)
                     .join("")}
                 </tr>
-              `;
-              })
+              `
+              )
               .join("")}
             `
           )
@@ -801,7 +796,7 @@ async function updateShotSelectionInFirebase(
 ) {
   const user = auth.currentUser;
   if (!user) throw new Error("No hay usuario autenticado");
-  const userDocRef = doc(db, "Simulador", user.uid);
+  const userDocRef = doc(db, "Simulador", selectedUserUid || user.uid);
   const userDoc = await getDoc(userDocRef);
   if (!userDoc.exists()) throw new Error("No se encontraron datos del usuario");
   const userData = userDoc.data();
@@ -1000,7 +995,7 @@ async function exportCurrentSessionToPDF() {
   }
   const user = auth.currentUser;
   if (!user) return;
-  const userDocRef = doc(db, "Simulador", user.uid);
+  const userDocRef = doc(db, "Simulador", selectedUserUid || user.uid);
   const userDoc = await getDoc(userDocRef);
   if (!userDoc.exists()) return;
   const userData = userDoc.data();
@@ -1009,7 +1004,6 @@ async function exportCurrentSessionToPDF() {
     currentData[0]?.["shot created date"]?.split(" ")[0] ||
     new Date().toISOString().split("T")[0];
   const dataWithSelection = currentData.filter(isShotSelected);
-  console.log("Tiros exportados a PDF:", dataWithSelection);
   if (dataWithSelection.length === 0) {
     alert("No hay tiros seleccionados para exportar");
     return;
@@ -1061,7 +1055,6 @@ function exportToCSV() {
       csvRows.push(rowData);
     });
   });
-  console.log("Tiros exportados a CSV:", allExportedShots);
   const csvContent = `data:text/csv;charset=utf-8,${csvRows.join("\n")}`;
   const link = document.createElement("a");
   link.setAttribute("href", encodeURI(csvContent));
@@ -1074,10 +1067,11 @@ function exportToCSV() {
 // Load sessions with pagination
 async function loadSessions() {
   const sessionsList = document.getElementById("sessionsList");
-  sessionsList.innerHTML = "";
   const mensajeElement = document.getElementById("mensaje");
+  sessionsList.innerHTML = "";
   loadSelectedColumns();
   loadSelectedSessions();
+
   const user =
     auth.currentUser ||
     (await new Promise((resolve) => onAuthStateChanged(auth, resolve)));
@@ -1087,21 +1081,100 @@ async function loadSessions() {
       mensajeElement.textContent = "No hay usuario autenticado.";
     return;
   }
-  const userDocRef = doc(db, "Simulador", user.uid);
+
+  if (user.uid === "7G8P8GR7fBP62TU7zK0z5gkLpiA2") {
+    await loadUserSelector();
+  } else {
+    selectedUserUid = user.uid;
+  }
+
+  await loadUserSessions(selectedUserUid || user.uid);
+}
+
+// Nueva función para cargar el selector de usuarios
+async function loadUserSelector() {
+  const usersCollection = collection(db, "Simulador");
+  const usersSnapshot = await getDocs(usersCollection);
+  const users = [];
+  usersSnapshot.forEach((doc) => {
+    const data = doc.data();
+    users.push({
+      uid: doc.id,
+      nombreCompleto: `${data.nombre || ""} ${data.apellido || ""}`.trim(),
+    });
+  });
+
+  users.sort((a, b) => a.nombreCompleto.localeCompare(b.nombreCompleto, "es"));
+
+  const selectContainer = document.createElement("div");
+  selectContainer.id = "userSelectorContainer";
+  selectContainer.style.marginBottom = "10px";
+  selectContainer.innerHTML = `
+    <label for="userSelector">Seleccionar usuario: </label>
+    <select id="userSelector" onchange="handleUserSelection(this.value)">
+      <option value="">Selecciona un usuario</option>
+      ${users
+        .map(
+          (user) =>
+            `<option value="${user.uid}" ${
+              user.uid === selectedUserUid ? "selected" : ""
+            }>${user.nombreCompleto}</option>`
+        )
+        .join("")}
+    </select>
+  `;
+
+  const sessionsList = document.getElementById("sessionsList");
+  sessionsList.parentElement.insertBefore(selectContainer, sessionsList);
+
+  if (!selectedUserUid && users.length > 0) {
+    selectedUserUid = users[0].uid;
+    document.getElementById("userSelector").value = selectedUserUid;
+  }
+}
+
+// Nueva función para manejar la selección de usuario
+async function handleUserSelection(uid) {
+  if (uid) {
+    selectedUserUid = uid;
+    await loadUserSessions(uid);
+  } else {
+    selectedUserUid = null;
+    const sessionsList = document.getElementById("sessionsList");
+    sessionsList.innerHTML = "<p>Por favor, selecciona un usuario.</p>";
+    document.getElementById("mensaje").textContent =
+      "Selecciona un usuario para ver sus sesiones.";
+    document.getElementById("shotsTableContainer").innerHTML = "";
+    showSwitchContainer(false);
+  }
+}
+
+// Nueva función para cargar sesiones de un usuario específico
+async function loadUserSessions(uid) {
+  const sessionsList = document.getElementById("sessionsList");
+  const mensajeElement = document.getElementById("mensaje");
+  const userDocRef = doc(db, "Simulador", uid);
   const userDoc = await getDoc(userDocRef);
+
   if (!userDoc.exists()) {
     sessionsList.innerHTML = "<p>No se encontraron sesiones.</p>";
     if (mensajeElement)
       mensajeElement.textContent = "No se encontraron sesiones.";
     return;
   }
+
   const userData = userDoc.data();
-  let sessions = userData.Sesiones || [];
-  sessions = sessions.map((s, idx) => ({ ...s, _firebaseIndex: idx }));
-  sessions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-  if (mensajeElement)
+  sortedSessions = (userData.Sesiones || []).map((s, idx) => ({
+    ...s,
+    _firebaseIndex: idx,
+  }));
+  sortedSessions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+  if (mensajeElement) {
     mensajeElement.textContent = `Sesiones de ${userData.nombre} ${userData.apellido}`;
-  renderSessionsPage(sessions);
+  }
+
+  renderSessionsPage(sortedSessions);
 }
 
 // Render sessions for the current page
@@ -1140,7 +1213,11 @@ function renderSessionsPage(sessions) {
         .forEach((item) => item.classList.remove("active"));
       sessionItem.classList.add("active");
       try {
-        const userDocRef = doc(db, "Simulador", user.uid);
+        const userDocRef = doc(
+          db,
+          "Simulador",
+          selectedUserUid || auth.currentUser.uid
+        );
         const userDoc = await getDoc(userDocRef);
         const userData = userDoc.data();
         const sessionData = userData.Sesiones[session._firebaseIndex];
@@ -1178,7 +1255,6 @@ function renderSessionsPage(sessions) {
 
 // Render pagination controls
 function renderPaginationControls(sessions) {
-  // Remove existing pagination controls
   const existingControls = document.querySelector(".pagination-controls");
   if (existingControls) existingControls.remove();
 
@@ -1208,23 +1284,17 @@ function renderPaginationControls(sessions) {
 function goToPreviousPage() {
   if (currentPage > 0) {
     currentPage--;
-    loadSessions();
+    renderSessionsPage(sortedSessions);
   }
 }
 
 // Go to next page
 function goToNextPage() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const userDocRef = doc(db, "Simulador", user.uid);
-  getDoc(userDocRef).then((userDoc) => {
-    const sessions = userDoc.data().Sesiones || [];
-    const totalPages = Math.ceil(sessions.length / 3);
-    if (currentPage < totalPages - 1) {
-      currentPage++;
-      loadSessions();
-    }
-  });
+  const totalPages = Math.ceil(sortedSessions.length / 3);
+  if (currentPage < totalPages - 1) {
+    currentPage++;
+    renderSessionsPage(sortedSessions);
+  }
 }
 
 // Save selected sessions
@@ -1349,7 +1419,7 @@ async function deleteSession(sessionFecha, event) {
   if (!confirm("¿Estás seguro de que quieres eliminar esta sesión?")) return;
   const user = auth.currentUser;
   if (!user) return;
-  const userDocRef = doc(db, "Simulador", user.uid);
+  const userDocRef = doc(db, "Simulador", selectedUserUid || user.uid);
   const userDoc = await getDoc(userDocRef);
   if (!userDoc.exists()) return;
   const userData = userDoc.data();
@@ -1361,7 +1431,6 @@ async function deleteSession(sessionFecha, event) {
   sessions.splice(sessionIndex, 1);
   await updateDoc(userDocRef, { Sesiones: sessions });
   alert("Sesión eliminada exitosamente");
-  // Adjust currentPage if necessary
   const totalPages = Math.ceil(sessions.length / 3);
   if (currentPage >= totalPages && currentPage > 0) {
     currentPage--;
@@ -1429,6 +1498,7 @@ Object.assign(window, {
   deleteSession,
   goToPreviousPage,
   goToNextPage,
+  handleUserSelection,
 });
 
 // Initialize on DOM load
