@@ -160,7 +160,8 @@ tr:hover {
   }
 
   /* Asegurarse de que el botón de estadísticas se vea bien */
-  #stats-btn {
+  #stats-btn,
+  #stats-btn1 {
     width: 100%;
     padding: 12px;
   }
@@ -213,4 +214,7 @@ tbody td:before {
   padding-left: 10px;
   font-weight: bold;
   text-align: left;
+}
+.modal-content .chart-container {
+  min-height: 500px; /* Esto asegura una altura mínima */
 }

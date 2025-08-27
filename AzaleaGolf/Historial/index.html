@@ -125,7 +125,8 @@
         </div>
         <button id="filter-btn">Filtrar</button>
 
-        <button id="stats-btn">Ver Estadísticas</button>
+        <button id="stats-btn">Reservas x hora</button>
+        <button id="stats-btn1">Reservas x mes</button>
       </div>
       <table id="reservations-table">
         <thead>
@@ -148,6 +149,24 @@
         <span class="close">&times;</span>
         <h2>Horarios Más Solicitados</h2>
         <div id="chart-container"></div>
+      </div>
+    </div>
+    <div id="monthly-stats-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Reservas por Mes</h2>
+
+        <div class="filter-controls">
+          <label for="monthly-start-date">Desde:</label>
+          <select id="monthly-start-date"></select>
+          <label for="monthly-end-date">Hasta:</label>
+          <select id="monthly-end-date"></select>
+          <button id="monthly-filter-btn">Filtrar</button>
+        </div>
+
+        <div id="monthly-chart-container" class="chart-container">
+          <canvas id="monthly-chart"></canvas>
+        </div>
       </div>
     </div>
   </body>

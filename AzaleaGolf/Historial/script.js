@@ -33,6 +33,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const closeModal = statsModal.querySelector(".close");
   const chartContainer = document.getElementById("chart-container");
 
+  // Nuevas referencias para el modal mensual
+  const statsBtn1 = document.getElementById("stats-btn1");
+  const monthlyStatsModal = document.getElementById("monthly-stats-modal");
+  const closeMonthlyModal = monthlyStatsModal.querySelector(".close");
+  const monthlyChartContainer = document.getElementById(
+    "monthly-chart-container"
+  );
+  const monthlyStartDateInput = document.getElementById("monthly-start-date");
+  const monthlyEndDateInput = document.getElementById("monthly-end-date");
+  const monthlyFilterBtn = document.getElementById("monthly-filter-btn");
+
   let reservations = [];
 
   const fetchReservations = async () => {
@@ -52,7 +63,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const clients = [
       ...new Set(reservations.map((reservation) => reservation.name)),
     ];
-    clientSelect.innerHTML = '<option value="">Todos</option>'; // Reiniciar opciones
+    // Ordena la lista de clientes alfabéticamente
+    clients.sort((a, b) => a.localeCompare(b));
+
+    clientSelect.innerHTML = '<option value="">Todos</option>';
 
     clients.forEach((client) => {
       const option = document.createElement("option");
@@ -75,7 +89,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return matchesClient && matchesDateRange;
     });
 
-    // Ordenar por fecha y luego por hora
     const sortedReservations = filteredReservations.sort((a, b) => {
       const dateComparison = new Date(a.date) - new Date(b.date);
       if (dateComparison === 0) {
@@ -138,7 +151,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }></td>`;
     reservationsTableBody.appendChild(row);
 
-    // Añadir evento para el checkbox de pago
     const paymentCheckbox = row.querySelector(".payment-checkbox");
     paymentCheckbox.addEventListener("change", async (e) => {
       const clientsSnapshot = await getDocs(collection(db, "Clientes"));
@@ -150,32 +162,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       });
 
-      // Si se encuentra el cliente, obtener las sesiones disponibles y mostrarlas en consola
       const sesiones = clientDoc.data().availableSessions;
       if (sesiones < 1) {
         let b = confirm("Confirmar pago");
         if (b) {
-          b = e.target.checked;
+          e.target.checked = true;
           await updateDoc(doc(db, "Reservas", id), { payment: true });
-          paymentCheckbox.disabled = true; // Deshabilitar el checkbox después de marcarlo
+          paymentCheckbox.disabled = true;
         } else {
           e.target.checked = false;
         }
       } else {
         let b = confirm("Desea Pagar usando cuponera?");
         if (b) {
-          b = e.target.checked;
+          e.target.checked = true;
           await updateDoc(doc(db, "Clientes", clientDoc.id), {
             availableSessions: sesiones - 1,
           });
           await updateDoc(doc(db, "Reservas", id), { payment: true });
-          paymentCheckbox.disabled = true; // Deshabilitar el checkbox después de marcarlo
+          paymentCheckbox.disabled = true;
         } else {
-          let b = confirm("Confirmar pago");
-          if (b) {
-            b = e.target.checked;
+          let c = confirm("Confirmar pago");
+          if (c) {
+            e.target.checked = true;
             await updateDoc(doc(db, "Reservas", id), { payment: true });
-            paymentCheckbox.disabled = true; // Deshabilitar el checkbox después de marcarlo
+            paymentCheckbox.disabled = true;
           } else {
             e.target.checked = false;
           }
@@ -222,19 +233,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     filteredReservations.forEach((reservation) => {
       const dateObj = new Date(`${reservation.date}T${reservation.time}`);
-      const day = dateObj.toLocaleDateString("es-ES", { weekday: "long" });
+      const day = dateObj
+        .toLocaleDateString("es-ES", { weekday: "long" })
+        .substring(0, 3);
       const hour = dateObj.getHours();
 
-      const key = `${day} ${hour}:00`;
+      const key = `${day} ${hour}hs`;
       if (!dayHourCounts[key]) {
         dayHourCounts[key] = 0;
       }
       dayHourCounts[key]++;
     });
-    chartContainer.innerHTML = `<div style="width: 80%; margin: 0 auto;">
-        <canvas id="myChart"></canvas>
-    </div>`;
-    console.log(dayHourCounts);
+    chartContainer.innerHTML = `<canvas id="myChart"></canvas>`;
+
     const diasSemana = {
       lunes: 1,
       martes: 2,
@@ -245,124 +256,317 @@ document.addEventListener("DOMContentLoaded", async () => {
       domingo: 7,
     };
 
-    // Función para ordenar el array de reservas por día de la semana y hora
+    const diasSemanaAbreviado = {
+      lun: 1,
+      mar: 2,
+      mié: 3,
+      jue: 4,
+      vie: 5,
+      sáb: 6,
+      dom: 7,
+    };
+
     function ordenarReservas(reservas) {
       return Object.entries(reservas).sort(([diaHoraA], [diaHoraB]) => {
         const [diaA, horaA] = diaHoraA.split(" ");
         const [diaB, horaB] = diaHoraB.split(" ");
-        const [horaAInt, minutoA] = horaA.split(":").map(Number);
-        const [horaBInt, minutoB] = horaB.split(":").map(Number);
+        const horaAInt = parseInt(horaA.replace("hs", ""));
+        const horaBInt = parseInt(horaB.replace("hs", ""));
 
-        // Comparar por día y luego por hora
-        if (diasSemana[diaA] !== diasSemana[diaB]) {
-          return diasSemana[diaA] - diasSemana[diaB];
+        if (diasSemanaAbreviado[diaA] !== diasSemanaAbreviado[diaB]) {
+          return diasSemanaAbreviado[diaA] - diasSemanaAbreviado[diaB];
         }
-        return horaAInt - horaBInt || minutoA - minutoB;
+        return horaAInt - horaBInt;
       });
     }
 
-    // Obtener las reservas ordenadas
     const reservasOrdenadas = ordenarReservas(dayHourCounts);
-    console.log(reservasOrdenadas);
     const reservas = [
-      ["martes 13:00", 0],
-      ["martes 14:00", 0],
-      ["martes 15:00", 0],
-      ["martes 16:00", 0],
-      ["martes 17:00", 0],
-      ["martes 18:00", 0],
-      ["martes 19:00", 0],
-      ["miércoles 13:00", 0],
-      ["miércoles 14:00", 0],
-      ["miércoles 15:00", 0],
-      ["miércoles 16:00", 0],
-      ["miércoles 17:00", 0],
-      ["miércoles 18:00", 0],
-      ["miércoles 19:00", 0],
-      ["jueves 13:00", 0],
-      ["jueves 14:00", 0],
-      ["jueves 15:00", 0],
-      ["jueves 16:00", 0],
-      ["jueves 17:00", 0],
-      ["jueves 18:00", 0],
-      ["jueves 19:00", 0],
-      ["viernes 13:00", 0],
-      ["viernes 14:00", 0],
-      ["viernes 15:00", 0],
-      ["viernes 16:00", 0],
-      ["viernes 17:00", 0],
-      ["viernes 18:00", 0],
-      ["viernes 19:00", 0],
-      ["sábado 10:00", 0],
-      ["sábado 11:00", 0],
-      ["sábado 12:00", 0],
-      ["sábado 13:00", 0],
+      ["lun 13hs", 0],
+      ["lun 14hs", 0],
+      ["lun 15hs", 0],
+      ["lun 16hs", 0],
+      ["lun 17hs", 0],
+      ["lun 18hs", 0],
+      ["lun 19hs", 0],
+      ["mar 13hs", 0],
+      ["mar 14hs", 0],
+      ["mar 15hs", 0],
+      ["mar 16hs", 0],
+      ["mar 17hs", 0],
+      ["mar 18hs", 0],
+      ["mar 19hs", 0],
+      ["mié 13hs", 0],
+      ["mié 14hs", 0],
+      ["mié 15hs", 0],
+      ["mié 16hs", 0],
+      ["mié 17hs", 0],
+      ["mié 18hs", 0],
+      ["mié 19hs", 0],
+      ["jue 13hs", 0],
+      ["jue 14hs", 0],
+      ["jue 15hs", 0],
+      ["jue 16hs", 0],
+      ["jue 17hs", 0],
+      ["jue 18hs", 0],
+      ["jue 19hs", 0],
+      ["vie 13hs", 0],
+      ["vie 14hs", 0],
+      ["vie 15hs", 0],
+      ["vie 16hs", 0],
+      ["vie 17hs", 0],
+      ["vie 18hs", 0],
+      ["vie 19hs", 0],
     ];
+
     function combinarReservas(reservas, reservasOrdenadas) {
       reservas.forEach((reserva) => {
-        const [diaHora, valorReserva] = reserva;
         const reservaOrdenada = reservasOrdenadas.find(
-          ([diaHoraOrdenada]) => diaHoraOrdenada === diaHora
+          ([diaHoraOrdenada]) => diaHoraOrdenada === reserva[0]
         );
-
         if (reservaOrdenada) {
-          reserva[1] += reservaOrdenada[1]; // Sumar los valores
+          reserva[1] = reservaOrdenada[1];
         }
       });
     }
 
     combinarReservas(reservas, reservasOrdenadas);
 
-    // Extraer las etiquetas (día y hora) y los valores (cantidad de reservas)
     const etiquetas = reservas.map(([diaHora]) => diaHora);
     const valores = reservas.map(([, cantidad]) => cantidad);
-    // Configuración del gráfico con Chart.js
+
     const ctx = document.getElementById("myChart").getContext("2d");
-    const myChart = new Chart(ctx, {
-      type: "line", // Puedes cambiar el tipo de gráfico a 'bar' si prefieres barras.
+    if (window.myChartInstance) {
+      window.myChartInstance.destroy();
+    }
+    window.myChartInstance = new Chart(ctx, {
+      type: "line",
       data: {
         labels: etiquetas,
         datasets: [
           {
             label: "Cantidad de Reservas",
-            fillColor: "rgba(220,220,220,0.2)",
-            strokeColor: "rgba(220,220,220,1)",
-            pointColor: "rgba(220,220,220,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(220,220,220,1)",
             data: valores,
+            fill: false,
+            borderColor: "rgb(76, 175, 80)",
+            tension: 0.1,
           },
         ],
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
           x: {
             title: {
               display: true,
               text: "Día y Hora",
+              font: { size: 14, weight: "600" },
             },
           },
           y: {
             title: {
               display: true,
               text: "Reservas",
+              font: { size: 14, weight: "600" },
             },
             beginAtZero: true,
             ticks: {
-              stepSize: 1, // Controla el intervalo de los valores en el eje Y
+              stepSize: 1,
               callback: function (value) {
                 if (Number.isInteger(value)) {
-                  return value; // Solo muestra los valores enteros
+                  return value;
                 }
               },
             },
+          },
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: "top",
+          },
+          title: {
+            display: true,
+            text: "Cantidad de Reservas por Día y Hora",
+            font: { size: 18, weight: "bold" },
           },
         },
       },
     });
   };
 
+  const displayMonthlyStats = (startDateStr, endDateStr) => {
+    const monthlyCounts = {};
+    const monthLabels = [];
+    const monthlyValues = [];
+
+    const startParts = startDateStr.split("-");
+    const endParts = endDateStr.split("-");
+    const start = new Date(
+      parseInt(startParts[0]),
+      parseInt(startParts[1]) - 1,
+      1
+    );
+    const end = new Date(parseInt(endParts[0]), parseInt(endParts[1]) - 1, 1);
+
+    const dateCursor = new Date(start);
+
+    while (dateCursor <= end) {
+      const monthYear = dateCursor.toLocaleString("es-ES", {
+        month: "short",
+        year: "numeric",
+      });
+
+      let count = 0;
+      reservations.forEach((res) => {
+        const resDate = new Date(res.date);
+        if (
+          resDate.getFullYear() === dateCursor.getFullYear() &&
+          resDate.getMonth() === dateCursor.getMonth()
+        ) {
+          count++;
+        }
+      });
+
+      monthLabels.push(monthYear);
+      monthlyValues.push(count);
+
+      dateCursor.setMonth(dateCursor.getMonth() + 1);
+    }
+
+    if (window.monthlyChartInstance) {
+      window.monthlyChartInstance.destroy();
+    }
+
+    monthlyChartContainer.innerHTML = '<canvas id="monthly-chart"></canvas>';
+    const ctx = document.getElementById("monthly-chart").getContext("2d");
+    window.monthlyChartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: monthLabels,
+        datasets: [
+          {
+            label: "Reservas por Mes",
+            data: monthlyValues,
+            fill: false,
+            borderColor: "rgb(76, 175, 80)",
+            tension: 0.1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Cantidad de Reservas",
+              font: { size: 14, weight: "600" },
+            },
+            ticks: {
+              stepSize: 1,
+            },
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Mes",
+              font: { size: 14, weight: "600" },
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: "top",
+          },
+          title: {
+            display: true,
+            text: `Reservas de ${start.toLocaleString("es-ES", {
+              month: "long",
+              year: "numeric",
+            })} a ${end.toLocaleString("es-ES", {
+              month: "long",
+              year: "numeric",
+            })}`,
+            font: { size: 18, weight: "bold" },
+          },
+        },
+      },
+    });
+  };
+
+  const populateMonthlyDateFilters = () => {
+    const today = new Date();
+    const startDateOptions = new Date(2024, 7, 1); // Agosto 2024
+
+    monthlyStartDateInput.innerHTML = "";
+    monthlyEndDateInput.innerHTML = "";
+
+    const populateSelect = (selectElement, defaultValue) => {
+      let dateCursor = new Date(startDateOptions);
+      while (dateCursor <= today) {
+        const option = document.createElement("option");
+        const value = `${dateCursor.getFullYear()}-${String(
+          dateCursor.getMonth() + 1
+        ).padStart(2, "0")}`;
+        option.value = value;
+        option.textContent = dateCursor.toLocaleString("es-ES", {
+          month: "long",
+          year: "numeric",
+        });
+
+        const defaultValueMonth = `${defaultValue.getFullYear()}-${String(
+          defaultValue.getMonth() + 1
+        ).padStart(2, "0")}`;
+        if (value === defaultValueMonth) {
+          option.selected = true;
+        }
+        selectElement.appendChild(option);
+        dateCursor.setMonth(dateCursor.getMonth() + 1);
+      }
+    };
+
+    const defaultStartDate = new Date(2024, 7, 1); // Agosto 2024
+    const defaultEndDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    populateSelect(monthlyStartDateInput, defaultStartDate);
+    populateSelect(monthlyEndDateInput, defaultEndDate);
+  };
+
+  statsBtn1.addEventListener("click", () => {
+    const defaultStartDate = monthlyStartDateInput.value;
+    const defaultEndDate = monthlyEndDateInput.value;
+
+    displayMonthlyStats(defaultStartDate, defaultEndDate);
+    monthlyStatsModal.style.display = "block";
+  });
+
+  monthlyFilterBtn.addEventListener("click", () => {
+    const startDate = monthlyStartDateInput.value;
+    const endDate = monthlyEndDateInput.value;
+
+    if (startDate > endDate) {
+      alert("La fecha de inicio no puede ser posterior a la fecha de fin.");
+      return;
+    }
+    displayMonthlyStats(startDate, endDate);
+  });
+
+  closeMonthlyModal.addEventListener("click", () => {
+    monthlyStatsModal.style.display = "none";
+  });
+
+  window.addEventListener("click", (event) => {
+    if (event.target == monthlyStatsModal) {
+      monthlyStatsModal.style.display = "none";
+    }
+  });
+
   await fetchReservations();
   displayReservations();
+  populateMonthlyDateFilters();
 });
