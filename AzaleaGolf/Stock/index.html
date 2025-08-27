@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de Ventas por Categoría</title>
+    <link href="styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../nav.css" />
+  </head>
+  <body>
+    <nav>
+      <div class="logo" id="acceso">
+        <img src="../logo.jpg" alt="logo" />
+      </div>
+      <ul>
+        <li><a href="../index.html">Gestión de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+        <li><a href="">Stock</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
+        <li><a href="../Suscriptores/index.html">Members Club</a></li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+    <div class="menubar">
+      <ul>
+        <li><a href="../index.html">Gestión de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+
+        <li><a href="">Stock</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
+        <li><a href="../Suscriptores/index.html">Members Club</a></li>
+      </ul>
+    </div>
+    <div id="root"></div>
+    <!-- Firebase SDK (modular) -->
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"
+    ></script>
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"
+    ></script>
+    <!-- React y ReactDOM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- App scripts -->
+    <script type="module" src="../db.js"></script>
+    <script type="module" src="app.js"></script>
+    <script defer src="../login.js"></script>
+  </body>
+</html>

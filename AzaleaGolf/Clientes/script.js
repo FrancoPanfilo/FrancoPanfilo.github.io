@@ -1,4 +1,12 @@
-import { db, collection, increment, getDocs, updateDoc, doc } from "../db.js";
+import {
+  db,
+  collection,
+  increment,
+  getDocs,
+  updateDoc,
+  doc,
+  setDoc,
+} from "../db.js";
 
 const mobileNav = document.querySelector(".hamburger");
 const navbar = document.querySelector(".menubar");
@@ -31,6 +39,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const displayClients = async () => {
     clientsTableBody.innerHTML = "";
     const clients = await fetchClients();
+
+    // Sort clients alphabetically by name
+    clients.sort((a, b) => a.name.localeCompare(b.name));
 
     clients.forEach((client) => addClientToTable(client));
   };
@@ -70,6 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await displayClients();
 });
+
 document.addEventListener("DOMContentLoaded", function () {
   const openModalBtn = document.getElementById("openModalBtn");
   const modal = document.createElement("div");
@@ -172,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       alert("Cuponera ingresada exitosamente");
     } else {
-      await setDoc(clientDoc.ref, {
+      await setDoc(doc(collection(db, "Clientes")), {
         name,
         availableSessions: sessions,
         reservations: 0,
