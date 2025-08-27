@@ -625,11 +625,11 @@ function App() {
         const data = [];
         const headers = [
           "Tipo",
-          "Categoría/Subcategoría",
+          `Categoría/<br />Subcategoría`,
           "Stock",
           "Ventas Totales",
           ...mesesFiltrados,
-          "Meses de Stock",
+          `Meses de<br />Stock`,
         ];
         data.push(headers);
 
