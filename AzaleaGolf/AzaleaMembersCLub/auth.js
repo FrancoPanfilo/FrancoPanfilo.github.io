@@ -644,8 +644,7 @@ function setupRegisterForm() {
       errorMessage.textContent = "";
       errorMessage.style.color = "";
 
-      // console.log("🚀 Iniciando registro de usuario...");
-
+      // === 1. Crear usuario en Firebase Auth ===
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -653,8 +652,7 @@ function setupRegisterForm() {
       );
       const user = userCredential.user;
 
-      // console.log("✅ Usuario creado en Firebase Auth con UID:", user.uid);
-
+      // === 2. Guardar datos en Firestore con reintentos ===
       const userData = {
         nombre,
         apellido,
@@ -664,35 +662,89 @@ function setupRegisterForm() {
         ultimaActividad: new Date().toISOString(),
       };
 
-      const userDocRef = doc(db, "Simulador", user.uid);
-      await setDoc(userDocRef, userData);
+      await saveUserWithRetry(user.uid, userData);
 
-      // console.log(
-      //   "✅ Documento creado en Firestore para el usuario:",
-      //   user.uid
-      // );
+      // === 3. Verificar que el documento existe (polling) ===
+      const userCreatedInDB = await waitForUserInFirestore(user.uid, 10, 800);
 
-      errorMessage.style.color = "green";
-      errorMessage.textContent = "¡Registro exitoso! Redirigiendo...";
+      const errorElement = document.getElementById("errorMessage");
 
-      showNotification("¡Cuenta creada exitosamente!", "success");
+      if (userCreatedInDB) {
+        errorElement.style.color = "green";
+        errorElement.textContent = "¡Registro exitoso! Redirigiendo...";
+        showNotification("¡Cuenta creada exitosamente!", "success");
 
-      setTimeout(() => {
-        window.location.href = "Sesiones/index.html";
-      }, 2000);
+        setTimeout(() => {
+          window.location.href = "Sesiones/index.html";
+        }, 1500);
+      } else {
+        // FALLO PARCIAL: Auth OK, pero Firestore no sincronizó
+        errorElement.style.color = "red";
+        errorElement.textContent =
+          "Cuenta creada, pero datos no guardados. Inicia sesión e intenta de nuevo.";
+        showNotification(
+          "Error: datos no guardados. Intenta iniciar sesión.",
+          "error"
+        );
+      }
     } catch (error) {
-      // console.error("❌ Error en el registro:", error);
-      const errorMessage = handleFirebaseAuthError(error, "register");
+      const errorMsg = handleFirebaseAuthError(error, "register");
       const errorElement = document.getElementById("errorMessage");
       if (errorElement) {
         errorElement.style.color = "red";
-        errorElement.textContent = errorMessage;
+        errorElement.textContent = errorMsg;
       }
     } finally {
       submitButton.textContent = originalText;
       submitButton.disabled = false;
     }
   });
+}
+
+// === FUNCIÓN AUXILIAR: Guardar con reintentos ===
+async function saveUserWithRetry(uid, userData, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const userDocRef = doc(db, "Simulador", uid);
+      await setDoc(userDocRef, userData);
+      console.log(`Documento guardado en intento ${i + 1}`);
+      return true;
+    } catch (error) {
+      console.warn(`Reintento ${i + 1}/${maxRetries} fallido:`, error.message);
+      if (i === maxRetries - 1) throw error;
+      await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
+}
+
+// === FUNCIÓN AUXILIAR: Polling con backoff exponencial ===
+async function waitForUserInFirestore(uid, maxAttempts = 10, baseDelay = 800) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const userDocRef = doc(db, "Simulador", uid);
+      const docSnap = await getDoc(userDocRef);
+
+      if (docSnap.exists()) {
+        console.log(`Usuario encontrado en Firestore (intento #${attempt})`);
+        return true;
+      }
+
+      const delay = baseDelay * Math.pow(1.5, attempt - 1);
+      console.log(
+        `Intento ${attempt}/${maxAttempts}: no encontrado. Esperando ${delay}ms...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    } catch (error) {
+      console.warn(`Error en polling (intento ${attempt}):`, error.message);
+      const delay = baseDelay * Math.pow(1.5, attempt - 1);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  console.error(
+    "Usuario NO encontrado en Firestore después de todos los intentos"
+  );
+  return false;
 }
 
 // Manejar cierre de sesión

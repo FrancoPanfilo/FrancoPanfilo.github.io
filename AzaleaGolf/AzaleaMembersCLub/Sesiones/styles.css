@@ -503,7 +503,7 @@ a:hover {
   padding: 0 2px;
 }
 .checkbox-column i.fas.fa-eye {
-  color: var(--accent-color);
+  color: transparent;
   cursor: pointer;
   transition: all var(--transition-fast);
   font-size: var(--font-size-sm);
@@ -593,6 +593,7 @@ a:hover {
   cursor: pointer;
 }
 .average-row {
+  height: 30px;
   background: rgba(78, 205, 196, 0.1);
   font-weight: var(--font-weight-semibold);
   border-top: 2px solid transparent;
@@ -605,12 +606,17 @@ a:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
+
 .average-row td {
   color: var(--accent-color);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-);
 }
 .average-row td:first-child {
   cursor: pointer;
+}
+.shots-table tr th,
+.shots-table tr td {
+  text-align: center;
 }
 .toggle-club-btn {
   background: none;
@@ -1274,6 +1280,9 @@ input:checked + .slider:before {
     font-size: 0.9rem;
     margin-bottom: 10px;
   }
+  thead tr .checkbox-column .fas::before {
+    color: transparent !important;
+  }
   .sessions-list {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -1547,7 +1556,7 @@ input:checked + .slider:before {
   .shots-table-container,
   .shots-table th,
   .shots-table td {
-    font-size: var(--font-size-md);
+    font-size: 1rem;
     padding: var(--spacing-md);
   }
   .table-actions {
