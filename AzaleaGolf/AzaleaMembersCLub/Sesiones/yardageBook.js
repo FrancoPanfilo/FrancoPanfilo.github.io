@@ -158,66 +158,47 @@ function agruparTirosPorPalo(sessions) {
 
   return shotsByClub;
 }
-
+console.log("HOLAAAA")
 // ============= FUNCIONES DE CÁLCULO DE ESTADÍSTICAS =============
 function calcularEstadisticasClub(
   shots,
   deviationPercentage = 0.75,
   lateralPerc = 0.75
 ) {
-  let carryValues,
-    variation = "-",
-    maxRight = 0,
-    maxLeft = 0;
+  if (shots.length === 0) return { avgCarry: 0, maxLeft: 0, maxRight: 0, variation: "-" };
 
-  if (shots.length === 1) {
-    carryValues = shots.map((s) => s.carry);
-  } else if (shots.length >= 5) {
-    const avgCarry = shots.reduce((sum, s) => sum + s.carry, 0) / shots.length;
-    const closestShots = shots.sort(
-      (a, b) => Math.abs(a.carry - avgCarry) - Math.abs(b.carry - avgCarry)
-    );
-    const limit = Math.floor(shots.length * deviationPercentage);
-    carryValues = closestShots.slice(0, limit).map((s) => s.carry);
-  } else {
-    carryValues = shots.map((s) => s.carry);
+  // 1. ORDENAR POR CARRY DESCENDENTE Y TOMAR EL % MÁS ALTO
+  const sortedByCarry = [...shots].sort((a, b) => b.carry - a.carry); // mayor a menor
+  const limit = Math.floor(shots.length * deviationPercentage);
+  const selectedShots = sortedByCarry.slice(0, limit); // los X% con mayor carry
+  const carryValues = selectedShots.map(s => s.carry);
+
+  // 2. PROMEDIO DE LOS MAYORES
+  const avgCarry = carryValues.reduce((a, b) => a + b, 0) / carryValues.length;
+
+  // 3. VARIACIÓN: ± (mitad del rango) de los seleccionados
+  let variation = "-";
+  if (carryValues.length > 1) {
+    const minC = Math.min(...carryValues);
+    const maxC = Math.max(...carryValues);
+    variation = `±${((maxC - minC) / 2).toFixed(0)}`;
   }
 
+  // 4. DISPERSIÓN LATERAL (sin cambios)
+  let maxLeft = 0, maxRight = 0;
   if (shots.length > 1) {
-    const avgCarry =
-      carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length;
-    const minCarry = Math.min(...carryValues);
-    const maxCarry = Math.max(...carryValues);
-    variation = `±${((maxCarry - minCarry) / 2).toFixed(0)}`;
+    const offlineSortedByAbs = [...shots]
+      .sort((a, b) => Math.abs(a.offline) - Math.abs(b.offline));
+    const limitLat = Math.floor(shots.length * lateralPerc);
+    const selectedOffline = offlineSortedByAbs
+      .slice(0, limitLat)
+      .map(s => s.offline);
 
-    // CÁLCULO DE DISPERSIÓN LATERAL
-
-    const offlineValues = shots.map((s) => s.offline);
-
-    const offlineValuesSorted = offlineValues.sort((a, b) => a - b);
-
-    const lateralLimit = Math.floor(offlineValues.length * lateralPerc);
-
-    const selectedOffline = shots
-      .map((s) => s.offline)
-      .sort((a, b) => Math.abs(a) - Math.abs(b))
-      .slice(0, lateralLimit);
-
-    maxLeft = Math.abs(Math.min(...selectedOffline)).toFixed(0);
-    maxRight = Math.max(...selectedOffline).toFixed(0);
-    if (maxRight < 0) maxRight = 0;
-  } else {
+    maxLeft = Math.abs(Math.min(...selectedOffline, 0)).toFixed(0);
+    maxRight = Math.max(...selectedOffline, 0).toFixed(0);
   }
 
-  const result = {
-    avgCarry:
-      carryValues.reduce((sum, val) => sum + val, 0) / carryValues.length,
-    maxLeft,
-    maxRight,
-    variation,
-  };
-
-  return result;
+  return { avgCarry, maxLeft, maxRight, variation };
 }
 
 function ajustarDispersion(clubStats, categoryClubs) {
