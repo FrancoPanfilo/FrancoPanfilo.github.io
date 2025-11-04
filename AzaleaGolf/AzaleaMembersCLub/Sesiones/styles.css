@@ -1033,6 +1033,7 @@ input:checked + .slider:before {
 }
 #shotsTableContainer {
   display: block;
+  border: none;
 }
 .session-item-yardagebook {
   padding: 0;
