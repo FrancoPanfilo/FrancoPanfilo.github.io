@@ -2,91 +2,106 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Club Atlético Mármol</title>
-    <link rel="stylesheet" href="style.css" />
-    <link
-      href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap"
-      rel="stylesheet"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CA Mármol - Historial de Partidos Oficiales</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   </head>
   <body>
     <header>
-      <h1>Club Atlético Mármol</h1>
-      <p>Pasión, historia y fútbol amateur</p>
+      <h1>CA Mármol - Historial de Partidos Oficiales</h1>
+      <p class="subtitle">
+        Liga del Rey - Todos los partidos completos con videos
+      </p>
     </header>
-    <div class="container">
-      <section class="stats">
-        <h2>Resumen del equipo</h2>
-        <div class="stats-grid" id="statsGrid"></div>
-      </section>
-      <section class="records">
-        <h2>Rachas y Récords</h2>
-        <div id="recordsContent"></div>
-      </section>
-      <section class="head-to-head">
-        <h2>Enfrentamientos destacados</h2>
-        <ul>
-          <li>Más victorias contra: <strong id="mostWins"></strong></li>
-          <li>Más empates contra: <strong id="mostDraws"></strong></li>
-          <li>Más derrotas contra: <strong id="mostLosses"></strong></li>
-        </ul>
-      </section>
-      <section class="cards-visual">
-        <h2>Tarjetas acumuladas</h2>
-        <div class="cards-bar">
-          <div id="yellowBar" class="bar yellow"></div>
-          <div id="redBar" class="bar red"></div>
-        </div>
-        <div class="cards-labels">
-          <span id="yellowLabel"></span>
-          <span id="redLabel"></span>
-        </div>
-      </section>
-      <section class="experience">
-        <h2>Progreso de experiencia y títulos</h2>
-        <div id="experienceContent"></div>
-      </section>
-      <section class="achievements" id="achievementsSection">
-        <h2>Logros</h2>
-        <div id="achievementsContent"></div>
-      </section>
-      <section class="players">
-        <h2>Plantilla actual</h2>
-        <input
-          type="text"
-          id="playerFilter"
-          placeholder="Buscar jugador..."
-          aria-label="Buscar jugador"
-        />
-        <div class="players-grid" id="playersGrid"></div>
-      </section>
-      <section class="matches">
-        <h2>Historial de partidos recientes</h2>
-        <div class="match-filters">
-          <button data-filter="all" class="active">Todos</button>
-          <button data-filter="Won">Ganados</button>
-          <button data-filter="Drawn">Empatados</button>
-          <button data-filter="Lost">Perdidos</button>
-        </div>
-        <div style="overflow-x: auto">
-          <table id="matchesTable">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Rival</th>
-                <th>Resultado</th>
-                <th>Marcador</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
+
+    <!-- Filtros -->
+    <div id="filters">
+      <div class="filter-group">
+        <label for="filtro-rival">Buscar rival:</label>
+        <input type="text" id="filtro-rival" placeholder="Ej: Buceo Celtic" />
+      </div>
+
+      <div class="filter-group">
+        <label for="filtro-resultado">Resultado:</label>
+        <select id="filtro-resultado">
+          <option value="todos">Todos</option>
+          <option value="ganado">Ganado</option>
+          <option value="empatado">Empatado</option>
+          <option value="perdido">Perdido</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filtro-video">Con video:</label>
+        <select id="filtro-video">
+          <option value="todos">Todos</option>
+          <option value="si">Sí</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filtro-anio">Año:</label>
+        <select id="filtro-anio">
+          <option value="todos">Todos</option>
+        </select>
+      </div>
+
+      <button id="clear-filters" class="clear-btn">Limpiar filtros</button>
     </div>
-    <footer>
-      <span id="leagueStatus"></span>
-    </footer>
-    <script src="main.js"></script>
+
+    <!-- Sección provisoria al principio -->
+    <div
+      id="videos-sin-vincular"
+      class="provisional-section"
+      style="display: none"
+    >
+      <h2>Videos sin asociar a ningún partido</h2>
+      <p class="provisional-note">
+        Vincúlalos manualmente o guárdalos como "no cargado":
+      </p>
+      <div id="provisional-table-container"></div>
+    </div>
+
+    <!-- Tabla principal -->
+    <div id="tabla-container">
+      <table id="tabla-principal">
+        <thead>
+          <tr>
+            <th>Fecha del Partido</th>
+            <th>Resultado (CA Mármol primero)</th>
+            <th>Rival</th>
+            <th>Video en YouTube</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-partidos">
+          <tr>
+            <td colspan="4" class="loading">Cargando datos...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal para ver el video -->
+    <div id="video-modal" class="modal-overlay" style="display: none">
+      <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div class="modal-video-container">
+          <iframe
+            id="youtube-player"
+            width="100%"
+            height="100%"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
   </body>
 </html>

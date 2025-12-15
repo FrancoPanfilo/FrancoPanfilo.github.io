@@ -1,0 +1,318 @@
+/* Reset y base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background: linear-gradient(
+    135deg,
+    #5a1620 0%,
+    #8b2230 100%
+  ); /* Fondo granate oscuro basado en #713f1c */
+  min-height: 100vh;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  background: #713f1c; /* Color principal */
+  color: white;
+  padding: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 6px 25px rgba(113, 63, 28, 0.4);
+  margin-bottom: 2rem;
+}
+
+header h1 {
+  color: white;
+  font-size: 2.8rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.subtitle {
+  color: #ffd700; /* Amarillo como acento */
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+/* Filtros */
+#filters {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(113, 63, 28, 0.2);
+  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: end;
+  border: 3px solid #713f1c;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #713f1c;
+  font-size: 0.9rem;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 0.75rem;
+  border: 2px solid #d4d5d7;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  outline: none;
+  border-color: #713f1c;
+  box-shadow: 0 0 0 3px rgba(113, 63, 28, 0.2);
+}
+
+.clear-btn {
+  background: #713f1c;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+  align-self: end;
+}
+
+.clear-btn:hover {
+  background: #5a1620;
+}
+
+/* Sección provisoria */
+.provisional-section {
+  background: linear-gradient(135deg, #fff8e1, #ffecb3);
+  border: 3px solid #ffd700; /* Amarillo como borde */
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(255, 215, 0, 0.3);
+}
+
+.provisional-section h2 {
+  background: #ffd700;
+  color: #713f1c;
+  padding: 1rem;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.provisional-note {
+  padding: 0 1rem 1rem;
+  color: #713f1c;
+  font-style: italic;
+}
+
+#provisional-table-container th {
+  background: #ffd700;
+  color: #713f1c;
+  padding: 1rem;
+  text-align: left;
+  font-weight: bold;
+}
+
+.info-rival {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid #713f1c;
+  font-weight: bold;
+  color: #713f1c;
+}
+
+/* Tabla principal */
+#tabla-container {
+  background: rgba(255, 255, 255, 0.95);
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(113, 63, 28, 0.2);
+  border: 3px solid #713f1c;
+}
+#tabla-principal {
+  width: 100%;
+}
+#tabla-principal th {
+  background: #713f1c; /* Principal en header */
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1.2rem;
+}
+
+#tabla-principal td {
+  padding: 1rem;
+  border-bottom: 1px solid #d4d5d7;
+}
+
+#tabla-principal tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+#tabla-principal tr:hover {
+  background: #fff3cd; /* Toque amarillo suave */
+  transition: background 0.2s ease;
+}
+
+.yes a {
+  text-decoration: none;
+  background: #d4edda;
+  color: #155724;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-weight: bold;
+  border: 1px solid #713f1c;
+}
+
+.no {
+  color: #dc3545;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.unlink-btn {
+  background: none;
+  border: 1px solid #d4d5d7;
+  color: #713f1c;
+  font-size: 1.2em;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.unlink-btn:hover {
+  background: #713f1c;
+  color: white;
+  border-color: #713f1c;
+}
+
+/* Títulos de año y mes */
+#tabla-partidos h2 {
+  background: #713f1c;
+  color: white;
+  padding: 0.8rem;
+  text-align: center;
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+#tabla-partidos h3 {
+  background: #d4d5d7;
+  color: #713f1c;
+  padding: 0.6rem;
+  text-align: center;
+  font-size: 1.3rem;
+  margin: 0;
+  font-weight: bold;
+}
+
+/* Loading y mensajes */
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #713f1c;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 2.2rem;
+  }
+
+  #filters {
+    grid-template-columns: 1fr;
+  }
+
+  #tabla-principal th,
+  #tabla-principal td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+/* Modal de video */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 1000px;
+  height: 80vh;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 2.5rem;
+  color: #ffd700;
+  cursor: pointer;
+  z-index: 1001;
+  transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+  color: white;
+}
+
+.modal-video-container {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Icono de TV */
+.video-icon {
+  font-size: 1.8rem;
+  color: #ffd700;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: transform 0.2s ease;
+}
+
+.video-icon:hover {
+  transform: scale(1.2);
+  color: white;
+}
