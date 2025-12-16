@@ -4,10 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CA Mármol - Historial de Partidos Oficiales</title>
-    <link rel="stylesheet" href="styles.css" />
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header>
@@ -17,13 +18,11 @@
       </p>
     </header>
 
-    <!-- Filtros -->
-    <div id="filters" style="display: none">
+    <div id="filters">
       <div class="filter-group">
         <label for="filtro-rival">Buscar rival:</label>
         <input type="text" id="filtro-rival" placeholder="Ej: Buceo Celtic" />
       </div>
-
       <div class="filter-group">
         <label for="filtro-resultado">Resultado:</label>
         <select id="filtro-resultado">
@@ -33,7 +32,6 @@
           <option value="perdido">Perdido</option>
         </select>
       </div>
-
       <div class="filter-group">
         <label for="filtro-video">Con video:</label>
         <select id="filtro-video">
@@ -42,66 +40,49 @@
           <option value="no">No</option>
         </select>
       </div>
-
       <div class="filter-group">
         <label for="filtro-anio">Año:</label>
         <select id="filtro-anio">
           <option value="todos">Todos</option>
         </select>
       </div>
-
       <button id="clear-filters" class="clear-btn">Limpiar filtros</button>
     </div>
 
-    <!-- Sección provisoria al principio -->
-    <div
-      id="videos-sin-vincular"
-      class="provisional-section"
-      style="display: none"
-    >
-      <h2>Videos sin asociar a ningún partido</h2>
-      <p class="provisional-note">
-        Vincúlalos manualmente o guárdalos como "no cargado":
-      </p>
-      <div id="provisional-table-container"></div>
-    </div>
-
-    <!-- Tabla principal -->
     <div id="tabla-container">
-      <table id="tabla-principal">
+      <table>
         <thead>
           <tr>
-            <th>Fecha del Partido</th>
-            <th>Resultado (CA Mármol primero)</th>
+            <th>Día</th>
+            <th>Resultado</th>
             <th>Rival</th>
-            <th>Video en YouTube</th>
+            <th>Video</th>
           </tr>
         </thead>
         <tbody id="tabla-partidos">
           <tr>
-            <td colspan="4" class="loading">Cargando datos...</td>
+            <td colspan="4">Cargando datos...</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Modal para ver el video -->
-    <div id="video-modal" class="modal-overlay" style="display: none">
+    <!-- Modal solo para video -->
+    <div id="modal" class="modal-overlay">
       <div class="modal-content">
-        <span class="modal-close">&times;</span>
+        <span class="modal-close" onclick="cerrarModal()">×</span>
         <div class="modal-video-container">
           <iframe
             id="youtube-player"
             width="100%"
             height="100%"
             frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           ></iframe>
         </div>
       </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js" type="module"></script>
   </body>
 </html>
