@@ -55,6 +55,62 @@ header h1 {
   border: 2px solid #d4d5d7;
   border-radius: 8px;
 }
+/* Sección de vinculación */
+#vinculacion-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+  margin-bottom: 2rem;
+}
+#vinculacion-container h2 {
+  color: #3d2817;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.partido-sin-video {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.partido-info {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #3d2817;
+}
+.video-option {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+.video-thumbnail {
+  width: 120px;
+  height: 68px;
+  object-fit: cover;
+  margin-right: 1rem;
+  border-radius: 4px;
+}
+.video-title {
+  flex: 1;
+  font-size: 0.9rem;
+}
+.vincular-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.vincular-btn:hover {
+  background: #218838;
+}
 .clear-btn {
   background: linear-gradient(135deg, #3d2817 0%, #2a1e12 100%);
   color: white;
@@ -133,7 +189,102 @@ tr:hover {
 .unlink-btn:hover {
   color: #c0392b;
 }
+/* Sección Provisoria - Vinculación de Videos */
+#videos-sin-vincular {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  margin-top: 2rem;
+  border: 2px solid #3d2817;
+}
 
+#videos-sin-vincular h2 {
+  color: #3d2817;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+#provisional-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+#provisional-table-container th {
+  background: #3d2817;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+}
+
+#provisional-table-container td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  vertical-align: top;
+}
+
+#provisional-table-container tr:hover {
+  background: #f5f5f5;
+}
+
+#provisional-table-container a {
+  color: #1a1108;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#provisional-table-container a:hover {
+  text-decoration: underline;
+}
+
+.video-date {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+.video-description {
+  font-size: 0.9rem;
+  color: #444;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.info-rival {
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.info-rival strong {
+  color: #3d2817;
+}
+
+.select-partido {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+#provisional-table-container button {
+  background: #3d2817;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#provisional-table-container button:hover {
+  background: #2a1e12;
+}
 .modal-overlay {
   position: fixed;
   top: 0;
