@@ -251,7 +251,7 @@ function renderTabla(rows) {
         <tr class="partido-row clickable-row" data-id="${row.partidoId}"
           data-rival="${row.normalizedRival}" data-tipo="${row.tipoResultado}"
           data-video="${row.tieneVideo}" data-year="${row.year}">
-          <td>${row.fecha}</td>
+          <td>${day}</td>
           <td>${row.resultado}</td>
           <td>${row.rival}</td>
           <td>${row.video}</td>
@@ -261,13 +261,6 @@ function renderTabla(rows) {
 
   document.getElementById("tabla-partidos").innerHTML =
     html || "<tr><td colspan='4'>No hay resultados</td></tr>";
-
-  document.querySelectorAll(".clickable-row").forEach((row) => {
-    row.onclick = (e) => {
-      if (e.target.tagName === "SPAN" || e.target.tagName === "BUTTON") return;
-      window.open(`https://ligadelrey.org/partido/${row.dataset.id}`, "_blank");
-    };
-  });
 }
 
 function llenarFiltroAnio(years) {
@@ -420,12 +413,10 @@ window.desvincular = async function (encodedUrl, partidoIndex) {
   }
 };
 
-function abrirVideo(vid) {
-  document.getElementById(
-    "youtube-player"
-  ).src = `https://www.youtube.com/embed/${vid}?autoplay=1`;
-  document.getElementById("modal").style.display = "flex";
-}
+window.abrirVideo = function (videoId) {
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  window.open(videoUrl, "_blank");
+};
 
 function cerrarModal() {
   document.getElementById("modal").style.display = "none";
