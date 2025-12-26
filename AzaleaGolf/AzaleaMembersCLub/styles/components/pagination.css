@@ -1,0 +1,71 @@
+/**
+ * PAGINACIÓN - AZALEA GOLF SIMULATOR
+ */
+
+.pagination-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: var(--spacing-lg);
+  gap: var(--spacing-sm);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.page-btn,
+.prev-btn,
+.next-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 40px;
+  text-align: center;
+}
+
+.page-btn:hover,
+.prev-btn:hover,
+.next-btn:hover {
+  background-color: var(--primary-color);
+  color: var(--text-white);
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.page-btn.active {
+  background-color: var(--primary-color);
+  color: var(--text-white);
+  border-color: var(--primary-color);
+}
+
+.page-btn:disabled,
+.prev-btn:disabled,
+.next-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.page-numbers {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.pagination-info {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.filter-info {
+  color: var(--info-color);
+  font-weight: var(--font-weight-medium);
+}

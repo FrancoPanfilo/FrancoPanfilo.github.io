@@ -14,15 +14,17 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="modal.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../styles/main.css" />
     <link rel="stylesheet" href="../nav.css" />
+    <link rel="stylesheet" href="css/sesiones.css" />
+    <link rel="stylesheet" href="css/heatmap.css" />
+    <link rel="stylesheet" href="css/yardagebook-modal.css" />
 
     <script type="module" src="../firebase.js"></script>
     <script type="module" src="../auth.js"></script>
     <script type="module" src="script.js"></script>
     <script type="module" src="heatmap.js"></script>
-    <!-- <script type="module" src="js/shots.js"></script> -->
+    <script src="../nav.js"></script>
   </head>
   <body>
     <header class="header">
@@ -55,6 +57,12 @@
               </a>
             </li>
             <li class="nav-item">
+              <a href="../perfil.html" class="nav-link">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
+              </a>
+            </li>
+            <li class="nav-item">
               <a href="#" class="nav-link auth-button">
                 <i class="fas fa-sign-in-alt"></i>
                 <span>Iniciar Sesión</span>
@@ -71,9 +79,68 @@
     </header>
 
     <section class="sessions">
-      <h2 id="mensaje">Cargando sesiones...</h2>
+      <div class="sessions-header">
+        <h2 id="mensaje">Cargando sesiones...</h2>
+        <button id="uploadSessionBtn" class="btn-upload-session" onclick="openUploadModal()">
+          <i class="fas fa-upload"></i> Cargar Sesión
+        </button>
+      </div>
       <div class="sessions-list" id="sessionsList"></div>
     </section>
+
+    <!-- Modal de Carga de Sesión -->
+    <div id="uploadSessionModal" class="modal">
+      <div class="modal-content upload-modal">
+        <div class="modal-header">
+          <h3><i class="fas fa-file-upload"></i> Cargar Nueva Sesión</h3>
+          <button class="close-modal" onclick="closeUploadModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="uploadSessionForm">
+            <div class="form-group">
+              <label for="simuladorType">Tipo de Simulador:</label>
+              <select id="simuladorType" required>
+                <option value="foresight">Foresight</option>
+                <option value="garmin" disabled>Garmin (Próximamente)</option>
+                <option value="trackman" disabled>Trackman (Próximamente)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="sessionDate">Fecha de la Sesión:</label>
+              <input type="date" id="sessionDate" required />
+            </div>
+            <div class="form-group">
+              <label for="csvFileInput">Archivo CSV:</label>
+              <div class="file-input-wrapper">
+                <input type="file" id="csvFileInput" accept=".csv" required />
+                <span class="file-hint">Selecciona el archivo exportado desde tu simulador</span>
+              </div>
+            </div>
+            <div id="uploadPreview" class="upload-preview" style="display: none;">
+              <h4>Vista previa</h4>
+              <div class="preview-stats">
+                <span id="previewShotCount">0 tiros</span>
+                <span id="previewDuration">Duración: --</span>
+              </div>
+              <div class="preview-table-wrapper">
+                <table id="uploadPreviewTable">
+                  <thead></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+            <p id="uploadStatus" class="status-message"></p>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" onclick="closeUploadModal()">Cancelar</button>
+              <button type="submit" class="btn-primary" id="submitUploadBtn" disabled>
+                <i class="fas fa-save"></i> Guardar Sesión
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Switch para alternar entre tabla y mapa de dispersión (por encima de la tabla) -->
 
     <section class="sessions">
@@ -200,43 +267,6 @@
           }
         }
       };
-    </script>
-    <script>
-      // Menú móvil
-      const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
-      const nav = document.querySelector(".nav");
-
-      function toggleMobileMenu() {
-        mobileMenuToggle.classList.toggle("active");
-        nav.classList.toggle("active");
-        document.body.style.overflow = nav.classList.contains("active")
-          ? "hidden"
-          : "";
-      }
-
-      function closeMobileMenu() {
-        mobileMenuToggle.classList.remove("active");
-        nav.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-
-      mobileMenuToggle.addEventListener("click", toggleMobileMenu);
-
-      // Cerrar menú al hacer clic en un enlace
-      document.querySelectorAll(".nav-link").forEach((link) => {
-        link.addEventListener("click", () => {
-          if (window.innerWidth <= 768) {
-            closeMobileMenu();
-          }
-        });
-      });
-
-      // Cerrar menú al redimensionar la ventana
-      window.addEventListener("resize", () => {
-        if (window.innerWidth > 768) {
-          closeMobileMenu();
-        }
-      });
     </script>
   </body>
 </html>

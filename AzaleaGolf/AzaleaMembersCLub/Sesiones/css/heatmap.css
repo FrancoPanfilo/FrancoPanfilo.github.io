@@ -1,0 +1,236 @@
+/**
+ * ESTILOS DE HEATMAP/SCATTER - AZALEA GOLF SIMULATOR
+ */
+
+#scatterCanvas {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-lg);
+  margin-top: var(--spacing-xl);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.scatter-container {
+  position: relative;
+  margin-top: var(--spacing-xl);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.scatter-controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.scatter-control-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-white);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-weight: var(--font-weight-medium);
+  backdrop-filter: blur(5px);
+}
+
+.scatter-control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.scatter-control-btn:active {
+  transform: translateY(0);
+}
+
+.scatter-control-btn i {
+  margin-right: var(--spacing-xs);
+}
+
+/* Toggle cell para mostrar/ocultar en heatmap */
+.toggle-cell {
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.toggle-cell i {
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  transition: transform var(--transition-fast);
+  display: inline-block;
+}
+
+.toggle-cell:hover i {
+  color: var(--accent-light);
+  transform: scale(1.2);
+}
+
+/* Leyenda del heatmap */
+.heatmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--border-radius-md);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-white);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Contenedor oculto por defecto */
+#scatterCanvas,
+#scatterControls {
+  display: none;
+}
+
+#shotsTableContainer {
+  display: block;
+  border: none;
+}
+
+/* Responsive - Tablets */
+@media (max-width: 768px) {
+  .scatter-container {
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+  }
+
+  .scatter-controls {
+    gap: var(--spacing-sm);
+  }
+
+  .scatter-control-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  #scatterCanvas {
+    margin-top: var(--spacing-lg);
+  }
+
+  .heatmap-legend {
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+  }
+
+  .legend-item {
+    font-size: var(--font-size-xs);
+    padding: 4px var(--spacing-xs);
+  }
+}
+
+/* Responsive - Móviles */
+@media (max-width: 600px) {
+  .scatter-container {
+    padding: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+  }
+
+  .scatter-controls {
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .scatter-control-btn {
+    padding: 6px 10px;
+    font-size: var(--font-size-xs);
+  }
+
+  .scatter-control-btn i {
+    margin-right: 4px;
+  }
+
+  #scatterCanvas {
+    margin-top: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+  }
+
+  .heatmap-legend {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-xs);
+  }
+
+  .legend-item {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  .legend-color {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Responsive - Móviles pequeños */
+@media (max-width: 480px) {
+  .scatter-container {
+    padding: var(--spacing-xs);
+    margin: var(--spacing-sm) calc(-1 * var(--spacing-xs));
+    width: calc(100% + var(--spacing-sm));
+    border-radius: 0;
+  }
+
+  .scatter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scatter-control-btn {
+    width: 100%;
+    text-align: center;
+    padding: var(--spacing-sm);
+  }
+
+  #scatterCanvas {
+    border-radius: 0;
+    margin: var(--spacing-sm) calc(-1 * var(--spacing-xs));
+    width: calc(100% + var(--spacing-sm)) !important;
+  }
+
+  .heatmap-legend {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .legend-item {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,201 @@
+/**
+ * PÁGINA PRINCIPAL (HOME) - AZALEA GOLF SIMULATOR
+ */
+
+/* Welcome section */
+.welcome {
+  text-align: center;
+  padding: var(--spacing-xxl) var(--spacing-md);
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.welcome h1 {
+  font-size: var(--font-size-xxxl);
+  color: var(--text-white);
+  margin-bottom: var(--spacing-lg);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.welcome p {
+  font-size: var(--font-size-lg);
+  color: var(--text-white);
+  margin-bottom: var(--spacing-xl);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Progress section */
+.progress {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+.progress h2 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.progress-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Hero section */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xxl);
+  align-items: center;
+}
+
+.hero-text {
+  text-align: left;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  margin-bottom: var(--spacing-lg);
+  color: white;
+}
+
+.hero-title .highlight {
+  color: var(--accent-color);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-xl);
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 500px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+/* Hero user message */
+.hero-user-message {
+  margin-top: var(--spacing-lg);
+}
+
+.hero-welcome-text {
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-lg);
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 500px;
+  font-weight: var(--font-weight-medium);
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
+}
+
+.stat-item {
+  text-align: center;
+  padding: var(--spacing-lg);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* CTA section */
+.cta-section {
+  padding: var(--spacing-xxl) 0;
+  background: var(--bg-secondary);
+  text-align: center;
+}
+
+.cta-content h2 {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.cta-content p {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-text {
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+  }
+
+  .hero-stats {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+}

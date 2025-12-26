@@ -1,0 +1,92 @@
+/**
+ * MAIN CSS - AZALEA GOLF SIMULATOR
+ * Archivo principal que importa todos los módulos CSS
+ */
+
+/* Variables y base */
+@import './variables.css';
+@import './reset.css';
+@import './animations.css';
+
+/* Componentes */
+@import './components/buttons.css';
+@import './components/forms.css';
+@import './components/modals.css';
+@import './components/tables.css';
+@import './components/cards.css';
+@import './components/switches.css';
+@import './components/pagination.css';
+
+/* Layout */
+@import './layout/container.css';
+@import './layout/dashboard.css';
+
+/* Páginas */
+@import './pages/home.css';
+@import './pages/auth.css';
+
+/* Loading y estados */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  color: var(--text-light);
+}
+
+.empty-state i {
+  font-size: var(--font-size-xxxl);
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+/* Utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-white {
+  color: var(--text-white);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.invisible {
+  visibility: hidden;
+}

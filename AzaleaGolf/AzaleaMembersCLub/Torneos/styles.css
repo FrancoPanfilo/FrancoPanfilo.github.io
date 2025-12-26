@@ -25,321 +25,10 @@ body {
   margin: 0 auto;
   padding: var(--spacing-lg);
 }
-.nav {
-  display: flex;
-  align-items: center;
-}
-
-.nav-menu {
-  list-style: none;
-  display: flex;
-  gap: var(--spacing-md);
-  align-items: center;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-item {
-  position: relative;
-  display: flex;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-md);
-  transition: all var(--transition-normal);
-  position: relative;
-  overflow: hidden;
-  font-size: var(--font-size-sm);
-  letter-spacing: 0.5px;
-}
-
-.nav-link::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
-  transition: left var(--transition-slow);
-}
-
-.nav-link:hover::before {
-  left: 100%;
-}
-
-.nav-link i {
-  font-size: 1rem;
-  transition: transform var(--transition-normal);
-}
-
-.nav-link:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.nav-link:hover i {
-  transform: scale(1.1);
-}
-
-.nav-link::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #4ecdc4, #45b7d1);
-  transition: all var(--transition-normal);
-  transform: translateX(-50%);
-  border-radius: 1px;
-}
-
-.nav-link:hover::after {
-  width: 80%;
-}
 
 /* ========================================
-   BOTÓN DE AUTENTICACIÓN
+   ESTILOS ESPECÍFICOS DE TORNEOS
    ======================================== */
-.nav-link.auth-button {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-weight: var(--font-weight-semibold);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  margin-left: var(--spacing-sm);
-}
-
-.nav-link.auth-button:hover {
-  background: linear-gradient(
-    135deg,
-    var(--primary-dark),
-    var(--secondary-dark)
-  );
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.nav-link.auth-button::after {
-  background: white;
-}
-
-.nav-link.auth-button.logout {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-}
-
-.nav-link.auth-button.logout:hover {
-  background: linear-gradient(135deg, #c0392b, #a93226);
-}
-
-/* ========================================
-   INFORMACIÓN DEL USUARIO
-   ======================================== */
-.user-info {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: var(--font-size-sm);
-  margin-right: var(--spacing-md);
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-weight: var(--font-weight-medium);
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--border-radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  transition: all var(--transition-normal);
-}
-
-.user-info:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
-}
-
-/* ========================================
-   MENÚ MÓVIL
-   ======================================== */
-.mobile-menu-toggle {
-  display: none;
-  flex-direction: column;
-  cursor: pointer;
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  transition: all var(--transition-normal);
-}
-
-.mobile-menu-toggle span {
-  width: 25px;
-  height: 3px;
-  background: white;
-  margin: 3px 0;
-  border-radius: 2px;
-  transition: all var(--transition-normal);
-}
-
-.mobile-menu-toggle:hover span {
-  background: #4ecdc4;
-}
-
-.mobile-menu-toggle.active span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-
-.mobile-menu-toggle.active span:nth-child(2) {
-  opacity: 0;
-}
-
-.mobile-menu-toggle.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -6px);
-}
-
-/* ========================================
-   RESPONSIVE DESIGN PARA NAV
-   ======================================== */
-@media (max-width: 768px) {
-  .header-container {
-    height: 60px;
-    padding: 0 var(--spacing-sm);
-  }
-
-  .logo img {
-    height: 35px;
-  }
-
-  .nav {
-    position: fixed;
-    top: 60px;
-    left: -100%;
-    width: 100%;
-    height: calc(100vh - 60px);
-    background: linear-gradient(
-      135deg,
-      rgba(40, 14, 24, 0.98),
-      rgba(81, 69, 73, 0.95)
-    );
-    backdrop-filter: blur(20px);
-    transition: left var(--transition-normal);
-    z-index: var(--z-modal);
-  }
-
-  .nav.active {
-    left: 0;
-  }
-
-  .nav-menu {
-    flex-direction: column;
-    gap: 0;
-    padding: var(--spacing-xl) 0;
-    height: 100%;
-    justify-content: flex-start;
-  }
-
-  .nav-item {
-    width: 100%;
-  }
-
-  .nav-link {
-    width: 100%;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-radius: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    justify-content: flex-start;
-    font-size: var(--font-size-md);
-  }
-
-  .nav-link:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: none;
-    box-shadow: none;
-  }
-
-  .nav-link.auth-button {
-    margin: var(--spacing-lg) var(--spacing-xl) 0;
-    border-radius: var(--border-radius-md);
-    justify-content: center;
-  }
-
-  .mobile-menu-toggle {
-    display: flex;
-  }
-
-  .user-info {
-    display: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .header-container {
-    height: 55px;
-  }
-
-  .logo img {
-    height: 30px;
-  }
-
-  .nav {
-    top: 55px;
-    height: calc(100vh - 55px);
-  }
-
-  .nav-link {
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: var(--font-size-sm);
-  }
-
-  .nav-link i {
-    font-size: 1.1rem;
-  }
-}
-
-/* ========================================
-   ANIMACIONES PARA NAV
-   ======================================== */
-@keyframes slideInDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.header {
-  animation: slideInDown 0.6s ease-out;
-}
-
-.nav-item {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.nav-item:nth-child(1) {
-  animation-delay: 0.1s;
-}
-.nav-item:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.nav-item:nth-child(3) {
-  animation-delay: 0.3s;
-}
 /* Encabezado de sección */
 .section-header {
   text-align: center;
@@ -982,18 +671,14 @@ body {
   }
 }
 /* Estilo inspirado en el leaderboard del Masters */
-:root {
-  --primary-color: #1b3c34; /* Verde oscuro del Masters */
-  --secondary-color: #ffffff; /* Blanco para texto */
-  --background-color: #f5f5f5; /* Gris claro para filas */
-}
+/* Nota: Usamos variables específicas para torneos para no sobrescribir las globales del nav */
 
 table {
   width: 100%;
   border-collapse: collapse;
   border-radius: 8px;
   overflow: hidden;
-  border: 2px solid var(--primary-color);
+  border: 2px solid var(--torneo-color-primario, #1b3c34);
   background-color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -1006,8 +691,8 @@ td {
 }
 
 th {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
+  background-color: var(--torneo-color-primario, #1b3c34);
+  color: #ffffff;
   font-family: "Noto Serif", serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -1026,7 +711,7 @@ tbody tr.leader {
 }
 
 tbody tr:nth-child(even) {
-  background-color: var(--background-color);
+  background-color: #f5f5f5;
 }
 
 tbody tr:hover {
@@ -1050,7 +735,7 @@ tbody tr:hover {
 }
 
 .scorecard-icon {
-  color: var(--primary-color);
+  color: var(--torneo-color-primario, #1b3c34);
   font-size: 18px;
   transition: color 0.3s ease, transform 0.2s ease;
 }
@@ -1227,11 +912,11 @@ tbody tr:hover {
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 3px solid var(--primary-color);
+  border-bottom: 3px solid var(--torneo-color-primario, #1b3c34);
 }
 
 .scorecard-modal-content h3 {
-  color: var(--primary-color);
+  color: var(--torneo-color-primario, #1b3c34);
   margin: 0;
   font-size: 1.8rem;
   font-weight: 700;
@@ -1273,7 +958,7 @@ tbody tr:hover {
 }
 
 .scorecard-horizontal th {
-  background-color: var(--primary-color);
+  background-color: var(--torneo-color-primario, #1b3c34);
   color: white;
   padding: 0.8rem 0.4rem;
   font-weight: 600;
@@ -1331,7 +1016,7 @@ tbody tr:hover {
 }
 
 #scorecard-modal-close {
-  background-color: var(--primary-color);
+  background-color: var(--torneo-color-primario, #1b3c34);
   color: white;
   border: none;
   padding: 0.8rem 2rem;

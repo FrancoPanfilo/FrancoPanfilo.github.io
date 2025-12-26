@@ -660,6 +660,14 @@ function setupRegisterForm() {
         fechaRegistro: new Date().toISOString(),
         Sesiones: [],
         ultimaActividad: new Date().toISOString(),
+        // Campos de perfil de golf
+        fechaNacimiento: null,
+        manoDominante: null,
+        handicap: {
+          current: null,
+          history: [],
+          lastUpdated: null,
+        },
       };
 
       await saveUserWithRetry(user.uid, userData);

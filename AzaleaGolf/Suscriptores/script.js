@@ -34,6 +34,7 @@ document.getElementById("fecha").value = `${year}-${month}-${day}`;
 document.getElementById("csvFile").addEventListener("change", async (e) => {
   const csvFile = e.target.files[0];
   const status = document.getElementById("status");
+  const simulatorType = document.getElementById("simulador").value;
 
   if (!csvFile) {
     status.textContent = "Por favor, selecciona un archivo CSV.";
@@ -46,7 +47,13 @@ document.getElementById("csvFile").addEventListener("change", async (e) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        sessionData = parseCSV(event.target.result);
+        sessionData = parseCSV(event.target.result, simulatorType);
+
+        if (sessionData.length === 0) {
+          status.textContent = "El archivo CSV está vacío o no se pudo procesar.";
+          return;
+        }
+
         // Inicializar selectedColumns con todas las columnas, excepto las deseleccionadas
         const allColumns = Object.keys(sessionData[0] || {});
         const deselectedByDefault = [
@@ -63,7 +70,13 @@ document.getElementById("csvFile").addEventListener("change", async (e) => {
         );
         displayPreviewTable(sessionData);
         displaySessionStats(sessionData);
-        status.textContent = "";
+
+        // Mostrar mensaje según el simulador
+        if (simulatorType !== "foresight") {
+          status.textContent = `⚠️ Parser de ${simulatorType.charAt(0).toUpperCase() + simulatorType.slice(1)} en desarrollo. Los datos pueden requerir mapeo manual.`;
+        } else {
+          status.textContent = "";
+        }
       } catch (error) {
         status.textContent = `Error al procesar el CSV: ${error.message}`;
       }
@@ -92,11 +105,26 @@ async function loadUsers() {
       select.remove(1);
     }
 
+    // Crear array de usuarios y ordenar alfabéticamente
+    const users = [];
     querySnapshot.forEach((doc) => {
       const data = doc.data();
+      users.push({
+        id: doc.id,
+        nombre: data.nombre || "",
+        apellido: data.apellido || "",
+        fullName: `${data.nombre || ""} ${data.apellido || ""}`.trim()
+      });
+    });
+
+    // Ordenar alfabéticamente por nombre completo
+    users.sort((a, b) => a.fullName.localeCompare(b.fullName, 'es'));
+
+    // Agregar opciones ordenadas al select
+    users.forEach((user) => {
       const option = document.createElement("option");
-      option.value = doc.id;
-      option.textContent = `${data.nombre} ${data.apellido}`;
+      option.value = user.id;
+      option.textContent = user.fullName;
       select.appendChild(option);
     });
 
@@ -207,15 +235,27 @@ async function poblarSelectUsuarios() {
   if (!selectUsuario) return;
   selectUsuario.innerHTML = '<option value="">Selecciona un usuario</option>';
   try {
-    const usuariosRef = collection(db, "Simulador"); // Cambia a "Usuarios" si corresponde
+    const usuariosRef = collection(db, "Simulador");
     const snapshot = await getDocs(usuariosRef);
+
+    // Crear array y ordenar alfabéticamente
+    const users = [];
     snapshot.forEach((doc) => {
       const data = doc.data();
+      users.push({
+        id: doc.id,
+        fullName: data.nombre
+          ? `${data.nombre} ${data.apellido || ""}`.trim()
+          : doc.id
+      });
+    });
+
+    users.sort((a, b) => a.fullName.localeCompare(b.fullName, 'es'));
+
+    users.forEach((user) => {
       const option = document.createElement("option");
-      option.value = doc.id;
-      option.textContent = data.nombre
-        ? `${data.nombre} ${data.apellido || ""}`
-        : doc.id;
+      option.value = user.id;
+      option.textContent = user.fullName;
       selectUsuario.appendChild(option);
     });
   } catch (error) {
@@ -395,8 +435,26 @@ window.agregarFotoGaleria = function () {
   lista.appendChild(btn);
 };
 
-// Función para parsear el CSV
-function parseCSV(csvData) {
+// ============================================
+// FUNCIONES DE PARSEO POR TIPO DE SIMULADOR
+// ============================================
+
+// Función principal que selecciona el parser correcto
+function parseCSV(csvData, simulatorType = "foresight") {
+  switch (simulatorType) {
+    case "foresight":
+      return parseCSVForesight(csvData);
+    case "garmin":
+      return parseCSVGarmin(csvData);
+    case "trackman":
+      return parseCSVTrackman(csvData);
+    default:
+      return parseCSVForesight(csvData);
+  }
+}
+
+// Parser para Foresight
+function parseCSVForesight(csvData) {
   const lines = csvData.split("\n").filter((line) => line.trim() !== "");
   const headers = lines[0]
     .split(",")
@@ -441,6 +499,82 @@ function parseCSV(csvData) {
       data[i]["closure rate (deg/sec)"] = "-";
     }
   }
+  return data;
+}
+
+// Parser para Garmin R10 - TODO: Implementar mapeo de columnas
+function parseCSVGarmin(csvData) {
+  // TODO: Implementar parser para Garmin R10
+  // El CSV de Garmin tiene diferentes nombres de columnas que deben mapearse
+  // a los nombres estándar usados en la aplicación.
+  //
+  // Columnas esperadas de Garmin (ejemplo):
+  // - Club Speed, Ball Speed, Launch Angle, Spin Rate, Carry Distance, etc.
+  //
+  // Deben mapearse a:
+  // - club speed (mph), ball speed (mph), launch angle (deg), back spin (rpm), carry (yds), etc.
+
+  console.warn("Parser de Garmin no implementado aún. Usando parser genérico.");
+
+  const lines = csvData.split("\n").filter((line) => line.trim() !== "");
+  if (lines.length < 2) return [];
+
+  const headers = lines[0].split(",").map((header) => header.trim().toLowerCase());
+  const data = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const columns = lines[i].split(",").map((col) => col.trim());
+    if (columns.length < headers.length) continue;
+
+    const rowData = {};
+    headers.forEach((header, index) => {
+      let value = columns[index];
+      if (!isNaN(value) && value !== "") {
+        value = parseFloat(value);
+      }
+      rowData[header] = value;
+    });
+    data.push(rowData);
+  }
+
+  return data;
+}
+
+// Parser para Trackman - TODO: Implementar mapeo de columnas
+function parseCSVTrackman(csvData) {
+  // TODO: Implementar parser para Trackman
+  // El CSV de Trackman tiene diferentes nombres de columnas que deben mapearse
+  // a los nombres estándar usados en la aplicación.
+  //
+  // Columnas esperadas de Trackman (ejemplo):
+  // - Club Speed, Ball Speed, Smash Factor, Launch Angle, Spin Rate, Carry, Total, etc.
+  //
+  // Deben mapearse a:
+  // - club speed (mph), ball speed (mph), efficiency, launch angle (deg), back spin (rpm), carry (yds), total distance (yds), etc.
+
+  console.warn("Parser de Trackman no implementado aún. Usando parser genérico.");
+
+  const lines = csvData.split("\n").filter((line) => line.trim() !== "");
+  if (lines.length < 2) return [];
+
+  const headers = lines[0].split(",").map((header) => header.trim().toLowerCase());
+  const data = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const columns = lines[i].split(",").map((col) => col.trim());
+    if (columns.length < headers.length) continue;
+
+    const rowData = {};
+    headers.forEach((header, index) => {
+      let value = columns[index];
+      if (!isNaN(value) && value !== "") {
+        value = parseFloat(value);
+      }
+      rowData[header] = value;
+    });
+    data.push(rowData);
+  }
+
   return data;
 }
 

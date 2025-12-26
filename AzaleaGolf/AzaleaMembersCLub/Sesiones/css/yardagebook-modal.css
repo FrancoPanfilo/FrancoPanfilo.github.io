@@ -467,6 +467,105 @@
   transform: translateY(-2px);
 }
 
+/* Responsive - Tablets */
+@media (max-width: 768px) {
+  .modal-content.yardagebook-modal {
+    margin: 70px auto;
+    max-width: 95vw;
+  }
+
+  .modal-body {
+    max-height: 60vh;
+  }
+
+  .sessions-list-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .clubs-list-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  #clubListYardageBook label {
+    min-height: 80px;
+    padding: 0.6rem;
+  }
+}
+
+/* Responsive - Móviles */
+@media (max-width: 600px) {
+  .modal-content.yardagebook-modal {
+    margin: 60px 0.75rem;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+
+  .modal-header {
+    padding: 0.75rem;
+  }
+
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .modal-body {
+    padding: 0.75rem;
+    max-height: 55vh;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .sessions-list-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .session-item-yardagebook {
+    padding: 0.75rem;
+  }
+
+  .session-row-yardagebook {
+    font-size: 0.85rem;
+  }
+
+  .clubs-list-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+  }
+
+  #clubListYardageBook label {
+    min-height: 70px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .modal-footer {
+    padding: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .modal-footer div:first-child {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .create-yardagebook-btn,
+  .cancel-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
 /* Responsive adjustments for small screens (e.g., iPhone 12) */
 @media (max-width: 400px) {
   .modal-content.yardagebook-modal {

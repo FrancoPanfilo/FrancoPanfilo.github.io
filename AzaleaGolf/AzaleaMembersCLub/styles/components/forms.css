@@ -1,0 +1,142 @@
+/**
+ * FORMULARIOS - AZALEA GOLF SIMULATOR
+ */
+
+.form-group {
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.form-group label i {
+  color: var(--primary-color);
+  width: 16px;
+}
+
+.form-control {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-md);
+  border: 2px solid #e1e5e9;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-fast);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(40, 14, 24, 0.1);
+  transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-control.error {
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.form-control.success {
+  border-color: var(--success-color);
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+/* Mensajes de error y éxito */
+.error-message {
+  color: var(--error-color);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.success-message {
+  color: var(--success-color);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Contenedor de contraseña con toggle */
+.password-input-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-normal);
+}
+
+.password-toggle:hover {
+  color: var(--primary-color);
+  background: rgba(40, 14, 24, 0.1);
+}
+
+.password-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(40, 14, 24, 0.2);
+}
+
+/* Formulario de login */
+.login-form,
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.form-error {
+  color: var(--error-color);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.form-info {
+  text-align: center;
+  margin-top: var(--spacing-lg);
+}
+
+.form-info p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.form-info a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.form-info a:hover {
+  text-decoration: underline;
+}

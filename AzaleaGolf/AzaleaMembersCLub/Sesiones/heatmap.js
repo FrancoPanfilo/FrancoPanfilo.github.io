@@ -1,5 +1,6 @@
 import { currentData, formatClubName } from "./script.js";
-import { clubColors } from "../utils/constants.js";
+import { clubColors } from "../shared/utils/constants.js";
+import { calculateOfflineCarry, calculateEllipseParams } from "../shared/utils/golf-calculations.js";
 
 // State for toggle modes
 let isCarryMode = true;
@@ -8,73 +9,6 @@ let showEllipses = false;
 // Función local para verificar si un tiro está seleccionado
 function isShotSelected(shot) {
   return shot.TiroDesactivado !== true;
-}
-
-// Function to calculate offline carry
-function calculateOfflineCarry(row) {
-  const pushPullDeg = parseFloat(row["push/pull (deg l-/r+)"]) || 0;
-  const carryYds = parseFloat(row["carry (yds)"]) || 0;
-  const sideSpinRpm = parseFloat(row["side spin (rpm l-/r+)"]) || 0;
-  const offlineTotal = parseFloat(row["offline (yds l-/r+)"]) || 0;
-
-  // Validar datos
-  if (
-    Math.abs(pushPullDeg) > 45 ||
-    Math.abs(sideSpinRpm) > 5000 ||
-    carryYds < 0 ||
-    Math.abs(offlineTotal) > 100
-  ) {
-    return 0;
-  }
-
-  // Desviación inicial por push/pull
-  const initialOffline = Math.tan((pushPullDeg * Math.PI) / 180) * carryYds;
-
-  // Curvatura por side spin (1.5 yds por 1000 RPM por 50 yds de carry)
-  const curvature = (sideSpinRpm / 1000) * 1.5 * (carryYds / 50);
-
-  // Término de corrección basado en offline total
-  const offlineCorrection = 0.2 * offlineTotal;
-
-  return (initialOffline + curvature + offlineCorrection).toFixed(2);
-}
-
-// Function to calculate ellipse parameters for a dataset
-function calculateEllipseParams(data) {
-  if (data.length < 2) return null; // Necesitamos al menos 2 puntos para una elipse
-
-  // Calcular promedios (centro de la elipse)
-  const meanX = data.reduce((sum, d) => sum + d.x, 0) / data.length;
-  const meanY = data.reduce((sum, d) => sum + d.y, 0) / data.length;
-
-  // Calcular matriz de covarianza
-  const varianceX =
-    data.reduce((sum, d) => sum + Math.pow(d.x - meanX, 2), 0) / data.length;
-  const varianceY =
-    data.reduce((sum, d) => sum + Math.pow(d.y - meanY, 2), 0) / data.length;
-  const covarianceXY =
-    data.reduce((sum, d) => sum + (d.x - meanX) * (d.y - meanY), 0) /
-    data.length;
-
-  // Calcular valores propios para los radios
-  const a = varianceX + varianceY;
-  const b = Math.sqrt(
-    Math.pow(varianceX - varianceY, 2) + 4 * Math.pow(covarianceXY, 2)
-  );
-  const lambda1 = (a + b) / 2; // Valor propio mayor
-  const lambda2 = (a - b) / 2; // Valor propio menor
-
-  // Radios: 2 * raíces de los valores propios (~95% de los puntos)
-  const radiusX = Math.max(Math.sqrt(lambda1) * 2, 5); // Mínimo de 5 yardas
-  const radiusY = Math.max(Math.sqrt(lambda2) * 2, 5);
-
-  // Calcular ángulo de rotación (corregido para invertir la inclinación)
-  const rotation =
-    -0.5 *
-    Math.atan2(2 * covarianceXY, varianceX - varianceY) *
-    (180 / Math.PI); // Negado para corregir la inclinación
-
-  return { x: meanX, y: meanY, radiusX, radiusY, rotation };
 }
 
 // Function to create the scatter plot
@@ -88,29 +22,45 @@ function createScatterPlot() {
   let canvasWidth, canvasHeight, xMin, xMax, yMin, yMax;
   const screenW = window.innerWidth;
   const screenH = window.innerHeight;
-  const isMobile = screenW <= 600;
+  const isMobile = screenW <= 768; // Cambio a 768px para tablets
+
   if (isMobile) {
-    // Rango de dispersión lateral (offline) y distancia
-    xMin = -80;
-    xMax = 80;
+    // En móvil: optimizar para legibilidad
+    xMin = -100;
+    xMax = 100;
     yMin = 0;
     yMax = 350;
-    // Relación de aspecto: (yMax-yMin)/(xMax-xMin)
     const aspectRatio = (yMax - yMin) / (xMax - xMin);
-    // Definir ancho en función de la pantalla, pero mantener la proporción
-    canvasWidth = Math.max(Math.min(screenW * 0.8, 320), 200); // ancho entre 200 y 320px aprox
+    // Ancho más generoso para móviles
+    canvasWidth = Math.min(screenW * 0.92, 400); // máx 400px
     canvasHeight = Math.round(canvasWidth * aspectRatio);
   } else {
-    // Rango de distancia y dispersión lateral
+    // Desktop/tablet: distancia y dispersión lateral
     xMin = 0;
     xMax = 350;
-    yMin = -100;
-    yMax = 100;
-    // Relación de aspecto: (yMax-yMin)/(xMax-xMin)
-    const aspectRatio = (yMax - yMin) / (xMax - xMin);
-    canvasWidth = Math.floor(screenW * 0.7); // 70% del ancho de la pantalla
+    yMin = -120;
+    yMax = 120;
+    const aspectRatio = (yMax - yMin) / (xMax - xMin); // ~0.686
+
+    // Calcular espacio disponible en viewport
+    // Header: 70px, controles: ~60px, padding: ~100px, margen seguridad: 50px
+    const availableHeight = screenH - 280;
+    const availableWidth = screenW * 0.85;
+
+    // Calcular dimensiones basadas en altura disponible primero
+    const heightBasedWidth = availableHeight / aspectRatio;
+
+    // Usar el menor entre el ancho disponible y el calculado por altura
+    canvasWidth = Math.min(availableWidth, heightBasedWidth, 900); // máx 900px
     canvasHeight = Math.round(canvasWidth * aspectRatio);
+
+    // Asegurar altura máxima
+    if (canvasHeight > availableHeight) {
+      canvasHeight = availableHeight;
+      canvasWidth = Math.round(canvasHeight / aspectRatio);
+    }
   }
+  
   canvas.style.width = canvasWidth + "px";
   canvas.style.height = canvasHeight + "px";
   canvas.width = canvasWidth;
@@ -225,10 +175,12 @@ function createScatterPlot() {
       responsive: false,
       plugins: {
         legend: {
-          position: "top",
+          position: isMobile ? "bottom" : "top", // Legend abajo en móviles
           labels: {
-            font: { size: 12 },
+            font: { size: isMobile ? 11 : 12 },
             color: "#FFFFFF",
+            padding: isMobile ? 8 : 12,
+            boxWidth: isMobile ? 10 : 12,
           },
         },
         title: {
@@ -236,10 +188,16 @@ function createScatterPlot() {
           text: `Dispersión de Tiros (${
             isCarryMode ? "Carry" : "Total Distance"
           })`,
-          font: { size: 16 },
+          font: { size: isMobile ? 14 : 16 },
           color: "#FFFFFF",
+          padding: isMobile ? 8 : 12,
         },
         tooltip: {
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          padding: isMobile ? 8 : 10,
+          titleFont: { size: isMobile ? 11 : 12 },
+          bodyFont: { size: isMobile ? 10 : 11 },
+          displayColors: true,
           callbacks: {
             label: function (context) {
               const dataPoint = context.raw;
@@ -273,9 +231,13 @@ function createScatterPlot() {
           title: {
             display: true,
             text: xTitle,
+            font: { size: isMobile ? 11 : 12, weight: "bold" },
           },
-          grid: { display: true },
-          ticks: { color: "#FFFFFF" },
+          grid: { 
+            display: true,
+            color: isMobile ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.1)",
+          },
+          ticks: { color: "#FFFFFF", font: { size: isMobile ? 10 : 11 } },
           min: xMin,
           max: xMax,
         },
@@ -283,9 +245,13 @@ function createScatterPlot() {
           title: {
             display: true,
             text: yTitle,
+            font: { size: isMobile ? 11 : 12, weight: "bold" },
           },
-          grid: { display: true },
-          ticks: { color: "#FFFFFF" },
+          grid: { 
+            display: true,
+            color: isMobile ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.1)",
+          },
+          ticks: { color: "#FFFFFF", font: { size: isMobile ? 10 : 11 } },
           min: yMin,
           max: yMax,
         },

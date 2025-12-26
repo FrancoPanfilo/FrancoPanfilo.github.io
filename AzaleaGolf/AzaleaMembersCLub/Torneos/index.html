@@ -6,13 +6,17 @@
     <title>Torneos - Azalea Golf</title>
     <link rel="icon" type="image/png" href="../img/icono.png" />
 
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../styles/main.css" />
     <link rel="stylesheet" href="../nav.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="css/torneos.css" />
+    <link rel="stylesheet" href="css/scorecard.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
+    <script type="module" src="../firebase.js"></script>
+    <script type="module" src="../auth.js"></script>
+    <script src="../nav.js"></script>
   </head>
   <body>
     <header class="header">
@@ -42,6 +46,12 @@
               <a href="" class="nav-link">
                 <i class="fas fa-trophy"></i>
                 <span>Torneos</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="../perfil.html" class="nav-link">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
               </a>
             </li>
             <li class="nav-item">
@@ -229,7 +239,79 @@
       </div>
     </div>
 
+    <script type="module">
+      import { auth } from "../firebase.js";
+      import {
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+      import {
+        getDoc,
+        doc,
+      } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+      import { db } from "../db.js";
+
+      // Función para obtener el nombre completo del usuario
+      async function getUserFullName(uid) {
+        const userDocRef = doc(db, "Simulador", uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          return `${userData.nombre} ${userData.apellido}`;
+        }
+        return "Usuario";
+      }
+
+      // Verificar el estado de autenticación
+      onAuthStateChanged(auth, async (user) => {
+        const authButton = document.querySelector(".auth-button");
+
+        if (user) {
+          // Obtener nombre del usuario
+          const fullName = await getUserFullName(user.uid);
+
+          // Crear o actualizar el mensaje de bienvenida
+          let userInfo = document.querySelector(".user-info");
+          if (!userInfo) {
+            userInfo = document.createElement("span");
+            userInfo.className = "user-info";
+            const navMenu = document.querySelector(".nav-menu");
+            const authItem = authButton.closest(".nav-item");
+            navMenu.insertBefore(userInfo, authItem);
+          }
+          userInfo.textContent = `Bienvenido, ${fullName}`;
+
+          // Actualizar botón de autenticación
+          authButton.innerHTML =
+            '<i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>';
+          authButton.href = "#";
+          authButton.classList.add("logout");
+
+          // Configurar el botón de cerrar sesión
+          authButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+              await signOut(auth);
+              window.location.href = "../login.html";
+            } catch (error) {
+              alert("Error al cerrar sesión. Por favor, intente nuevamente.");
+            }
+          });
+        } else {
+          // Restaurar botón de autenticación
+          authButton.innerHTML =
+            '<i class="fas fa-sign-in-alt"></i><span>Iniciar Sesión</span>';
+          authButton.href = "../login.html";
+          authButton.classList.remove("logout");
+
+          // Remover el nombre del usuario si existe
+          const userInfo = document.querySelector(".user-info");
+          if (userInfo) {
+            userInfo.remove();
+          }
+        }
+      });
+    </script>
     <script type="module" src="script.js"></script>
-    <!-- Eliminado script modal-fix.js -->
   </body>
 </html>

@@ -1,116 +1,667 @@
-.form-container {
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  font-family: Arial, sans-serif;
+/* ============================================
+   SUSCRIPTORES - ESTILOS PROFESIONALES
+   Azalea Golf Admin Panel
+   ============================================ */
+
+:root {
+  --primary-color: #2d5a27;
+  --primary-dark: #1e3d1a;
+  --primary-light: #4a8a42;
+  --accent-color: #c9a227;
+  --accent-light: #e6c44a;
+  --bg-color: #f5f7fa;
+  --card-bg: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a68;
+  --text-muted: #8888a0;
+  --border-color: #e0e4e8;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --transition: all 0.3s ease;
 }
 
-h2 {
-  text-align: center;
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #555;
-}
-
-input[type="text"],
-input[type="date"],
-input[type="file"],
-select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+* {
   box-sizing: border-box;
 }
 
-select {
-  background-color: white;
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* ============================================
+   LAYOUT PRINCIPAL
+   ============================================ */
+
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.page-header h1 {
+  font-size: 2.2rem;
+  color: var(--primary-color);
+  margin: 0 0 10px 0;
+  font-weight: 700;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* ============================================
+   SELECTOR DE ACCIÓN PRINCIPAL
+   ============================================ */
+
+.action-selector {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.action-selector label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-right: 10px;
+}
+
+#accionSelect {
+  padding: 12px 40px 12px 20px;
+  font-size: 16px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a4a68' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  transition: var(--transition);
+  min-width: 250px;
+}
+
+#accionSelect:hover {
+  border-color: var(--primary-light);
+}
+
+#accionSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.15);
+}
+
+/* Botón Admin */
+.btn-admin {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 30px;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  text-align: center;
+}
+
+.btn-admin:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-color));
+}
+
+/* ============================================
+   FORMULARIOS - CARDS
+   ============================================ */
+
+.accion-form {
+  max-width: 800px;
+  margin: 0 auto 40px;
+  padding: 35px;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+}
+
+.accion-form h2 {
+  text-align: left;
+  color: var(--primary-color);
+  font-size: 1.6rem;
+  margin: 0 0 30px 0;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.accion-form h2::before {
+  content: '';
+  width: 5px;
+  height: 28px;
+  background: linear-gradient(180deg, var(--primary-color), var(--primary-light));
+  border-radius: 3px;
+}
+
+/* ============================================
+   FORM GROUPS
+   ============================================ */
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group input[type="url"],
+.form-group input[type="datetime-local"],
+.form-group input[type="file"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  color: var(--text-primary);
+  background: white;
+  transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.12);
+}
+
+.form-group input:hover,
+.form-group select:hover {
+  border-color: var(--primary-light);
+}
+
+.form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a4a68' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+}
+
+.form-group input[type="file"] {
+  padding: 12px;
   cursor: pointer;
 }
 
-select option {
-  padding: 8px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #4caf50;
+.form-group input[type="file"]::file-selector-button {
+  padding: 8px 16px;
+  margin-right: 15px;
+  background: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 16px;
+  font-weight: 500;
+  transition: var(--transition);
 }
 
-button:hover {
-  background-color: #45a049;
+.form-group input[type="file"]::file-selector-button:hover {
+  background: var(--primary-dark);
 }
+
+/* User ID display */
+.user-id {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-family: 'Consolas', monospace;
+  background: var(--bg-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* ============================================
+   FIELDSETS
+   ============================================ */
+
+fieldset {
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 25px;
+  margin: 25px 0;
+  background: var(--bg-color);
+}
+
+fieldset legend {
+  font-weight: 700;
+  color: var(--primary-color);
+  padding: 0 12px;
+  font-size: 15px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+button {
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button[type="submit"],
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  color: white;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button[type="submit"]:hover,
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+button[type="button"] {
+  background: var(--bg-color);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  width: auto;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+button[type="button"]:hover {
+  background: var(--border-color);
+  border-color: var(--text-muted);
+}
+
+/* ============================================
+   STATUS MESSAGES
+   ============================================ */
 
 .status {
-  margin-top: 10px;
+  margin-top: 20px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
   text-align: center;
-  color: #666;
+  font-weight: 500;
+  background: var(--bg-color);
+  color: var(--text-secondary);
 }
 
-.preview-container {
+.status:empty {
+  display: none;
+}
+
+/* ============================================
+   SESSION STATS
+   ============================================ */
+
+.session-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
   margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  border-radius: var(--radius-md);
+  color: white;
+}
+
+.session-stats:empty {
+  display: none;
+}
+
+.session-stats div {
+  flex: 1;
+  min-width: 150px;
+  text-align: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+}
+
+.session-stats strong {
+  display: block;
+  font-size: 13px;
+  opacity: 0.9;
+  margin-bottom: 5px;
+}
+
+/* ============================================
+   PREVIEW TABLE
+   ============================================ */
+
+.preview-container {
+  margin-top: 40px;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.preview-container h3 {
+  margin: 0;
+  padding: 20px 25px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  color: white;
+  font-size: 1.1rem;
 }
 
 .preview-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
 }
 
 .preview-table th,
 .preview-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  padding: 14px 16px;
   text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
 }
 
 .preview-table th {
-  background-color: #4caf50;
-  color: white;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  white-space: nowrap;
 }
 
-.preview-table tr:nth-child(even) {
-  background-color: #f2f2f2;
+.preview-table th label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin: 0;
 }
 
-.preview-table tr:hover {
-  background-color: #ddd;
+.preview-table th input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
 }
 
+.preview-table tbody tr:hover {
+  background: rgba(45, 90, 39, 0.04);
+}
+
+.preview-table tbody tr:nth-child(even) {
+  background: var(--bg-color);
+}
+
+.preview-table tbody tr:nth-child(even):hover {
+  background: rgba(45, 90, 39, 0.06);
+}
+
+/* Delete button in table */
 .delete-btn {
-  background-color: #f44336;
+  padding: 8px 14px;
+  background: var(--danger-color);
   color: white;
   border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition);
+  width: auto;
 }
 
 .delete-btn:hover {
-  background-color: #d32f2f;
+  background: #c82333;
+  transform: scale(1.02);
 }
 
-.user-id {
-  font-size: 0.8em;
-  color: #666;
-  margin-top: 2px;
-  font-style: italic;
+/* ============================================
+   TARJETA FORM - TABLA DE SCORES
+   ============================================ */
+
+#form-tarjeta-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+}
+
+#form-tarjeta-container th,
+#form-tarjeta-container td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+#form-tarjeta-container th {
+  background: var(--primary-color);
+  color: white;
+  font-weight: 600;
+}
+
+#form-tarjeta-container tbody tr:hover {
+  background: rgba(45, 90, 39, 0.05);
+}
+
+#form-tarjeta-container input[type="number"] {
+  width: 70px;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+#form-tarjeta-container input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+/* Score readonly fields */
+#score_bruto,
+#score_neto {
+  background: var(--bg-color);
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+/* ============================================
+   TORNEO FORM - INPUTS EN GRID
+   ============================================ */
+
+#form-torneo-container div[style*="flex"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#form-torneo-container div[style*="flex"] input {
+  width: 55px !important;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Premios y reglas dinámicas */
+.premio-item,
+#reglas-lista,
+#galeria-lista {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.premio-item input,
+#reglas-lista input,
+#galeria-lista input {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Color inputs */
+input[type="color"] {
+  width: 60px;
+  height: 45px;
+  padding: 4px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  .accion-form {
+    padding: 25px 20px;
+    margin: 0 15px 30px;
+  }
+
+  .accion-form h2 {
+    font-size: 1.3rem;
+  }
+
+  .preview-container {
+    margin: 30px 15px;
+    overflow-x: auto;
+  }
+
+  .preview-table {
+    min-width: 600px;
+  }
+
+  #form-tarjeta-container table {
+    font-size: 13px;
+  }
+
+  #form-tarjeta-container th,
+  #form-tarjeta-container td {
+    padding: 8px 6px;
+  }
+
+  fieldset {
+    padding: 15px;
+  }
+
+  button[type="submit"] {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.6rem;
+  }
+
+  #accionSelect {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .accion-form {
+    padding: 20px 15px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 12px;
+  }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.accion-form {
+  animation: fadeIn 0.4s ease;
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }

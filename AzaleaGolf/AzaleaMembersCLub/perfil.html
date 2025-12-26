@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Perfil - Azalea Members Club</title>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="nav.css" />
+    <link rel="stylesheet" href="styles/pages/perfil.css" />
+    <link rel="icon" type="image/png" href="img/icono.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div class="logo">
+          <a href="index.html">
+            <img src="img/logo.jpg" class="logoimg" alt="Azalea Golf Logo" />
+          </a>
+        </div>
+        <nav class="nav">
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="Sesiones/index.html" class="nav-link">
+                <i class="fas fa-golf-ball"></i>
+                <span>Mis Sesiones</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="Torneos/index.html" class="nav-link">
+                <i class="fas fa-trophy"></i>
+                <span>Torneos</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="perfil.html" class="nav-link active">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link auth-button" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="mobile-menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </header>
+
+    <main class="profile-page">
+      <div class="container">
+        <header class="profile-header">
+          <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+          <p>Gestiona tu información personal</p>
+        </header>
+
+        <section class="profile-card">
+          <!-- Información Personal (no editable) -->
+          <div class="profile-section">
+            <h3><i class="fas fa-id-card"></i> Información Personal</h3>
+
+            <div class="profile-field">
+              <label>Nombre completo</label>
+              <p id="displayName" class="field-value">--</p>
+            </div>
+
+            <div class="profile-field">
+              <label>Email</label>
+              <p id="displayEmail" class="field-value">--</p>
+            </div>
+
+            <div class="profile-field">
+              <label>Miembro desde</label>
+              <p id="displayMemberSince" class="field-value">--</p>
+            </div>
+          </div>
+
+          <!-- Datos de Golf (editables) -->
+          <div class="profile-section editable">
+            <h3><i class="fas fa-golf-ball"></i> Datos de Golf</h3>
+
+            <div class="profile-field">
+              <label for="handicapInput">Handicap</label>
+              <div class="field-input-group">
+                <input
+                  type="number"
+                  id="handicapInput"
+                  min="0"
+                  max="54"
+                  step="0.1"
+                  placeholder="Ej: 18.5"
+                />
+                <span class="field-hint">0 - 54</span>
+              </div>
+            </div>
+
+            <div class="profile-field">
+              <label for="fechaNacimiento">Fecha de nacimiento</label>
+              <input type="date" id="fechaNacimiento" />
+            </div>
+
+            <div class="profile-field">
+              <label>Mano dominante</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="manoDominante" value="derecha" />
+                  <span>Diestro</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="manoDominante" value="izquierda" />
+                  <span>Zurdo</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <button id="saveProfileBtn" class="btn-primary">
+                <i class="fas fa-save"></i> Guardar Cambios
+              </button>
+            </div>
+          </div>
+
+          <!-- Historial de Handicap -->
+          <div class="profile-section">
+            <h3><i class="fas fa-history"></i> Historial de Handicap</h3>
+            <div id="handicapHistory" class="handicap-history">
+              <p class="no-history">Sin historial disponible</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="config.js"></script>
+    <script type="module" src="db.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="perfil.js"></script>
+    <script src="nav.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1034 @@
+/**
+ * ESTILOS DE TABLAS Y SCORECARD DE TORNEOS - AZALEA GOLF SIMULATOR
+ */
+
+/* ========================================
+   ANIMACIONES
+   ======================================== */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   TABLAS DE LEADERBOARD
+   ======================================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--torneo-color-primario, #1b3c34);
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+  background-color: var(--torneo-color-primario, #1b3c34);
+  color: #ffffff;
+  font-family: "Noto Serif", serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 16px;
+  border-bottom: 2px solid #ffd700;
+}
+
+td {
+  font-family: "Noto Serif", serif;
+  font-size: 16px;
+  color: #2d3748;
+}
+
+tbody tr.leader {
+  background-color: #e6f3e6;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+tbody tr:hover {
+  background-color: #e6e6e6;
+  transition: background-color 0.3s ease;
+}
+
+/* Colores de score */
+.text-green-600 {
+  font-weight: 600;
+  color: #15803d;
+}
+
+.text-yellow-600 {
+  font-weight: 600;
+  color: #d97706;
+}
+
+.text-red-600 {
+  font-weight: 600;
+  color: #dc2626;
+}
+
+/* Wrapper de tabla leaderboard del modal */
+.leaderboard-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.leaderboard-table th {
+  background-color: var(--color-primario, var(--torneo-color-primario, #1b3c34));
+  color: #ffffff;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.leaderboard-table td {
+  font-size: 15px;
+  color: #2d3748;
+}
+
+.leaderboard-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.leaderboard-table tbody tr:hover {
+  background-color: #e8f5e8;
+}
+
+.leaderboard-table tbody tr.leader {
+  background-color: #d4edda;
+  font-weight: 600;
+}
+
+.leaderboard-table tbody tr.leader td {
+  color: #155724;
+}
+
+/* Clases de color para el score neto */
+.leaderboard-table .par {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.leaderboard-table .menos {
+  font-weight: 700;
+  color: #15803d;
+}
+
+.leaderboard-table .mas {
+  font-weight: 600;
+  color: #dc2626;
+}
+
+/* ========================================
+   ICONO DE SCORECARD
+   ======================================== */
+.scorecard-icon {
+  color: var(--torneo-color-primario, #1b3c34);
+  font-size: 18px;
+  transition: color 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.scorecard-icon:hover {
+  color: #ffd700;
+  transform: scale(1.2);
+}
+
+/* ========================================
+   INDICADORES DE SCORE (CÍRCULOS Y CUADRADOS)
+   ======================================== */
+.score-circulo {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 26px;
+  text-align: center;
+  font-weight: bold;
+  position: relative;
+  background: #e0f0ff;
+  z-index: 1;
+}
+
+.score-circulo-1 {
+  border: 1px solid #23740a;
+  border-radius: 50%;
+}
+
+.score-circulo-2 {
+  border: 1px solid #23740a;
+  border-radius: 50%;
+}
+
+.score-circulo-2::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border: 1px solid #23740a;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.score-circulo-3 {
+  border: 1px solid #23740a;
+  border-radius: 50%;
+}
+
+.score-circulo-3::before,
+.score-circulo-3::after {
+  content: "";
+  position: absolute;
+  border: 1px solid #23740a;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.score-circulo-3::before {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+}
+
+.score-circulo-3::after {
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+}
+
+.score-cuadrado {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 26px;
+  text-align: center;
+  font-weight: bold;
+  position: relative;
+  background: #ffe0e0;
+  z-index: 1;
+}
+
+.score-cuadrado-1 {
+  border: 1px solid #bd0a0a;
+}
+
+.score-cuadrado-2 {
+  border: 1px solid #bd0a0a;
+}
+
+.score-cuadrado-2::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border: 1px solid #bd0a0a;
+  z-index: 0;
+}
+
+.score-cuadrado-3 {
+  border: 1px solid #bd0a0a;
+}
+
+.score-cuadrado-3::before,
+.score-cuadrado-3::after {
+  content: "";
+  position: absolute;
+  border: 1px solid #bd0a0a;
+  z-index: 0;
+}
+
+.score-cuadrado-3::before {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+}
+
+.score-cuadrado-3::after {
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+}
+
+/* ========================================
+   MODAL DE TARJETA DE SCORE
+   ======================================== */
+.scorecard-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200000;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.scorecard-modal-content {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 98vw;
+  max-width: 1400px;
+  max-height: 95vh;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+  position: relative;
+  overflow: auto;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.scorecard-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--torneo-color-primario, #1b3c34);
+}
+
+.scorecard-modal-content h3 {
+  color: var(--torneo-color-primario, #1b3c34);
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scorecard-player-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.scorecard-tables-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.scorecard-half-section {
+  width: 100%;
+}
+
+.scorecard-horizontal-wrapper {
+  margin-bottom: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.scorecard-horizontal {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  background: white;
+}
+
+.scorecard-horizontal th {
+  background-color: var(--torneo-color-primario, #1b3c34);
+  color: white;
+  padding: 0.8rem 0.4rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.8rem;
+  text-align: center;
+  min-width: 50px;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+}
+
+.scorecard-horizontal th:first-child {
+  min-width: 80px;
+  background-color: #1a472a;
+}
+
+.scorecard-horizontal td {
+  padding: 0.6rem 0.4rem;
+  text-align: center;
+  border-bottom: 1px solid #e9ecef;
+  font-weight: 500;
+  min-width: 45px;
+  transition: background-color 0.2s;
+}
+
+.scorecard-horizontal tr:nth-child(even) td {
+  background-color: #f8f9fa;
+}
+
+.scorecard-horizontal tr:hover td {
+  background-color: #e8f5e8;
+}
+
+.scorecard-horizontal tr:nth-child(2) td {
+  background-color: #f0f8f0;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.scorecard-horizontal tr:nth-child(3) td {
+  background-color: #fff3cd;
+  font-weight: 600;
+  color: #856404;
+}
+
+.scorecard-horizontal tr:nth-child(4) td {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+#scorecard-modal-close {
+  background-color: var(--torneo-color-primario, #1b3c34);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#scorecard-modal-close:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  background-color: #2d5a2d;
+}
+
+/* ========================================
+   SECCIONES COLAPSABLES
+   ======================================== */
+.collapsible-section {
+  margin-bottom: 0.8rem;
+}
+
+.collapsible-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 2px solid var(--torneo-color-primario, var(--primary-color));
+  transition: all 0.3s ease;
+}
+
+.collapsible-header:hover {
+  background-color: rgba(27, 60, 52, 0.05);
+}
+
+.collapsible-icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+  color: var(--torneo-color-primario, var(--primary-color));
+}
+
+.collapsible-section.expanded .collapsible-icon {
+  transform: rotate(180deg);
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0;
+}
+
+.collapsible-section.expanded .collapsible-content {
+  max-height: 1000px;
+  padding: 0.8rem 0;
+}
+
+/* En desktop, siempre mostrar el contenido */
+@media (min-width: 769px) {
+  .collapsible-content {
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 1rem 0 !important;
+  }
+
+  .collapsible-header {
+    cursor: default;
+  }
+
+  .collapsible-icon {
+    display: none;
+  }
+}
+
+/* ========================================
+   MODAL DE TORNEO
+   ======================================== */
+#torneo-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  backdrop-filter: blur(5px);
+  overflow-y: auto;
+}
+
+#torneo-modal .modal-content {
+  background-color: var(--background-light);
+  margin: 1rem auto;
+  width: 95%;
+  max-width: 1100px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 2rem);
+  max-height: calc(100vh - 2rem);
+}
+
+#torneo-modal .modal-header {
+  padding: var(--spacing-lg);
+  width: 100%;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--torneo-color-primario, var(--primary-color));
+  color: var(--torneo-color-secundario, var(--text-white));
+  border-top-left-radius: var(--border-radius-lg);
+  border-top-right-radius: var(--border-radius-lg);
+}
+
+#torneo-modal .modal-header h2 {
+  margin: 0;
+  font-size: var(--font-size-xxl);
+}
+
+#torneo-modal .close-modal {
+  color: var(--torneo-color-secundario, var(--text-muted));
+  font-size: 2rem;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+#torneo-modal .close-modal:hover {
+  opacity: 1;
+}
+
+/* Body del modal de torneo */
+.modal-body1 {
+  width: 100%;
+  padding: 5px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-content: start;
+}
+
+.modal-info-container {
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.modal-info-section h3 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--torneo-color-primario, var(--primary-color));
+  font-weight: var(--font-weight-bold);
+  border-bottom: 2px solid var(--torneo-color-primario, var(--primary-color));
+  padding-bottom: var(--spacing-sm);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+}
+
+.info-value {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-lg);
+}
+
+.reglas-list {
+  padding-left: var(--spacing-lg);
+  list-style: none;
+}
+
+.reglas-list li {
+  margin-bottom: var(--spacing-sm);
+  position: relative;
+  padding-left: 25px;
+}
+
+.reglas-list li::before {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 0;
+  top: 2px;
+  color: var(--torneo-color-primario, var(--success-color));
+}
+
+.modal-leaderboard-section {
+  width: 100%;
+}
+
+.modal-leaderboard-section h3 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--torneo-color-primario, var(--primary-color));
+  font-weight: var(--font-weight-bold);
+  border-bottom: 2px solid var(--torneo-color-primario, var(--primary-color));
+  padding-bottom: var(--spacing-sm);
+}
+
+.modal-leaderboard-container {
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  height: fit-content;
+  max-height: none;
+  overflow-y: auto;
+}
+
+.no-tarjetas-text {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--spacing-xl);
+  font-style: italic;
+}
+
+/* Imagen del modal */
+.modal-image {
+  height: 250px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #ffffff;
+  position: relative;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+
+/* Spinner de carga */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xxl);
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+}
+
+.loading-spinner i {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  table {
+    font-size: 14px;
+  }
+  th,
+  td {
+    padding: 8px;
+  }
+  .scorecard-icon {
+    font-size: 16px;
+  }
+
+  .collapsible-section {
+    margin-bottom: 0.5rem;
+  }
+
+  .modal-leaderboard-container {
+    font-size: 0.8rem;
+  }
+
+  .leaderboard-item {
+    grid-template-columns: 30px 1fr 60px;
+    padding: 0.4rem 0.6rem;
+    gap: 0.5rem;
+  }
+
+  .leaderboard-position {
+    font-size: 0.75rem;
+  }
+
+  .leaderboard-player {
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .leaderboard-score {
+    font-size: 0.75rem;
+  }
+
+  .score-bruto {
+    font-size: 0.8rem;
+    margin-right: 0.2rem;
+  }
+
+  .score-neto {
+    font-size: 0.7rem;
+  }
+
+  .scorecard-modal {
+    padding: 0.5rem;
+  }
+
+  .scorecard-modal-content {
+    width: 99vw;
+    max-width: none;
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .scorecard-modal-content h3 {
+    font-size: 1.4rem;
+  }
+
+  .scorecard-player-info {
+    font-size: 0.9rem;
+    gap: 0.8rem;
+  }
+
+  .scorecard-horizontal {
+    font-size: 0.75rem;
+  }
+
+  .scorecard-horizontal th {
+    padding: 0.6rem 0.25rem;
+    font-size: 0.7rem;
+    min-width: 40px;
+  }
+
+  .scorecard-horizontal th:first-child {
+    min-width: 70px;
+  }
+
+  .scorecard-horizontal td {
+    padding: 0.45rem 0.25rem;
+    min-width: 35px;
+    font-size: 0.75rem;
+  }
+
+  .scorecard-horizontal tr:nth-child(2) td {
+    font-size: 0.65rem;
+  }
+
+  .scorecard-horizontal tr:nth-child(4) td {
+    font-size: 0.8rem;
+  }
+
+  #scorecard-modal-close {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  #torneo-modal .modal-content {
+    width: 95%;
+    margin: 1rem auto;
+    height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2rem);
+  }
+
+  .modal-image {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    font-size: 12px;
+  }
+  th,
+  td {
+    padding: 6px;
+  }
+  .scorecard-icon {
+    font-size: 14px;
+  }
+
+  .modal-leaderboard-container {
+    font-size: 0.7rem;
+    max-height: 200px;
+  }
+
+  .leaderboard-item {
+    grid-template-columns: 25px 1fr 50px;
+    padding: 0.3rem 0.4rem;
+    gap: 0.3rem;
+  }
+
+  .leaderboard-position {
+    font-size: 0.65rem;
+  }
+
+  .leaderboard-player {
+    font-size: 0.7rem;
+  }
+
+  .leaderboard-score {
+    font-size: 0.65rem;
+  }
+
+  .score-bruto {
+    font-size: 0.7rem;
+    margin-right: 0.1rem;
+  }
+
+  .score-neto {
+    font-size: 0.6rem;
+  }
+
+  .scorecard-modal {
+    padding: 0.25rem;
+  }
+
+  .scorecard-modal-content {
+    width: 99.5vw;
+    max-width: none;
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .scorecard-modal-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .scorecard-modal-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .scorecard-player-info {
+    font-size: 0.8rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .scorecard-horizontal-wrapper {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+  }
+
+  .scorecard-horizontal {
+    font-size: 0.6rem;
+  }
+
+  .scorecard-horizontal th {
+    padding: 0.3rem 0.1rem;
+    font-size: 0.55rem;
+    min-width: 25px;
+    letter-spacing: 0.1px;
+  }
+
+  .scorecard-horizontal th:first-child {
+    min-width: 45px;
+    font-size: 0.5rem;
+  }
+
+  .scorecard-horizontal td {
+    padding: 0.25rem 0.1rem;
+    min-width: 22px;
+    font-size: 0.6rem;
+  }
+
+  .scorecard-horizontal tr:nth-child(2) td {
+    font-size: 0.5rem;
+  }
+
+  .scorecard-horizontal tr:nth-child(4) td {
+    font-size: 0.65rem;
+  }
+
+  .score-circulo,
+  .score-cuadrado {
+    width: 20px;
+    height: 20px;
+    line-height: 18px;
+    font-size: 0.6rem;
+  }
+
+  #scorecard-modal-close {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+    border-radius: 20px;
+  }
+
+  #torneo-modal {
+    padding: 0.5rem;
+  }
+
+  #torneo-modal .modal-content {
+    margin: 0.5rem;
+    width: calc(100% - 1rem);
+    max-height: calc(100vh - 1rem);
+  }
+
+  .modal-image {
+    height: 120px;
+  }
+}
+
+@media (max-width: 360px) {
+  .scorecard-modal-content {
+    padding: 0.6rem;
+  }
+
+  .scorecard-modal-content h3 {
+    font-size: 1.1rem;
+  }
+
+  .scorecard-player-info {
+    font-size: 0.75rem;
+  }
+
+  .scorecard-horizontal {
+    font-size: 0.65rem;
+  }
+
+  .scorecard-horizontal th {
+    padding: 0.4rem 0.15rem;
+    font-size: 0.6rem;
+    min-width: 32px;
+  }
+
+  .scorecard-horizontal th:first-child {
+    min-width: 55px;
+    font-size: 0.55rem;
+  }
+
+  .scorecard-horizontal td {
+    padding: 0.35rem 0.15rem;
+    min-width: 28px;
+    font-size: 0.65rem;
+  }
+
+  .scorecard-horizontal tr:nth-child(2) td {
+    font-size: 0.55rem;
+  }
+
+  .scorecard-horizontal tr:nth-child(4) td {
+    font-size: 0.7rem;
+  }
+
+  .score-circulo,
+  .score-cuadrado {
+    width: 22px;
+    height: 22px;
+    line-height: 20px;
+    font-size: 0.65rem;
+  }
+
+  #scorecard-modal-close {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Scrollbars personalizados */
+.modal-body::-webkit-scrollbar,
+.modal-leaderboard-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track,
+.modal-leaderboard-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb,
+.modal-leaderboard-container::-webkit-scrollbar-thumb {
+  background: var(--torneo-color-primario, var(--primary-color));
+  border-radius: 3px;
+  opacity: 0.6;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover,
+.modal-leaderboard-container::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}

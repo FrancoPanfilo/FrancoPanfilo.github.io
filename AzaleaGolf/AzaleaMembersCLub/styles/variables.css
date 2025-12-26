@@ -1,0 +1,124 @@
+/**
+ * VARIABLES CSS GLOBALES - AZALEA GOLF SIMULATOR
+ * Archivo centralizado de todas las variables CSS
+ * NO DUPLICAR estas variables en otros archivos
+ */
+
+:root {
+  /* ========================================
+     COLORES PRINCIPALES
+     ======================================== */
+  --primary-color: #280e18;
+  --primary-dark: #1a0a10;
+  --primary-light: #3a1a24;
+  --secondary-color: #514549;
+  --secondary-dark: #3a3235;
+  --secondary-light: #6a5d61;
+  --accent-color: #4ecdc4;
+  --accent-light: #6dd5cd;
+  --accent-dark: #3db8b0;
+
+  /* ========================================
+     COLORES DE TEXTO
+     ======================================== */
+  --text-color: #333333;
+  --text-white: #ffffff;
+  --text-muted: #666666;
+  --text-light: #999999;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+
+  /* ========================================
+     COLORES DE ESTADO
+     ======================================== */
+  --success-color: #27ae60;
+  --warning-color: #f39c12;
+  --error-color: #e74c3c;
+  --info-color: #3498db;
+
+  /* ========================================
+     COLORES DE FONDO
+     ======================================== */
+  --background-color: #f8f9fa;
+  --background-light: #ffffff;
+  --background-dark: #2c3e50;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* ========================================
+     ESPACIADO
+     ======================================== */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
+
+  /* ========================================
+     TIPOGRAFÍA
+     ======================================== */
+  --font-family-primary: "Jost", "Lato", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  --font-family-secondary: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-xxl: 1.5rem;
+  --font-size-xxxl: 2rem;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.7;
+
+  /* ========================================
+     BORDES
+     ======================================== */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  --border-width: 1px;
+  --border-color: #e1e5e9;
+
+  /* ========================================
+     SOMBRAS
+     ======================================== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* ========================================
+     TRANSICIONES
+     ======================================== */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* ========================================
+     Z-INDEX
+     ======================================== */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+
+  /* ========================================
+     VARIABLES ESPECÍFICAS DE TORNEOS
+     ======================================== */
+  --torneo-color-primario: #1b3c34;
+  --torneo-color-secundario: #ffffff;
+  --torneo-color-fondo: #f5f5f5;
+}

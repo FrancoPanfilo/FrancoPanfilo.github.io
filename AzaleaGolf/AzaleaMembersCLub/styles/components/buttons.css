@@ -1,0 +1,122 @@
+/**
+ * BOTONES - AZALEA GOLF SIMULATOR
+ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  min-height: 44px;
+  gap: var(--spacing-sm);
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left var(--transition-slow);
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Variantes de botón */
+.btn-primary {
+  background-color: var(--accent-color);
+  color: var(--text-white);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-light);
+  color: var(--text-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: var(--text-white);
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-light);
+  color: var(--text-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: var(--text-white);
+}
+
+.btn-success:hover {
+  background-color: #229954;
+  color: var(--text-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-danger {
+  background-color: var(--error-color);
+  color: var(--text-white);
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+  color: var(--text-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: var(--text-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Tamaños de botón */
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  min-height: 36px;
+}
+
+.btn-lg {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-lg);
+  min-height: 52px;
+}

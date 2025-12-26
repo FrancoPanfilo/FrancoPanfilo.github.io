@@ -173,6 +173,64 @@ export const GOLF_CONSTANTS = {
   ],
 };
 
+// Rangos de handicap para comparación
+export const HANDICAP_RANGES = [
+  { id: "0-5", label: "Scratch (0-5)", min: 0, max: 5 },
+  { id: "6-10", label: "Bajo (6-10)", min: 6, max: 10 },
+  { id: "11-15", label: "Medio-Bajo (11-15)", min: 11, max: 15 },
+  { id: "16-20", label: "Medio (16-20)", min: 16, max: 20 },
+  { id: "21-25", label: "Medio-Alto (21-25)", min: 21, max: 25 },
+  { id: "26-30", label: "Alto (26-30)", min: 26, max: 30 },
+  { id: "31-35", label: "Alto+ (31-35)", min: 31, max: 35 },
+  { id: "36-40", label: "Principiante (36-40)", min: 36, max: 40 },
+  { id: "41-45", label: "Principiante+ (41-45)", min: 41, max: 45 },
+  { id: "46-50", label: "Iniciación (46-50)", min: 46, max: 50 },
+  { id: "51+", label: "Nuevo (51+)", min: 51, max: 54 },
+];
+
+// Métricas para comparación de handicap
+export const COMPARISON_METRICS = [
+  {
+    key: "club speed (mph)",
+    label: "Velocidad de Palo",
+    unit: "mph",
+    icon: "fa-gauge-high",
+  },
+  {
+    key: "angle of attack (deg)",
+    label: "Ángulo de Ataque",
+    unit: "°",
+    icon: "fa-arrow-down",
+  },
+  {
+    key: "club path (deg out-in-/in-out+)",
+    label: "Club Path",
+    unit: "°",
+    icon: "fa-route",
+  },
+];
+
+// Obtener el rango de handicap para un valor dado
+export function getHandicapRange(handicap) {
+  if (handicap === null || handicap === undefined) return null;
+  return HANDICAP_RANGES.find((r) => handicap >= r.min && handicap <= r.max);
+}
+
+// Validar valor de handicap
+export function validateHandicap(value) {
+  const num = parseFloat(value);
+  if (isNaN(num)) return { valid: false, message: "Debe ser un número" };
+  if (num < 0 || num > 54)
+    return { valid: false, message: "Debe estar entre 0 y 54" };
+  return { valid: true, value: Math.round(num * 10) / 10 };
+}
+
+// Formatear handicap para mostrar
+export function formatHandicap(handicap) {
+  if (handicap === null || handicap === undefined) return "No establecido";
+  return handicap.toFixed(1);
+}
+
 // Funciones helper
 export function formatClubName(clubCode, short = false) {
   if (!clubCode || typeof clubCode !== "string") {

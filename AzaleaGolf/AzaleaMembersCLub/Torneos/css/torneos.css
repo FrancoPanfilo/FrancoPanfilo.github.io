@@ -1,0 +1,263 @@
+/**
+ * ESTILOS ESPECÍFICOS DE TORNEOS - AZALEA GOLF SIMULATOR
+ * Solo estilos únicos de esta sección (sin duplicar variables/reset)
+ * Usa --torneo-color-primario y --torneo-color-secundario definidas en variables.css
+ */
+
+/* Botón ver detalles */
+.btn-ver-detalles {
+  background-color: var(--success-color);
+}
+
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+/* Encabezado de sección */
+.section-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-header h1 {
+  font-size: var(--font-size-xxxl);
+  color: var(--text-white);
+  margin-bottom: var(--spacing-sm);
+}
+
+.section-header p {
+  font-size: var(--font-size-lg);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Filtros de torneos */
+.torneos-filter {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-lg);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.filter-group label {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-white);
+}
+
+.filter-group select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background-color: var(--background-light);
+  color: var(--text-color);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Contenedor de torneos */
+.torneos-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+/* Tarjeta de torneo */
+.torneo-card {
+  background-color: var(--background-light);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.torneo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.torneo-header {
+  position: relative;
+  padding: var(--spacing-lg);
+  background-color: #ffffff;
+  background-size: contain;
+  background-position: right center;
+  background-repeat: no-repeat;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Área de texto con fondo para legibilidad */
+.torneo-header::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9), transparent);
+  z-index: 1;
+}
+
+.torneo-header > * {
+  position: relative;
+  z-index: 2;
+}
+
+.torneo-nombre {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-color);
+  text-shadow: none;
+}
+
+.torneo-fecha {
+  font-size: var(--font-size-md);
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+.torneo-estado {
+  position: absolute;
+  top: var(--spacing-md);
+  left: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.torneo-estado.proximo {
+  background-color: var(--info-color);
+}
+
+.torneo-estado.activo {
+  background-color: var(--success-color);
+}
+
+.torneo-estado.finalizado {
+  background-color: var(--text-muted);
+}
+
+.torneo-body {
+  padding: var(--spacing-lg);
+}
+
+.torneo-info {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.torneo-cancha,
+.torneo-distancia,
+.torneo-formato {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-color);
+}
+
+.torneo-cancha i,
+.torneo-distancia i,
+.torneo-formato i {
+  color: var(--accent-color);
+}
+
+.torneo-leaderboard h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-md);
+  color: var(--text-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.leaderboard-container {
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-color);
+}
+
+.leaderboard-item {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: var(--border-width) solid var(--border-color);
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-item:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.leaderboard-position {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.leaderboard-player {
+  font-weight: var(--font-weight-medium);
+}
+
+.leaderboard-score {
+  text-align: right;
+}
+
+.score-bruto {
+  font-weight: var(--font-weight-bold);
+  margin-right: var(--spacing-xs);
+}
+
+.score-neto {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.torneo-footer {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: var(--border-width) solid var(--border-color);
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .torneos-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .torneos-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .torneos-container {
+    grid-template-columns: 1fr;
+  }
+
+  .torneo-info {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+}

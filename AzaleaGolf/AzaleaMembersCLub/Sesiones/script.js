@@ -14,7 +14,8 @@ import {
   formatClubName,
   getClubColor,
   clubColors,
-} from "../utils/constants.js";
+  getClubOrder,
+} from "../shared/utils/constants.js";
 
 // Fixed column order (excluding club name and shot number)
 const fixedColumns = [
@@ -31,63 +32,6 @@ const fixedColumns = [
   "angle of attack (deg)",
   "club path (deg out-in-/in-out+)",
 ];
-
-// Club order hierarchy
-function getClubOrder(clubName) {
-  const clubHierarchy = {
-    Dr: 1,
-    "1w": 2,
-    "2w": 3,
-    "3w": 4,
-    "4w": 5,
-    "5w": 6,
-    "6w": 7,
-    "7w": 8,
-    "8w": 9,
-    "9w": 10,
-    "1h": 11,
-    "2h": 12,
-    "3h": 13,
-    "4h": 14,
-    "5h": 15,
-    "6h": 16,
-    "7h": 17,
-    "8h": 18,
-    "1i": 19,
-    "2i": 20,
-    "3i": 21,
-    "4i": 22,
-    "5i": 23,
-    "6i": 24,
-    "7i": 25,
-    "8i": 26,
-    "9i": 27,
-    PW: 28,
-    GW: 29,
-    SW: 30,
-    LW: 31,
-    47: 32,
-    48: 33,
-    49: 34,
-    50: 35,
-    51: 36,
-    52: 37,
-    53: 38,
-    54: 39,
-    55: 40,
-    56: 41,
-    57: 42,
-    58: 43,
-    59: 44,
-    60: 45,
-    61: 46,
-    62: 47,
-    63: 48,
-    64: 49,
-    Putter: 1000,
-  };
-  return clubHierarchy[clubName] || 999;
-}
 
 // Format column display names
 function formatColumnDisplayName(columnName) {
@@ -479,13 +423,42 @@ async function showYardageBookModal() {
           <button class="close-modal" onclick="closeYardageBookModal()">&times;</button>
         </div>
         <div class="modal-body">
+          <!-- SECCIÓN DE SESIONES -->
           <div class="sessions-section">
-            <h4><i class="fas fa-list"></i> Selecciona las sesiones</h4>
-            <div id="yardageBookSessionsList" class="sessions-list"></div>
-            <div id="clubListYardageBook"></div>
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-history"></i>
+                <span>Mis Sesiones</span>
+              </div>
+              <button class="select-all-btn" onclick="toggleAllSessions()" title="Seleccionar/Deseleccionar todas">
+                <i class="fas fa-check-double"></i> <span id="sessionsToggleText">Seleccionar todas</span>
+              </button>
+            </div>
+            <div id="yardageBookSessionsList" class="sessions-list-grid"></div>
           </div>
+
+          <!-- SECCIÓN DE PALOS -->
+          <div class="clubs-section">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-golf-ball"></i>
+                <span>Palos Disponibles</span>
+              </div>
+              <button class="select-all-btn" onclick="toggleAllClubs()" title="Seleccionar/Deseleccionar todos los palos">
+                <i class="fas fa-check-double"></i> <span id="clubsToggleText">Seleccionar todos</span>
+              </button>
+            </div>
+            <div id="clubListYardageBook" class="clubs-list-grid"></div>
+          </div>
+
+          <!-- AJUSTES AVANZADOS -->
           <div class="advanced-settings">
-            <h4><i class="fas fa-cogs"></i> Ajustes Avanzados</h4>
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-sliders-h"></i>
+                <span>Ajustes Avanzados</span>
+              </div>
+            </div>
             <div class="settings-grid">
               <div class="setting-group">
                 <label>Porcentaje de Desviación: <span id="deviationValue">75%</span></label>
@@ -545,6 +518,87 @@ async function showYardageBookModal() {
 function closeYardageBookModal() {
   closeModal("yardageBookModal");
   restoreMainPageState();
+}
+
+// Función para seleccionar/deseleccionar todas las sesiones
+function toggleAllSessions() {
+  const sessionCheckboxes = document.querySelectorAll(
+    '.sessions-list-grid input[type="checkbox"]'
+  );
+  const button = document.querySelector(".section-header .select-all-btn");
+  const allChecked = Array.from(sessionCheckboxes).every((cb) => cb.checked);
+
+  sessionCheckboxes.forEach((checkbox) => {
+    checkbox.checked = !allChecked;
+  });
+
+  // Actualizar texto del botón
+  const textSpan = button.querySelector("span");
+  if (allChecked) {
+    textSpan.textContent = "Seleccionar todas";
+    button.innerHTML =
+      '<i class="fas fa-check-double"></i> <span>Seleccionar todas</span>';
+  } else {
+    button.innerHTML =
+      '<i class="fas fa-times-circle"></i> <span>Deseleccionar todas</span>';
+  }
+
+  updateSelectionInfo();
+}
+
+// Función para seleccionar/deseleccionar todos los palos
+function toggleAllClubs() {
+  const clubCheckboxes = document.querySelectorAll(
+    '.clubs-list-grid input[type="checkbox"]'
+  );
+  const buttons = document.querySelectorAll(".section-header .select-all-btn");
+  const clubButton = buttons[1]; // Segundo botón es para palos
+
+  const allChecked = Array.from(clubCheckboxes).every((cb) => cb.checked);
+
+  clubCheckboxes.forEach((checkbox) => {
+    checkbox.checked = !allChecked;
+  });
+
+  // Actualizar texto del botón
+  if (clubButton) {
+    if (allChecked) {
+      clubButton.innerHTML =
+        '<i class="fas fa-check-double"></i> <span>Seleccionar todos</span>';
+    } else {
+      clubButton.innerHTML =
+        '<i class="fas fa-times-circle"></i> <span>Deseleccionar todos</span>';
+    }
+  }
+
+  updateSelectionInfo();
+}
+
+// Función para actualizar información de selección
+function updateSelectionInfo() {
+  const selectedSessions = document.querySelectorAll(
+    '.sessions-list-grid input[type="checkbox"]:checked'
+  ).length;
+  const selectedClubs = document.querySelectorAll(
+    '.clubs-list-grid input[type="checkbox"]:checked'
+  ).length;
+
+  // Mostrar contador en los botones si lo deseas
+  const headers = document.querySelectorAll(".section-header");
+  if (headers[0]) {
+    const sessionsBtn = headers[0].querySelector(".select-all-btn span");
+    if (sessionsBtn) {
+      sessionsBtn.textContent =
+        selectedSessions > 0 ? "Deseleccionar todas" : "Seleccionar todas";
+    }
+  }
+  if (headers[1]) {
+    const clubsBtn = headers[1].querySelector(".select-all-btn span");
+    if (clubsBtn) {
+      clubsBtn.textContent =
+        selectedClubs > 0 ? "Deseleccionar todos" : "Seleccionar todos";
+    }
+  }
 }
 
 // Cerrar modal genérico
@@ -1461,6 +1515,355 @@ function getMaxSelectableColumns() {
   return Math.max(1, maxColumnas);
 }
 
+// ============================================
+// FUNCIONALIDAD DE CARGA DE SESIÓN
+// ============================================
+
+let uploadSessionData = [];
+
+// Abrir modal de carga
+function openUploadModal() {
+  const modal = document.getElementById("uploadSessionModal");
+  if (!modal) return;
+
+  // Resetear formulario
+  document.getElementById("uploadSessionForm").reset();
+  document.getElementById("uploadPreview").style.display = "none";
+  document.getElementById("uploadStatus").textContent = "";
+  document.getElementById("uploadStatus").className = "status-message";
+  document.getElementById("submitUploadBtn").disabled = true;
+  uploadSessionData = [];
+
+  // Establecer fecha de hoy
+  const today = new Date();
+  const dateStr = today.toISOString().split("T")[0];
+  document.getElementById("sessionDate").value = dateStr;
+
+  modal.style.display = "flex";
+  setTimeout(() => modal.classList.add("show"), 10);
+}
+
+// Cerrar modal de carga
+function closeUploadModal() {
+  const modal = document.getElementById("uploadSessionModal");
+  if (!modal) return;
+  modal.classList.remove("show");
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 300);
+}
+
+// Procesar archivo CSV
+function processCSVFile(file) {
+  const status = document.getElementById("uploadStatus");
+  const simulatorType = document.getElementById("simuladorType").value;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      uploadSessionData = parseCSVForUpload(event.target.result, simulatorType);
+
+      if (uploadSessionData.length === 0) {
+        status.textContent = "El archivo CSV está vacío o no se pudo procesar.";
+        status.className = "status-message error";
+        document.getElementById("submitUploadBtn").disabled = true;
+        return;
+      }
+
+      displayUploadPreview(uploadSessionData);
+      document.getElementById("submitUploadBtn").disabled = false;
+
+      if (simulatorType !== "foresight") {
+        status.textContent = `⚠️ Parser de ${simulatorType.charAt(0).toUpperCase() + simulatorType.slice(1)} en desarrollo.`;
+        status.className = "status-message";
+      } else {
+        status.textContent = `✓ ${uploadSessionData.length} tiros cargados correctamente`;
+        status.className = "status-message success";
+      }
+    } catch (error) {
+      status.textContent = `Error al procesar el CSV: ${error.message}`;
+      status.className = "status-message error";
+      document.getElementById("submitUploadBtn").disabled = true;
+    }
+  };
+  reader.onerror = () => {
+    status.textContent = "Error al leer el archivo.";
+    status.className = "status-message error";
+  };
+  reader.readAsText(file);
+}
+
+// Parser principal
+function parseCSVForUpload(csvData, simulatorType = "foresight") {
+  switch (simulatorType) {
+    case "foresight":
+      return parseCSVForesight(csvData);
+    case "garmin":
+      return parseCSVGarmin(csvData);
+    case "trackman":
+      return parseCSVTrackman(csvData);
+    default:
+      return parseCSVForesight(csvData);
+  }
+}
+
+// Parser para Foresight
+function parseCSVForesight(csvData) {
+  const lines = csvData.split("\n").filter((line) => line.trim() !== "");
+  const headers = lines[0].split(",").map((header) => header.trim().toLowerCase());
+  const data = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const columns = lines[i].split(",").map((col) => col.trim());
+    if (columns.length < headers.length) continue;
+
+    const rowData = {};
+    headers.forEach((header, index) => {
+      let value = columns[index];
+      if (header !== "shot created date" && !isNaN(value) && value !== "") {
+        value = parseFloat(value);
+      }
+      if (header === "club speed (mph)") {
+        if (value > 1000) {
+          rowData["club speed (mph)"] = "-";
+        } else {
+          rowData[header] = value;
+        }
+      } else {
+        rowData[header] = value;
+      }
+    });
+    data.push(rowData);
+  }
+
+  // Limpiar datos con club speed inválido
+  for (let i = 0; i < data.length; i++) {
+    if (data[i]["club speed (mph)"] === "-") {
+      data[i]["efficiency"] = "-";
+      data[i]["club path (deg out-in-/in-out+)"] = "-";
+      data[i]["angle of attack (deg)"] = "-";
+      data[i]["loft (deg)"] = "-";
+      data[i]["lie (deg toe down-/toe up+)"] = "-";
+      data[i]["club speed at impact location (mph)"] = "-";
+      data[i]["face impact horizontal (mm toe-/heel+)"] = "-";
+      data[i]["face impact vertical (mm low-/high+)"] = "-";
+      data[i]["face to target (deg closed-/open+)"] = "-";
+      data[i]["closure rate (deg/sec)"] = "-";
+    }
+  }
+  return data;
+}
+
+// Parser para Garmin R10 - En desarrollo
+function parseCSVGarmin(csvData) {
+  console.warn("Parser de Garmin en desarrollo. Usando parser genérico.");
+  const lines = csvData.split("\n").filter((line) => line.trim() !== "");
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(",").map((header) => header.trim().toLowerCase());
+  const data = [];
+  for (let i = 1; i < lines.length; i++) {
+    const columns = lines[i].split(",").map((col) => col.trim());
+    if (columns.length < headers.length) continue;
+    const rowData = {};
+    headers.forEach((header, index) => {
+      let value = columns[index];
+      if (!isNaN(value) && value !== "") value = parseFloat(value);
+      rowData[header] = value;
+    });
+    data.push(rowData);
+  }
+  return data;
+}
+
+// Parser para Trackman - En desarrollo
+function parseCSVTrackman(csvData) {
+  console.warn("Parser de Trackman en desarrollo. Usando parser genérico.");
+  const lines = csvData.split("\n").filter((line) => line.trim() !== "");
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(",").map((header) => header.trim().toLowerCase());
+  const data = [];
+  for (let i = 1; i < lines.length; i++) {
+    const columns = lines[i].split(",").map((col) => col.trim());
+    if (columns.length < headers.length) continue;
+    const rowData = {};
+    headers.forEach((header, index) => {
+      let value = columns[index];
+      if (!isNaN(value) && value !== "") value = parseFloat(value);
+      rowData[header] = value;
+    });
+    data.push(rowData);
+  }
+  return data;
+}
+
+// Calcular estadísticas de la sesión
+function calculateUploadSessionStats(data) {
+  const shotCount = data.length;
+  let sessionTime = 0;
+  let restBetweenShots = 0;
+
+  if (shotCount > 0 && data[0]["shot created date"]) {
+    const parseTimestamp = (timestamp) => {
+      const [date, time] = timestamp.split(" ");
+      const [month, day, year] = date.split("/").map(Number);
+      const [hours, minutes, seconds] = time.split(":").map(Number);
+      return new Date(year, month - 1, day, hours, minutes, seconds);
+    };
+    try {
+      const firstShotTime = parseTimestamp(data[0]["shot created date"]);
+      const lastShotTime = parseTimestamp(data[data.length - 1]["shot created date"]);
+      sessionTime = (lastShotTime - firstShotTime) / 1000;
+      restBetweenShots = shotCount > 1 ? sessionTime / (shotCount - 1) : 0;
+    } catch (e) {
+      console.warn("No se pudo calcular el tiempo de sesión");
+    }
+  }
+
+  const formatTime = (seconds) => {
+    if (seconds <= 0) return "0h 0m";
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  };
+
+  const formatRest = (seconds) => {
+    if (seconds <= 0) return "0s";
+    if (seconds < 60) return `${Math.round(seconds)}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.round(seconds % 60);
+    return `${minutes}m ${remainingSeconds}s`;
+  };
+
+  return {
+    shotCount,
+    sessionTime: formatTime(sessionTime),
+    restBetweenShots: formatRest(restBetweenShots),
+  };
+}
+
+// Mostrar vista previa
+function displayUploadPreview(data) {
+  const previewContainer = document.getElementById("uploadPreview");
+  const previewStats = calculateUploadSessionStats(data);
+
+  document.getElementById("previewShotCount").textContent = `${previewStats.shotCount} tiros`;
+  document.getElementById("previewDuration").textContent = `Duración: ${previewStats.sessionTime}`;
+
+  const tableHead = document.querySelector("#uploadPreviewTable thead");
+  const tableBody = document.querySelector("#uploadPreviewTable tbody");
+
+  const previewColumns = ["club name", "ball speed (mph)", "carry (yds)", "total distance (yds)"];
+  const availableColumns = previewColumns.filter(col => data[0] && data[0][col] !== undefined);
+
+  tableHead.innerHTML = `<tr>${availableColumns.map(col =>
+    `<th>${col.split(" ")[0].charAt(0).toUpperCase() + col.split(" ")[0].slice(1)}</th>`
+  ).join("")}</tr>`;
+
+  tableBody.innerHTML = data.slice(0, 5).map(row =>
+    `<tr>${availableColumns.map(col => `<td>${row[col] || "-"}</td>`).join("")}</tr>`
+  ).join("");
+
+  if (data.length > 5) {
+    tableBody.innerHTML += `<tr><td colspan="${availableColumns.length}" style="text-align:center;color:var(--text-muted)">...y ${data.length - 5} tiros más</td></tr>`;
+  }
+
+  previewContainer.style.display = "block";
+}
+
+// Guardar sesión en Firebase
+async function saveUploadedSession(event) {
+  event.preventDefault();
+  const status = document.getElementById("uploadStatus");
+  const submitBtn = document.getElementById("submitUploadBtn");
+
+  if (uploadSessionData.length === 0) {
+    status.textContent = "No hay datos para guardar.";
+    status.className = "status-message error";
+    return;
+  }
+
+  const user = auth.currentUser;
+  if (!user) {
+    status.textContent = "Debes iniciar sesión para guardar una sesión.";
+    status.className = "status-message error";
+    return;
+  }
+
+  const fecha = document.getElementById("sessionDate").value;
+  if (!fecha) {
+    status.textContent = "Por favor, selecciona una fecha.";
+    status.className = "status-message error";
+    return;
+  }
+
+  submitBtn.disabled = true;
+  status.textContent = "Guardando...";
+  status.className = "status-message";
+
+  try {
+    const userDocRef = doc(db, "Simulador", user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    const sessionStats = calculateUploadSessionStats(uploadSessionData);
+    const sessionEntry = {
+      fecha: fecha,
+      datos: uploadSessionData,
+      stats: sessionStats,
+    };
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      await updateDoc(userDocRef, {
+        Sesiones: [...(userData.Sesiones || []), sessionEntry],
+      });
+    } else {
+      await updateDoc(userDocRef, {
+        Sesiones: [sessionEntry],
+      });
+    }
+
+    status.textContent = "✓ Sesión guardada exitosamente";
+    status.className = "status-message success";
+
+    setTimeout(() => {
+      closeUploadModal();
+      loadSessions();
+    }, 1500);
+
+  } catch (error) {
+    console.error("Error guardando sesión:", error);
+    status.textContent = `Error al guardar: ${error.message}`;
+    status.className = "status-message error";
+    submitBtn.disabled = false;
+  }
+}
+
+// Inicializar eventos de carga de sesión
+function initUploadSessionEvents() {
+  const csvInput = document.getElementById("csvFileInput");
+  if (csvInput) {
+    csvInput.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        processCSVFile(e.target.files[0]);
+      }
+    });
+  }
+
+  const uploadForm = document.getElementById("uploadSessionForm");
+  if (uploadForm) {
+    uploadForm.addEventListener("submit", saveUploadedSession);
+  }
+
+  const modal = document.getElementById("uploadSessionModal");
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeUploadModal();
+      }
+    });
+  }
+}
+
 // Global function assignments
 Object.assign(window, {
   showColumnSelector,
@@ -1478,6 +1881,9 @@ Object.assign(window, {
   closeYardageBookModal,
   createYardageBookFromModal,
   toggleSessionSelection,
+  toggleAllSessions,
+  toggleAllClubs,
+  updateSelectionInfo,
   updateClubListForYardageBook,
   toggleClubForYardageBook,
   updateShotSelection,
@@ -1499,11 +1905,14 @@ Object.assign(window, {
   goToPreviousPage,
   goToNextPage,
   handleUserSelection,
+  openUploadModal,
+  closeUploadModal,
 });
 
 // Initialize on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   loadSessions();
+  initUploadSessionEvents();
   const toggle = document.getElementById("toggleView");
   if (toggle) {
     toggle.checked = false;

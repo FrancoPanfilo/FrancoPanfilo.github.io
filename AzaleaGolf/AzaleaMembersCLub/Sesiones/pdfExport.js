@@ -3,7 +3,8 @@ import {
   doc as firestoreDoc,
   getDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { GOLF_CONSTANTS } from "../utils/constants.js";
+import { GOLF_CONSTANTS, clubColors, getClubOrder, formatClubName } from "../shared/utils/constants.js";
+import { calculateOfflineCarry, calculateEllipseParams, hexToRgb } from "../shared/utils/golf-calculations.js";
 
 // Función para calcular promedios
 function calculateAverages(clubData) {
@@ -517,155 +518,6 @@ async function exportSessionToPDF(sessionData, nombreCompleto, fechaSesion) {
   }
 }
 
-// Función para calcular offline carry (copiada de heatmap.js)
-function calculateOfflineCarry(row) {
-  const pushPullDeg = parseFloat(row["push/pull (deg l-/r+)"]) || 0;
-  const carryYds = parseFloat(row["carry (yds)"]) || 0;
-  const sideSpinRpm = parseFloat(row["side spin (rpm l-/r+)"]) || 0;
-  const offlineTotal = parseFloat(row["offline (yds l-/r+)"]) || 0;
-
-  // Validar datos
-  if (
-    Math.abs(pushPullDeg) > 45 ||
-    Math.abs(sideSpinRpm) > 5000 ||
-    carryYds < 0 ||
-    Math.abs(offlineTotal) > 100
-  ) {
-    return 0;
-  }
-
-  // Desviación inicial por push/pull
-  const initialOffline = Math.tan((pushPullDeg * Math.PI) / 180) * carryYds;
-
-  // Curvatura por side spin (1.5 yds por 1000 RPM por 50 yds de carry)
-  const curvature = (sideSpinRpm / 1000) * 1.5 * (carryYds / 50);
-
-  // Término de corrección basado en offline total
-  const offlineCorrection = 0.2 * offlineTotal;
-
-  return (initialOffline + curvature + offlineCorrection).toFixed(2);
-}
-
-// Función para calcular parámetros de elipse (copiada de heatmap.js)
-function calculateEllipseParams(data) {
-  if (data.length < 2) return null;
-
-  // Calcular promedios (centro de la elipse)
-  const meanX = data.reduce((sum, d) => sum + d.x, 0) / data.length;
-  const meanY = data.reduce((sum, d) => sum + d.y, 0) / data.length;
-
-  // Calcular matriz de covarianza
-  const varianceX =
-    data.reduce((sum, d) => sum + Math.pow(d.x - meanX, 2), 0) / data.length;
-  const varianceY =
-    data.reduce((sum, d) => sum + Math.pow(d.y - meanY, 2), 0) / data.length;
-  const covarianceXY =
-    data.reduce((sum, d) => sum + (d.x - meanX) * (d.y - meanY), 0) /
-    data.length;
-
-  // Calcular valores propios para los radios
-  const a = varianceX + varianceY;
-  const b = Math.sqrt(
-    Math.pow(varianceX - varianceY, 2) + 4 * Math.pow(covarianceXY, 2)
-  );
-  const lambda1 = (a + b) / 2;
-  const lambda2 = (a - b) / 2;
-
-  // Radios: 2 * raíces de los valores propios (~95% de los puntos)
-  const radiusX = Math.max(Math.sqrt(lambda1) * 2, 5);
-  const radiusY = Math.max(Math.sqrt(lambda2) * 2, 5);
-
-  // Calcular ángulo de rotación
-  const rotation =
-    -0.5 *
-    Math.atan2(2 * covarianceXY, varianceX - varianceY) *
-    (180 / Math.PI);
-
-  return { x: meanX, y: meanY, radiusX, radiusY, rotation };
-}
-
-// Función para formatear nombre del palo
-function formatClubName(clubCode) {
-  const clubNames = {
-    Dr: "Driver",
-    "1w": "1 Wood",
-    "2w": "2 Wood",
-    "3w": "3 Wood",
-    "4w": "4 Wood",
-    "5w": "5 Wood",
-    "7w": "7 Wood",
-    "9w": "9 Wood",
-    "1h": "1 Hybrid",
-    "2h": "2 Hybrid",
-    "3h": "3 Hybrid",
-    "4h": "4 Hybrid",
-    "5h": "5 Hybrid",
-    "6h": "6 Hybrid",
-    "7h": "7 Hybrid",
-    "8h": "8 Hybrid",
-    "9h": "9 Hybrid",
-    "1i": "1 Iron",
-    "2i": "2 Iron",
-    "3i": "3 Iron",
-    "4i": "4 Iron",
-    "5i": "5 Iron",
-    "6i": "6 Iron",
-    "7i": "7 Iron",
-    "8i": "8 Iron",
-    "9i": "9 Iron",
-    PW: "Pitching Wedge",
-    GW: "Gap Wedge",
-    SW: "Sand Wedge",
-    LW: "Lob Wedge",
-    50: "50° Wedge",
-    52: "52° Wedge",
-    54: "54° Wedge",
-    56: "56° Wedge",
-    58: "58° Wedge",
-    60: "60° Wedge",
-    62: "62° Wedge",
-    64: "64° Wedge",
-    Putt: "Putter",
-  };
-  return clubNames[clubCode] || clubCode;
-}
-
-// Colores para los palos (copiados de constants.js)
-const clubColors = [
-  "#FF6B6B", // Rojo
-  "#4ECDC4", // Turquesa
-  "#45B7D1", // Azul claro
-  "#96CEB4", // Verde claro
-  "#FFEAA7", // Amarillo
-  "#DDA0DD", // Ciruela
-  "#98D8C8", // Verde azulado
-  "#F7DC6F", // Amarillo dorado
-  "#BB8FCE", // Violeta claro
-  "#85C1E9", // Azul cielo
-  "#F8C471", // Naranja claro
-  "#82E0AA", // Verde lima
-  "#F1948A", // Rosa salmón
-  "#85C1E9", // Azul claro
-  "#D7BDE2", // Lavanda
-  "#FAD7A0", // Melocotón
-  "#A9DFBF", // Verde menta
-  "#F9E79F", // Amarillo crema
-  "#D5A6BD", // Rosa pálido
-  "#A3E4D7", // Verde agua
-];
-
-// Función para convertir color hex a RGB
-function hexToRgb(hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : { r: 0, g: 0, b: 0 };
-}
-
 // Función para crear el heatmap en el PDF
 async function createPDFHeatmap(pdfDoc, sessionData, y) {
   // Agrupar datos por palo
@@ -845,63 +697,6 @@ async function createPDFHeatmap(pdfDoc, sessionData, y) {
       pdfDoc.circle(screenPoint.x, screenPoint.y, 0.7, "F"); // Radio más pequeño
     });
   });
-
-  // Función para obtener el orden de los palos (copiada de script.js)
-  function getClubOrder(clubName) {
-    const clubHierarchy = {
-      Dr: 1,
-      "1w": 2,
-      "2w": 3,
-      "3w": 4,
-      "4w": 5,
-      "5w": 6,
-      "6w": 7,
-      "7w": 8,
-      "8w": 9,
-      "9w": 10,
-      "1h": 11,
-      "2h": 12,
-      "3h": 13,
-      "4h": 14,
-      "5h": 15,
-      "6h": 16,
-      "7h": 17,
-      "8h": 18,
-      "1i": 19,
-      "2i": 20,
-      "3i": 21,
-      "4i": 22,
-      "5i": 23,
-      "6i": 24,
-      "7i": 25,
-      "8i": 26,
-      "9i": 27,
-      PW: 28,
-      GW: 29,
-      SW: 30,
-      LW: 31,
-      47: 32,
-      48: 33,
-      49: 34,
-      50: 35,
-      51: 36,
-      52: 37,
-      53: 38,
-      54: 39,
-      55: 40,
-      56: 41,
-      57: 42,
-      58: 43,
-      59: 44,
-      60: 45,
-      61: 46,
-      62: 47,
-      63: 48,
-      64: 49,
-      Putter: 1000, // Warm Up siempre al final
-    };
-    return clubHierarchy[clubName] || 999;
-  }
 
   // Dibujar leyenda ordenada
   const legendY = chartY + chartHeight + 15;

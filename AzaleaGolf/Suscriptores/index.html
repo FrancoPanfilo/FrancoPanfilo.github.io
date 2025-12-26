@@ -39,15 +39,22 @@
         <li><a href="../Simulador/index.html">PDF</a></li>
       </ul>
     </div>
-    <button><a href="Admin/index.html">Admin</a></button>
-    <div style="margin-bottom: 20px">
-      <label for="accionSelect"><strong>Selecciona una acción:</strong></label>
-      <select id="accionSelect">
-        <option value="sesion">Cargar Sesión</option>
-        <option value="tarjeta">Cargar Tarjeta</option>
-        <option value="torneo">Cargar Torneo</option>
-      </select>
-    </div>
+    <div class="page-container">
+      <header class="page-header">
+        <h1>Panel de Suscriptores</h1>
+        <p>Gestión de sesiones, tarjetas y torneos</p>
+      </header>
+
+      <a href="Admin/index.html" class="btn-admin">Ir al Panel Admin</a>
+
+      <div class="action-selector">
+        <label for="accionSelect">Selecciona una acción:</label>
+        <select id="accionSelect">
+          <option value="sesion">Cargar Sesión</option>
+          <option value="tarjeta">Cargar Tarjeta</option>
+          <option value="torneo">Cargar Torneo</option>
+        </select>
+      </div>
 
     <div id="form-sesion-container" class="accion-form">
       <h2>Cargar Sesión de Golf</h2>
@@ -58,6 +65,14 @@
             <option value="">Seleccione un usuario</option>
           </select>
           <div id="userId" class="user-id"></div>
+        </div>
+        <div class="form-group">
+          <label for="simulador">Tipo de Simulador:</label>
+          <select id="simulador" name="simulador" required>
+            <option value="foresight">Foresight</option>
+            <option value="garmin">Garmin</option>
+            <option value="trackman">Trackman</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="fecha">Fecha:</label>
@@ -76,6 +91,7 @@
         <button type="submit">Cargar Sesión</button>
       </form>
       <p id="status" class="status"></p>
+      <div id="sessionStats" class="session-stats"></div>
     </div>
     <div id="form-tarjeta-container" class="accion-form" style="display: none">
       <h2>Cargar Tarjeta</h2>
@@ -737,6 +753,8 @@
         <tbody></tbody>
       </table>
     </div>
+
+    </div><!-- Cierre de page-container -->
     <script type="module" src="script.js"></script>
     <script>
       (function () {

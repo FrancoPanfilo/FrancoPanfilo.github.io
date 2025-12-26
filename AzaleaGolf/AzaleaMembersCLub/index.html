@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Azalea Golf - Análisis Profesional de Golf</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="nav.css" />
     <link rel="icon" type="image/png" href="img/icono.png" />
     <link
@@ -12,6 +12,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
     <script type="module" src="auth.js"></script>
+    <script src="nav.js"></script>
   </head>
   <body>
     <header class="header">
@@ -37,6 +38,12 @@
               <a href="Torneos/index.html" class="nav-link">
                 <i class="fas fa-trophy"></i>
                 <span>Torneos</span>
+              </a>
+            </li>
+            <li class="nav-item nav-item-auth" id="navPerfil" style="display: none">
+              <a href="perfil.html" class="nav-link">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
               </a>
             </li>
             <li class="nav-item">
@@ -107,15 +114,6 @@
 
     <!-- Contenido para Invitados -->
     <div id="guestContent">
-      <!-- Sección de Características -->
-      <!-- Se eliminó la sección de características -->
-
-      <!-- Sección de Métricas -->
-      <!-- Se eliminó la sección de métricas -->
-
-      <!-- Sección de Estadísticas Globales -->
-      <!-- Se eliminó la sección de estadísticas globales -->
-
       <!-- CTA Section -->
       <section class="cta-section">
         <div class="container">
@@ -188,6 +186,38 @@
                   <div class="perf-number" id="userBestDistance">-</div>
                 </div>
               </div>
+            </div>
+          </section>
+
+          <!-- Handicap y Comparación con Grupo -->
+          <section class="handicap-comparison-section" id="handicapComparisonSection" style="display: none;">
+            <div class="handicap-summary">
+              <div class="handicap-badge">
+                <span class="handicap-value" id="dashboardHandicap">--</span>
+                <span class="handicap-label">Handicap</span>
+              </div>
+              <a href="perfil.html" class="btn-edit-profile">
+                <i class="fas fa-edit"></i> Editar en Perfil
+              </a>
+            </div>
+
+            <h3><i class="fas fa-chart-bar"></i> Comparación con tu Grupo</h3>
+            <p class="comparison-subtitle" id="comparisonSubtitle"></p>
+
+            <div class="comparison-cards" id="comparisonCards">
+              <!-- Se genera dinámicamente -->
+            </div>
+
+            <p class="comparison-info" id="comparisonInfo"></p>
+          </section>
+
+          <!-- Mensaje si no tiene handicap -->
+          <section class="handicap-prompt" id="handicapPrompt" style="display: none;">
+            <div class="prompt-card">
+              <i class="fas fa-golf-ball"></i>
+              <h3>Configura tu Handicap</h3>
+              <p>Establece tu handicap para ver cómo te comparas con otros jugadores de tu nivel</p>
+              <a href="perfil.html" class="btn btn-primary">Ir a Mi Perfil</a>
             </div>
           </section>
 
@@ -272,7 +302,7 @@
         onAuthStateChanged,
         signOut,
       } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-      import { db, doc, getDoc } from "./db.js";
+      import { db, doc, getDoc, collection, getDocs } from "./db.js";
 
       // Función para obtener el nombre completo del usuario
       async function getUserFullName(uid) {
@@ -436,6 +466,272 @@
           .join("");
       }
 
+      // Constantes para comparación de handicap
+      const HANDICAP_RANGES = [
+        { id: "0-5", label: "Scratch (0-5)", min: 0, max: 5 },
+        { id: "6-10", label: "Bajo (6-10)", min: 6, max: 10 },
+        { id: "11-15", label: "Medio-Bajo (11-15)", min: 11, max: 15 },
+        { id: "16-20", label: "Medio (16-20)", min: 16, max: 20 },
+        { id: "21-25", label: "Medio-Alto (21-25)", min: 21, max: 25 },
+        { id: "26-30", label: "Alto (26-30)", min: 26, max: 30 },
+        { id: "31-35", label: "Alto+ (31-35)", min: 31, max: 35 },
+        { id: "36-40", label: "Principiante (36-40)", min: 36, max: 40 },
+        { id: "41-45", label: "Principiante+ (41-45)", min: 41, max: 45 },
+        { id: "46-50", label: "Iniciación (46-50)", min: 46, max: 50 },
+        { id: "51+", label: "Nuevo (51+)", min: 51, max: 54 },
+      ];
+
+      const COMPARISON_METRICS = [
+        {
+          key: "club speed (mph)",
+          label: "Velocidad Driver",
+          unit: "mph",
+          icon: "fa-gauge-high",
+          clubFilter: "Dr",
+          clubField: "club name",
+          useAbsolute: false,
+          higherIsBetter: true
+        },
+        {
+          key: "angle of attack (deg)",
+          label: "Ángulo de Ataque (7i)",
+          unit: "°",
+          icon: "fa-arrow-down",
+          clubFilter: "7i",
+          clubField: "club name",
+          useAbsolute: false,
+          higherIsBetter: null  // Depende del contexto
+        },
+        {
+          key: "club path (deg out-in-/in-out+)",
+          label: "Club Path",
+          unit: "°",
+          icon: "fa-route",
+          clubFilter: null,
+          clubField: null,
+          useAbsolute: true,  // Promedio de valores absolutos
+          higherIsBetter: false  // Menor desviación es mejor
+        },
+      ];
+
+      function getHandicapRange(handicap) {
+        return HANDICAP_RANGES.find(r => handicap >= r.min && handicap <= r.max);
+      }
+
+      // Función para cargar sección de handicap
+      async function loadHandicapSection(uid) {
+        try {
+          const userDocRef = doc(db, "Simulador", uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (!userDocSnap.exists()) return;
+
+          const userData = userDocSnap.data();
+          const currentHcp = userData.handicap?.current;
+
+          const comparisonSection = document.getElementById("handicapComparisonSection");
+          const promptSection = document.getElementById("handicapPrompt");
+
+          if (currentHcp !== null && currentHcp !== undefined) {
+            // Mostrar sección de comparación
+            document.getElementById("dashboardHandicap").textContent = currentHcp.toFixed(1);
+            comparisonSection.style.display = "block";
+            promptSection.style.display = "none";
+
+            // Cargar comparación (pasando el UID para excluir al usuario de la comparación)
+            await loadComparison(userData, currentHcp, uid);
+          } else {
+            // Mostrar prompt para configurar handicap
+            comparisonSection.style.display = "none";
+            promptSection.style.display = "block";
+          }
+        } catch (error) {
+          console.error("Error cargando sección de handicap:", error);
+        }
+      }
+
+      // Función para obtener usuarios en un rango de handicap
+      async function getUsersInHandicapRange(minHcp, maxHcp, excludeUid) {
+        try {
+          const usersRef = collection(db, "Simulador");
+          const snapshot = await getDocs(usersRef);
+
+          return snapshot.docs
+            .filter(doc => doc.id !== excludeUid) // Excluir al usuario actual
+            .map(doc => ({ uid: doc.id, ...doc.data() }))
+            .filter(user => {
+              const hcp = user.handicap?.current;
+              return hcp !== null && hcp !== undefined && hcp >= minHcp && hcp <= maxHcp;
+            });
+        } catch (error) {
+          console.error("Error obteniendo usuarios:", error);
+          return [];
+        }
+      }
+
+      // Calcular métricas agregadas de un grupo de usuarios
+      function calculateGroupMetrics(users, metric) {
+        const allValues = [];
+
+        users.forEach(user => {
+          (user.Sesiones || []).forEach(session => {
+            (session.datos || []).forEach(shot => {
+              if (shot.TiroDesactivado) return;
+              const clubSpeed = parseFloat(shot["club speed (mph)"]);
+              if (!clubSpeed || clubSpeed >= 550 || clubSpeed <= 0) return;
+
+              // Filtrar por palo si es necesario
+              if (metric.clubFilter && metric.clubField) {
+                const shotClub = shot[metric.clubField] || "";
+                if (shotClub !== metric.clubFilter) return;
+              }
+
+              const value = parseFloat(shot[metric.key]);
+              if (!isNaN(value)) {
+                // Usar valor absoluto si la métrica lo requiere
+                allValues.push(metric.useAbsolute ? Math.abs(value) : value);
+              }
+            });
+          });
+        });
+
+        if (allValues.length === 0) return null;
+
+        return {
+          average: allValues.reduce((a, b) => a + b, 0) / allValues.length,
+          count: allValues.length
+        };
+      }
+
+      // Función para cargar comparación con grupo
+      async function loadComparison(userData, handicap, currentUid) {
+        const range = getHandicapRange(handicap);
+        if (!range) return;
+
+        document.getElementById("comparisonSubtitle").textContent = `Tu rango: ${range.label}`;
+
+        // Calcular métricas del usuario
+        const userMetrics = calculateUserMetrics(userData.Sesiones);
+
+        // Obtener usuarios del mismo rango (excluyendo al usuario actual)
+        const usersInRange = await getUsersInHandicapRange(range.min, range.max, currentUid);
+
+        // Si no hay suficientes jugadores para comparar
+        if (usersInRange.length < 1) {
+          const cardsHTML = COMPARISON_METRICS.map(metric => {
+            const userValue = userMetrics[metric.key];
+            const displayValue = userValue !== null ? userValue.toFixed(1) : '--';
+
+            return `
+              <div class="comparison-card">
+                <div class="metric-icon"><i class="fas ${metric.icon}"></i></div>
+                <div class="metric-name">${metric.label}</div>
+                <div class="your-value">${displayValue} ${metric.unit}</div>
+                <div class="group-value">Tu promedio personal</div>
+              </div>
+            `;
+          }).join('');
+
+          document.getElementById("comparisonCards").innerHTML = cardsHTML;
+          document.getElementById("comparisonInfo").textContent =
+            `No hay otros jugadores en tu rango (${range.label}) para comparar`;
+          return;
+        }
+
+        // Generar cards de comparación con datos del grupo
+        const cardsHTML = COMPARISON_METRICS.map(metric => {
+          const userValue = userMetrics[metric.key];
+          const groupStats = calculateGroupMetrics(usersInRange, metric);
+
+          const displayValue = userValue !== null ? userValue.toFixed(1) : '--';
+          const groupAverage = groupStats?.average;
+          const groupDisplay = groupAverage !== null && groupAverage !== undefined
+            ? groupAverage.toFixed(1)
+            : '--';
+
+          // Calcular diferencia
+          let diffHtml = '';
+          if (userValue !== null && groupAverage !== null && groupAverage !== undefined) {
+            const diff = userValue - groupAverage;
+            const diffAbs = Math.abs(diff);
+
+            let diffClass;
+
+            if (metric.higherIsBetter === true) {
+              // Mayor es mejor (velocidad driver)
+              diffClass = diff > 0.5 ? 'positive' : (diff < -0.5 ? 'negative' : 'neutral');
+            } else if (metric.higherIsBetter === false) {
+              // Menor es mejor (club path - menor desviación)
+              diffClass = diff < -0.5 ? 'positive' : (diff > 0.5 ? 'negative' : 'neutral');
+            } else {
+              // Neutro (ángulo de ataque - depende del contexto)
+              diffClass = 'neutral';
+            }
+
+            const diffSign = diff > 0 ? '+' : '';
+            diffHtml = `<span class="difference ${diffClass}">${diffSign}${diff.toFixed(1)}${metric.unit}</span>`;
+          }
+
+          // Info adicional según la métrica
+          let metricNote = '';
+          if (metric.useAbsolute) {
+            metricNote = '<small class="metric-note">(desviación promedio)</small>';
+          }
+
+          return `
+            <div class="comparison-card">
+              <div class="metric-icon"><i class="fas ${metric.icon}"></i></div>
+              <div class="metric-name">${metric.label}</div>
+              ${metricNote}
+              <div class="your-value">${displayValue} ${metric.unit}</div>
+              <div class="group-value">Grupo: ${groupDisplay} ${metric.unit}</div>
+              ${diffHtml}
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById("comparisonCards").innerHTML = cardsHTML;
+        document.getElementById("comparisonInfo").textContent =
+          `Comparando con ${usersInRange.length} jugador${usersInRange.length !== 1 ? 'es' : ''} de tu rango (${range.label})`;
+      }
+
+      // Calcular métricas del usuario
+      function calculateUserMetrics(sessions) {
+        const metrics = {};
+        const counts = {};
+
+        COMPARISON_METRICS.forEach(metric => {
+          const values = [];
+          (sessions || []).forEach(session => {
+            (session.datos || []).forEach(shot => {
+              if (shot.TiroDesactivado) return;
+              const clubSpeed = parseFloat(shot["club speed (mph)"]);
+              if (!clubSpeed || clubSpeed >= 550 || clubSpeed <= 0) return;
+
+              // Filtrar por palo si es necesario
+              if (metric.clubFilter && metric.clubField) {
+                const shotClub = shot[metric.clubField] || "";
+                if (shotClub !== metric.clubFilter) return;
+              }
+
+              const val = parseFloat(shot[metric.key]);
+              if (!isNaN(val)) {
+                // Usar valor absoluto si la métrica lo requiere
+                values.push(metric.useAbsolute ? Math.abs(val) : val);
+              }
+            });
+          });
+
+          metrics[metric.key] = values.length > 0
+            ? values.reduce((a, b) => a + b, 0) / values.length
+            : null;
+          counts[metric.key] = values.length;
+        });
+
+        metrics.counts = counts;
+        return metrics;
+      }
+
       // Actualizar la interfaz según el estado de autenticación
       onAuthStateChanged(auth, async (user) => {
         const authButton = document.querySelector(".auth-button");
@@ -461,6 +757,9 @@
           // Cargar resumen de rendimiento usando el UID
           await loadPerformanceSummary(user.uid);
 
+          // Cargar sección de handicap
+          await loadHandicapSection(user.uid);
+
           // Remover mensaje de bienvenida anterior si existe
           const existingUserInfo = document.querySelector(".user-info");
           if (existingUserInfo) {
@@ -476,6 +775,10 @@
           const navMenu = document.querySelector(".nav-menu");
           const authItem = authButton.closest(".nav-item");
           navMenu.insertBefore(userInfo, authItem);
+
+          // Mostrar enlace de perfil
+          const navPerfil = document.getElementById("navPerfil");
+          if (navPerfil) navPerfil.style.display = "block";
 
           // Actualizar botón de autenticación
           authButton.innerHTML =
@@ -499,6 +802,10 @@
           userContent.style.display = "none";
           heroButtons.style.display = "block";
           heroUserMessage.style.display = "none";
+
+          // Ocultar enlace de perfil
+          const navPerfil = document.getElementById("navPerfil");
+          if (navPerfil) navPerfil.style.display = "none";
 
           // Remover el nombre del usuario si existe
           const userInfo = document.querySelector(".user-info");

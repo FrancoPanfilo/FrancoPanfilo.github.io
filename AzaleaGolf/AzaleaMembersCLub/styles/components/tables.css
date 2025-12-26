@@ -1,0 +1,83 @@
+/**
+ * TABLAS - AZALEA GOLF SIMULATOR
+ */
+
+/* Tabla base */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.table th,
+.table td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  background-color: var(--bg-secondary);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.table th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.table th.sortable::after {
+  content: "↕️";
+  margin-left: var(--spacing-xs);
+  opacity: 0.5;
+}
+
+.table th.sortable.asc::after {
+  content: "↑";
+  opacity: 1;
+}
+
+.table th.sortable.desc::after {
+  content: "↓";
+  opacity: 1;
+}
+
+.table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+.table tbody tr.selected {
+  background-color: rgba(39, 174, 96, 0.1);
+}
+
+/* Contenedor de tabla con scroll */
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tabla responsive */
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+}

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Gestión de Usuarios</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../../nav.css" />
+    <link rel="stylesheet" href="admin.css" />
+    <script defer src="../../login.js"></script>
+  </head>
+  <body>
+    <nav>
+      <div class="logo" id="acceso">
+        <img src="../../logo.jpg" alt="logo" />
+      </div>
+      <ul>
+        <li><a href="../../index.html">Gestion de Reservas</a></li>
+        <li><a href="../../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../../Clientes/index.html">Clientes</a></li>
+        <li><a href="../../Historial/index.html">Historial</a></li>
+        <li><a href="../../Stock/index.html">Stock</a></li>
+        <li><a href="../../Simulador/index.html">PDF</a></li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+    <div class="menubar">
+      <ul>
+        <li><a href="../../index.html">Gestion de Reservas</a></li>
+        <li><a href="../../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../../Clientes/index.html">Clientes</a></li>
+        <li><a href="../../Historial/index.html">Historial</a></li>
+        <li><a href="../../Stock/index.html">Stock</a></li>
+        <li><a href="../../Simulador/index.html">PDF</a></li>
+      </ul>
+    </div>
+
+    <div class="admin-container">
+      <header class="admin-header">
+        <h1>Panel de Administración</h1>
+        <a href="../index.html" class="btn-back">&larr; Volver</a>
+      </header>
+
+      <!-- Tabs de navegación -->
+      <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="usuarios">
+          Gestión de Usuarios
+        </button>
+        <button class="tab-btn" data-tab="handicaps">
+          Handicaps Rápido
+        </button>
+        <button class="tab-btn" data-tab="estadisticas">
+          Estadísticas
+        </button>
+      </div>
+
+      <!-- Tab: Gestión de Usuarios -->
+      <div id="tab-usuarios" class="tab-content active">
+        <div class="section-header">
+          <h2>Usuarios Registrados</h2>
+          <div class="search-box">
+            <input type="text" id="searchUser" placeholder="Buscar usuario..." />
+          </div>
+        </div>
+
+        <div class="users-table-container">
+          <table id="usersTable" class="users-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Handicap</th>
+                <th>Fecha Nacimiento</th>
+                <th>Mano</th>
+                <th>Sesiones</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr>
+                <td colspan="7" class="loading">Cargando usuarios...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Handicaps Rápido -->
+      <div id="tab-handicaps" class="tab-content">
+        <div class="section-header">
+          <h2>Actualización Rápida de Handicaps</h2>
+          <p class="section-desc">Edita múltiples handicaps y guarda todos los cambios de una vez.</p>
+        </div>
+
+        <div class="handicap-grid" id="handicapGrid">
+          <!-- Se llena dinámicamente -->
+        </div>
+
+        <div class="bulk-actions">
+          <button id="saveAllHandicaps" class="btn-primary">
+            Guardar Todos los Cambios
+          </button>
+          <span id="handicapStatus" class="status-message"></span>
+        </div>
+      </div>
+
+      <!-- Tab: Estadísticas -->
+      <div id="tab-estadisticas" class="tab-content">
+        <div class="section-header">
+          <h2>Estadísticas Generales</h2>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-value" id="statTotalUsers">-</div>
+            <div class="stat-label">Usuarios Registrados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statWithHandicap">-</div>
+            <div class="stat-label">Con Handicap Asignado</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statTotalSessions">-</div>
+            <div class="stat-label">Sesiones Totales</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statAvgHandicap">-</div>
+            <div class="stat-label">Handicap Promedio</div>
+          </div>
+        </div>
+
+        <div class="handicap-distribution">
+          <h3>Distribución por Rango de Handicap</h3>
+          <div id="handicapDistribution" class="distribution-chart">
+            <!-- Se llena dinámicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de edición de usuario -->
+    <div id="editUserModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Editar Usuario</h3>
+          <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <form id="editUserForm">
+          <input type="hidden" id="editUserId" />
+
+          <div class="form-group">
+            <label>Nombre:</label>
+            <input type="text" id="editNombre" readonly class="readonly" />
+          </div>
+
+          <div class="form-group">
+            <label>Apellido:</label>
+            <input type="text" id="editApellido" readonly class="readonly" />
+          </div>
+
+          <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="editEmail" readonly class="readonly" />
+          </div>
+
+          <div class="form-group">
+            <label for="editHandicap">Handicap:</label>
+            <input type="number" id="editHandicap" min="0" max="54" step="0.1" placeholder="0-54" />
+          </div>
+
+          <div class="form-group">
+            <label for="editFechaNacimiento">Fecha de Nacimiento:</label>
+            <input type="date" id="editFechaNacimiento" />
+          </div>
+
+          <div class="form-group">
+            <label>Mano Dominante:</label>
+            <div class="radio-group">
+              <label>
+                <input type="radio" name="editMano" value="derecha" /> Diestro
+              </label>
+              <label>
+                <input type="radio" name="editMano" value="izquierda" /> Zurdo
+              </label>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancelar</button>
+            <button type="submit" class="btn-primary">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+  </body>
+</html>
