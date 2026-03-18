@@ -1573,7 +1573,7 @@ function processCSVFile(file) {
       displayUploadPreview(uploadSessionData);
       document.getElementById("submitUploadBtn").disabled = false;
 
-      if (simulatorType !== "foresight") {
+      if (simulatorType !== "foresight" && simulatorType !== "gspro") {
         status.textContent = `⚠️ Parser de ${simulatorType.charAt(0).toUpperCase() + simulatorType.slice(1)} en desarrollo.`;
         status.className = "status-message";
       } else {
@@ -1598,6 +1598,8 @@ function parseCSVForUpload(csvData, simulatorType = "foresight") {
   switch (simulatorType) {
     case "foresight":
       return parseCSVForesight(csvData);
+    case "gspro":
+      return parseCSVGSPro(csvData);
     case "garmin":
       return parseCSVGarmin(csvData);
     case "trackman":
@@ -1651,6 +1653,155 @@ function parseCSVForesight(csvData) {
       data[i]["closure rate (deg/sec)"] = "-";
     }
   }
+  return data;
+}
+
+// Parser para GSPro
+function parseCSVGSPro(csvData) {
+  const lines = csvData.split("\n").filter((line) => line.trim() !== "");
+  if (lines.length < 2) return [];
+
+  // Limpiamos el BOM (\uFEFF) y quitamos cualquier espacio interno para asegurar que "Club Speed" y "clubspeed" se lean igual
+  const headers = lines[0].split(",").map((header) => header.replace(/^[\uFEFF\xA0]+/, '').trim().toLowerCase().replace(/\s+/g, ''));
+  const data = [];
+
+  // Mapeo de nombres de columnas de GSPro a FSX Live
+  const gsproToFsxMap = {
+    'no.': 'shot number',
+    'no': 'shot number',
+    'shot': 'shot number',
+    'shot no': 'shot number',
+    'shot no.': 'shot number',
+    'shotno': 'shot number',
+    'shotno.': 'shot number',
+    'carry': 'carry (yds)',
+    'totaldistance': 'total distance (yds)',
+    'ballspeed': 'ball speed (mph)',
+    'backspin': 'back spin (rpm)',
+    'sidespin': 'side spin (rpm l-/r+)',
+    'vla': 'launch angle (deg)',
+    'launchangle': 'launch angle (deg)',
+    'decent': 'descent angle (deg)',
+    'descentangle': 'descent angle (deg)',
+    'peakheight': 'peak height (yds)',
+    'offline': 'offline (yds l-/r+)',
+    'club': 'club name',
+    'clubspeed': 'club speed (mph)',
+    'path': 'club path (deg out-in-/in-out+)',
+    'clubpath': 'club path (deg out-in-/in-out+)',
+    'aoa': 'angle of attack (deg)',
+    'angleofattack': 'angle of attack (deg)',
+    'facetotarget': 'face to target (deg closed-/open+)',
+    'smashfactor': 'efficiency'
+  };
+
+  // Traductor de palos de GSPro a formato estándar
+  const mapGSProClub = (club) => {
+    if (!club) return "Unknown";
+    // Eliminamos posibles comillas extrañas que vengan del CSV
+    let c = club.replace(/['"]/g, '').toUpperCase().trim();
+    if (c === "DR") return "Dr";
+    if (c === "PT") return "Putter";
+    if (c === "PW") return "PW";
+    if (c === "GW") return "GW";
+    if (c === "SW") return "SW";
+    if (c === "LW") return "LW";
+    // Maderas: W3 -> 3w
+    if (c.startsWith("W") && c.length === 2) return c[1] + "w";
+    // Hierros: I6 -> 6i
+    if (c.startsWith("I") && c.length === 2) return c[1] + "i";
+    // Híbridos: H3 -> 3h
+    if (c.startsWith("H") && c.length === 2) return c[1] + "h";
+    return c;
+  };
+
+  // Objeto base que contiene todas las columnas estándar de FSX Play
+  const baseFsxRow = {
+    "shot number": "",
+    "shot created date": "",
+    "club name": "Unknown",
+    "ball speed (mph)": "-",
+    "launch angle (deg)": "-",
+    "back spin (rpm)": "-",
+    "side spin (rpm l-/r+)": "-",
+    "carry (yds)": "-",
+    "total distance (yds)": "-",
+    "peak height (yds)": "-",
+    "descent angle (deg)": "-",
+    "offline (yds l-/r+)": "-",
+    "club speed (mph)": "-",
+    "efficiency": "-",
+    "club path (deg out-in-/in-out+)": "-",
+    "angle of attack (deg)": "-",
+    "loft (deg)": "-",
+    "lie (deg toe down-/toe up+)": "-",
+    "club speed at impact location (mph)": "-",
+    "face impact horizontal (mm toe-/heel+)": "-",
+    "face impact vertical (mm low-/high+)": "-",
+    "face to target (deg closed-/open+)": "-",
+    "closure rate (deg/sec)": "-"
+  };
+
+  // Para calcular estadísticas de sesión, GSPro no provee fecha/hora de cada tiro.
+  // Simularemos una fecha partiendo de ahora y sumando 1 minuto por tiro.
+  let currentTime = new Date();
+
+  for (let i = 1; i < lines.length; i++) {
+    // Quitamos comillas redundantes en los valores numéricos y de texto generados por GSPro
+    const columns = lines[i].split(",").map((col) => col.replace(/['"]/g, '').trim());
+    if (columns.length < headers.length) continue;
+
+    const rowData = { ...baseFsxRow };
+
+    headers.forEach((header, index) => {
+      let value = columns[index];
+      const mappedHeader = gsproToFsxMap[header];
+
+      if (mappedHeader) {
+        if (mappedHeader === 'club name') {
+          rowData[mappedHeader] = mapGSProClub(value);
+        } else {
+          if (!isNaN(value) && value !== "") {
+            value = parseFloat(value);
+          }
+          rowData[mappedHeader] = value;
+        }
+      }
+    });
+
+    // Si no hay velocidad de palo (0 o nulo), establecer como "-"
+    if (rowData["club speed (mph)"] === 0 || isNaN(rowData["club speed (mph)"]) || rowData["club speed (mph)"] === "") {
+      rowData["club speed (mph)"] = "-";
+      rowData["efficiency"] = "-";
+      rowData["club path (deg out-in-/in-out+)"] = "-";
+      rowData["angle of attack (deg)"] = "-";
+      rowData["loft (deg)"] = "-";
+      rowData["lie (deg toe down-/toe up+)"] = "-";
+      rowData["club speed at impact location (mph)"] = "-";
+      rowData["face impact horizontal (mm toe-/heel+)"] = "-";
+      rowData["face impact vertical (mm low-/high+)"] = "-";
+      rowData["face to target (deg closed-/open+)"] = "-";
+      rowData["closure rate (deg/sec)"] = "-";
+    }
+
+    // Respaldo infalible: Si el CSV derechamente no trae columna de tiro, aplicamos el secuencial
+    if (rowData["shot number"] === undefined || rowData["shot number"] === "") {
+      rowData["shot number"] = data.length + 1;
+    }
+
+    // Fecha simulada
+    currentTime.setMinutes(currentTime.getMinutes() + 1);
+    const month = String(currentTime.getMonth() + 1).padStart(2, '0');
+    const day = String(currentTime.getDate()).padStart(2, '0');
+    const year = currentTime.getFullYear();
+    const hours = String(currentTime.getHours()).padStart(2, '0');
+    const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+    const seconds = String(currentTime.getSeconds()).padStart(2, '0');
+    rowData["shot created date"] = `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+
+    data.push(rowData);
+  }
+
   return data;
 }
 

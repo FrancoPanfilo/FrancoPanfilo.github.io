@@ -71,12 +71,7 @@ document.getElementById("csvFile").addEventListener("change", async (e) => {
         displayPreviewTable(sessionData);
         displaySessionStats(sessionData);
 
-        // Mostrar mensaje según el simulador
-        if (simulatorType !== "foresight") {
-          status.textContent = `⚠️ Parser de ${simulatorType.charAt(0).toUpperCase() + simulatorType.slice(1)} en desarrollo. Los datos pueden requerir mapeo manual.`;
-        } else {
-          status.textContent = "";
-        }
+        status.textContent = "";
       } catch (error) {
         status.textContent = `Error al procesar el CSV: ${error.message}`;
       }
@@ -440,14 +435,12 @@ window.agregarFotoGaleria = function () {
 // ============================================
 
 // Función principal que selecciona el parser correcto
-function parseCSV(csvData, simulatorType = "foresight") {
+function parseCSV(csvData, simulatorType = "fsx_live") {
   switch (simulatorType) {
-    case "foresight":
+    case "fsx_live":
       return parseCSVForesight(csvData);
-    case "garmin":
-      return parseCSVGarmin(csvData);
-    case "trackman":
-      return parseCSVTrackman(csvData);
+    case "gspro":
+      return parseCSVGSPro(csvData);
     default:
       return parseCSVForesight(csvData);
   }
@@ -502,76 +495,141 @@ function parseCSVForesight(csvData) {
   return data;
 }
 
-// Parser para Garmin R10 - TODO: Implementar mapeo de columnas
-function parseCSVGarmin(csvData) {
-  // TODO: Implementar parser para Garmin R10
-  // El CSV de Garmin tiene diferentes nombres de columnas que deben mapearse
-  // a los nombres estándar usados en la aplicación.
-  //
-  // Columnas esperadas de Garmin (ejemplo):
-  // - Club Speed, Ball Speed, Launch Angle, Spin Rate, Carry Distance, etc.
-  //
-  // Deben mapearse a:
-  // - club speed (mph), ball speed (mph), launch angle (deg), back spin (rpm), carry (yds), etc.
-
-  console.warn("Parser de Garmin no implementado aún. Usando parser genérico.");
-
+// Parser para GSPro
+function parseCSVGSPro(csvData) {
   const lines = csvData.split("\n").filter((line) => line.trim() !== "");
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(",").map((header) => header.trim().toLowerCase());
+  // Limpiamos el BOM (\uFEFF) oculto que suele venir en el primer caracter de los CSVs
+  const headers = lines[0].split(",").map((header) => header.replace(/^[\uFEFF\xA0]+/, '').trim().toLowerCase());
   const data = [];
+
+  // Mapeo de nombres de columnas de GSPro a FSX Live
+  const gsproToFsxMap = {
+    'no.': 'shot number',
+    'no': 'shot number',
+    'shot': 'shot number',
+    'shot no': 'shot number',
+    'shot no.': 'shot number',
+    'carry': 'carry (yds)',
+    'totaldistance': 'total distance (yds)',
+    'ballspeed': 'ball speed (mph)',
+    'backspin': 'back spin (rpm)',
+    'sidespin': 'side spin (rpm l-/r+)',
+    'vla': 'launch angle (deg)',
+    'decent': 'descent angle (deg)',
+    'peakheight': 'peak height (yds)',
+    'offline': 'offline (yds l-/r+)',
+    'club': 'club name',
+    'clubspeed': 'club speed (mph)',
+    'path': 'club path (deg out-in-/in-out+)',
+    'aoa': 'angle of attack (deg)',
+    'facetotarget': 'face to target (deg closed-/open+)',
+    'smashfactor': 'efficiency'
+  };
+
+  // Traductor de palos de GSPro a formato estándar
+  const mapGSProClub = (club) => {
+    if (!club) return "Unknown";
+    let c = club.toUpperCase().trim();
+    if (c === "DR") return "Dr";
+    if (c === "PT") return "Putter";
+    if (c === "PW") return "PW";
+    if (c === "GW") return "GW";
+    if (c === "SW") return "SW";
+    if (c === "LW") return "LW";
+    // Maderas: W3 -> 3w
+    if (c.startsWith("W") && c.length === 2) return c[1] + "w";
+    // Hierros: I6 -> 6i
+    if (c.startsWith("I") && c.length === 2) return c[1] + "i";
+    // Híbridos: H3 -> 3h
+    if (c.startsWith("H") && c.length === 2) return c[1] + "h";
+    return c;
+  };
+
+  // Objeto base que contiene todas las columnas estándar de FSX Play
+  const baseFsxRow = {
+    "shot number": "",
+    "shot created date": "",
+    "club name": "Unknown",
+    "ball speed (mph)": "-",
+    "launch angle (deg)": "-",
+    "back spin (rpm)": "-",
+    "side spin (rpm l-/r+)": "-",
+    "carry (yds)": "-",
+    "total distance (yds)": "-",
+    "peak height (yds)": "-",
+    "descent angle (deg)": "-",
+    "offline (yds l-/r+)": "-",
+    "club speed (mph)": "-",
+    "efficiency": "-",
+    "club path (deg out-in-/in-out+)": "-",
+    "angle of attack (deg)": "-",
+    "loft (deg)": "-",
+    "lie (deg toe down-/toe up+)": "-",
+    "club speed at impact location (mph)": "-",
+    "face impact horizontal (mm toe-/heel+)": "-",
+    "face impact vertical (mm low-/high+)": "-",
+    "face to target (deg closed-/open+)": "-",
+    "closure rate (deg/sec)": "-"
+  };
+
+  // Para calcular estadísticas de sesión, GSPro no provee fecha/hora de cada tiro.
+  // Simularemos una fecha partiendo de ahora y sumando 1 minuto por tiro.
+  let currentTime = new Date();
 
   for (let i = 1; i < lines.length; i++) {
     const columns = lines[i].split(",").map((col) => col.trim());
     if (columns.length < headers.length) continue;
 
-    const rowData = {};
+    const rowData = { ...baseFsxRow };
+
     headers.forEach((header, index) => {
       let value = columns[index];
-      if (!isNaN(value) && value !== "") {
-        value = parseFloat(value);
+      const mappedHeader = gsproToFsxMap[header];
+
+      if (mappedHeader) {
+        if (mappedHeader === 'club name') {
+          rowData[mappedHeader] = mapGSProClub(value);
+        } else {
+          if (!isNaN(value) && value !== "") {
+            value = parseFloat(value);
+          }
+          rowData[mappedHeader] = value;
+        }
       }
-      rowData[header] = value;
     });
-    data.push(rowData);
-  }
 
-  return data;
-}
+    // Si no hay velocidad de palo (0 o nulo), establecer como "-"
+    if (rowData["club speed (mph)"] === 0 || isNaN(rowData["club speed (mph)"]) || rowData["club speed (mph)"] === "") {
+      rowData["club speed (mph)"] = "-";
+      rowData["efficiency"] = "-";
+      rowData["club path (deg out-in-/in-out+)"] = "-";
+      rowData["angle of attack (deg)"] = "-";
+      rowData["loft (deg)"] = "-";
+      rowData["lie (deg toe down-/toe up+)"] = "-";
+      rowData["club speed at impact location (mph)"] = "-";
+      rowData["face impact horizontal (mm toe-/heel+)"] = "-";
+      rowData["face impact vertical (mm low-/high+)"] = "-";
+      rowData["face to target (deg closed-/open+)"] = "-";
+      rowData["closure rate (deg/sec)"] = "-";
+    }
 
-// Parser para Trackman - TODO: Implementar mapeo de columnas
-function parseCSVTrackman(csvData) {
-  // TODO: Implementar parser para Trackman
-  // El CSV de Trackman tiene diferentes nombres de columnas que deben mapearse
-  // a los nombres estándar usados en la aplicación.
-  //
-  // Columnas esperadas de Trackman (ejemplo):
-  // - Club Speed, Ball Speed, Smash Factor, Launch Angle, Spin Rate, Carry, Total, etc.
-  //
-  // Deben mapearse a:
-  // - club speed (mph), ball speed (mph), efficiency, launch angle (deg), back spin (rpm), carry (yds), total distance (yds), etc.
+    // Respaldo infalible: Si el CSV derechamente no trae columna de tiro, aplicamos el secuencial
+    if (rowData["shot number"] === undefined || rowData["shot number"] === "") {
+      rowData["shot number"] = data.length + 1;
+    }
 
-  console.warn("Parser de Trackman no implementado aún. Usando parser genérico.");
+    // Fecha simulada
+    currentTime.setMinutes(currentTime.getMinutes() + 1);
+    const month = String(currentTime.getMonth() + 1).padStart(2, '0');
+    const day = String(currentTime.getDate()).padStart(2, '0');
+    const year = currentTime.getFullYear();
+    const hours = String(currentTime.getHours()).padStart(2, '0');
+    const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+    const seconds = String(currentTime.getSeconds()).padStart(2, '0');
+    rowData["shot created date"] = `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
 
-  const lines = csvData.split("\n").filter((line) => line.trim() !== "");
-  if (lines.length < 2) return [];
-
-  const headers = lines[0].split(",").map((header) => header.trim().toLowerCase());
-  const data = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const columns = lines[i].split(",").map((col) => col.trim());
-    if (columns.length < headers.length) continue;
-
-    const rowData = {};
-    headers.forEach((header, index) => {
-      let value = columns[index];
-      if (!isNaN(value) && value !== "") {
-        value = parseFloat(value);
-      }
-      rowData[header] = value;
-    });
     data.push(rowData);
   }
 
