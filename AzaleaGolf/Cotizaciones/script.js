@@ -634,6 +634,7 @@ function renderPresentacionesTable() {
       <td style="white-space:nowrap">
         <button class="btn-sm btn-primary" onclick="window._pdfPres('${p.id}')">PDF</button>
         <button class="btn-sm" onclick="window._editPres('${p.id}')" style="margin:0 4px">Editar</button>
+        <button class="btn-sm" onclick="window._dupPres('${p.id}')" style="margin-right:4px">Duplicar</button>
         <button class="btn-sm btn-danger" onclick="window._deletePres('${p.id}')">Eliminar</button>
       </td>
     </tr>
@@ -1505,9 +1506,21 @@ window._editCot   = (id) => { const c = cotizaciones.find(x => x.id === id);   i
 window._deleteCot = (id) => deleteCotizacion(id);
 window._pdfCot    = (id) => { const c = cotizaciones.find(x => x.id === id);   if (c) generateCotizacionPDF(c); };
 
-window._editPres  = (id) => { const p = presentaciones.find(x => x.id === id); if (p) openEditPresentacionForm(p); };
+window._editPres   = (id) => { const p = presentaciones.find(x => x.id === id); if (p) openEditPresentacionForm(p); };
 window._deletePres = (id) => deletePresentacion(id);
-window._pdfPres   = async (id) => { const p = presentaciones.find(x => x.id === id); if (p) await generatePresentacionPDF(p); };
+window._pdfPres    = async (id) => { const p = presentaciones.find(x => x.id === id); if (p) await generatePresentacionPDF(p); };
+window._dupPres    = async (id) => {
+  const p = presentaciones.find(x => x.id === id);
+  if (!p) return;
+  const { id: _id, ...datos } = p;
+  await addDoc(collection(db, "Presentaciones"), {
+    ...datos,
+    titulo: `${p.titulo} (copia)`,
+    fecha: todayStr(),
+    createdAt: serverTimestamp(),
+  });
+  await loadPresentaciones();
+};
 
 // ══════════════════════════════════════════════════════════════════════════════
 // INIT
