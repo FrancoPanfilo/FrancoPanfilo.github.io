@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cotizaciones y Presentaciones</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../nav.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script defer src="../login.js"></script>
+    <script defer type="module" src="../db.js"></script>
+  </head>
+  <body>
+    <nav>
+      <div class="logo" id="acceso">
+        <img src="../logo.jpg" alt="logo" />
+      </div>
+      <ul>
+        <li><a href="../index.html">Gestión de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+        <li><a href="../Stock/index.html">Stock</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
+        <li><a href="">Cotizaciones</a></li>
+        <li><a href="../Suscriptores/index.html">Members Club</a></li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+    <div class="menubar">
+      <ul>
+        <li><a href="../index.html">Gestión de Reservas</a></li>
+        <li><a href="../Cuponeras/index.html">Acuerdos</a></li>
+        <li><a href="../Clientes/index.html">Clientes</a></li>
+        <li><a href="../Historial/index.html">Historial</a></li>
+        <li><a href="../Stock/index.html">Stock</a></li>
+        <li><a href="../Simulador/index.html">PDF</a></li>
+        <li><a href="">Cotizaciones</a></li>
+        <li><a href="../Suscriptores/index.html">Members Club</a></li>
+      </ul>
+    </div>
+
+    <main>
+      <div class="cot-header" style="margin-bottom:10px">
+        <h1>Documentos Comerciales</h1>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="cotizaciones">Cotizaciones</button>
+        <button class="tab-btn" data-tab="presentaciones">Presentaciones de Productos</button>
+      </div>
+
+      <!-- Tab: Cotizaciones -->
+      <div id="tab-cotizaciones" class="tab-content active">
+        <div class="tab-actions">
+          <button id="btnNuevaCotizacion" class="btn-primary">+ Nueva Cotización</button>
+          <button id="btnGestionarCatalogo">Gestionar Catálogo</button>
+        </div>
+        <table id="cotizacionesTable">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cotizacionesBody">
+            <tr><td colspan="5" style="text-align:center;color:#888;padding:20px">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tab: Presentaciones -->
+      <div id="tab-presentaciones" class="tab-content">
+        <div class="tab-actions">
+          <button id="btnNuevaPresentacion" class="btn-primary">+ Nueva Presentación</button>
+          <button id="btnGestionarMarcas">Gestionar Marcas</button>
+        </div>
+        <table id="presentacionesTable">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Productos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="presentacionesBody">
+            <tr><td colspan="5" style="text-align:center;color:#888;padding:20px">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- ══════════════════════════════════════════
+         MODAL: Formulario nueva/editar cotización
+    ══════════════════════════════════════════ -->
+    <div id="formModal" class="modal">
+      <div class="modal-content modal-wide">
+        <span class="close" id="closeFormModal">&times;</span>
+        <h2 id="formModalTitle">Nueva Cotización</h2>
+
+        <div class="form-section">
+          <h3>Cliente</h3>
+          <div class="form-row">
+            <label>
+              Empresa / Cliente *
+              <input type="text" id="inputCliente" placeholder="Nombre de la empresa" required />
+            </label>
+            <label>
+              Logo del cliente (opcional)
+              <input type="file" id="inputLogoCliente" accept="image/*" />
+              <span class="logo-hint">PNG o JPG, máx. 200 KB recomendado</span>
+            </label>
+          </div>
+          <img id="previewLogoCliente" class="logo-preview" alt="Logo cliente" />
+        </div>
+
+        <div class="form-section">
+          <h3>Artículos</h3>
+          <div class="items-toolbar">
+            <button type="button" id="btnAgregarCatalogo" class="btn-primary btn-sm">+ Agregar del catálogo</button>
+            <button type="button" id="btnAgregarNuevo" class="btn-sm">+ Artículo nuevo</button>
+          </div>
+          <div class="items-table-wrapper">
+            <table id="itemsTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Artículo</th>
+                  <th>Marca</th>
+                  <th>Cant.</th>
+                  <th>Precio c/IVA</th>
+                  <th>Desc. %</th>
+                  <th>P. Desc.</th>
+                  <th>Bordado/Impr. ($/u)</th>
+                  <th>P. Final</th>
+                  <th>Cat.</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="itemsTableBody"></tbody>
+            </table>
+          </div>
+          <datalist id="catalogSuggestions"></datalist>
+        </div>
+
+        <div class="totals-section">
+          <div class="totals-grid">
+            <span>Subtotal lista:</span>        <span id="totalSubtotalLista">$0,00</span>
+            <span>Descuento total:</span>        <span id="totalDescuento">-$0,00</span>
+            <span>Subtotal neto:</span>          <span id="totalSubtotalNeto">$0,00</span>
+            <span>Bordado / Impresión:</span>    <span id="totalBordado">$0,00</span>
+            <span class="total-final-label">TOTAL FINAL:</span>
+            <span class="total-final-value" id="totalFinal">$0,00</span>
+          </div>
+        </div>
+
+        <div class="form-section" style="margin-top:16px">
+          <h3>Condiciones</h3>
+          <div class="form-row">
+            <label>
+              Condiciones de pago
+              <textarea id="inputCondicionesPago" placeholder="Ej: 50% adelanto, 50% contra entrega"></textarea>
+            </label>
+            <label>
+              Tiempo de entrega
+              <textarea id="inputTiempoEntrega" placeholder="Ej: 15 días hábiles desde aprobación"></textarea>
+            </label>
+          </div>
+          <div class="form-row">
+            <label style="flex:1;min-width:100%">
+              Notas / Observaciones
+              <textarea id="inputNotas" placeholder="Mínimos de cantidad, aclaraciones, etc."></textarea>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="button" id="btnCancelarForm">Cancelar</button>
+          <button type="button" id="btnGuardar" class="btn-primary">Guardar</button>
+          <button type="button" id="btnGuardarPDF" class="btn-primary">Guardar y generar PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         MODAL: Selector del catálogo (compartido)
+    ══════════════════════════════════════════ -->
+    <div id="catalogoModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeCatalogoModal">&times;</span>
+        <h2>Seleccionar del catálogo</h2>
+        <input type="text" id="catalogSearch" class="catalog-search" placeholder="Buscar por artículo o marca..." />
+        <table id="catalogTable">
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>Artículo</th>
+              <th>Marca</th>
+              <th>Precio c/IVA</th>
+              <th>Cant. mín.</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="catalogBody">
+            <tr><td colspan="6" style="text-align:center;color:#888">Sin artículos en el catálogo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         MODAL: Gestión del catálogo
+    ══════════════════════════════════════════ -->
+    <div id="gestionCatalogoModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeGestionModal">&times;</span>
+        <h2>Gestionar catálogo de artículos</h2>
+        <div style="margin-bottom:10px">
+          <button type="button" id="btnNuevoArticulo" class="btn-primary btn-sm">+ Nuevo artículo</button>
+        </div>
+        <table id="gestionCatalogoTable">
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>Artículo</th>
+              <th>Marca</th>
+              <th>Precio</th>
+              <th>Cant. mín.</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="gestionCatalogoBody">
+            <tr><td colspan="6" style="text-align:center;color:#888">Sin artículos</td></tr>
+          </tbody>
+        </table>
+
+        <div id="articuloForm" style="display:none;margin-top:16px;padding:12px;background:#f9f9f9;border-radius:6px;">
+          <h3 style="margin:0 0 10px;font-size:13px;color:#009879;text-transform:uppercase">Artículo</h3>
+          <input type="hidden" id="articuloEditId" />
+          <div class="form-row">
+            <label>Nombre<input type="text" id="articuloNombre" /></label>
+            <label>Marca<input type="text" id="articuloMarca" /></label>
+            <label>Precio c/IVA<input type="number" id="articuloPrecio" min="0" step="0.01" /></label>
+            <label>Cant. mínima<input type="number" id="articuloCantMin" min="0" step="1" placeholder="0" /></label>
+          </div>
+          <div class="form-row" style="align-items:flex-start">
+            <label style="flex:1">
+              Foto del producto
+              <input type="file" id="articuloFotoFile" accept="image/*" />
+              <input type="text" id="articuloFotoUrl" placeholder="O pegá una URL de imagen" style="margin-top:4px" />
+            </label>
+            <div style="margin-top:20px">
+              <img id="articuloFotoPreview" class="logo-preview" style="max-height:70px;max-width:100px" alt="preview" />
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" id="btnGuardarArticulo" class="btn-primary btn-sm">Guardar</button>
+            <button type="button" id="btnCancelarArticulo" class="btn-sm">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         MODAL: Nueva / Editar Presentación
+    ══════════════════════════════════════════ -->
+    <div id="formPresentacionModal" class="modal">
+      <div class="modal-content modal-wide">
+        <span class="close" id="closePresModal">&times;</span>
+        <h2 id="presModalTitle">Nueva Presentación</h2>
+
+        <!-- Sección: encabezado -->
+        <div class="form-section">
+          <h3>Encabezado</h3>
+          <div class="form-row">
+            <label>
+              Título de la presentación *
+              <input type="text" id="presTitulo" placeholder="Ej: Presentación Corporativa Banco XYZ" />
+            </label>
+            <label>
+              Empresa / Cliente *
+              <input type="text" id="presCliente" placeholder="Nombre del cliente" />
+            </label>
+            <label>
+              Logo del cliente (opcional)
+              <input type="file" id="presLogoFile" accept="image/*" />
+              <span class="logo-hint">PNG o JPG</span>
+            </label>
+          </div>
+          <img id="presLogoPreview" class="logo-preview" alt="Logo cliente presentación" />
+          <div style="margin-top:10px">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+              <input type="checkbox" id="presConIva" style="width:auto;padding:0" />
+              Precios con IVA incluido
+            </label>
+          </div>
+        </div>
+
+        <!-- Sección: productos -->
+        <div class="form-section">
+          <h3>Productos</h3>
+          <div class="items-toolbar">
+            <button type="button" id="btnAgregarProdCatalogo" class="btn-primary btn-sm">+ Agregar del catálogo</button>
+            <button type="button" id="btnAgregarProdNuevo" class="btn-sm">+ Producto manual</button>
+          </div>
+          <div class="items-table-wrapper">
+            <table id="prodTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Foto</th>
+                  <th>Nombre</th>
+                  <th>Marca / Logo</th>
+                  <th>Precio (U$S)</th>
+                  <th>Cant. mínima</th>
+                  <th>Tipo / Precio (U$S/u)</th>
+                  <th>Plazo entrega</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="prodTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="button" id="btnCancelarPres">Cancelar</button>
+          <button type="button" id="btnGuardarPres" class="btn-primary">Guardar</button>
+          <button type="button" id="btnGuardarPDFPres" class="btn-primary">Guardar y generar PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         MODAL: Gestión de logos de marcas
+    ══════════════════════════════════════════ -->
+    <div id="gestionMarcasModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeGestionMarcasModal">&times;</span>
+        <h2>Logos de marcas</h2>
+        <div style="margin-bottom:10px">
+          <button type="button" id="btnNuevaMarca" class="btn-primary btn-sm">+ Nueva marca</button>
+        </div>
+        <table id="gestionMarcasTable">
+          <thead>
+            <tr>
+              <th>Logo</th>
+              <th>Marca</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="gestionMarcasBody">
+            <tr><td colspan="3" style="text-align:center;color:#888">Sin marcas guardadas</td></tr>
+          </tbody>
+        </table>
+
+        <div id="marcaForm" style="display:none;margin-top:16px;padding:12px;background:#f9f9f9;border-radius:6px;">
+          <h3 style="margin:0 0 10px;font-size:13px;color:#009879;text-transform:uppercase">Marca</h3>
+          <input type="hidden" id="marcaEditId" />
+          <div class="form-row">
+            <label>
+              Nombre de la marca
+              <input type="text" id="marcaNombre" placeholder="Ej: Adidas" />
+            </label>
+          </div>
+          <div class="form-row" style="align-items:flex-start">
+            <label style="flex:1">
+              Logo de la marca
+              <input type="file" id="marcaLogoFile" accept="image/*" />
+              <input type="text" id="marcaLogoUrl" placeholder="O pegá una URL de imagen" style="margin-top:4px" />
+            </label>
+            <div style="margin-top:20px;margin-left:12px">
+              <img id="marcaLogoPreview" class="logo-preview" style="max-height:60px;max-width:100px" alt="preview" />
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" id="btnGuardarMarca" class="btn-primary btn-sm">Guardar</button>
+            <button type="button" id="btnCancelarMarca" class="btn-sm">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
