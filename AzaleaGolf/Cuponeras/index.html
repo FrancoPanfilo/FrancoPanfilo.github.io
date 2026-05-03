@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -128,5 +128,746 @@
         </form>
       </div>
     </div>
+    <!-- ///// Prueba boton para cargar  -->
+
+    <!-- AZALEA GOLF - Widget Publicar Palo -->
+    <style>
+      .golf-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(2px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .golf-modal-overlay.open {
+        display: flex;
+      }
+      .golf-modal {
+        position: relative;
+        width: 100%;
+        max-width: 540px;
+        max-height: 90vh;
+        overflow-y: auto;
+        background: #f5f5f5;
+        border-radius: 4px;
+        padding: 28px 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+      .golf-modal-close {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background: #e2e2e2;
+        color: #111;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+      .golf-modal-close:hover {
+        background: #cdcdcd;
+      }
+      .golf-btn-open {
+        display: inline-block;
+        padding: 15px 32px;
+        background: #111;
+        color: #fff;
+        border: none;
+        border-radius: 0;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: "Jost", Arial, sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        transition: background 0.2s;
+      }
+      .golf-btn-open:hover {
+        background: #ff6f61;
+      }
+      .golf-widget {
+        box-sizing: border-box;
+        font-family: "Jost", Arial, sans-serif;
+        max-width: 520px;
+        margin: 0 auto;
+        color: #525252;
+      }
+      .golf-widget *,
+      .golf-widget *::before,
+      .golf-widget *::after {
+        box-sizing: border-box;
+      }
+      .golf-widget .card {
+        background: #fff;
+        border: 1px solid #e2e2e2;
+        border-radius: 4px;
+        padding: 20px;
+        margin-bottom: 14px;
+      }
+      .golf-widget .trail {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .golf-widget .trail:empty {
+        display: none;
+      }
+      .golf-widget .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 4px 4px 10px;
+        background: #fff5f4;
+        color: #ff6f61;
+        border: 1px solid #ffc9c4;
+        border-radius: 999px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .golf-widget .chip .lbl {
+        color: #767676;
+        font-weight: 400;
+        margin-right: 5px;
+      }
+      .golf-widget .chip .val {
+        font-weight: 600;
+      }
+      .golf-widget .chip .x {
+        background: none;
+        border: none;
+        color: #ff6f61;
+        cursor: pointer;
+        padding: 0 6px 0 5px;
+        font-size: 16px;
+        line-height: 1;
+        opacity: 0.6;
+        font-weight: 700;
+        font-family: inherit;
+      }
+      .golf-widget .chip .x:hover {
+        opacity: 1;
+      }
+      .golf-widget .step-num {
+        font-size: 11px;
+        font-weight: 600;
+        color: #ff6f61;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 4px;
+      }
+      .golf-widget .step-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #111;
+      }
+      .golf-widget select,
+      .golf-widget input[type="text"],
+      .golf-widget input[type="email"],
+      .golf-widget input[type="tel"],
+      .golf-widget input[type="number"] {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #e2e2e2;
+        border-radius: 4px;
+        font-size: 14px;
+        background: #fff;
+        font-family: "Jost", Arial, sans-serif;
+        color: #111;
+      }
+      .golf-widget select:focus,
+      .golf-widget input:focus {
+        outline: none;
+        border-color: #ff6f61;
+        box-shadow: 0 0 0 2px rgba(255, 111, 97, 0.15);
+      }
+      .golf-widget .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .golf-widget .done-msg {
+        padding: 10px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+        margin-bottom: 14px;
+      }
+      .golf-widget .done-msg .palo-name {
+        font-weight: 700;
+        color: #111;
+      }
+      .golf-widget button {
+        padding: 9px 14px;
+        border: 1px solid #e2e2e2;
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        color: #111;
+      }
+      .golf-widget button:hover {
+        background: #f5f5f5;
+      }
+      .golf-widget .btn-reset {
+        font-size: 12px;
+        color: #767676;
+        border: none;
+        padding: 6px 0;
+        background: none;
+        text-decoration: underline;
+      }
+      .golf-widget .btn-reset:hover {
+        color: #111;
+        background: none;
+      }
+      .golf-widget .field-group {
+        margin-bottom: 14px;
+      }
+      .golf-widget .field-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 5px;
+      }
+      .golf-widget .field-hint {
+        font-size: 11px;
+        color: #a0a0a0;
+        margin-top: 3px;
+      }
+      .golf-widget .photos-area {
+        border: 2px dashed #e2e2e2;
+        border-radius: 4px;
+        padding: 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .golf-widget .photos-area:hover,
+      .golf-widget .photos-area.drag-over {
+        border-color: #ff6f61;
+        background: #fff5f4;
+      }
+      .golf-widget .photos-area input {
+        display: none;
+      }
+      .golf-widget .photos-area .ph-text {
+        font-size: 13px;
+        color: #767676;
+      }
+      .golf-widget .photos-area .ph-text strong {
+        color: #ff6f61;
+      }
+      .golf-widget .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .golf-widget .photo-thumb {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 4px;
+        overflow: hidden;
+        border: 1px solid #e2e2e2;
+      }
+      .golf-widget .photo-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .golf-widget .photo-thumb .rm {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: none;
+        font-size: 12px;
+        line-height: 18px;
+        text-align: center;
+        cursor: pointer;
+        padding: 0;
+      }
+      .golf-widget .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: #111;
+        color: #fff;
+        border: none;
+        border-radius: 0;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .golf-widget .btn-submit:hover {
+        background: #ff6f61;
+      }
+      .golf-widget .btn-submit:disabled {
+        background: #cdcdcd;
+        cursor: not-allowed;
+      }
+      .golf-widget .success {
+        text-align: center;
+        padding: 40px 20px;
+      }
+      .golf-widget .success .icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      .golf-widget .success .msg {
+        font-size: 15px;
+        color: #525252;
+        line-height: 1.6;
+      }
+      .golf-widget .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+    </style>
+
+    <button class="golf-btn-open" onclick="abrirModal()">
+      Publicar mi palo
+    </button>
+
+    <div
+      class="golf-modal-overlay"
+      id="golf-overlay"
+      onclick="if (event.target === this) cerrarModal();"
+    >
+      <div class="golf-modal">
+        <button class="golf-modal-close" onclick="cerrarModal()">×</button>
+        <div class="golf-widget" id="golf-widget">
+          <div class="card">
+            <div class="trail" id="trail"></div>
+            <div id="step"></div>
+          </div>
+          <div id="form-extra" style="display: none"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const PALOS_URL =
+        "https://francopanfilo.github.io/AzaleaGolf/Datos/palos-golf.json";
+      let PALOS = [];
+      async function initWidget() {
+        try {
+          const r = await fetch(PALOS_URL);
+          PALOS = await r.json();
+          render();
+        } catch (e) {
+          document.getElementById("step").innerHTML =
+            '<div style="color:#dc2626;padding:12px;text-align:center;">Error cargando datos.</div>';
+        }
+      }
+      const $ = (id) => document.getElementById(id);
+      const TIPO_LABELS = {
+        driver: "Driver",
+        madera: "Madera",
+        hibrido: "Híbrido",
+        hierros: "Hierros",
+        wedge: "Wedge",
+        putter: "Putter",
+      };
+      const TIPO_ORDEN = [
+        "driver",
+        "madera",
+        "hibrido",
+        "hierros",
+        "wedge",
+        "putter",
+      ];
+      const LOFTS = {
+        driver: ["8°", "9°", "9.5°", "10.5°", "12°"],
+        madera: [
+          "13°",
+          "13.5°",
+          "15° (3W)",
+          "16.5°",
+          "18° (5W)",
+          "21° (7W)",
+          "24° (9W)",
+        ],
+        hibrido: [
+          "16°",
+          "17°",
+          "18°",
+          "19°",
+          "20°",
+          "21°",
+          "22°",
+          "23°",
+          "24°",
+          "25°",
+          "26°",
+          "27°",
+          "28°",
+        ],
+        wedge: [
+          "46°",
+          "48°",
+          "50°",
+          "52°",
+          "54°",
+          "56°",
+          "58°",
+          "60°",
+          "62°",
+          "64°",
+        ],
+      };
+      const SET_DESDE = ["3", "4", "5", "6", "7", "8"];
+      const SET_HASTA = ["8", "9", "PW", "AW (GW)", "SW", "LW"];
+      const state = {
+        marca: null,
+        tipo: null,
+        modelo: null,
+        version: null,
+        anio: null,
+        loft: null,
+        setDesde: null,
+        setHasta: null,
+      };
+      const photos = [];
+      const ORDEN_CAMPOS = [
+        "marca",
+        "tipo",
+        "modelo",
+        "version",
+        "anio",
+        "loft",
+        "setDesde",
+        "setHasta",
+      ];
+      function uniq(a) {
+        return [...new Set(a)];
+      }
+      function aniosDisponibles() {
+        return uniq(
+          PALOS.filter(
+            (p) =>
+              p.marca === state.marca &&
+              p.tipo === state.tipo &&
+              p.modelo === state.modelo &&
+              p.version === state.version,
+          ).map((p) => p.anio),
+        ).sort((a, b) => b - a);
+      }
+      function autoAvanzar() {
+        if (
+          state.marca &&
+          state.tipo &&
+          state.modelo &&
+          state.version &&
+          !state.anio
+        ) {
+          const a = aniosDisponibles();
+          if (a.length === 1) state.anio = a[0];
+        }
+      }
+      function pasoActivo() {
+        autoAvanzar();
+        if (!state.marca) return "marca";
+        if (!state.tipo) return "tipo";
+        if (!state.modelo) return "modelo";
+        if (!state.version) return "version";
+        if (!state.anio) return "anio";
+        if (state.tipo === "putter") return "done";
+        if (state.tipo === "hierros") {
+          if (!state.setDesde || !state.setHasta) return "extra";
+        } else if (!state.loft) return "extra";
+        return "done";
+      }
+      function volver(campo) {
+        const idx = ORDEN_CAMPOS.indexOf(campo);
+        ORDEN_CAMPOS.forEach((k, i) => {
+          if (i >= idx) state[k] = null;
+        });
+        render();
+      }
+      function setVal(campo, valor) {
+        state[campo] = valor || null;
+        render();
+      }
+      function chipsHTML() {
+        const chips = [];
+        if (state.marca) chips.push(["marca", "Marca", state.marca]);
+        if (state.tipo) chips.push(["tipo", "Tipo", TIPO_LABELS[state.tipo]]);
+        if (state.modelo) chips.push(["modelo", "Modelo", state.modelo]);
+        if (state.version) chips.push(["version", "Versión", state.version]);
+        if (state.anio) {
+          const a = aniosDisponibles();
+          if (a.length > 1) chips.push(["anio", "Año", state.anio]);
+        }
+        if (state.loft) chips.push(["loft", "Loft", state.loft]);
+        if (state.setDesde && state.setHasta)
+          chips.push([
+            "setDesde",
+            "Set",
+            `${state.setDesde}–${state.setHasta}`,
+          ]);
+        return chips
+          .map(
+            ([k, lbl, v]) =>
+              `<span class="chip"><span class="lbl">${lbl}:</span><span class="val">${v}</span><button class="x" onclick="volver('${k}')" title="Quitar">×</button></span>`,
+          )
+          .join("");
+      }
+      function selectStep(num, total, titulo, opts, campo) {
+        return `<div class="step-num">Paso ${num} de ${total}</div><div class="step-title">${titulo}</div><select onchange="setVal('${campo}',this.value)"><option value="">Elegir…</option>${opts}</select>`;
+      }
+      function modeloOptions() {
+        const g = {};
+        PALOS.filter(
+          (p) => p.marca === state.marca && p.tipo === state.tipo,
+        ).forEach((p) => {
+          if (!g[p.modelo])
+            g[p.modelo] = { modelo: p.modelo, max: p.anio, min: p.anio };
+          else {
+            g[p.modelo].max = Math.max(g[p.modelo].max, p.anio);
+            g[p.modelo].min = Math.min(g[p.modelo].min, p.anio);
+          }
+        });
+        return Object.values(g)
+          .sort((a, b) => b.max - a.max || a.modelo.localeCompare(b.modelo))
+          .map((g) => {
+            const yr = g.min === g.max ? `${g.max}` : `${g.min}–${g.max}`;
+            return `<option value="${g.modelo}">${g.modelo} (${yr})</option>`;
+          })
+          .join("");
+      }
+      function tipoOptions() {
+        const t = uniq(
+          PALOS.filter((p) => p.marca === state.marca).map((p) => p.tipo),
+        );
+        return TIPO_ORDEN.filter((x) => t.includes(x))
+          .map((x) => `<option value="${x}">${TIPO_LABELS[x]}</option>`)
+          .join("");
+      }
+      function versionOptions() {
+        return uniq(
+          PALOS.filter(
+            (p) =>
+              p.marca === state.marca &&
+              p.tipo === state.tipo &&
+              p.modelo === state.modelo,
+          ).map((p) => p.version),
+        )
+          .sort((a, b) => a.localeCompare(b, "es"))
+          .map((v) => `<option value="${v}">${v}</option>`)
+          .join("");
+      }
+      function anioOptions() {
+        return aniosDisponibles()
+          .map((a) => `<option value="${a}">${a}</option>`)
+          .join("");
+      }
+      function extraStepHTML() {
+        if (state.tipo === "hierros")
+          return `<div class="step-num">Paso final</div><div class="step-title">Composición del set</div><div class="row"><select onchange="setVal('setDesde',this.value)"><option value="">Desde…</option>${SET_DESDE.map((s) => `<option value="${s}" ${state.setDesde === s ? "selected" : ""}>${s}</option>`).join("")}</select><select onchange="setVal('setHasta',this.value)"><option value="">Hasta…</option>${SET_HASTA.map((s) => `<option value="${s}" ${state.setHasta === s ? "selected" : ""}>${s}</option>`).join("")}</select></div>`;
+        const l = LOFTS[state.tipo] || [];
+        return `<div class="step-num">Paso final</div><div class="step-title">Loft</div><select onchange="setVal('loft',this.value)"><option value="">Elegir loft…</option>${l.map((x) => `<option value="${x}">${x}</option>`).join("")}</select>`;
+      }
+      function paloFinal() {
+        return PALOS.find(
+          (p) =>
+            p.marca === state.marca &&
+            p.tipo === state.tipo &&
+            p.modelo === state.modelo &&
+            p.version === state.version &&
+            String(p.anio) === String(state.anio),
+        );
+      }
+      function paloResumen() {
+        const p = paloFinal();
+        if (!p) return "";
+        let e = "";
+        if (p.tipo === "hierros" && state.setDesde && state.setHasta)
+          e = ` · Set ${state.setDesde}–${state.setHasta}`;
+        else if (state.loft) e = ` · ${state.loft}`;
+        return `${p.marca} ${p.modelo} ${p.version} (${p.anio}) — ${TIPO_LABELS[p.tipo]}${e}`;
+      }
+      function render() {
+        $("trail").innerHTML = chipsHTML();
+        const paso = pasoActivo();
+        let html = "";
+        switch (paso) {
+          case "marca": {
+            const m = uniq(PALOS.map((p) => p.marca)).sort((a, b) =>
+              a.localeCompare(b, "es"),
+            );
+            html = selectStep(
+              1,
+              5,
+              "¿Qué marca?",
+              m.map((x) => `<option value="${x}">${x}</option>`).join(""),
+              "marca",
+            );
+            break;
+          }
+          case "tipo":
+            html = selectStep(
+              2,
+              5,
+              "¿Qué tipo de palo?",
+              tipoOptions(),
+              "tipo",
+            );
+            break;
+          case "modelo":
+            html = selectStep(3, 5, "¿Qué modelo?", modeloOptions(), "modelo");
+            break;
+          case "version":
+            html = selectStep(
+              4,
+              5,
+              "¿Qué versión?",
+              versionOptions(),
+              "version",
+            );
+            break;
+          case "anio":
+            html = selectStep(5, 5, "¿De qué año?", anioOptions(), "anio");
+            break;
+          case "extra":
+            html = extraStepHTML();
+            break;
+          case "done":
+            html = `<div class="done-msg"><span class="palo-name">${paloResumen()}</span></div><button class="btn-reset" onclick="reset()">← Cambiar palo</button>`;
+            break;
+        }
+        $("step").innerHTML = html;
+        renderFormExtra(paso === "done");
+      }
+      function renderFormExtra(show) {
+        const box = $("form-extra");
+        if (!show) {
+          box.style.display = "none";
+          return;
+        }
+        box.style.display = "block";
+        box.innerHTML = `<div class="card"><div class="field-group"><label class="field-label">Fotos (máx. 8)</label><div class="photos-area" id="photos-area" onclick="$('photo-input').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault();this.classList.remove('drag-over');addFiles(event.dataTransfer.files)"><input type="file" id="photo-input" accept="image/*" multiple onchange="addFiles(this.files)"><div class="ph-text"><strong>Click o arrastrá</strong> para subir fotos</div></div><div class="photos-grid" id="photos-grid"></div><div class="field-hint" id="photo-count">${photos.length}/8 fotos</div></div><div class="field-group"><label class="field-label">Precio de venta (USD)</label><input type="number" id="inp-precio" placeholder="Ej: 350" min="1" oninput="checkSubmit()"></div><div class="row2"><div class="field-group"><label class="field-label">Email</label><input type="email" id="inp-email" placeholder="tu@email.com" oninput="checkSubmit()"></div><div class="field-group"><label class="field-label">Teléfono</label><input type="tel" id="inp-tel" placeholder="+598 99 123 456" oninput="checkSubmit()"></div></div><button class="btn-submit" id="btn-enviar" disabled onclick="enviarForm()">Publicar palo</button></div>`;
+        renderPhotos();
+        checkSubmit();
+      }
+      function addFiles(files) {
+        for (const f of files) {
+          if (photos.length >= 8) break;
+          if (!f.type.startsWith("image/")) continue;
+          photos.push({ file: f, url: URL.createObjectURL(f) });
+        }
+        renderPhotos();
+        checkSubmit();
+      }
+      function removePhoto(i) {
+        URL.revokeObjectURL(photos[i].url);
+        photos.splice(i, 1);
+        renderPhotos();
+        checkSubmit();
+      }
+      function renderPhotos() {
+        const grid = $("photos-grid"),
+          count = $("photo-count");
+        if (!grid) return;
+        grid.innerHTML = photos
+          .map(
+            (p, i) =>
+              `<div class="photo-thumb"><img src="${p.url}" alt="Foto ${i + 1}"><button class="rm" onclick="event.stopPropagation();removePhoto(${i})">×</button></div>`,
+          )
+          .join("");
+        if (count) count.textContent = `${photos.length}/8 fotos`;
+        const area = $("photos-area");
+        if (area) area.style.display = photos.length >= 8 ? "none" : "";
+      }
+      function checkSubmit() {
+        const btn = $("btn-enviar");
+        if (!btn) return;
+        const p = $("inp-precio") && $("inp-precio").value.trim(),
+          e = $("inp-email") && $("inp-email").value.trim(),
+          t = $("inp-tel") && $("inp-tel").value.trim();
+        btn.disabled = !(photos.length > 0 && p && e && t);
+      }
+      const WEB3FORMS_KEY = "7c3ebe1f-1e99-450e-8fac-a1b94c2605e7";
+      async function enviarForm() {
+        const btn = $("btn-enviar");
+        btn.disabled = true;
+        btn.textContent = "Enviando…";
+        const form = new FormData();
+        form.append("access_key", WEB3FORMS_KEY);
+        form.append("subject", "Nuevo palo: " + paloResumen());
+        form.append("Palo", paloResumen());
+        form.append("Precio USD", $("inp-precio").value);
+        form.append("Email", $("inp-email").value);
+        form.append("Teléfono", $("inp-tel").value);
+        photos.forEach((p, i) =>
+          form.append(
+            "attachment",
+            p.file,
+            `foto-${i + 1}.${p.file.name.split(".").pop()}`,
+          ),
+        );
+        try {
+          const res = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: form,
+          });
+          const data = await res.json();
+          if (data.success) {
+            $("golf-widget").innerHTML =
+              `<div class="card success"><div class="icon">✓</div><div class="msg">¡Gracias! A la brevedad nos pondremos en contacto con usted para finalizar la publicación de sus artículos.</div></div>`;
+          } else {
+            btn.disabled = false;
+            btn.textContent = "Publicar palo";
+            alert("Error al enviar. Intentá de nuevo.");
+          }
+        } catch (e) {
+          btn.disabled = false;
+          btn.textContent = "Publicar palo";
+          alert("Error de conexión. Verificá tu internet e intentá de nuevo.");
+        }
+      }
+      function reset() {
+        Object.keys(state).forEach((k) => (state[k] = null));
+        photos.forEach((p) => URL.revokeObjectURL(p.url));
+        photos.length = 0;
+        render();
+      }
+      function abrirModal() {
+        $("golf-overlay").classList.add("open");
+        document.body.style.overflow = "hidden";
+        if (PALOS.length === 0) initWidget();
+      }
+      function cerrarModal() {
+        $("golf-overlay").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+    </script>
+    <!-- FIN Widget Publicar Palo -->
   </body>
 </html>
