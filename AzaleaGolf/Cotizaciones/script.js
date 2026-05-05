@@ -1302,9 +1302,20 @@ async function generatePresentacionPDF(pres) {
     docPdf.line(dataX, dy, PW - MR, dy);
     dy += 10;
 
-    // Helper para filas de datos
+    // Logo de marca — posición fija al pie del panel de datos
+    const LOGO_MARCA_Y = PH - 22;
+    const LOGO_MARCA_H = 13;
+    const LOGO_MARCA_W = 40;
+    if (marcaLogoImg) {
+      const logoBoxX = dataX + (dataW - LOGO_MARCA_W) / 2;
+      addImageFit(docPdf, marcaLogoImg, logoBoxX, LOGO_MARCA_Y, LOGO_MARCA_W, LOGO_MARCA_H);
+    }
+
+    // Helper para filas de datos (se detiene antes de pisar el logo)
+    const MAX_DATA_Y = marcaLogoImg ? LOGO_MARCA_Y - 4 : PH - 12;
     function dataRow(label, value) {
       if (value === "" || value === 0 || value === undefined || value === null) return;
+      if (dy + 14 > MAX_DATA_Y) return;
       docPdf.setFont("helvetica", "bold"); docPdf.setFontSize(7.5); docPdf.setTextColor(120, 120, 120);
       docPdf.text(label.toUpperCase(), dataX, dy);
       docPdf.setFont("helvetica", "bold"); docPdf.setFontSize(13); docPdf.setTextColor(20, 20, 20);
@@ -1321,14 +1332,6 @@ async function generatePresentacionPDF(pres) {
     if (prod.bordado)        dataRow(prod.tipoGrabado || "Bordado", prod.bordado);
     if (prod.plazo)          dataRow("Plazo de entrega",   prod.plazo);
     if (prod.talles)         dataRow("Talles disponibles", prod.talles);
-
-    // Logo de marca — centrado debajo de los datos (solo si hay espacio)
-    if (marcaLogoImg && dy + 32 < PH - 10) {
-      dy += 4;
-      const logoMaxW = 60, logoMaxH = 24;
-      const logoBoxX = dataX + (dataW - logoMaxW) / 2;
-      addImageFit(docPdf, marcaLogoImg, logoBoxX, dy, logoMaxW, logoMaxH);
-    }
 
     // Número de página (pie)
     docPdf.setFont("helvetica", "normal"); docPdf.setFontSize(7.5); docPdf.setTextColor(180, 180, 180);
