@@ -70,6 +70,25 @@ function formatNum(n) {
   });
 }
 
+const IVA_RATE = 0.22;
+
+function calcPrecioSinIva(precioPublico, descuento) {
+  const p = Number(precioPublico) || 0;
+  const d = Number(descuento) || 0;
+  return p * (1 - d / 100) / (1 + IVA_RATE);
+}
+
+function formatPrecio(n, moneda) {
+  const num = Number(n) || 0;
+  const dec = Number.isInteger(num) ? 0 : 2;
+  const fmt = num.toLocaleString("es-AR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  return moneda === "UYU" ? `$ ${fmt}` : `U$S ${fmt}`;
+}
+
+function getPresMoneda() {
+  return document.getElementById("presMoneda")?.value || "USD";
+}
+
 function formatDate(s) {
   if (!s) return "";
   const [y, m, d] = s.split("-");
@@ -690,16 +709,18 @@ function buildProdRow(item, index) {
         <button type="button" class="btn-foto-browse btn-sm brand-logo-btn" title="Cargar logo de marca" style="${marcaLogoData ? "display:none" : "display:inline"}">Logo</button>
       </div>
     </td>
-    <td><input type="number" class="prod-precio"  value="${item.precio||""}"          min="0" step="0.01" placeholder="0" style="width:75px" /></td>
-    <td><input type="number" class="prod-cantmin" value="${item.cantidadMinima||""}"  min="0" step="1"    placeholder="0" style="width:55px" /></td>
+    <td><input type="number" class="prod-pvp"    value="${(item.precioPublico ?? item.precio) || ''}" min="0" step="0.01" placeholder="0" style="width:80px" /></td>
+    <td><input type="number" class="prod-desc"   value="${item.descuento || 0}" min="0" max="100" step="1" style="width:55px" /></td>
+    <td class="prod-sin-iva" style="white-space:nowrap;font-weight:600;font-size:11px;padding:4px 6px;color:#009879">${(item.precioPublico ?? item.precio) ? formatPrecio(calcPrecioSinIva(item.precioPublico ?? item.precio ?? 0, item.descuento ?? 0), getPresMoneda()) : "—"}</td>
     <td>
       <select class="prod-tipo-grabado" style="width:100%;font-size:11px;margin-bottom:3px;padding:2px 3px">
         <option value="Bordado"   ${(item.tipoGrabado||"Bordado")==="Bordado"   ? "selected":""}>Bordado</option>
         <option value="Impresión" ${(item.tipoGrabado||"Bordado")==="Impresión" ? "selected":""}>Impresión</option>
       </select>
-      <input type="number" class="prod-bordado" value="${item.precioBordado||""}" min="0" step="0.01" placeholder="— sin precio" style="width:100%;box-sizing:border-box" />
+      <input type="text" class="prod-bordado" value="${escHtml(item.bordado||"")}" placeholder="Ej: $5/u" style="width:100%;box-sizing:border-box" />
     </td>
     <td><input type="text"   class="prod-plazo"   value="${escHtml(item.plazo||"")}"  placeholder="Ej: 15 días" style="width:80px" /></td>
+    <td><input type="text"   class="prod-talles"  value="${escHtml(item.talles||"")}" placeholder="S, M, L, XL"  style="width:90px" /></td>
     <td><button type="button" class="btn-sm btn-danger btn-remove-prod">✕</button></td>
   `;
 
@@ -710,21 +731,31 @@ function buildProdRow(item, index) {
     const fileInp = tr.querySelector(`.fs-file[data-slot="${si}"]`);
     const browseB = tr.querySelector(`.btn-foto-browse[data-slot="${si}"]`);
     browseB.addEventListener("click", () => fileInp.click());
-    fileInp.addEventListener("change", () => {
+    fileInp.addEventListener("change", async () => {
       const file = fileInp.files[0]; if (!file) return;
       if (file.size > 800000) alert("Imagen grande (>800 KB).");
-      const r = new FileReader();
-      r.onload = (e) => {
-        urlInp.value = e.target.result;
-        prev.src = e.target.result; prev.style.display = "";
-      };
-      r.readAsDataURL(file);
+      const objectUrl = URL.createObjectURL(file);
+      const dataUrl = await convertToJpeg(objectUrl);
+      URL.revokeObjectURL(objectUrl);
+      if (dataUrl) { urlInp.value = dataUrl; prev.src = dataUrl; prev.style.display = ""; }
     });
     urlInp.addEventListener("input", () => {
       const s = urlInp.value.trim();
       prev.src = s; prev.style.display = s ? "" : "none";
     });
   }
+
+  // ── PVP / Descuento → Precio s/IVA calculado ──
+  const pvpInp   = tr.querySelector(".prod-pvp");
+  const descInp  = tr.querySelector(".prod-desc");
+  const sinIvaTd = tr.querySelector(".prod-sin-iva");
+  function updateSinIva() {
+    const pvp  = Number(pvpInp.value)  || 0;
+    const desc = Number(descInp.value) || 0;
+    sinIvaTd.textContent = pvp ? formatPrecio(calcPrecioSinIva(pvp, desc), getPresMoneda()) : "—";
+  }
+  pvpInp.addEventListener("input",  updateSinIva);
+  descInp.addEventListener("input", updateSinIva);
 
   // ── Logo de marca ──
   const marcaInput    = tr.querySelector(".prod-marca");
@@ -782,10 +813,11 @@ function addProdRow(item = {}) {
 function selectProdCatalogItem(item) {
   addProdRow({
     nombre: item.nombre, marca: item.marca || "",
-    precio: item.precioUnitario || 0,
-    cantidadMinima: item.cantidadMinima || 0,
-    precioBordado: 0,
+    precioPublico: item.precioUnitario || 0,
+    descuento: 0,
+    talles: "",
     tipoGrabado: "Bordado",
+    bordado: "",
     plazo: "",
     fotos: item.foto ? [item.foto] : [],
   });
@@ -794,13 +826,14 @@ function selectProdCatalogItem(item) {
 
 function collectProdItems() {
   return Array.from(document.querySelectorAll("#prodTableBody tr")).map(tr => ({
-    nombre:        tr.querySelector(".prod-nombre")?.value.trim()  || "",
-    marca:         tr.querySelector(".prod-marca")?.value.trim()   || "",
-    precio:        Number(tr.querySelector(".prod-precio")?.value)   || 0,
-    cantidadMinima:Number(tr.querySelector(".prod-cantmin")?.value)  || 0,
-    precioBordado: Number(tr.querySelector(".prod-bordado")?.value)  || 0,
-    tipoGrabado:   tr.querySelector(".prod-tipo-grabado")?.value    || "Bordado",
-    plazo:         tr.querySelector(".prod-plazo")?.value.trim()   || "",
+    nombre:        tr.querySelector(".prod-nombre")?.value.trim()   || "",
+    marca:         tr.querySelector(".prod-marca")?.value.trim()    || "",
+    precioPublico: Number(tr.querySelector(".prod-pvp")?.value)   || 0,
+    descuento:     Number(tr.querySelector(".prod-desc")?.value)  || 0,
+    talles:        tr.querySelector(".prod-talles")?.value.trim() || "",
+    tipoGrabado:   tr.querySelector(".prod-tipo-grabado")?.value  || "Bordado",
+    bordado:       tr.querySelector(".prod-bordado")?.value.trim() || "",
+    plazo:         tr.querySelector(".prod-plazo")?.value.trim()  || "",
     fotos: [0,1,2,3].map(i => tr.querySelector(`.fs-url[data-slot="${i}"]`)?.value.trim() || "").filter(Boolean),
   }));
 }
@@ -814,7 +847,7 @@ function openNewPresentacionForm() {
   document.getElementById("presCliente").value  = "";
   document.getElementById("presLogoFile").value = "";
   document.getElementById("presLogoPreview").style.display = "none";
-  document.getElementById("presConIva").checked = false;
+  document.getElementById("presMoneda").value = "USD";
   document.getElementById("prodTableBody").innerHTML = "";
   document.getElementById("formPresentacionModal").style.display = "block";
 }
@@ -825,12 +858,19 @@ function openEditPresentacionForm(pres) {
   document.getElementById("presModalTitle").textContent = `Editar: ${pres.titulo || "presentación"}`;
   document.getElementById("presTitulo").value  = pres.titulo  || "";
   document.getElementById("presCliente").value = pres.cliente || "";
-  document.getElementById("presConIva").checked = pres.conIva || false;
+  document.getElementById("presMoneda").value = pres.moneda || "USD";
   const prev = document.getElementById("presLogoPreview");
   if (pres.logoCliente) { prev.src = pres.logoCliente; prev.style.display = "block"; }
   else                  { prev.style.display = "none"; }
   document.getElementById("prodTableBody").innerHTML = "";
-  (pres.productos || []).forEach(p => addProdRow(p));
+  (pres.productos || []).forEach(p => addProdRow({
+    ...p,
+    precioPublico: p.precioPublico ?? p.precio ?? 0,
+    descuento: p.descuento ?? 0,
+    talles: p.talles ?? "",
+    tipoGrabado: p.tipoGrabado ?? "Bordado",
+    bordado: p.bordado ?? "",
+  }));
   document.getElementById("formPresentacionModal").style.display = "block";
 }
 
@@ -845,11 +885,11 @@ async function savePresentacion(generatePdfAfter = false) {
   if (!cliente)          { alert("Ingresá el nombre del cliente."); return; }
   if (!productos.length) { alert("Agregá al menos un producto."); return; }
 
-  const conIva = document.getElementById("presConIva").checked;
+  const moneda = document.getElementById("presMoneda").value || "USD";
 
   const data = {
     titulo, cliente, logoCliente: logoPresentBase64 || null,
-    conIva,
+    moneda,
     fecha: editingPresId
       ? (presentaciones.find(p => p.id === editingPresId)?.fecha || todayStr())
       : todayStr(),
@@ -986,21 +1026,43 @@ function generateCotizacionPDF(cot) {
 // PDF — PRESENTACIÓN DE PRODUCTOS
 // ══════════════════════════════════════════════════════════════════════════════
 
+function convertToJpeg(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext("2d").drawImage(img, 0, 0);
+      resolve(c.toDataURL("image/jpeg", 0.88));
+    };
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
 async function loadImageAsBase64(src) {
   if (!src) return null;
-  if (src.startsWith("data:")) return src;
+  if (src.startsWith("data:")) {
+    if (!src.includes("image/png") && !src.includes("image/jpeg") && !src.includes("image/jpg"))
+      return await convertToJpeg(src);
+    return src;
+  }
 
   // Intenta fetch directo primero; si falla por CORS usa proxy
   const tryFetch = async (url) => {
     const res = await fetch(url);
     if (!res.ok) throw new Error("fetch failed");
     const blob = await res.blob();
-    return new Promise((resolve, reject) => {
+    const dataUrl = await new Promise((resolve, reject) => {
       const r = new FileReader();
       r.onload  = (e) => resolve(e.target.result);
       r.onerror = () => reject(new Error("reader failed"));
       r.readAsDataURL(blob);
     });
+    // Convierte formatos no soportados por jsPDF (AVIF, WebP, etc.) a JPEG
+    if (!dataUrl.includes("image/png") && !dataUrl.includes("image/jpeg") && !dataUrl.includes("image/jpg"))
+      return await convertToJpeg(dataUrl);
+    return dataUrl;
   };
 
   try {
@@ -1051,6 +1113,7 @@ function addImageCentered(docPdf, imgData, fmt, boxX, boxY, boxW, boxH) {
 
 async function generatePresentacionPDF(pres) {
   const { jsPDF } = window.jspdf;
+  const moneda = pres.moneda || "USD";
 
   const productos = pres.productos || [];
 
@@ -1246,20 +1309,23 @@ async function generatePresentacionPDF(pres) {
       docPdf.text(label.toUpperCase(), dataX, dy);
       docPdf.setFont("helvetica", "bold"); docPdf.setFontSize(13); docPdf.setTextColor(20, 20, 20);
       docPdf.text(String(value), dataX, dy + 7);
-      dy += 20;
+      dy += 17;
     }
 
-    const ivaLabel = pres.conIva ? "c/IVA" : "s/IVA";
-    if (prod.marca)          dataRow("Marca",                               prod.marca);
-    if (prod.precio)         dataRow(`Precio (${ivaLabel})`,                formatUSD(prod.precio));
-    if (prod.cantidadMinima) dataRow("Cantidad mínima",                     `${formatNum(prod.cantidadMinima)} unidades`);
-    if (prod.precioBordado)  dataRow(`${prod.tipoGrabado || "Bordado"} (${ivaLabel})`, `${formatUSD(prod.precioBordado)} / unidad`);
-    if (prod.plazo)          dataRow("Plazo de entrega",                    prod.plazo);
+    const pvp  = prod.precioPublico ?? prod.precio ?? 0;
+    const desc = prod.descuento ?? 0;
+    if (prod.marca)          dataRow("Marca",              prod.marca);
+    if (pvp)                 dataRow("PVP c/IVA",          formatPrecio(pvp, moneda));
+    if (desc)                dataRow("Descuento",          `${desc}%`);
+    if (pvp)                 dataRow("Su precio s/IVA",    formatPrecio(calcPrecioSinIva(pvp, desc), moneda));
+    if (prod.bordado)        dataRow(prod.tipoGrabado || "Bordado", prod.bordado);
+    if (prod.plazo)          dataRow("Plazo de entrega",   prod.plazo);
+    if (prod.talles)         dataRow("Talles disponibles", prod.talles);
 
-    // Logo de marca — centrado debajo del plazo de entrega
-    if (marcaLogoImg) {
+    // Logo de marca — centrado debajo de los datos (solo si hay espacio)
+    if (marcaLogoImg && dy + 32 < PH - 10) {
       dy += 4;
-      const logoMaxW = 60, logoMaxH = 28;
+      const logoMaxW = 60, logoMaxH = 24;
       const logoBoxX = dataX + (dataW - logoMaxW) / 2;
       addImageFit(docPdf, marcaLogoImg, logoBoxX, dy, logoMaxW, logoMaxH);
     }
@@ -1460,6 +1526,16 @@ function setupEventListeners() {
       p.src = logoPresentBase64; p.style.display = "block";
     };
     r.readAsDataURL(file);
+  });
+
+  document.getElementById("presMoneda").addEventListener("change", function() {
+    const moneda = this.value;
+    document.querySelectorAll("#prodTableBody tr").forEach(tr => {
+      const pvp  = Number(tr.querySelector(".prod-pvp")?.value)  || 0;
+      const desc = Number(tr.querySelector(".prod-desc")?.value) || 0;
+      const cell = tr.querySelector(".prod-sin-iva");
+      if (cell) cell.textContent = pvp ? formatPrecio(calcPrecioSinIva(pvp, desc), moneda) : "—";
+    });
   });
 
   // ── Gestión de marcas ──

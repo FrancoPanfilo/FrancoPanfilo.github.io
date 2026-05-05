@@ -300,9 +300,12 @@
           </div>
           <img id="presLogoPreview" class="logo-preview" alt="Logo cliente presentación" />
           <div style="margin-top:10px">
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
-              <input type="checkbox" id="presConIva" style="width:auto;padding:0" />
-              Precios con IVA incluido
+            <label style="font-size:12px;display:flex;flex-direction:column;gap:4px;max-width:160px">
+              Moneda
+              <select id="presMoneda" style="padding:5px 8px;font-size:12px;border:1px solid #ccc;border-radius:4px">
+                <option value="USD">U$S (dólares)</option>
+                <option value="UYU">$ (pesos)</option>
+              </select>
             </label>
           </div>
         </div>
@@ -322,10 +325,12 @@
                   <th>Foto</th>
                   <th>Nombre</th>
                   <th>Marca / Logo</th>
-                  <th>Precio (U$S)</th>
-                  <th>Cant. mínima</th>
-                  <th>Tipo / Precio (U$S/u)</th>
+                  <th>PVP c/IVA</th>
+                  <th>Desc. %</th>
+                  <th>Precio s/IVA</th>
+                  <th>Bordado / Impr.</th>
                   <th>Plazo entrega</th>
+                  <th>Talles</th>
                   <th></th>
                 </tr>
               </thead>

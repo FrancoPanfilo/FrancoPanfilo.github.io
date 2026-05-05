@@ -340,7 +340,7 @@ textarea { resize: vertical; min-height: 56px; }
   font-size: 12px;
   box-shadow: none;
   margin-top: 0;
-  min-width: 700px;
+  min-width: 950px;
 }
 #prodTable thead th {
   padding: 8px 6px;
