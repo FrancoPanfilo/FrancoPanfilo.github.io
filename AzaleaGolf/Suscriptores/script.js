@@ -143,14 +143,17 @@ document.addEventListener("DOMContentLoaded", function () {
   const formSesion = document.getElementById("form-sesion-container");
   const formTarjeta = document.getElementById("form-tarjeta-container");
   const formTorneo = document.getElementById("form-torneo-container");
+  const formEditarTorneo = document.getElementById("form-editar-torneo-container");
 
   function mostrarFormulario(accion) {
     formSesion.style.display = "none";
     formTarjeta.style.display = "none";
     formTorneo.style.display = "none";
+    formEditarTorneo.style.display = "none";
     if (accion === "sesion") formSesion.style.display = "";
     if (accion === "tarjeta") formTarjeta.style.display = "";
     if (accion === "torneo") formTorneo.style.display = "";
+    if (accion === "editar-torneo") formEditarTorneo.style.display = "";
   }
 
   select.addEventListener("change", function () {
@@ -261,6 +264,80 @@ async function poblarSelectUsuarios() {
 document.addEventListener("DOMContentLoaded", () => {
   poblarSelectTorneos();
   poblarSelectUsuarios();
+
+  // Cargar tees cuando se selecciona un torneo en el form de tarjeta
+  const selectTorneo = document.getElementById("select-torneo");
+  const selectTee = document.getElementById("select-tee-tarjeta");
+  const seccionTee = document.getElementById("seccion-tee-tarjeta");
+  const ajusteInfo = document.getElementById("tee-ajuste-info");
+  const ajusteValor = document.getElementById("tee-ajuste-valor");
+
+  selectTorneo?.addEventListener("change", async function () {
+    const torneoId = this.value;
+    selectTee.innerHTML = '<option value="">Selecciona el tee</option>';
+    seccionTee.style.display = "none";
+    ajusteInfo.style.display = "none";
+    document.getElementById("handicap-efectivo-box").style.display = "none";
+
+    if (!torneoId) return;
+
+    try {
+      const torneoSnap = await getDoc(doc(db, "Torneos", torneoId));
+      if (!torneoSnap.exists()) return;
+      const data = torneoSnap.data();
+
+      // Tee principal
+      const cancha = data.cancha || {};
+      const principalColor = cancha.tee_color || TEE_COLORS.find(t => t.nombre === cancha.tee_salida)?.color || '#ffffff';
+      const optPrincipal = document.createElement("option");
+      optPrincipal.value = cancha.tee_salida || "Blanco";
+      optPrincipal.textContent = `${cancha.tee_salida || "Blanco"} (principal)`;
+      optPrincipal.dataset.ajuste = "0";
+      optPrincipal.dataset.color = principalColor;
+      selectTee.appendChild(optPrincipal);
+
+      // Tees adicionales
+      (data.tees_adicionales || []).forEach((tee) => {
+        const teeCol = tee.color || TEE_COLORS.find(t => t.nombre === tee.nombre)?.color || '#ffffff';
+        const opt = document.createElement("option");
+        opt.value = tee.nombre;
+        const signo = tee.ajuste_handicap >= 0 ? "+" : "";
+        opt.textContent = `${tee.nombre} (${signo}${tee.ajuste_handicap} hcp)`;
+        opt.dataset.ajuste = tee.ajuste_handicap;
+        opt.dataset.color = teeCol;
+        selectTee.appendChild(opt);
+      });
+
+      seccionTee.style.display = "";
+    } catch (err) {
+      console.error("Error cargando tees:", err);
+    }
+  });
+
+  // Actualizar info de ajuste, color swatch y scores cuando cambia el tee
+  selectTee?.addEventListener("change", function () {
+    const selected = this.options[this.selectedIndex];
+    const ajuste = parseFloat(selected?.dataset.ajuste) || 0;
+    if (ajuste !== 0) {
+      const signo = ajuste > 0 ? "+" : "";
+      ajusteValor.textContent = `${signo}${ajuste}`;
+      ajusteInfo.style.display = "";
+    } else {
+      ajusteInfo.style.display = "none";
+    }
+    // Mostrar swatch de color
+    const preview = document.getElementById("tee-color-preview");
+    if (preview && this.value) {
+      const color = selected?.dataset.color || '#ffffff';
+      const isWhite = color.toLowerCase() === '#ffffff';
+      preview.style.background = color;
+      preview.style.border = isWhite ? '2px solid #1a1a18' : '2px solid transparent';
+      preview.style.display = 'inline-block';
+    } else if (preview) {
+      preview.style.display = 'none';
+    }
+    actualizarScoresTarjeta();
+  });
 });
 
 // --- GUARDAR FORMULARIO DE TORNEO ---
@@ -275,6 +352,7 @@ document.getElementById("torneoForm")?.addEventListener("submit", async (e) => {
     cancha: {
       nombre: form.cancha_nombre.value,
       tee_salida: form.tee_salida.value,
+      tee_color: teeColorFromSelect(form.tee_salida),
       par_por_hoyo: Array.from({ length: 18 }, (_, i) =>
         parseInt(form[`par_hoyo_${i + 1}`].value)
       ),
@@ -334,17 +412,43 @@ document
     e.preventDefault();
     const form = e.target;
     const torneoId = form.torneo.value;
-    const usuarioId = form.usuario.value;
-    if (!torneoId || !usuarioId) {
-      alert("Selecciona torneo y usuario");
+    if (!torneoId) {
+      alert("Selecciona un torneo");
       return;
     }
-    // Obtener el nombre del usuario seleccionado
-    const usuarioSelect = form.usuario;
-    const nombreUsuario =
-      usuarioSelect.options[usuarioSelect.selectedIndex].textContent;
-    const handicap = parseFloat(form.handicap.value);
-    // Calcular scores
+
+    const tipoJugador = form.tipo_jugador.value;
+    let usuarioId = null;
+    let nombreUsuario = "";
+
+    if (tipoJugador === "registrado") {
+      usuarioId = form.usuario.value;
+      if (!usuarioId) {
+        alert("Selecciona un usuario registrado");
+        return;
+      }
+      const usuarioSelect = form.usuario;
+      nombreUsuario = usuarioSelect.options[usuarioSelect.selectedIndex].textContent;
+    } else {
+      const nombre = form.jugador_nombre.value.trim();
+      const apellido = form.jugador_apellido.value.trim();
+      if (!nombre || !apellido) {
+        alert("Ingresa nombre y apellido del jugador");
+        return;
+      }
+      nombreUsuario = `${nombre} ${apellido}`;
+    }
+
+    const selectTee = document.getElementById("select-tee-tarjeta");
+    const teeSeleccionado = selectTee?.value || "";
+    if (!teeSeleccionado) {
+      alert("Selecciona el tee de salida");
+      return;
+    }
+    const ajusteTee = parseFloat(selectTee.options[selectTee.selectedIndex]?.dataset.ajuste) || 0;
+    const teeColor = selectTee.options[selectTee.selectedIndex]?.dataset.color || '#ffffff';
+    const handicapBase = parseFloat(form.handicap.value);
+    const handicapEfectivo = handicapBase + ajusteTee;
     const scores = Array.from({ length: 18 }, (_, i) => ({
       hoyo: i + 1,
       golpes: parseInt(form[`golpes_${i + 1}`].value),
@@ -355,25 +459,33 @@ document
       (acc, curr) => acc + (isNaN(curr.golpes) ? 0 : curr.golpes),
       0
     );
-    const score_neto = score_bruto - handicap;
+    const score_neto = score_bruto - handicapEfectivo;
     const tarjeta = {
       id_usuario: usuarioId,
       nombre_usuario: nombreUsuario,
-      handicap: handicap,
+      registrado: tipoJugador === "registrado",
+      tee_salida: teeSeleccionado,
+      tee_color: teeColor,
+      ajuste_tee: ajusteTee,
+      handicap_base: handicapBase,
+      handicap: handicapEfectivo,
       scores: scores,
       score_bruto: score_bruto,
       score_neto: score_neto,
       fecha_envio: form.fecha_envio.value,
     };
     try {
-      // Buscar el torneo y agregar la tarjeta al array "tarjetas"
       const torneoRef = doc(db, "Torneos", torneoId);
       const torneoSnap = await getDoc(torneoRef);
       if (!torneoSnap.exists()) throw new Error("Torneo no encontrado");
       const torneoData = torneoSnap.data();
-      // Verificar si ya existe una tarjeta para ese usuario
-      if ((torneoData.tarjetas || []).some((t) => t.id_usuario === usuarioId)) {
-        alert("Ya existe una tarjeta para este usuario en este torneo");
+      const tarjetas = torneoData.tarjetas || [];
+      // Para registrados verificar por id; para nuevos verificar por nombre exacto
+      const duplicado = tipoJugador === "registrado"
+        ? tarjetas.some((t) => t.id_usuario === usuarioId)
+        : tarjetas.some((t) => t.nombre_usuario.toLowerCase() === nombreUsuario.toLowerCase());
+      if (duplicado) {
+        alert("Ya existe una tarjeta para este jugador en este torneo");
         return;
       }
       await updateDoc(torneoRef, {
@@ -810,10 +922,29 @@ function actualizarScoresTarjeta() {
     const val = parseInt(golpesInput?.value);
     if (!isNaN(val)) score_bruto += val;
   }
-  const handicap = parseFloat(form.handicap.value) || 0;
-  const score_neto = score_bruto - handicap;
+  const handicapBase = parseFloat(form.handicap.value) || 0;
+  const ajusteTee = obtenerAjusteTeeActual();
+  const handicapEfectivo = handicapBase + ajusteTee;
+
+  // Actualizar display de handicap efectivo
+  const box = document.getElementById("handicap-efectivo-box");
+  const valorEl = document.getElementById("handicap-efectivo-valor");
+  if (box && valorEl) {
+    const signo = ajusteTee >= 0 ? "+" : "";
+    valorEl.textContent = `${handicapBase} ${signo}${ajusteTee} = ${handicapEfectivo}`;
+    box.style.display = "";
+  }
+
+  const score_neto = score_bruto - handicapEfectivo;
   form.score_bruto.value = score_bruto;
   form.score_neto.value = score_neto;
+}
+
+function obtenerAjusteTeeActual() {
+  const selectTee = document.getElementById("select-tee-tarjeta");
+  if (!selectTee || !selectTee.value) return 0;
+  const selected = selectTee.options[selectTee.selectedIndex];
+  return parseFloat(selected.dataset.ajuste) || 0;
 }
 
 // Asignar eventos a los inputs de golpes y handicap
@@ -830,3 +961,324 @@ function asignarEventosTarjeta() {
 }
 
 document.addEventListener("DOMContentLoaded", asignarEventosTarjeta);
+
+// --- TOGGLE TIPO DE JUGADOR EN TARJETA ---
+document.addEventListener("DOMContentLoaded", () => {
+  const radios = document.querySelectorAll('input[name="tipo_jugador"]');
+  const secRegistrado = document.getElementById("seccion-usuario-registrado");
+  const secNuevo = document.getElementById("seccion-jugador-nuevo");
+  const selectUsuario = document.getElementById("select-usuario");
+  const inputNombre = document.getElementById("jugador-nombre");
+  const inputApellido = document.getElementById("jugador-apellido");
+
+  radios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const esNuevo = radio.value === "nuevo" && radio.checked;
+      secRegistrado.style.display = esNuevo ? "none" : "";
+      secNuevo.style.display = esNuevo ? "" : "none";
+      selectUsuario.required = !esNuevo;
+      inputNombre.required = esNuevo;
+      inputApellido.required = esNuevo;
+    });
+  });
+});
+
+// ============================================
+// COLORES ESTÁNDAR DE TEES DE GOLF
+// ============================================
+const TEE_COLORS = [
+  { nombre: 'Blanco',   color: '#ffffff' },
+  { nombre: 'Amarillo', color: '#FFD700' },
+  { nombre: 'Azul',     color: '#1565C0' },
+  { nombre: 'Rojo',     color: '#C62828' },
+  { nombre: 'Dorado',   color: '#F9A825' },
+  { nombre: 'Negro',    color: '#212121' },
+  { nombre: 'Verde',    color: '#2E7D32' },
+  { nombre: 'Naranja',  color: '#E65100' },
+];
+
+function buildTeeOptions(selected = 'Blanco') {
+  return TEE_COLORS.map(t =>
+    `<option value="${t.nombre}" data-color="${t.color}"${t.nombre === selected ? ' selected' : ''}>${t.nombre}</option>`
+  ).join('');
+}
+
+function teeColorFromSelect(selectEl) {
+  if (!selectEl) return '#ffffff';
+  return selectEl.options[selectEl.selectedIndex]?.dataset.color || '#ffffff';
+}
+
+// ============================================
+// EDITAR TORNEO
+// ============================================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const selectEditar = document.getElementById("select-torneo-editar");
+  if (!selectEditar) return;
+
+  // Poblar selector de torneos para editar
+  async function poblarSelectTorneosEditar() {
+    selectEditar.innerHTML = '<option value="">Selecciona un torneo</option>';
+    try {
+      const snapshot = await getDocs(collection(db, "Torneos"));
+      snapshot.forEach((d) => {
+        const opt = document.createElement("option");
+        opt.value = d.id;
+        opt.textContent = d.data().nombre || d.id;
+        selectEditar.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Error cargando torneos:", err);
+    }
+  }
+  poblarSelectTorneosEditar();
+
+  selectEditar.addEventListener("change", async function () {
+    const torneoId = this.value;
+    const body = document.getElementById("editar-torneo-form-body");
+    if (!torneoId) {
+      body.style.display = "none";
+      return;
+    }
+    await cargarTorneoParaEditar(torneoId);
+    body.style.display = "";
+  });
+});
+
+async function cargarTorneoParaEditar(torneoId) {
+  const form = document.getElementById("editarTorneoForm");
+  const status = document.getElementById("status-editar-torneo");
+  try {
+    const torneoSnap = await getDoc(doc(db, "Torneos", torneoId));
+    if (!torneoSnap.exists()) {
+      status.textContent = "Torneo no encontrado.";
+      return;
+    }
+    const d = torneoSnap.data();
+    document.getElementById("editar-torneo-id").value = torneoId;
+
+    // Info general
+    form.nombre.value = d.nombre || "";
+    form.fecha_inicio.value = d.fecha_inicio || "";
+    form.fecha_fin.value = d.fecha_fin || "";
+    setSelectValue(form.formato, d.formato);
+    setSelectValue(form.estado, d.estado);
+    form.porcentaje_handicap.value = d.porcentaje_handicap ?? "";
+    form.notas_admin.value = d.notas_admin || "";
+
+    // Cancha principal
+    const c = d.cancha || {};
+    form.cancha_nombre.value = c.nombre || "";
+    form.tee_salida.value = c.tee_salida || "Blanco";
+    (c.par_por_hoyo || []).forEach((v, i) => {
+      if (form[`par_hoyo_${i + 1}`]) form[`par_hoyo_${i + 1}`].value = v;
+    });
+    (c.yardaje_por_hoyo || []).forEach((v, i) => {
+      if (form[`yardas_hoyo_${i + 1}`]) form[`yardas_hoyo_${i + 1}`].value = v;
+    });
+    setSelectValue(form.dureza_fairways, c.dureza_fairways);
+    form.velocidad_greens.value = c.velocidad_greens ?? "";
+    setSelectValue(form.dureza_greens, c.dureza_greens);
+    form.velocidad_viento.value = c.velocidad_viento ?? "";
+    form.direccion_viento.value = c.direccion_viento || "";
+
+    // Tees adicionales
+    const lista = document.getElementById("tees-adicionales-lista");
+    lista.innerHTML = "";
+    (d.tees_adicionales || []).forEach((tee) => agregarTeeAdicional(tee));
+
+    // Premio
+    form.premio_descripcion.value = d.premio?.descripcion || "";
+    const premiosLista = document.getElementById("editar-premios-lista");
+    premiosLista.innerHTML = "";
+    (d.premio?.distribucion || []).forEach((p) => agregarPremioEditar(p));
+
+    // Reglas
+    const reglasLista = document.getElementById("editar-reglas-lista");
+    reglasLista.innerHTML = "";
+    (d.reglas || []).forEach((r) => agregarReglaEditar(r));
+
+    // Fotos
+    form.foto_portada.value = d.fotos?.portada || "";
+    const galeriaLista = document.getElementById("editar-galeria-lista");
+    galeriaLista.innerHTML = "";
+    (d.fotos?.galeria || []).forEach((url) => agregarFotoGaleriaEditar(url));
+
+    // Colores
+    form.color_primario.value = d.colores?.primario || "#2d5a27";
+    form.color_secundario.value = d.colores?.secundario || "#c9a227";
+    form.color_fondo.value = d.colores?.fondo || "#f5f7fa";
+
+    status.textContent = "";
+  } catch (err) {
+    status.textContent = "Error al cargar torneo: " + err.message;
+  }
+}
+
+function setSelectValue(selectEl, value) {
+  if (!selectEl || value === undefined || value === null) return;
+  for (let opt of selectEl.options) {
+    if (opt.value === value || opt.textContent === value) {
+      selectEl.value = opt.value;
+      return;
+    }
+  }
+}
+
+// Agrega un bloque de tee adicional al formulario de edición
+window.agregarTeeAdicional = function (teeData = {}) {
+  const lista = document.getElementById("tees-adicionales-lista");
+  const idx = lista.children.length;
+  const div = document.createElement("div");
+  div.className = "tee-adicional-item";
+  div.dataset.index = idx;
+
+  const parInputs = Array.from({ length: 18 }, (_, i) =>
+    `<input type="number" class="tee-par" data-hoyo="${i+1}" min="3" max="6" placeholder="${i+1}" value="${teeData.par_por_hoyo?.[i] ?? ""}" style="width:40px;">`
+  ).join("");
+  const yardasInputs = Array.from({ length: 18 }, (_, i) =>
+    `<input type="number" class="tee-yardas" data-hoyo="${i+1}" min="50" max="700" placeholder="${i+1}" value="${teeData.yardaje_por_hoyo?.[i] ?? ""}" style="width:50px;">`
+  ).join("");
+
+  const ajuste = teeData.ajuste_handicap ?? 0;
+
+  div.innerHTML = `
+    <div class="tee-adicional-header">
+      <strong>Tee adicional #${idx + 1}</strong>
+      <button type="button" class="delete-btn" onclick="this.closest('.tee-adicional-item').remove(); renumerarTees()">Eliminar</button>
+    </div>
+    <label>Tee de salida*:<br />
+      <select class="tee-nombre" required>${buildTeeOptions(teeData.nombre || 'Blanco')}</select>
+    </label>
+    <label style="margin-left:16px;">Ajuste de handicap (± golpes)*:<br />
+      <input type="number" class="tee-ajuste-handicap" value="${ajuste}" placeholder="0" title="Positivo: tee más difícil (+n). Negativo: tee más fácil (-n)." style="width:80px;" />
+      <span class="tee-ajuste-hint">Ej: +2 suma 2 golpes al hándicap, -2 los resta</span>
+    </label><br />
+    <label>Par por hoyo*:<br />
+      <div style="display:flex;flex-wrap:wrap;gap:2px;">${parInputs}</div>
+    </label><br />
+    <label>Yardaje por hoyo*:<br />
+      <div style="display:flex;flex-wrap:wrap;gap:2px;">${yardasInputs}</div>
+    </label>
+  `;
+  lista.appendChild(div);
+};
+
+window.renumerarTees = function () {
+  const items = document.querySelectorAll(".tee-adicional-item");
+  items.forEach((item, i) => {
+    const header = item.querySelector("strong");
+    if (header) header.textContent = `Tee adicional #${i + 1}`;
+  });
+};
+
+// --- Premios / reglas / galería duplicados para el form de edición ---
+window.agregarPremioEditar = function (premioData = {}) {
+  const lista = document.getElementById("editar-premios-lista");
+  const div = document.createElement("div");
+  div.className = "premio-item";
+  div.innerHTML = `Posición: <input type="number" class="premio-posicion" min="1" required style="width:50px;" value="${premioData.posicion || ""}"> Recompensa: <input type="text" class="premio-recompensa" required value="${premioData.recompensa || ""}"> <button type="button" onclick="this.parentNode.remove()">Eliminar</button>`;
+  lista.appendChild(div);
+};
+
+window.agregarReglaEditar = function (valor = "") {
+  const lista = document.getElementById("editar-reglas-lista");
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "regla-item";
+  input.placeholder = "Regla específica";
+  input.value = typeof valor === "string" ? valor : "";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "Eliminar";
+  btn.onclick = function () { input.remove(); btn.remove(); };
+  lista.appendChild(input);
+  lista.appendChild(btn);
+};
+
+window.agregarFotoGaleriaEditar = function (url = "") {
+  const lista = document.getElementById("editar-galeria-lista");
+  const input = document.createElement("input");
+  input.type = "url";
+  input.className = "galeria-item";
+  input.placeholder = "URL de la foto";
+  input.value = typeof url === "string" ? url : "";
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "Eliminar";
+  btn.onclick = function () { input.remove(); btn.remove(); };
+  lista.appendChild(input);
+  lista.appendChild(btn);
+};
+
+// --- SUBMIT de editar torneo ---
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("editarTorneoForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const torneoId = document.getElementById("editar-torneo-id").value;
+    const status = document.getElementById("status-editar-torneo");
+    if (!torneoId) { status.textContent = "No hay torneo seleccionado."; return; }
+
+    // Leer tees adicionales
+    const teeItems = document.querySelectorAll(".tee-adicional-item");
+    const teesAdicionales = Array.from(teeItems).map((item) => ({
+      nombre: item.querySelector(".tee-nombre")?.value || "",
+      color: teeColorFromSelect(item.querySelector(".tee-nombre")),
+      ajuste_handicap: parseFloat(item.querySelector(".tee-ajuste-handicap")?.value) || 0,
+      par_por_hoyo: Array.from(item.querySelectorAll(".tee-par")).map((inp) => parseInt(inp.value) || 0),
+      yardaje_por_hoyo: Array.from(item.querySelectorAll(".tee-yardas")).map((inp) => parseInt(inp.value) || 0),
+    }));
+
+    const datos = {
+      nombre: form.nombre.value,
+      fecha_inicio: form.fecha_inicio.value,
+      fecha_fin: form.fecha_fin.value,
+      formato: form.formato.value,
+      estado: form.estado.value,
+      porcentaje_handicap: parseFloat(form.porcentaje_handicap.value),
+      notas_admin: form.notas_admin.value,
+      cancha: {
+        nombre: form.cancha_nombre.value,
+        tee_salida: form.tee_salida.value,
+        tee_color: teeColorFromSelect(form.tee_salida),
+        par_por_hoyo: Array.from({ length: 18 }, (_, i) => parseInt(form[`par_hoyo_${i + 1}`].value)),
+        yardaje_por_hoyo: Array.from({ length: 18 }, (_, i) => parseInt(form[`yardas_hoyo_${i + 1}`].value)),
+        dureza_fairways: form.dureza_fairways.value,
+        velocidad_greens: parseFloat(form.velocidad_greens.value),
+        dureza_greens: form.dureza_greens.value,
+        velocidad_viento: parseFloat(form.velocidad_viento.value),
+        direccion_viento: form.direccion_viento.value,
+      },
+      tees_adicionales: teesAdicionales,
+      premio: {
+        descripcion: form.premio_descripcion.value,
+        distribucion: Array.from(document.querySelectorAll("#editar-premios-lista .premio-item")).map((row) => ({
+          posicion: parseInt(row.querySelector(".premio-posicion").value),
+          recompensa: row.querySelector(".premio-recompensa").value,
+        })),
+      },
+      reglas: Array.from(document.querySelectorAll("#editar-reglas-lista .regla-item")).map((inp) => inp.value),
+      fotos: {
+        portada: form.foto_portada.value,
+        galeria: Array.from(document.querySelectorAll("#editar-galeria-lista .galeria-item")).map((inp) => inp.value),
+      },
+      colores: {
+        primario: form.color_primario.value,
+        secundario: form.color_secundario.value,
+        fondo: form.color_fondo.value,
+      },
+      fecha_actualizacion: new Date().toISOString(),
+    };
+
+    try {
+      status.textContent = "Guardando...";
+      await updateDoc(doc(db, "Torneos", torneoId), datos);
+      status.textContent = "Torneo actualizado correctamente.";
+      status.style.color = "var(--success-color)";
+    } catch (err) {
+      status.textContent = "Error al guardar: " + err.message;
+      status.style.color = "var(--danger-color)";
+    }
+  });
+});

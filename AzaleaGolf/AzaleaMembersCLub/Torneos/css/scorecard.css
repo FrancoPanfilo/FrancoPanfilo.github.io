@@ -1009,6 +1009,222 @@ tbody tr:hover {
   }
 }
 
+/* ========================================
+   TEES DE SALIDA — CARDS EXPANDIBLES
+   ======================================== */
+
+.tees-section {
+  margin-top: 1.5rem;
+}
+
+.tees-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem 0;
+}
+
+.tees-cards-container {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.no-tees-text {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.tee-card {
+  background: #fff;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: var(--border-radius-md, 8px);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.tee-card:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+
+.tee-card.expanded {
+  border-color: var(--torneo-color-primario, #1b3c34);
+}
+
+.tee-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background: #fafafa;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.tee-card.expanded .tee-card-header {
+  background: color-mix(in srgb, var(--torneo-color-primario, #1b3c34) 6%, #fff);
+}
+
+.tee-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tee-card-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-color, #2d3748);
+}
+
+.tee-card-badge {
+  display: inline-block;
+  background: var(--torneo-color-primario, #1b3c34);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  vertical-align: middle;
+}
+
+.tee-card-toggle {
+  background: none;
+  border: 1px solid var(--torneo-color-primario, #1b3c34);
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--torneo-color-primario, #1b3c34);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.tee-card-toggle:hover {
+  background: var(--torneo-color-primario, #1b3c34);
+  color: #fff;
+}
+
+.tee-card-toggle i {
+  transition: transform 0.2s ease;
+  font-size: 0.7rem;
+}
+
+.tee-card.expanded .tee-card-toggle i {
+  transform: rotate(180deg);
+}
+
+.tee-card.expanded .tee-card-details {
+  display: grid;
+}
+
+.tee-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tee-card-meta span {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.tee-card-meta span + span::before {
+  content: "·";
+  margin-right: 0.5rem;
+  opacity: 0.5;
+}
+
+.tee-card-details {
+  display: none;
+  padding: 0.75rem 0.75rem 0.85rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  gap: 0.6rem;
+  background: #fcfcfc;
+}
+
+.tee-card-table-wrapper {
+  overflow-x: auto;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.tee-card-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  background: #fff;
+}
+
+.tee-card-table th,
+.tee-card-table td {
+  padding: 6px 7px;
+  text-align: center;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.tee-card-table thead th {
+  background: var(--torneo-color-primario, #1b3c34);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+.tee-card-table thead th:first-child {
+  text-align: left;
+  padding-left: 10px;
+}
+
+.tee-card-table tbody th {
+  background: #f5f7fa;
+  text-align: left;
+  font-weight: 700;
+  padding-left: 10px;
+  color: var(--text-color, #2d3748);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tee-card-table tbody tr:last-child th,
+.tee-card-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ========================================
+   COLUMNA TEE EN LEADERBOARD
+   ======================================== */
+
+.leaderboard-table .tee-col {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* (reemplazado por bloque de diseño final) */
+
+/* Responsive tee cards */
+@media (max-width: 480px) {
+  .tee-card-toggle {
+    font-size: 0.72rem;
+    padding: 3px 10px;
+  }
+}
+
 /* Scrollbars personalizados */
 .modal-body::-webkit-scrollbar,
 .modal-leaderboard-container::-webkit-scrollbar {
@@ -1031,4 +1247,459 @@ tbody tr:hover {
 .modal-body::-webkit-scrollbar-thumb:hover,
 .modal-leaderboard-container::-webkit-scrollbar-thumb:hover {
   opacity: 1;
+}
+
+/* ============================================================
+   EDITORIAL COUNTRY CLUB — Refinamiento visual del modal
+   ============================================================ */
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.96) translateY(14px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+@keyframes sectionRise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Variables y backdrop --- */
+#torneo-modal {
+  --mf: 'Fraunces', Georgia, serif;
+  --mb: 'Jost', system-ui, sans-serif;
+  --paper: #fbfaf6;
+  --ink: #1a1a18;
+  --ink-soft: #6b6860;
+  --line: rgba(0,0,0,.08);
+  --line-strong: rgba(0,0,0,.2);
+  --mgreen: #1b3c34;
+  --mgold: #c9a227;
+  background-color: rgba(10, 16, 12, 0.72) !important;
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+}
+
+/* --- Frame del modal --- */
+#torneo-modal .modal-content {
+  background-color: var(--paper) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,.55), 0 16px 40px -12px rgba(0,0,0,.35) !important;
+  animation: modalIn 340ms cubic-bezier(.22,1,.36,1) both;
+  font-family: var(--mb);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- Header --- */
+#torneo-modal .modal-header {
+  background: linear-gradient(135deg, var(--mgreen) 0%, #264f43 100%) !important;
+  padding: 1.75rem 2rem 1.5rem !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border-radius: 8px 8px 0 0;
+}
+
+#torneo-modal .modal-header h2 {
+  font-family: var(--mf) !important;
+  font-size: 1.9rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  color: #fff !important;
+  margin: 0;
+  line-height: 1.15;
+}
+
+#torneo-modal .close-modal {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12) !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem !important;
+  line-height: 1;
+  transition: background 0.2s;
+}
+#torneo-modal .close-modal:hover {
+  background: rgba(255,255,255,.24) !important;
+}
+
+/* Eyebrow con fechas, formato y estado */
+.modal-header-eyebrow {
+  font-family: var(--mb);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.62);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.eyebrow-sep {
+  opacity: .4;
+  margin: 0 0.1rem;
+}
+.estado-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 3px;
+  vertical-align: middle;
+}
+
+/* --- Imagen de portada --- */
+#torneo-modal .modal-image {
+  height: 200px !important;
+  background-size: contain !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  box-shadow: none;
+}
+
+/* --- Secciones colapsables --- */
+#torneo-modal .collapsible-section:nth-child(1) { animation: sectionRise 380ms 80ms cubic-bezier(.22,1,.36,1) both; }
+#torneo-modal .collapsible-section:nth-child(2) { animation: sectionRise 380ms 150ms cubic-bezier(.22,1,.36,1) both; }
+#torneo-modal .collapsible-section:nth-child(3) { animation: sectionRise 380ms 220ms cubic-bezier(.22,1,.36,1) both; }
+#torneo-modal .modal-leaderboard-section       { animation: sectionRise 380ms 290ms cubic-bezier(.22,1,.36,1) both; }
+
+#torneo-modal .collapsible-header {
+  border-bottom: 1px solid var(--line) !important;
+  padding: 1.1rem 1.75rem;
+}
+#torneo-modal .collapsible-header h3 {
+  font-family: var(--mf) !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  margin: 0;
+}
+#torneo-modal .collapsible-icon { color: var(--ink-soft) !important; }
+
+#torneo-modal .collapsible-content {
+  padding: 1.25rem 1.75rem 1.75rem !important;
+}
+
+/* --- Info grid --- */
+#torneo-modal .info-grid {
+  gap: 1.4rem 2rem !important;
+}
+#torneo-modal .info-label {
+  font-family: var(--mb) !important;
+  font-size: 0.66rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .13em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-soft) !important;
+  margin-bottom: 5px !important;
+}
+#torneo-modal .info-value {
+  font-family: var(--mf) !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+}
+
+/* Estado pill en info-grid */
+.estado-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mb, 'Jost', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.estado-pill::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.estado-pill--activo    { background: rgba(39,174,96,.12);  color: #1a7a42; }
+.estado-pill--activo::before { background: #27ae60; }
+.estado-pill--próximo,
+.estado-pill--proximo   { background: rgba(52,152,219,.12); color: #1a6fa0; }
+.estado-pill--próximo::before,
+.estado-pill--proximo::before { background: #3498db; }
+.estado-pill--finalizado { background: rgba(0,0,0,.07);    color: #666; }
+.estado-pill--finalizado::before { background: #999; }
+
+/* --- Lista de reglas --- */
+#torneo-modal .reglas-list { padding-left: 0; }
+#torneo-modal .reglas-list li {
+  font-family: var(--mb);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--ink);
+  padding-left: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+#torneo-modal .reglas-list li::before {
+  content: '—';
+  font-family: var(--mb);
+  color: var(--mgold);
+  font-size: 0.9rem;
+}
+
+/* --- Leaderboard section --- */
+#torneo-modal .modal-leaderboard-section { padding: 0 1.75rem 1.75rem; }
+#torneo-modal .modal-leaderboard-section h3 {
+  font-family: var(--mf) !important;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line) !important;
+  padding: 1.1rem 0 0.9rem;
+  margin: 0 0 0.75rem;
+}
+
+/* Leaderboard table overrides */
+#torneo-modal .leaderboard-table-wrapper {
+  border: none;
+  box-shadow: none;
+}
+#torneo-modal .leaderboard-table thead tr {
+  background: transparent !important;
+}
+#torneo-modal .leaderboard-table thead th {
+  background: transparent !important;
+  color: var(--ink-soft) !important;
+  font-family: var(--mb) !important;
+  font-size: 0.66rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .11em !important;
+  text-transform: uppercase !important;
+  border-bottom: 2px solid var(--mgreen) !important;
+  border-top: none;
+  padding: 0.6rem 0.75rem !important;
+}
+#torneo-modal .leaderboard-table td {
+  font-family: var(--mb) !important;
+  color: var(--ink);
+  padding: 0.65rem 0.75rem !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+#torneo-modal .leaderboard-table tbody tr:hover {
+  background: rgba(27,60,52,.04) !important;
+}
+#torneo-modal .leaderboard-table tbody tr.leader {
+  background: rgba(27,60,52,.04) !important;
+  border-left: 3px solid var(--mgreen);
+}
+#torneo-modal .leaderboard-table tbody tr.leader td {
+  color: var(--ink) !important;
+}
+#torneo-modal .leaderboard-table tbody tr:nth-child(even) {
+  background: rgba(0,0,0,.015) !important;
+}
+
+/* Columna de posición */
+#torneo-modal .pos-col {
+  width: 36px;
+  text-align: center !important;
+}
+.pos-cell {
+  font-family: var(--mf, 'Fraunces', serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink, #1a1a18);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+}
+#torneo-modal .leaderboard-table tbody tr.leader .pos-cell {
+  color: var(--mgreen, #1b3c34);
+}
+
+/* Avatar de iniciales (ahora inline dentro de la celda de jugador) */
+.player-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--mgreen, #1b3c34);
+  color: #fff;
+  font-family: var(--mb, 'Jost', sans-serif);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-right: 7px;
+}
+
+/* Nombre del jugador con avatar inline */
+.player-name-cell {
+  font-weight: 500;
+  text-align: left !important;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* Celdas numéricas */
+.num-cell {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* Chip de neto */
+.neto-chip {
+  display: inline-block;
+  font-family: var(--mf, 'Fraunces', serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.neto-chip--menos { background: rgba(21,128,61,.11); color: #15803d; }
+.neto-chip--par   { background: rgba(45,55,72,.09);  color: #374151; }
+.neto-chip--mas   { background: rgba(220,38,38,.1);  color: #b91c1c; }
+
+/* Circulo de color de tee */
+.tee-color-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  vertical-align: middle;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Columna tee en leaderboard — solo el círculo, centrado */
+#torneo-modal .tee-col {
+  text-align: center !important;
+  vertical-align: middle;
+}
+#torneo-modal .tee-col .tee-color-dot {
+  width: 16px;
+  height: 16px;
+}
+
+/* Scorecard icon */
+#torneo-modal .scorecard-icon {
+  color: var(--ink-soft) !important;
+  font-size: 16px;
+}
+#torneo-modal .scorecard-icon:hover { color: var(--mgreen) !important; }
+
+/* Empty state */
+.leaderboard-empty {
+  text-align: center;
+  padding: 3.5rem 1rem;
+  color: var(--ink-soft, #6b6860);
+}
+.leaderboard-empty i {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  display: block;
+  opacity: .25;
+}
+.leaderboard-empty p {
+  font-family: var(--mf, 'Fraunces', serif);
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* --- Tee cards — refinamiento tipográfico --- */
+#torneo-modal .tee-card {
+  background: var(--paper);
+  border-color: var(--line);
+}
+#torneo-modal .tee-card-name {
+  font-family: var(--mf) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+}
+#torneo-modal .tee-card-badge {
+  background: rgba(201,162,39,.1) !important;
+  color: #7a5c0a !important;
+  border: 1px solid rgba(201,162,39,.28) !important;
+}
+#torneo-modal .tee-card-toggle {
+  border: 1px solid var(--line-strong) !important;
+  color: var(--ink-soft) !important;
+  background: transparent !important;
+}
+#torneo-modal .tee-card-toggle:hover {
+  border-color: var(--mgreen) !important;
+  color: var(--mgreen) !important;
+}
+#torneo-modal .tee-card-meta span {
+  font-family: var(--mb);
+  color: var(--ink-soft);
+}
+#torneo-modal .tee-card-table th,
+#torneo-modal .tee-card-table td {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+#torneo-modal .tees-section-title {
+  font-family: var(--mb);
+  color: var(--ink-soft);
+}
+
+/* --- Modal scorecard individual --- */
+.scorecard-modal-content {
+  background: #fbfaf6 !important;
+}
+.scorecard-modal-content h3 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-size: 1.55rem !important;
+  font-weight: 600 !important;
+  color: #1a1a18 !important;
+  letter-spacing: -0.01em;
+}
+.scorecard-player-info {
+  font-family: 'Jost', system-ui, sans-serif;
+  font-size: 0.85rem !important;
+}
+.scorecard-horizontal th,
+.scorecard-horizontal td {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+#scorecard-modal-close {
+  font-family: 'Jost', system-ui, sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 5px !important;
+  background: #1b3c34 !important;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-size: 0.85rem !important;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  #torneo-modal .modal-header { padding: 1.35rem 1.25rem 1.2rem !important; }
+  #torneo-modal .modal-header h2 { font-size: 1.55rem !important; }
+  #torneo-modal .collapsible-header { padding: 0.9rem 1.25rem; }
+  #torneo-modal .collapsible-content { padding: 1rem 1.25rem 1.5rem !important; }
+  #torneo-modal .modal-leaderboard-section { padding: 0 1.25rem 1.5rem; }
+}
+@media (max-width: 480px) {
+  #torneo-modal .modal-header h2 { font-size: 1.3rem !important; }
+  #torneo-modal .tee-col { display: none; }
+  .player-name-cell { font-size: 0.8rem; }
+  .neto-chip { font-size: 0.8rem; padding: 2px 7px; }
+  .player-avatar { width: 26px; height: 26px; font-size: 0.6rem; }
 }

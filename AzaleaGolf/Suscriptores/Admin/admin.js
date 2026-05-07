@@ -70,28 +70,52 @@ function setupSearch() {
 }
 
 // Cargar usuarios desde Firebase
-async function loadUsers() {
+window.loadUsers = async function loadUsers() {
+  const tbody = document.getElementById("usersTableBody");
+  tbody.innerHTML = '<tr><td colspan="7" class="loading"><span class="admin-spinner"></span> Cargando usuarios…</td></tr>';
+
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("timeout")), 20000)
+  );
+
   try {
-    const usersRef = collection(db, "Simulador");
-    const snapshot = await getDocs(usersRef);
+    const snapshot = await Promise.race([
+      getDocs(collection(db, "Simulador")),
+      timeout,
+    ]);
 
-    usersData = snapshot.docs.map((doc) => ({
-      uid: doc.id,
-      ...doc.data(),
-    }));
+    // Solo extraer los campos que el admin necesita — no cargamos Sesiones completas
+    usersData = snapshot.docs.map((d) => {
+      const data = d.data();
+      return {
+        uid: d.id,
+        nombre: data.nombre || "",
+        apellido: data.apellido || "",
+        email: data.email || "",
+        handicap: data.handicap || null,
+        fechaNacimiento: data.fechaNacimiento || null,
+        manoDominante: data.manoDominante || null,
+        sesionesCount: Array.isArray(data.Sesiones) ? data.Sesiones.length : 0,
+      };
+    });
 
-    // Ordenar por nombre
     usersData.sort((a, b) => {
-      const nameA = `${a.nombre || ""} ${a.apellido || ""}`.toLowerCase();
-      const nameB = `${b.nombre || ""} ${b.apellido || ""}`.toLowerCase();
-      return nameA.localeCompare(nameB);
+      const nameA = `${a.nombre} ${a.apellido}`.toLowerCase();
+      const nameB = `${b.nombre} ${b.apellido}`.toLowerCase();
+      return nameA.localeCompare(nameB, "es");
     });
 
     renderUsersTable();
   } catch (error) {
     console.error("Error cargando usuarios:", error);
-    document.getElementById("usersTableBody").innerHTML =
-      '<tr><td colspan="7" class="loading">Error al cargar usuarios</td></tr>';
+    const msg = error.message === "timeout"
+      ? "La carga tardó demasiado. Verificá tu conexión."
+      : `Error: ${error.message}`;
+    tbody.innerHTML = `
+      <tr><td colspan="7" class="loading" style="color:#c0392b;">
+        ${msg}
+        <br><button onclick="loadUsers()" style="margin-top:8px;padding:6px 16px;cursor:pointer;">Reintentar</button>
+      </td></tr>`;
   }
 }
 
@@ -124,7 +148,7 @@ function renderUsersTable(filteredUsers = null) {
           : "Zurdo"
         : '<span class="no-data">-</span>';
 
-      const sesiones = user.Sesiones?.length || 0;
+      const sesiones = user.sesionesCount ?? 0;
 
       return `
         <tr>

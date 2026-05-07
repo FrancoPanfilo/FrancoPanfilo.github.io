@@ -75,6 +75,7 @@ async function loadTorneos() {
     torneos = [];
     querySnapshot.forEach((doc) => {
       const torneoData = doc.data();
+      if (torneoData.estado === "Oculto") return;
       torneos.push({
         id: doc.id,
         ...torneoData,
@@ -189,33 +190,36 @@ function showTorneoDetails(torneo) {
 
   // Info básica
   document.getElementById("modal-torneo-nombre").textContent = torneo.nombre;
-  document.getElementById("modal-fecha-inicio").textContent = formatDate(
-    torneo.fecha_inicio
-  );
-  document.getElementById("modal-fecha-fin").textContent = formatDate(
-    torneo.fecha_fin
-  );
-  document.getElementById("modal-formato").textContent =
-    torneo.formato || "No especificado";
-  document.getElementById("modal-estado").textContent =
-    torneo.estado || "No especificado";
+  document.getElementById("modal-fecha-inicio").textContent = formatDate(torneo.fecha_inicio);
+  document.getElementById("modal-fecha-fin").textContent = formatDate(torneo.fecha_fin);
+  document.getElementById("modal-formato").textContent = torneo.formato || "No especificado";
+
+  // Estado como pill
+  const estadoEl = document.getElementById("modal-estado");
+  if (estadoEl) {
+    const estadoSlug = (torneo.estado || "").toLowerCase().replace(/[^a-z]/g, "");
+    estadoEl.innerHTML = `<span class="estado-pill estado-pill--${estadoSlug}">${torneo.estado || "No especificado"}</span>`;
+  }
+
+  // Eyebrow con fechas + formato bajo el título (inyectado en el header)
+  const headerEl = document.querySelector("#torneo-modal .modal-header");
+  headerEl.querySelector(".modal-header-eyebrow")?.remove();
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "modal-header-eyebrow";
+  const estadoDotColors = { activo: "#27ae60", próximo: "#3498db", proximo: "#3498db", finalizado: "#999" };
+  const estadoSlugDot = (torneo.estado || "").toLowerCase().replace(/[^a-z]/g, "");
+  const dotColor = estadoDotColors[estadoSlugDot] || "#aaa";
+  eyebrow.innerHTML = `${formatDate(torneo.fecha_inicio)} — ${formatDate(torneo.fecha_fin)}<span class="eyebrow-sep">·</span>${torneo.formato || ""}<span class="eyebrow-sep">·</span><span class="estado-dot" style="background:${dotColor}"></span>${torneo.estado || ""}`;
+  headerEl.insertBefore(eyebrow, headerEl.querySelector(".close-modal"));
+
+  // Imagen de portada — ocultar si no existe
   const modalImage = document.getElementById("modal-torneo-imagen");
   if (modalImage) {
-    modalImage.style.backgroundImage =
-      torneo.fotos && torneo.fotos.portada
-        ? `url(${torneo.fotos.portada})`
-        : "url('../img/golf-course-default.svg')";
-    if (torneo.colores) {
-      if (torneo.colores.primario)
-        modalImage.style.setProperty(
-          "--torneo-color-primario",
-          torneo.colores.primario
-        );
-      if (torneo.colores.secundario)
-        modalImage.style.setProperty(
-          "--torneo-color-secundario",
-          torneo.colores.secundario
-        );
+    if (torneo.fotos && torneo.fotos.portada) {
+      modalImage.style.backgroundImage = `url(${torneo.fotos.portada})`;
+      modalImage.style.display = "";
+    } else {
+      modalImage.style.display = "none";
     }
   }
 
@@ -223,16 +227,12 @@ function showTorneoDetails(torneo) {
   if (torneo.cancha) {
     document.getElementById("modal-cancha-nombre").textContent =
       torneo.cancha.nombre || "No especificado";
-    document.getElementById("modal-tee-salida").textContent =
-      torneo.cancha.tee_salida || "No especificado";
     document.getElementById("modal-dureza-fairways").textContent =
       torneo.cancha.dureza_fairways || "No especificado";
-    document.getElementById("modal-velocidad-greens").textContent = `${
-      torneo.cancha.velocidad_greens || "No especificado"
-    } pies`;
-    document.getElementById("modal-distancia-total").textContent =
-      calcularDistanciaTotal(torneo.cancha);
+    document.getElementById("modal-velocidad-greens").textContent =
+      torneo.cancha.velocidad_greens ? `${torneo.cancha.velocidad_greens} pies` : "No especificado";
   }
+  renderTeeCards(torneo);
 
   // Reglas
   const reglasContainer = document.getElementById("modal-reglas");
@@ -262,12 +262,22 @@ function showTorneoDetails(torneo) {
     const tarjetasOrdenadas = [...torneo.tarjetas].sort(
       (a, b) => a.score_neto - b.score_neto
     );
-    let tabla = `<div class="leaderboard-table-wrapper" style="--color-primario:${colorPrimario};--color-secundario:${colorSecundario};--color-fondo:${colorFondo};">
+
+    // Mapa de colores por nombre de tee
+    const teeColorMap = {};
+    if (torneo.cancha) {
+      teeColorMap[torneo.cancha.tee_salida || 'Principal'] = torneo.cancha.tee_color || '#ffffff';
+    }
+    (torneo.tees_adicionales || []).forEach(t => {
+      teeColorMap[t.nombre] = t.color || '#ffffff';
+    });
+    let tabla = `<div class="leaderboard-table-wrapper">
       <table class="leaderboard-table" role="grid" aria-label="Leaderboard de golf">
       <thead>
           <tr>
-              <th>#</th>
-              <th>Nombre</th>
+              <th class="pos-col">#</th>
+              <th>Jugador</th>
+              <th>Tee</th>
               <th>Hcp</th>
               <th>Gross</th>
               <th>Neto</th>
@@ -275,38 +285,63 @@ function showTorneoDetails(torneo) {
           </tr>
       </thead>
       <tbody>`;
+    let lastNeto = null;
+    let currentPos = 0;
     tarjetasOrdenadas.forEach((tarjeta, index) => {
+      currentPos = index + 1;
       const netoRelativo = formatNetoRelativo(tarjeta.score_neto, parTotal);
       let colorClass = "par";
       if (netoRelativo === "Par") colorClass = "par";
       else if (netoRelativo.startsWith("-")) colorClass = "menos";
       else colorClass = "mas";
       const leaderClass = index === 0 ? "leader" : "";
+
+      // Posición: solo mostrar en la primera fila de cada grupo de empate
+      const isTied = lastNeto !== null && tarjeta.score_neto === lastNeto;
+      const posDisplay = isTied ? "" : currentPos;
+      lastNeto = tarjeta.score_neto;
+
+      const teePrincipal = torneo.cancha?.tee_salida || "Principal";
+      const teeLabel = tarjeta.tee_salida
+        ? (tarjeta.ajuste_tee && tarjeta.ajuste_tee !== 0
+            ? `${tarjeta.tee_salida} (${tarjeta.ajuste_tee > 0 ? "+" : ""}${tarjeta.ajuste_tee})`
+            : tarjeta.tee_salida)
+        : teePrincipal;
+      const teeColorVal = tarjeta.tee_color || teeColorMap[tarjeta.tee_salida] || teeColorMap[teePrincipal] || '#ffffff';
+      const isWhiteTee = teeColorVal.replace(/\s/g,'').toLowerCase() === '#ffffff';
+      const teeCircle = `<span class="tee-color-dot" style="background:${teeColorVal};${isWhiteTee ? 'border:2px solid #1a1a18;' : ''}" title="${teeLabel}"></span>`;
+      const initials = (tarjeta.nombre_usuario || "")
+        .split(/\s+/).filter(Boolean).slice(0, 2)
+        .map(s => s[0]?.toUpperCase() || "").join("");
+      const netoChip = `<span class="neto-chip neto-chip--${colorClass}">${netoRelativo}</span>`;
       tabla += `
         <tr class="${leaderClass}">
-          <td>${index + 1}</td>
-          <td>${tarjeta.nombre_usuario}</td>
-          <td>${tarjeta.handicap ?? ""}</td>
-          <td>${tarjeta.score_bruto ?? ""}</td>
-          <td class="${colorClass}">${netoRelativo}</td>
+          <td class="pos-cell">${posDisplay}</td>
+          <td class="player-name-cell">
+            <span class="player-avatar">${initials}</span>
+            ${tarjeta.nombre_usuario}
+          </td>
+          <td class="tee-col">${teeCircle}</td>
+          <td class="num-cell">${tarjeta.handicap ?? ""}</td>
+          <td class="num-cell">${tarjeta.score_bruto ?? ""}</td>
+          <td>${netoChip}</td>
           <td>
-  <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de score de ${
-    tarjeta.nombre_usuario
-  }"
-     onclick="mostrarTarjetaDetalle('${encodeURIComponent(
-       torneo.id
-     )}', '${encodeURIComponent(tarjeta.id_usuario)}');return false;">
-    <i class="fas fa-clipboard-list"></i>
-  </a>
-</td>
+            <a href="#" class="scorecard-icon" aria-label="Ver tarjeta de ${tarjeta.nombre_usuario}"
+               onclick="mostrarTarjetaDetalle('${encodeURIComponent(torneo.id)}', '${encodeURIComponent(tarjeta.id_usuario)}', '${encodeURIComponent(tarjeta.nombre_usuario)}');return false;">
+              <i class="fas fa-clipboard"></i>
+            </a>
+          </td>
         </tr>
       `;
     });
     tabla += "</tbody></table></div>";
     leaderboardContainer.innerHTML = tabla;
   } else {
-    leaderboardContainer.innerHTML =
-      '<div class="no-tarjetas-text">No hay participantes registrados</div>';
+    leaderboardContainer.innerHTML = `
+      <div class="leaderboard-empty">
+        <i class="fas fa-flag-checkered"></i>
+        <p>No hay participantes registrados</p>
+      </div>`;
   }
 
   // Agregar funcionalidad de colapso para móviles
@@ -376,11 +411,13 @@ function handleResponsiveCollapse() {
 }
 
 // Tarjeta horizontal por jugador (scorecard)
-window.mostrarTarjetaDetalle = function (torneoId, idUsuario) {
+window.mostrarTarjetaDetalle = function (torneoId, idUsuario, nombreUsuario) {
   const torneo = torneos.find((t) => t.id === decodeURIComponent(torneoId));
   if (!torneo || !torneo.tarjetas) return;
+  const idDec = decodeURIComponent(idUsuario);
+  const nombreDec = decodeURIComponent(nombreUsuario || "");
   const tarjeta = torneo.tarjetas.find(
-    (t) => t.id_usuario == decodeURIComponent(idUsuario)
+    (t) => (idDec && idDec !== "null" ? t.id_usuario === idDec : t.nombre_usuario === nombreDec)
   );
   if (!tarjeta) return;
   const scores = tarjeta.scores || [];
@@ -458,10 +495,18 @@ window.mostrarTarjetaDetalle = function (torneoId, idUsuario) {
     `;
   };
 
+  const teePrincipalNombre = torneo.cancha?.tee_salida || "Principal";
+  const teeInfo = tarjeta.tee_salida
+    ? (tarjeta.ajuste_tee && tarjeta.ajuste_tee !== 0
+        ? `${tarjeta.tee_salida} (${tarjeta.ajuste_tee > 0 ? "+" : ""}${tarjeta.ajuste_tee})`
+        : tarjeta.tee_salida)
+    : teePrincipalNombre;
+
   let html = `
     <div class="scorecard-modal-header">
       <h3>Tarjeta de ${tarjeta.nombre_usuario}</h3>
       <div class="scorecard-player-info">
+        <span style="display:inline-flex;align-items:center;gap:5px;">${(() => { const sc = tarjeta.tee_color || '#ffffff'; const sw = sc.toLowerCase() === '#ffffff'; return `<span class="tee-color-dot" style="background:${sc};${sw ? 'border:2px solid #1a1a18;' : ''}"></span>`; })()}Tee: <strong>${teeInfo}</strong></span>
         <span>Handicap: <strong>${tarjeta.handicap ?? "N/A"}</strong></span>
         <span>Score Neto: <strong>${tarjeta.score_neto ?? "N/A"}</strong></span>
         <span>Gross: <strong>${tarjeta.score_bruto ?? "N/A"}</strong></span>
@@ -500,6 +545,115 @@ window.mostrarTarjetaDetalle = function (torneoId, idUsuario) {
     }
   };
 };
+
+// ============================================
+// TEES DE SALIDA — Cards expandibles
+// ============================================
+function renderTeeCards(torneo) {
+  const container = document.getElementById("modal-tees-container");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const tees = [];
+  if (torneo.cancha) {
+    tees.push({
+      nombre: torneo.cancha.tee_salida || "Principal",
+      principal: true,
+      color: torneo.cancha.tee_color || '#ffffff',
+      ajuste_handicap: 0,
+      par_por_hoyo: torneo.cancha.par_por_hoyo || [],
+      yardaje_por_hoyo: torneo.cancha.yardaje_por_hoyo || [],
+    });
+  }
+  (torneo.tees_adicionales || []).forEach((t) =>
+    tees.push({ ...t, principal: false, color: t.color || '#ffffff' })
+  );
+
+  // Ordenar por yardas totales descendente (mayor distancia primero)
+  tees.sort((a, b) => {
+    const yardsA = (a.yardaje_por_hoyo || []).reduce((s, y) => s + (y || 0), 0);
+    const yardsB = (b.yardaje_por_hoyo || []).reduce((s, y) => s + (y || 0), 0);
+    return yardsB - yardsA;
+  });
+
+  if (tees.length === 0) {
+    container.innerHTML = '<p class="no-tees-text">Sin información de tees disponible.</p>';
+    return;
+  }
+
+  tees.forEach((tee) => {
+    const parTotal = (tee.par_por_hoyo || []).reduce((a, b) => a + (b || 0), 0);
+    const yardasTotal = (tee.yardaje_por_hoyo || []).reduce((a, b) => a + (b || 0), 0);
+    const ajusteTxt = tee.principal
+      ? "—"
+      : tee.ajuste_handicap > 0
+      ? `+${tee.ajuste_handicap}`
+      : `${tee.ajuste_handicap}`;
+
+    const card = document.createElement("div");
+    card.className = "tee-card";
+    const isWhiteCard = (tee.color).toLowerCase() === '#ffffff';
+    const cardDotStyle = `background:${tee.color};${isWhiteCard ? 'border:2px solid #1a1a18;' : ''}`;
+
+    card.innerHTML = `
+      <div class="tee-card-header">
+        <div class="tee-card-title">
+          <span class="tee-color-dot" style="${cardDotStyle}"></span>
+          <span class="tee-card-name">${tee.nombre}</span>
+          ${tee.principal ? '<span class="tee-card-badge">Principal</span>' : ""}
+          <span class="tee-card-meta">
+            ${parTotal ? `<span>${parTotal} par</span>` : ""}
+            ${yardasTotal ? `<span>${yardasTotal.toLocaleString()} yds</span>` : ""}
+            <span>Ajuste: ${ajusteTxt}</span>
+          </span>
+        </div>
+        <button type="button" class="tee-card-toggle" aria-expanded="false">
+          <span>Ver detalles</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+      <div class="tee-card-details">
+        ${buildTeeDetailsTable(tee)}
+      </div>
+    `;
+
+    const btn = card.querySelector(".tee-card-toggle");
+    btn.addEventListener("click", () => {
+      const open = card.classList.toggle("expanded");
+      btn.setAttribute("aria-expanded", open);
+      btn.querySelector("span").textContent = open ? "Ocultar detalles" : "Ver detalles";
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function buildTeeDetailsTable(tee) {
+  const par = tee.par_por_hoyo || [];
+  const yds = tee.yardaje_por_hoyo || [];
+
+  const renderHalf = (start) => {
+    const parSlice = par.slice(start, start + 9);
+    const ydsSlice = yds.slice(start, start + 9);
+    const totalPar = parSlice.reduce((a, b) => a + (b || 0), 0);
+    const totalYds = ydsSlice.reduce((a, b) => a + (b || 0), 0);
+    const headers = Array.from({ length: 9 }, (_, i) => `<th>${start + i + 1}</th>`).join("");
+    const parsRow = parSlice.map((p) => `<td>${p ?? "-"}</td>`).join("");
+    const ydsRow = ydsSlice.map((y) => `<td>${y ?? "-"}</td>`).join("");
+    return `
+      <div class="tee-card-table-wrapper">
+        <table class="tee-card-table">
+          <thead><tr><th>Hoyo</th>${headers}<th>Tot</th></tr></thead>
+          <tbody>
+            <tr><th>Par</th>${parsRow}<td><strong>${totalPar}</strong></td></tr>
+            <tr><th>Yds</th>${ydsRow}<td><strong>${totalYds.toLocaleString()}</strong></td></tr>
+          </tbody>
+        </table>
+      </div>`;
+  };
+
+  return renderHalf(0) + renderHalf(9);
+}
 
 if (closeModal) {
   closeModal.addEventListener("click", (event) => {

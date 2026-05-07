@@ -55,6 +55,7 @@
           <option value="sesion">Cargar Sesión</option>
           <option value="tarjeta">Cargar Tarjeta</option>
           <option value="torneo">Cargar Torneo</option>
+          <option value="editar-torneo">Editar Torneo</option>
         </select>
       </div>
 
@@ -103,16 +104,52 @@
             <option value="">Selecciona un torneo</option>
           </select> </label
         ><br />
-        <label
-          >Usuario*:<br />
-          <select id="select-usuario" name="usuario" required>
-            <option value="">Selecciona un usuario</option>
-          </select> </label
-        ><br />
-        <label
-          >Handicap*:<br />
-          <input type="number" name="handicap" step="0.1" required /> </label
-        ><br />
+
+        <div id="seccion-tee-tarjeta" style="display:none">
+          <label>Tee de salida*:<br />
+            <div style="display:flex;align-items:center;gap:10px;">
+              <select id="select-tee-tarjeta" name="tee_salida" required>
+                <option value="">Selecciona el tee</option>
+              </select>
+              <span id="tee-color-preview" style="width:22px;height:22px;border-radius:50%;display:none;flex-shrink:0;"></span>
+            </div>
+          </label><br />
+          <div id="tee-ajuste-info" class="tee-ajuste-info" style="display:none">
+            Ajuste de handicap por tee: <strong id="tee-ajuste-valor">0</strong>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tipo de jugador*:</label>
+          <div class="radio-toggle">
+            <label><input type="radio" name="tipo_jugador" value="registrado" checked /> Usuario registrado</label>
+            <label><input type="radio" name="tipo_jugador" value="nuevo" /> Jugador nuevo</label>
+          </div>
+        </div>
+
+        <div id="seccion-usuario-registrado">
+          <label>Usuario*:<br />
+            <select id="select-usuario" name="usuario">
+              <option value="">Selecciona un usuario</option>
+            </select>
+          </label><br />
+        </div>
+
+        <div id="seccion-jugador-nuevo" style="display:none">
+          <label>Nombre*:<br />
+            <input type="text" id="jugador-nombre" name="jugador_nombre" placeholder="Nombre" />
+          </label><br />
+          <label>Apellido*:<br />
+            <input type="text" id="jugador-apellido" name="jugador_apellido" placeholder="Apellido" />
+          </label><br />
+        </div>
+
+        <label>Handicap base*:<br />
+          <input type="number" name="handicap" step="0.1" required />
+        </label><br />
+        <div id="handicap-efectivo-box" class="handicap-efectivo-box" style="display:none">
+          Handicap efectivo (base + ajuste tee): <strong id="handicap-efectivo-valor">—</strong>
+        </div><br />
         <fieldset>
           <legend>Scores por hoyo</legend>
           <div style="overflow-x: auto">
@@ -333,10 +370,18 @@
             >Nombre*:<br />
             <input type="text" name="cancha_nombre" required /> </label
           ><br />
-          <label
-            >Tee de salida*:<br />
-            <input type="text" name="tee_salida" required /> </label
-          ><br />
+          <label>Tee de salida*:<br />
+            <select name="tee_salida" required>
+              <option value="Blanco"   data-color="#ffffff">Blanco</option>
+              <option value="Amarillo" data-color="#FFD700">Amarillo</option>
+              <option value="Azul"     data-color="#1565C0">Azul</option>
+              <option value="Rojo"     data-color="#C62828">Rojo</option>
+              <option value="Dorado"   data-color="#F9A825">Dorado</option>
+              <option value="Negro"    data-color="#212121">Negro</option>
+              <option value="Verde"    data-color="#2E7D32">Verde</option>
+              <option value="Naranja"  data-color="#E65100">Naranja</option>
+            </select>
+          </label><br />
           <label
             >Par por hoyo*:<br />
             <div style="display: flex; flex-wrap: wrap; gap: 2px">
@@ -742,11 +787,202 @@
             <option>Próximo</option>
             <option>Activo</option>
             <option>Finalizado</option>
+            <option>Oculto</option>
           </select> </label
         ><br />
         <button type="submit">Guardar Torneo</button>
       </form>
     </div>
+    <div id="form-editar-torneo-container" class="accion-form" style="display: none">
+      <h2>Editar Torneo</h2>
+      <div class="form-group">
+        <label for="select-torneo-editar">Torneo a editar*:</label>
+        <select id="select-torneo-editar">
+          <option value="">Selecciona un torneo</option>
+        </select>
+      </div>
+      <div id="editar-torneo-form-body" style="display:none">
+        <form id="editarTorneoForm">
+          <input type="hidden" id="editar-torneo-id" />
+
+          <fieldset>
+            <legend>Información general</legend>
+            <label>Nombre del torneo*:<br />
+              <input type="text" name="nombre" required />
+            </label><br />
+            <label>Fecha de inicio*:<br />
+              <input type="datetime-local" name="fecha_inicio" required />
+            </label><br />
+            <label>Fecha de fin*:<br />
+              <input type="datetime-local" name="fecha_fin" required />
+            </label><br />
+            <label>Formato*:<br />
+              <select name="formato" required>
+                <option value="">Selecciona</option>
+                <option>Stroke Play</option>
+                <option>Stableford</option>
+                <option>Match Play</option>
+                <option>Scramble</option>
+              </select>
+            </label><br />
+            <label>Estado*:<br />
+              <select name="estado" required>
+                <option value="">Selecciona</option>
+                <option>Próximo</option>
+                <option>Activo</option>
+                <option>Finalizado</option>
+                <option>Oculto</option>
+              </select>
+            </label><br />
+            <label>Porcentaje de handicap*:<br />
+              <input type="number" name="porcentaje_handicap" min="0" max="100" required />
+            </label><br />
+            <label>Notas del administrador:<br />
+              <textarea name="notas_admin"></textarea>
+            </label><br />
+          </fieldset>
+
+          <fieldset>
+            <legend>Cancha principal</legend>
+            <label>Nombre de la cancha*:<br />
+              <input type="text" name="cancha_nombre" required />
+            </label><br />
+            <label>Tee de salida principal*:<br />
+              <select name="tee_salida" required>
+                <option value="Blanco"   data-color="#ffffff">Blanco</option>
+                <option value="Amarillo" data-color="#FFD700">Amarillo</option>
+                <option value="Azul"     data-color="#1565C0">Azul</option>
+                <option value="Rojo"     data-color="#C62828">Rojo</option>
+                <option value="Dorado"   data-color="#F9A825">Dorado</option>
+                <option value="Negro"    data-color="#212121">Negro</option>
+                <option value="Verde"    data-color="#2E7D32">Verde</option>
+                <option value="Naranja"  data-color="#E65100">Naranja</option>
+              </select>
+            </label><br />
+            <label>Par por hoyo*:<br />
+              <div style="display: flex; flex-wrap: wrap; gap: 2px">
+                <input type="number" name="par_hoyo_1" min="3" max="6" required placeholder="1"/>
+                <input type="number" name="par_hoyo_2" min="3" max="6" required placeholder="2"/>
+                <input type="number" name="par_hoyo_3" min="3" max="6" required placeholder="3"/>
+                <input type="number" name="par_hoyo_4" min="3" max="6" required placeholder="4"/>
+                <input type="number" name="par_hoyo_5" min="3" max="6" required placeholder="5"/>
+                <input type="number" name="par_hoyo_6" min="3" max="6" required placeholder="6"/>
+                <input type="number" name="par_hoyo_7" min="3" max="6" required placeholder="7"/>
+                <input type="number" name="par_hoyo_8" min="3" max="6" required placeholder="8"/>
+                <input type="number" name="par_hoyo_9" min="3" max="6" required placeholder="9"/>
+                <input type="number" name="par_hoyo_10" min="3" max="6" required placeholder="10"/>
+                <input type="number" name="par_hoyo_11" min="3" max="6" required placeholder="11"/>
+                <input type="number" name="par_hoyo_12" min="3" max="6" required placeholder="12"/>
+                <input type="number" name="par_hoyo_13" min="3" max="6" required placeholder="13"/>
+                <input type="number" name="par_hoyo_14" min="3" max="6" required placeholder="14"/>
+                <input type="number" name="par_hoyo_15" min="3" max="6" required placeholder="15"/>
+                <input type="number" name="par_hoyo_16" min="3" max="6" required placeholder="16"/>
+                <input type="number" name="par_hoyo_17" min="3" max="6" required placeholder="17"/>
+                <input type="number" name="par_hoyo_18" min="3" max="6" required placeholder="18"/>
+              </div>
+            </label><br />
+            <label>Yardaje por hoyo*:<br />
+              <div style="display: flex; flex-wrap: wrap; gap: 2px">
+                <input type="number" name="yardas_hoyo_1" min="50" max="700" required placeholder="1"/>
+                <input type="number" name="yardas_hoyo_2" min="50" max="700" required placeholder="2"/>
+                <input type="number" name="yardas_hoyo_3" min="50" max="700" required placeholder="3"/>
+                <input type="number" name="yardas_hoyo_4" min="50" max="700" required placeholder="4"/>
+                <input type="number" name="yardas_hoyo_5" min="50" max="700" required placeholder="5"/>
+                <input type="number" name="yardas_hoyo_6" min="50" max="700" required placeholder="6"/>
+                <input type="number" name="yardas_hoyo_7" min="50" max="700" required placeholder="7"/>
+                <input type="number" name="yardas_hoyo_8" min="50" max="700" required placeholder="8"/>
+                <input type="number" name="yardas_hoyo_9" min="50" max="700" required placeholder="9"/>
+                <input type="number" name="yardas_hoyo_10" min="50" max="700" required placeholder="10"/>
+                <input type="number" name="yardas_hoyo_11" min="50" max="700" required placeholder="11"/>
+                <input type="number" name="yardas_hoyo_12" min="50" max="700" required placeholder="12"/>
+                <input type="number" name="yardas_hoyo_13" min="50" max="700" required placeholder="13"/>
+                <input type="number" name="yardas_hoyo_14" min="50" max="700" required placeholder="14"/>
+                <input type="number" name="yardas_hoyo_15" min="50" max="700" required placeholder="15"/>
+                <input type="number" name="yardas_hoyo_16" min="50" max="700" required placeholder="16"/>
+                <input type="number" name="yardas_hoyo_17" min="50" max="700" required placeholder="17"/>
+                <input type="number" name="yardas_hoyo_18" min="50" max="700" required placeholder="18"/>
+              </div>
+            </label><br />
+            <label>Dureza de fairways*:<br />
+              <select name="dureza_fairways" required>
+                <option value="">Selecciona</option>
+                <option>Suave</option>
+                <option>Media</option>
+                <option>Firme</option>
+              </select>
+            </label><br />
+            <label>Velocidad de greens* (pies):<br />
+              <input type="number" name="velocidad_greens" step="0.1" required />
+            </label><br />
+            <label>Dureza de greens*:<br />
+              <select name="dureza_greens" required>
+                <option value="">Selecciona</option>
+                <option>Suave</option>
+                <option>Media</option>
+                <option>Firme</option>
+              </select>
+            </label><br />
+            <label>Velocidad del viento*:<br />
+              <input type="number" name="velocidad_viento" required />
+            </label><br />
+            <label>Dirección del viento*:<br />
+              <input type="text" name="direccion_viento" required />
+            </label><br />
+          </fieldset>
+
+          <fieldset>
+            <legend>Tees adicionales</legend>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0 0 12px 0;">
+              Cada tee adicional ajusta el handicap del jugador según la salida seleccionada.
+              Un ajuste positivo aumenta el handicap (tee más difícil), negativo lo reduce (tee más fácil).
+            </p>
+            <div id="tees-adicionales-lista"></div>
+            <button type="button" class="btn-agregar" onclick="agregarTeeAdicional()">+ Agregar tee de salida</button>
+          </fieldset>
+
+          <fieldset>
+            <legend>Premio (opcional)</legend>
+            <label>Descripción general:<br />
+              <input type="text" name="premio_descripcion" />
+            </label><br />
+            <div id="editar-premios-lista"></div>
+            <button type="button" onclick="agregarPremioEditar()">Agregar premio</button>
+          </fieldset>
+
+          <fieldset>
+            <legend>Reglas específicas (opcional)</legend>
+            <div id="editar-reglas-lista"></div>
+            <button type="button" onclick="agregarReglaEditar()">Agregar regla</button>
+          </fieldset>
+
+          <fieldset>
+            <legend>Fotos (opcional)</legend>
+            <label>Foto de portada (URL):<br />
+              <input type="url" name="foto_portada" />
+            </label><br />
+            <div id="editar-galeria-lista"></div>
+            <button type="button" onclick="agregarFotoGaleriaEditar()">Agregar foto a galería</button>
+          </fieldset>
+
+          <fieldset>
+            <legend>Colores (opcional)</legend>
+            <label>Color primario:<br />
+              <input type="color" name="color_primario" />
+            </label><br />
+            <label>Color secundario:<br />
+              <input type="color" name="color_secundario" />
+            </label><br />
+            <label>Color de fondo:<br />
+              <input type="color" name="color_fondo" />
+            </label><br />
+          </fieldset>
+
+          <button type="submit" class="btn-guardar-torneo">Guardar Cambios</button>
+          <p id="status-editar-torneo" class="status"></p>
+        </form>
+      </div>
+    </div>
+
     <div id="previewContainer" class="preview-container">
       <h3>Previsualización de la Sesión</h3>
       <table id="previewTable" class="preview-table">

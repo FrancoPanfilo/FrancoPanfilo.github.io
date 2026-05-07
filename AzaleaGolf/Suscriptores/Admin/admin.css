@@ -262,6 +262,22 @@ body {
   font-size: 15px;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.admin-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
 .users-table .handicap-cell {
   font-weight: 700;
   color: var(--primary-color);
