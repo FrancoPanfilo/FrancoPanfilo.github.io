@@ -5,7 +5,7 @@ const isVercel = !!process.env.VERCEL;
 
 export default defineConfig({
   plugins: [react()],
-  base: isVercel ? '/' : '/AzaleaGolf/PalosUsados/',
+  base: isVercel ? '/' : '/PalosUsados/',
   build: {
     outDir: isVercel ? 'dist' : '../../AzaleaGolf/PalosUsados',
     emptyOutDir: true,
