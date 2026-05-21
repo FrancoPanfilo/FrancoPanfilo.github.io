@@ -54,11 +54,12 @@ const LOGO_COLOR = `${WP}/wp-content/uploads/2024/03/Azalea-Logo-Color-no-margin
 const LOGO_WHITE = `${WP}/wp-content/uploads/2024/03/Azalea-Logo-White-no-margin-PNG-small.png`;
 
 const NAV = [
-  { label: "Home",      href: `${WP}/` },
-  { label: "Catálogo",  href: `${WP}/catalogo-articulos-golf/` },
-  { label: "Simulador", href: `${WP}/simulador-de-golf/` },
-  { label: "Acerca de", href: `${WP}/acerca-azalea-tienda-golf/` },
-  { label: "Contacto",  href: `${WP}/contacto/` },
+  { label: "Home",         href: `${WP}/` },
+  { label: "Catálogo",     href: `${WP}/catalogo-articulos-golf/` },
+  { label: "Palos Usados", href: "/", active: true },
+  { label: "Simulador",    href: `${WP}/simulador-de-golf/` },
+  { label: "Acerca de",    href: `${WP}/acerca-azalea-tienda-golf/` },
+  { label: "Contacto",     href: `${WP}/contacto/` },
 ];
 const PRODUCTS_FOOTER = [
   { label: "Palos",        href: `${WP}/product-category/palos/` },
@@ -183,9 +184,9 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 1px 3px rgba(0,0,0,.05);
 }
 .az-header-inner {
-  max-width: 1140px; margin: 0 auto;
+  max-width: 1200px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 20px; height: 90px; position: relative;
+  padding: 0 15px; height: 90px; position: relative;
 }
 .az-logo { display: flex; align-items: center; flex-shrink: 0; }
 .az-logo img { height: 60px; display: block; }
@@ -220,7 +221,7 @@ a { text-decoration: none; color: inherit; }
   padding: 20px 20px 0;
 }
 .az-view-bar-inner {
-  max-width: 1140px; margin: 0 auto;
+  max-width: 1200px; margin: 0 auto;
   display: flex; align-items: flex-end; gap: 0;
 }
 .az-view-tab {
@@ -234,8 +235,8 @@ a { text-decoration: none; color: inherit; }
 .az-view-tab.active { color: var(--rz-color-dark); font-weight: 700; border-bottom-color: var(--rz-color-dark); }
 
 /* ─── PAGE TITLE BAR ─────────────────────────────────────── */
-.az-page-title { background: var(--rz-background-color-gray); border-bottom: 1px solid var(--rz-border-color-light); padding: 18px 20px; }
-.az-page-title-inner { max-width: 1140px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.az-page-title { background: var(--rz-background-color-gray); border-bottom: 1px solid var(--rz-border-color-light); padding: 18px 15px; }
+.az-page-title-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
 .az-page-title h1 { font-size: 22px; font-weight: 700; color: var(--rz-color-dark); letter-spacing: -.3px; }
 .az-breadcrumb { font-size: 12px; color: var(--rz-text-color-gray); }
 .az-breadcrumb a { color: var(--rz-text-color-gray); }
@@ -243,7 +244,7 @@ a { text-decoration: none; color: inherit; }
 .az-breadcrumb span { margin: 0 6px; }
 
 /* ─── LAYOUT ─────────────────────────────────────────────── */
-.az-layout { max-width: 1140px; margin: 0 auto; display: flex; gap: 30px; padding: 28px 20px 60px; align-items: flex-start; }
+.az-layout { max-width: 1200px; margin: 0 auto; display: flex; gap: 30px; padding: 28px 15px 60px; align-items: flex-start; }
 
 /* ─── SIDEBAR ────────────────────────────────────────────── */
 .az-sidebar { width: 240px; flex-shrink: 0; }
@@ -575,7 +576,7 @@ a { text-decoration: none; color: inherit; }
 .az-success-wrap p { font-size: 15px; color: var(--rz-text-color-gray); line-height: 1.7; margin-bottom: 28px; }
 
 /* ─── ADMIN ───────────────────────────────────────────────── */
-.az-admin-page { max-width: 1140px; margin: 0 auto; padding: 40px 20px 80px; }
+.az-admin-page { max-width: 1200px; margin: 0 auto; padding: 40px 20px 80px; }
 .az-admin-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
 .az-admin-topbar h2 { font-size: 20px; font-weight: 700; color: var(--rz-color-dark); }
 .az-admin-login-wrap { max-width: 400px; margin: 80px auto; padding: 40px; background: #fff; border: 1px solid var(--rz-border-color-light); border-radius: 6px; }
@@ -659,8 +660,8 @@ a { text-decoration: none; color: inherit; }
 .az-edit-close { position: absolute; top: 16px; right: 16px; background: #f0f0f0; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
 
 /* ─── FOOTER ──────────────────────────────────────────────── */
-.az-footer { background: #1F1F1F; color: #aaa; padding: 48px 20px 0; }
-.az-footer-inner { max-width: 1140px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1.2fr 1fr; gap: 40px; padding-bottom: 40px; }
+.az-footer { background: #1F1F1F; color: #aaa; padding: 48px 15px 0; }
+.az-footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1.2fr 1fr; gap: 40px; padding-bottom: 40px; }
 .az-footer-logo { margin-bottom: 0; }
 .az-footer-logo img { width: 180px; }
 .az-footer-col-header { display: flex; align-items: center; justify-content: space-between; }
@@ -676,7 +677,7 @@ a { text-decoration: none; color: inherit; }
 .az-footer-social a { display: flex; align-items: center; justify-content: center; color: #888; transition: color .2s; }
 .az-footer-social a:hover { color: #fff; }
 .az-footer-social svg { width: 22px; height: 22px; fill: currentColor; }
-.az-footer-bottom { max-width: 1140px; margin: 0 auto; border-top: 1px solid #2e2e2e; padding: 22px 0; display: flex; align-items: center; justify-content: space-between; }
+.az-footer-bottom { max-width: 1200px; margin: 0 auto; border-top: 1px solid #2e2e2e; padding: 22px 0; display: flex; align-items: center; justify-content: space-between; }
 .az-footer-bottom p { font-size: 12px; color: #666; }
 .az-footer-bottom a { color: #666; }
 .az-footer-bottom a:hover { color: #aaa; }
@@ -1950,7 +1951,9 @@ export default function PalosUsados() {
             <div className="az-nav-wrapper">
               <ul className="az-nav">
                 {NAV.map(l => (
-                  <li key={l.label}><a href={l.href}>{l.label}</a></li>
+                  <li key={l.label} className={l.active ? "active" : ""}>
+                    <a href={l.href}>{l.label}</a>
+                  </li>
                 ))}
               </ul>
             </div>
