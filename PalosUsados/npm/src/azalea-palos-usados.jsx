@@ -7,6 +7,26 @@ import {
   signInWithEmailAndPassword, signOut, onAuthStateChanged,
 } from "firebase/auth";
 import { db, auth } from "./firebase";
+import emailjs from "@emailjs/browser";
+
+const notifyNewListing = (form) => {
+  const sid = import.meta.env.VITE_EJS_SERVICE;
+  const tid = import.meta.env.VITE_EJS_TEMPLATE;
+  const key = import.meta.env.VITE_EJS_KEY;
+  if (!sid || !tid || !key) return;
+  emailjs.send(sid, tid, {
+    tipo:     TIPO_LABELS[form.tipo] ?? form.tipo,
+    marca:    form.marca,
+    modelo:   form.modelo,
+    version:  form.version || "Standard",
+    anio:     form.anio,
+    estado:   form.estado,
+    precio:   form.aConsultar ? "A consultar" : `US$ ${form.precio}`,
+    nombre:   form.nombre,
+    contacto: form.contacto,
+    depto:    form.departamento,
+  }, key).catch(() => {}); // silencioso
+};
 
 const CLOUDINARY_CLOUD  = "dmwai6eet";
 const CLOUDINARY_PRESET = "palosUsadosPreset";
@@ -796,6 +816,7 @@ function PublicarForm({ onSuccess }) {
       // Subir fotos a Cloudinary primero
       const fotos = await Promise.all(photos.map(f => uploadToCloudinary(f)));
 
+      notifyNewListing(form);
       await addDoc(collection(db, "listings"), {
         status: "pending",
         tipo: form.tipo, marca: form.marca, modelo: form.modelo,
