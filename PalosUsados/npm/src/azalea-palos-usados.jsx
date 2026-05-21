@@ -15,6 +15,7 @@ const notifyNewListing = (form) => {
   const key = import.meta.env.VITE_EJS_KEY;
   if (!sid || !tid || !key) { console.warn("EmailJS: env vars faltantes"); return; }
   emailjs.send(sid, tid, {
+    to_email: "francopanfilogolf@gmail.com",
     tipo:     TIPO_LABELS[form.tipo] ?? form.tipo,
     marca:    form.marca,
     modelo:   form.modelo,
