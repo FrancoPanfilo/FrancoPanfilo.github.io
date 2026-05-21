@@ -1,11 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const isVercel = !!process.env.VERCEL;
+
 export default defineConfig({
   plugins: [react()],
-  base: '/AzaleaGolf/PalosUsados/',
+  base: isVercel ? '/' : '/AzaleaGolf/PalosUsados/',
   build: {
-    outDir: '../../AzaleaGolf/PalosUsados',
+    outDir: isVercel ? 'dist' : '../../AzaleaGolf/PalosUsados',
     emptyOutDir: true,
   },
 })
