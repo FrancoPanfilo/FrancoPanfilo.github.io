@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:azaleasports.com.uy)",
+      "Bash(where playwright *)",
+      "Bash(where npx *)",
+      "Bash(npm install *)",
+      "Bash(node screenshot.mjs)",
+      "Bash(node -e ' *)",
+      "Bash(node *)",
+      "WebSearch"
+    ]
+  }
+}
