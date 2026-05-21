@@ -13,7 +13,7 @@ const notifyNewListing = (form) => {
   const sid = import.meta.env.VITE_EJS_SERVICE;
   const tid = import.meta.env.VITE_EJS_TEMPLATE;
   const key = import.meta.env.VITE_EJS_KEY;
-  if (!sid || !tid || !key) return;
+  if (!sid || !tid || !key) { console.warn("EmailJS: env vars faltantes"); return; }
   emailjs.send(sid, tid, {
     tipo:     TIPO_LABELS[form.tipo] ?? form.tipo,
     marca:    form.marca,
@@ -25,7 +25,7 @@ const notifyNewListing = (form) => {
     nombre:   form.nombre,
     contacto: form.contacto,
     depto:    form.departamento,
-  }, key).catch(() => {}); // silencioso
+  }, key).then(() => console.log("EmailJS: enviado")).catch(err => console.error("EmailJS error:", err));
 };
 
 const CLOUDINARY_CLOUD  = "dmwai6eet";
