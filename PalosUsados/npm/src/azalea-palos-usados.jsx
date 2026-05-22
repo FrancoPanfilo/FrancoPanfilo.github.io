@@ -893,6 +893,7 @@ a { text-decoration: none; color: inherit; }
 }
 @media (max-width: 640px) {
   .az-footer-inner { grid-template-columns: 1fr; gap: 0; padding-bottom: 0; }
+  .az-footer-col--split { grid-column: auto; display: block; }
   .az-footer-logo-col { display: flex; justify-content: center; padding: 8px 0 32px; border-bottom: 1px solid #2a2a2a; }
   .az-footer-logo img { width: 160px; }
   .az-footer-col { border-bottom: 1px solid #2a2a2a; }
