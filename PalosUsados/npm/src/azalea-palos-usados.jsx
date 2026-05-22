@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  collection, query, where, getDocs, addDoc, updateDoc,
+  collection, query, where, getDocs, getDoc, addDoc, updateDoc,
   deleteDoc, doc, serverTimestamp, orderBy,
 } from "firebase/firestore";
 import {
@@ -16,7 +16,9 @@ const notifyNewListing = (form) => {
   if (!sid || !tid || !key) { console.warn("EmailJS: env vars faltantes"); return; }
   emailjs.send(sid, tid, {
     to_email: "francopanfilogolf@gmail.com",
-    tipo:     TIPO_LABELS[form.tipo] ?? form.tipo,
+    tipo:     form.categoria && form.categoria !== "palos"
+                ? (CATEGORIA_LABELS[form.categoria] ?? form.categoria)
+                : (TIPO_LABELS[form.tipo] ?? form.tipo),
     marca:    form.marca,
     modelo:   form.modelo,
     version:  form.version || "Standard",
@@ -86,12 +88,39 @@ const TIPO_LABELS = {
   putter:  "Putter",
 };
 const TIPOS        = Object.keys(TIPO_LABELS);
+const CATEGORIA_LABELS = { palos: "Palos", carros: "Carros", bolsas: "Bolsas", otros: "Otros" };
+const CATEGORIA_OPTS   = ["palos", "carros", "bolsas", "otros"];
 const ESTADO_OPTS  = ["Como nuevo", "Muy bueno", "Bueno", "Regular", "Para reparar"];
 const FLEX_OPTS    = ["Ladies", "Senior", "Regular", "Stiff", "X-Stiff"];
 const IRON_OPTS    = ["2", "3", "4", "5", "6", "7", "8", "9", "PW", "GW", "SW", "LW"];
 const MATERIAL_OPTS = ["Grafito", "Acero"];
 const LARGO_OPTS = ["Standard", "+½\"", "+1\"", "+1½\"", "+2\"", "-½\"", "-1\"", "-1½\"", "-2\""];
+const PUTTER_LARGO_OPTS = ['33"', '34"', '35"', '36" (putter largo)'];
 const MANO_OPTS    = ["Diestro", "Zurdo"];
+const PUTTER_ESTILO_OPTS = ["Blade", "Mallet", "Mid-Mallet", "Putter largo"];
+const BOUNCE_OPTS  = ["4", "6", "7", "8", "9", "10", "11", "12", "13", "14"];
+const GRIND_OPTS = [
+  "S (Standard)", "W (Wide/Full)", "M (Medio)", "K (Low/Narrow)",
+  "T (Toe)", "F (Full)", "D (Dynamic)", "Otro",
+];
+const MADERA_NUM_OPTS  = ["3", "4", "5", "7", "9", "11", "13"];
+const HIBRIDO_NUM_OPTS = ["1", "2", "3", "4", "5", "6", "7"];
+const LOFT_OPTS = {
+  driver:  ["8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"],
+  madera:  ["13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"],
+  hibrido: ["16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"],
+  wedge:   ["46", "48", "50", "52", "54", "56", "58", "60", "62", "64"],
+};
+const PRICE_RANGES = [
+  { label: "Hasta US$100",   min: 0,   max: 100 },
+  { label: "US$100 – 300",   min: 100, max: 300 },
+  { label: "US$300 – 600",   min: 300, max: 600 },
+  { label: "Más de US$600",  min: 600, max: Infinity },
+  { label: "A consultar",    consultar: true },
+];
+const MONEDA_OPTS = ["USD", "UYU"];
+const ITEMS_PER_PAGE = 20;
+
 const DEPARTAMENTOS = [
   "Montevideo","Canelones","Maldonado","Colonia","San José",
   "Soriano","Río Negro","Paysandú","Salto","Artigas",
@@ -137,8 +166,11 @@ const cascadeFill = (tipo, marca, modelo, version) => {
 /* ─────────────────────────────────────────────────────────────
    DISPLAY HELPERS
 ───────────────────────────────────────────────────────────── */
-const formatPrecio = (l) =>
-  l.aConsultar ? "A consultar" : `US$ ${Number(l.precio).toLocaleString("es-UY")}`;
+const formatPrecio = (l) => {
+  if (l.aConsultar) return "A consultar";
+  const prefix = l.moneda === "UYU" ? "$" : "US$";
+  return `${prefix} ${Number(l.precio).toLocaleString("es-UY")}`;
+};
 
 const formatComposicion = (arr) => {
   if (!arr || arr.length === 0) return "";
@@ -552,6 +584,16 @@ a { text-decoration: none; color: inherit; }
   background: rgba(0,0,0,.55); color: #fff; padding: 1px 5px; border-radius: 2px; text-transform: uppercase;
 }
 
+/* ─── DATOS EXTRA TOGGLE ──────────────────────────────────── */
+.az-extra-toggle {
+  background: none; border: 1px solid var(--rz-border-color-light); border-radius: 4px;
+  cursor: pointer; padding: 9px 16px; margin-top: 20px;
+  font-family: var(--rz-font-family); font-size: 13px; font-weight: 600;
+  color: var(--rz-text-color-gray); display: flex; align-items: center; gap: 8px;
+  transition: all .2s; width: 100%;
+}
+.az-extra-toggle:hover { border-color: var(--rz-color-dark); color: var(--rz-color-dark); }
+
 /* ─── FORM NAVIGATION ─────────────────────────────────────── */
 .az-form-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--rz-border-color-light); }
 .az-btn-primary {
@@ -569,11 +611,24 @@ a { text-decoration: none; color: inherit; }
 .az-btn-secondary:hover { border-color: #999; color: var(--rz-color-dark); }
 .az-form-errors { background: #fff5f5; border: 1px solid #fdd; border-radius: 4px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; color: #e63946; }
 
+/* ─── CATEGORY SELECTOR ───────────────────────────────────── */
+.az-cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 12px; }
+@media (min-width: 540px) { .az-cat-grid { grid-template-columns: repeat(4, 1fr); } }
+.az-cat-card {
+  border: 2px solid var(--rz-border-color-light); border-radius: 6px;
+  padding: 32px 16px; text-align: center; cursor: pointer;
+  transition: all .18s; background: #fff;
+}
+.az-cat-card:hover { border-color: var(--rz-color-primary); background: rgba(255,123,172,.03); }
+.az-cat-name { font-size: 15px; font-weight: 600; color: var(--rz-color-dark); }
+
 /* ─── SUCCESS SCREEN ──────────────────────────────────────── */
 .az-success-wrap { text-align: center; padding: 80px 20px; max-width: 480px; margin: 0 auto; }
 .az-success-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--rz-color-primary); color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
 .az-success-wrap h2 { font-size: 24px; font-weight: 700; color: var(--rz-color-dark); margin-bottom: 12px; }
 .az-success-wrap p { font-size: 15px; color: var(--rz-text-color-gray); line-height: 1.7; margin-bottom: 28px; }
+.az-success-wa { display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #fff; padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 600; text-decoration: none; }
+.az-success-wa:hover { background: #128C7E; color: #fff; }
 
 /* ─── ADMIN ───────────────────────────────────────────────── */
 .az-admin-page { max-width: 1200px; margin: 0 auto; padding: 40px 20px 80px; }
@@ -635,6 +690,14 @@ a { text-decoration: none; color: inherit; }
   aspect-ratio: 1; transition: border-color .15s;
 }
 .az-edit-add-photo:hover { border-color: var(--rz-color-primary); color: var(--rz-color-primary); }
+.az-edit-photo-set-main {
+  position: absolute; bottom: 4px; left: 4px;
+  background: rgba(0,0,0,.65); color: #ffd700; border: none; border-radius: 3px;
+  cursor: pointer; font-size: 11px; font-weight: 700; padding: 2px 6px;
+  opacity: 0; transition: opacity .15s; white-space: nowrap;
+}
+.az-edit-photo-thumb:hover .az-edit-photo-set-main { opacity: 1; }
+.az-edit-photo-thumb:hover .az-edit-photo-set-main:hover { background: rgba(0,0,0,.85); }
 .az-admin-card-body strong { color: var(--rz-color-dark); }
 .az-admin-actions { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--rz-border-color-light); }
 .az-admin-btn {
@@ -683,6 +746,136 @@ a { text-decoration: none; color: inherit; }
 .az-footer-bottom a:hover { color: #aaa; }
 .az-footer-simbionte-logo img { height: 36px; opacity: .6; filter: brightness(0) invert(1); }
 
+/* ─── LISTING DETAIL ─────────────────────────────────────── */
+.az-detail-wrap { max-width: 1200px; margin: 0 auto; padding: 28px 15px 80px; }
+.az-detail-back {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  background: none; border: none; padding: 0; margin-bottom: 32px;
+  font-family: var(--rz-font-family); font-size: 13px; font-weight: 600;
+  color: var(--rz-text-color-gray); letter-spacing: .3px; transition: color .2s;
+}
+.az-detail-back:hover { color: var(--rz-color-dark); }
+.az-detail-layout { display: grid; grid-template-columns: 1.1fr 1fr; gap: 52px; align-items: start; }
+.az-detail-gallery { position: sticky; top: 106px; }
+.az-detail-main-img {
+  aspect-ratio: 4/3; background: var(--rz-background-color-gray);
+  border-radius: 6px; overflow: hidden; margin-bottom: 10px;
+}
+.az-detail-main-img img { width: 100%; height: 100%; object-fit: contain; }
+.az-detail-main-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 72px; opacity: .08; }
+.az-detail-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+.az-detail-thumb {
+  width: 76px; height: 76px; object-fit: contain; border-radius: 4px; cursor: pointer;
+  border: 2px solid transparent; opacity: .65; transition: all .15s;
+  background: var(--rz-background-color-gray);
+}
+.az-detail-thumb:hover { opacity: 1; }
+.az-detail-thumb.active { opacity: 1; border-color: var(--rz-color-dark); }
+.az-detail-tipo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: #999; margin-bottom: 6px; }
+.az-detail-title { font-size: 26px; font-weight: 700; color: var(--rz-color-dark); line-height: 1.3; margin-bottom: 16px; }
+.az-detail-price { font-size: 30px; font-weight: 700; color: var(--rz-color-dark); margin-bottom: 16px; }
+.az-detail-price.consultar { font-size: 18px; color: #888; font-style: italic; }
+.az-detail-local {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px; padding: 4px 12px;
+  border-radius: 3px; background: #111; color: #fff; margin-bottom: 20px;
+}
+.az-detail-specs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  background: var(--rz-background-color-gray); border-radius: 6px;
+  overflow: hidden; margin-bottom: 20px;
+}
+.az-detail-spec {
+  padding: 10px 14px; border-bottom: 1px solid #ebebeb; border-right: 1px solid #ebebeb;
+  font-size: 13px;
+}
+.az-detail-spec:nth-child(even) { border-right: none; }
+.az-detail-spec strong { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #aaa; margin-bottom: 2px; }
+.az-detail-desc { font-size: 14px; color: var(--rz-text-color-gray); line-height: 1.75; margin-bottom: 20px; padding: 16px 0; border-top: 1px solid var(--rz-border-color-light); }
+.az-detail-contact { background: var(--rz-background-color-gray); border-radius: 6px; padding: 20px 20px 24px; }
+.az-detail-contact h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+.az-detail-contact p { font-size: 13px; color: #767676; line-height: 1.6; margin-bottom: 14px; }
+@media (max-width: 768px) {
+  .az-detail-layout { grid-template-columns: 1fr; gap: 24px; }
+  .az-detail-gallery { position: static; }
+  .az-detail-title { font-size: 21px; }
+  .az-detail-price { font-size: 24px; }
+  .az-detail-specs { grid-template-columns: 1fr; }
+  .az-detail-spec { border-right: none; }
+}
+
+/* ─── MOBILE NAV ─────────────────────────────────────────── */
+.az-mobile-overlay {
+  position: fixed; inset: 0; z-index: 299; background: rgba(0,0,0,.45);
+}
+.az-mobile-nav {
+  position: fixed; top: 0; left: 0; bottom: 0; width: 280px; z-index: 300;
+  background: #fff; padding: 28px 20px; overflow-y: auto;
+  transform: translateX(-100%); transition: transform .28s ease;
+  display: flex; flex-direction: column; gap: 0;
+}
+.az-mobile-nav.open { transform: translateX(0); }
+.az-mobile-nav-close {
+  background: none; border: none; cursor: pointer; align-self: flex-end;
+  font-size: 22px; color: var(--rz-text-color-gray); padding: 4px; margin-bottom: 16px;
+}
+.az-mobile-nav ul { list-style: none; }
+.az-mobile-nav ul li { border-bottom: 1px solid var(--rz-border-color-light); }
+.az-mobile-nav ul li a {
+  display: block; padding: 14px 0; font-size: 15px; font-weight: 500;
+  color: var(--rz-color-dark); transition: color .2s;
+}
+.az-mobile-nav ul li a:hover,
+.az-mobile-nav ul li.active a { color: var(--rz-color-primary); }
+
+/* ─── MOBILE FILTER DRAWER ───────────────────────────────── */
+.az-filter-drawer-overlay {
+  position: fixed; inset: 0; z-index: 399; background: rgba(0,0,0,.45);
+}
+.az-filter-drawer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
+  background: #fff; border-radius: 14px 14px 0 0;
+  padding: 20px 20px 32px; max-height: 82vh; overflow-y: auto;
+}
+.az-filter-drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.az-filter-drawer-header h3 { font-size: 16px; font-weight: 700; color: var(--rz-color-dark); }
+.az-filter-drawer-close {
+  background: #f0f0f0; border: none; border-radius: 50%; width: 30px; height: 30px;
+  cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
+}
+.az-mobile-filter-btn {
+  display: none; align-items: center; gap: 6px;
+  background: var(--rz-color-dark); color: #fff; border: none; border-radius: 3px;
+  padding: 8px 14px; font-family: var(--rz-font-family); font-size: 12px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .4px; cursor: pointer;
+  transition: background .2s;
+}
+.az-mobile-filter-btn:hover { background: var(--rz-color-primary); }
+.az-mobile-filter-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+/* ─── PAGINATION ─────────────────────────────────────────── */
+.az-ver-mas {
+  width: 100%; padding: 13px; background: transparent;
+  border: 1px solid var(--rz-border-color); border-radius: 3px;
+  font-family: var(--rz-font-family); font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px; cursor: pointer;
+  color: var(--rz-text-color-gray); transition: all .2s; margin-top: 8px;
+}
+.az-ver-mas:hover { border-color: var(--rz-color-dark); color: var(--rz-color-dark); }
+
+/* ─── PRICE CURRENCY TOGGLE ──────────────────────────────── */
+.az-currency-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.az-currency-btn {
+  flex: 1; padding: 8px; border: 1.5px solid var(--rz-border-color-light);
+  border-radius: 4px; background: #fff; font-family: var(--rz-font-family);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s;
+  color: var(--rz-text-color-gray);
+}
+.az-currency-btn.active { border-color: var(--rz-color-dark); background: var(--rz-color-dark); color: #fff; }
+
 /* ─── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 900px) {
   .az-header-inner { justify-content: center; }
@@ -691,6 +884,7 @@ a { text-decoration: none; color: inherit; }
   .az-logo { position: absolute; left: 50%; transform: translateX(-50%); }
   .az-search-btn { position: absolute; right: 20px; }
   .az-sidebar { display: none; }
+  .az-mobile-filter-btn { display: flex; }
   .az-footer-inner { grid-template-columns: 180px 1fr 1fr; }
   .az-footer-col--split { grid-column: 2 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
   .az-footer-bottom { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
@@ -721,10 +915,11 @@ a { text-decoration: none; color: inherit; }
    FORM INITIAL STATE
 ───────────────────────────────────────────────────────────── */
 const EMPTY_FORM = {
+  categoria: "",
   tipo: "", marca: "", modelo: "", version: "", anio: "",
   estado: "", mano: "", flex: "", loft: "", material: "", largo: "",
-  bounce: "", grind: "", headcover: false, composicion: [],
-  aConsultar: false, precio: "",
+  bounce: "", grind: "", headcover: false, composicion: [], estiloPutter: "", numPalo: "",
+  aConsultar: false, precio: "", moneda: "USD",
   descripcion: "", departamento: "",
   enElLocal: false, aceptaComision: false,
   nombre: "", contacto: "",
@@ -734,7 +929,7 @@ const EMPTY_FORM = {
    SUBCOMPONENT: PublicarForm
 ───────────────────────────────────────────────────────────── */
 function PublicarForm({ onSuccess }) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [form, setForm] = useState(EMPTY_FORM);
   const [photos, setPhotos] = useState([]);
   const [previews, setPreviews] = useState([]);
@@ -742,9 +937,26 @@ function PublicarForm({ onSuccess }) {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [showExtra, setShowExtra] = useState(false);
+  const [manualEntry, setManualEntry] = useState(false);
   const fileRef = useRef();
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
+
+  const isPalos = form.categoria === "palos";
+  const STEPS = isPalos || !form.categoria
+    ? ["Categoría", "Identificar", "Estado", "Fotos", "Publicar"]
+    : ["Categoría", "Identificar", "Fotos", "Publicar"];
+  const maxStep = STEPS.length - 1;
+
+  const onCategorySelect = (cat) => {
+    if (cat !== form.categoria) {
+      setForm({ ...EMPTY_FORM, categoria: cat });
+      setPhotos([]);
+      setPreviews([]);
+    }
+    setStep(1);
+  };
 
   const hasTipo = (tipos) => tipos.includes(form.tipo);
   const needsFlex   = form.tipo && form.tipo !== "putter";
@@ -753,9 +965,9 @@ function PublicarForm({ onSuccess }) {
   const needsHead   = hasTipo(["driver", "madera", "hibrido", "putter"]);
 
   // Cascade handlers con autoselección cuando hay una sola opción
-  const onTipo = (v) => setForm(() => ({ ...EMPTY_FORM, ...cascadeFill(v, "", "", "") }));
-  const onMarca = (v) => setForm(f => ({ ...EMPTY_FORM, tipo: f.tipo, ...cascadeFill(f.tipo, v, "", "") }));
-  const onModelo = (v) => setForm(f => ({ ...EMPTY_FORM, tipo: f.tipo, marca: f.marca, ...cascadeFill(f.tipo, f.marca, v, "") }));
+  const onTipo = (v) => setForm(f => ({ ...EMPTY_FORM, categoria: f.categoria, ...cascadeFill(v, "", "", "") }));
+  const onMarca = (v) => setForm(f => ({ ...EMPTY_FORM, categoria: f.categoria, tipo: f.tipo, ...cascadeFill(f.tipo, v, "", "") }));
+  const onModelo = (v) => setForm(f => ({ ...EMPTY_FORM, categoria: f.categoria, tipo: f.tipo, marca: f.marca, ...cascadeFill(f.tipo, f.marca, v, "") }));
   const onVersion = (v) => {
     const years = getAnios(form.tipo, form.marca, form.modelo, v);
     setForm(f => ({ ...f, version: v, anio: years.length === 1 ? String(years[0]) : "" }));
@@ -780,29 +992,55 @@ function PublicarForm({ onSuccess }) {
   const validate = () => {
     const e = {};
     if (step === 1) {
-      if (!form.tipo)  e.tipo   = "Seleccioná un tipo";
-      if (form.tipo  && !form.marca)   e.marca   = "Seleccioná una marca";
-      if (form.marca && !form.modelo)  e.modelo  = "Seleccioná un modelo";
-      if (form.modelo && showVersionSelect && !form.version) e.version = "Seleccioná una versión";
-      if (form.version && showAnioSelect && !form.anio) e.anio = "Seleccioná el año";
+      if (isPalos) {
+        if (manualEntry) {
+          if (!form.tipo)  e.tipo  = "Seleccioná un tipo";
+          if (!form.marca.trim()) e.marca = "Ingresá la marca";
+        } else {
+          if (!form.tipo)  e.tipo   = "Seleccioná un tipo";
+          if (form.tipo  && !form.marca)   e.marca   = "Seleccioná una marca";
+          if (form.marca && !form.modelo)  e.modelo  = "Seleccioná un modelo";
+          if (form.modelo && showVersionSelect && !form.version) e.version = "Seleccioná una versión";
+          if (form.version && showAnioSelect && !form.anio) e.anio = "Seleccioná el año";
+        }
+      } else {
+        if (!form.marca.trim()) e.marca = "Ingresá la marca";
+      }
     }
-    if (step === 2) {
-      if (!form.estado) e.estado = "Seleccioná el estado";
-      if (!form.mano) e.mano = "Seleccioná la mano";
-      if (needsFlex && !form.flex) e.flex = "Seleccioná el flex";
-      if (needsLoft && !form.loft) e.loft = "Indicá el loft";
-      if (form.tipo === "hierros" && form.composicion.length < 2)
-        e.composicion = "Seleccioná al menos 2 palos del set";
-    }
-    if (step === 3) {
-      if (photos.length === 0) e.photos = "Subí al menos una foto";
-    }
-    if (step === 4) {
-      if (!form.aConsultar && !form.precio) e.precio = "Ingresá un precio o marcá 'A consultar'";
-      if (!form.departamento) e.departamento = "Seleccioná un departamento";
-      if (!form.nombre.trim()) e.nombre = "Ingresá tu nombre";
-      if (!form.contacto.trim()) e.contacto = "Ingresá tu WhatsApp o email";
-      if (form.enElLocal && !form.aceptaComision) e.aceptaComision = "Debés aceptar la comisión para activar esta opción";
+    if (isPalos) {
+      if (step === 2) {
+        if (!form.estado) e.estado = "Seleccioná la condición";
+        if (!form.mano) e.mano = "Seleccioná la mano";
+        if (form.tipo === "driver" && !form.flex) e.flex = "Seleccioná el flex";
+        if ((form.tipo === "driver" || form.tipo === "wedge") && !form.loft) e.loft = "Seleccioná el loft";
+        if ((form.tipo === "madera" || form.tipo === "hibrido") && !form.numPalo) e.numPalo = "Seleccioná el número";
+        if (form.tipo === "putter" && !form.estiloPutter) e.estiloPutter = "Seleccioná el estilo";
+        if (form.tipo === "putter" && !form.largo) e.largo = "Seleccioná el largo del putter";
+        if (form.tipo === "hierros" && form.composicion.length < 2)
+          e.composicion = "Seleccioná al menos 2 palos del set";
+      }
+      if (step === 3) {
+        if (photos.length === 0) e.photos = "Subí al menos una foto";
+      }
+      if (step === 4) {
+        if (!form.aConsultar && !form.precio) e.precio = "Ingresá un precio o marcá 'A consultar'";
+        if (!form.departamento) e.departamento = "Seleccioná un departamento";
+        if (!form.nombre.trim()) e.nombre = "Ingresá tu nombre";
+        if (!form.contacto.trim()) e.contacto = "Ingresá tu WhatsApp o email";
+        if (form.enElLocal && !form.aceptaComision) e.aceptaComision = "Debés aceptar la comisión para activar esta opción";
+      }
+    } else {
+      if (step === 2) {
+        if (photos.length === 0) e.photos = "Subí al menos una foto";
+      }
+      if (step === 3) {
+        if (!form.estado) e.estado = "Seleccioná el estado";
+        if (!form.aConsultar && !form.precio) e.precio = "Ingresá un precio o marcá 'A consultar'";
+        if (!form.departamento) e.departamento = "Seleccioná un departamento";
+        if (!form.nombre.trim()) e.nombre = "Ingresá tu nombre";
+        if (!form.contacto.trim()) e.contacto = "Ingresá tu WhatsApp o email";
+        if (form.enElLocal && !form.aceptaComision) e.aceptaComision = "Debés aceptar la comisión para activar esta opción";
+      }
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -815,33 +1053,49 @@ function PublicarForm({ onSuccess }) {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      // Subir fotos a Cloudinary primero
       const fotos = await Promise.all(photos.map(f => uploadToCloudinary(f)));
-
       notifyNewListing(form);
-      await addDoc(collection(db, "listings"), {
-        status: "pending",
-        tipo: form.tipo, marca: form.marca, modelo: form.modelo,
-        version: form.version || "Standard", anio: Number(form.anio),
-        estado: form.estado, mano: form.mano,
-        flex: form.flex || null, loft: form.loft ? Number(form.loft) : null,
-        material: form.material || null, largo: form.largo || null,
-        bounce: form.bounce ? Number(form.bounce) : null,
-        grind: form.grind || null, headcover: form.headcover || null,
-        composicion: form.composicion.length > 0 ? form.composicion : null,
-        aConsultar: form.aConsultar, precio: form.aConsultar ? null : Number(form.precio),
-        descripcion: form.descripcion || null, departamento: form.departamento,
-        enElLocal: form.enElLocal || false,
-        vendedor: { nombre: form.nombre, contacto: form.contacto },
-        fotos, createdAt: serverTimestamp(), approvedAt: null,
-      });
+
+      if (isPalos) {
+        await addDoc(collection(db, "listings"), {
+          status: "pending",
+          categoria: "palos",
+          tipo: form.tipo, marca: form.marca, modelo: form.modelo,
+          version: form.version || "Standard", anio: Number(form.anio),
+          estado: form.estado, mano: form.mano,
+          flex: form.flex || null, loft: form.loft ? Number(form.loft) : null,
+          material: form.material || null, largo: form.largo || null,
+          bounce: form.bounce ? Number(form.bounce) : null,
+          grind: form.grind || null, headcover: form.headcover || null,
+          estiloPutter: form.estiloPutter || null,
+          numPalo: form.numPalo || null,
+          composicion: form.composicion.length > 0 ? form.composicion : null,
+          aConsultar: form.aConsultar, precio: form.aConsultar ? null : Number(form.precio),
+          moneda: form.aConsultar ? null : (form.moneda || "USD"),
+          descripcion: form.descripcion || null, departamento: form.departamento,
+          enElLocal: form.enElLocal || false, aceptaComision: form.aceptaComision || false,
+          vendedor: { nombre: form.nombre, contacto: form.contacto },
+          fotos, createdAt: serverTimestamp(), approvedAt: null,
+        });
+      } else {
+        await addDoc(collection(db, "listings"), {
+          status: "pending",
+          categoria: form.categoria,
+          marca: form.marca, modelo: form.modelo || null,
+          estado: form.estado,
+          aConsultar: form.aConsultar, precio: form.aConsultar ? null : Number(form.precio),
+          moneda: form.aConsultar ? null : (form.moneda || "USD"),
+          descripcion: form.descripcion || null, departamento: form.departamento,
+          enElLocal: form.enElLocal || false, aceptaComision: form.aceptaComision || false,
+          vendedor: { nombre: form.nombre, contacto: form.contacto },
+          fotos, createdAt: serverTimestamp(), approvedAt: null,
+        });
+      }
       onSuccess();
     } catch (err) {
       console.error("Submit error:", err?.code, err?.message, err);
       const msg = err?.code === "permission-denied"
         ? "Sin permisos en Firebase. Revisá las Firestore Security Rules."
-        : err?.code === "storage/unauthorized"
-        ? "Sin permisos en Firebase Storage. Revisá las Storage Rules."
         : `Error: ${err?.code || err?.message || "desconocido"}`;
       setErrors({ submit: msg });
     } finally {
@@ -860,20 +1114,19 @@ function PublicarForm({ onSuccess }) {
   const showVersionSelect = versiones.length > 1;
   const showAnioSelect    = anios.length > 1;
 
-  const STEPS = ["Identificar", "Estado", "Fotos", "Publicar"];
-
   return (
     <div className="az-publicar-wrap">
-      <p className="az-publicar-title">Publicar mis palos</p>
+      <p className="az-publicar-title">
+        {!form.categoria ? "Publicar un artículo" : `Publicar: ${CATEGORIA_LABELS[form.categoria]}`}
+      </p>
 
       {/* Step indicator */}
       <div className="az-steps-bar">
         {STEPS.map((label, i) => {
-          const n = i + 1;
-          const cls = n < step ? "done" : n === step ? "active" : "";
+          const cls = i < step ? "done" : i === step ? "active" : "";
           return (
             <div key={label} className="az-step-item" style={{ flex: i < STEPS.length - 1 ? 1 : "none" }}>
-              <div className={`az-step-circle ${cls}`}>{n < step ? "✓" : n}</div>
+              <div className={`az-step-circle ${cls}`}>{i < step ? "✓" : i + 1}</div>
               <span className={`az-step-label ${cls}`}>{label}</span>
               {i < STEPS.length - 1 && <div className="az-step-line" />}
             </div>
@@ -883,87 +1136,159 @@ function PublicarForm({ onSuccess }) {
 
       {errors.submit && <div className="az-form-errors">{errors.submit}</div>}
 
+      {/* ── Step 0: Categoría ── */}
+      {step === 0 && (
+        <div>
+          <div className="az-form-section-title" style={{ marginBottom: 20 }}>¿Qué querés publicar?</div>
+          <div className="az-cat-grid">
+            {CATEGORIA_OPTS.map(cat => (
+              <div key={cat} className="az-cat-card" onClick={() => onCategorySelect(cat)}>
+                <div className="az-cat-name">{CATEGORIA_LABELS[cat]}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Step 1: Identificar ── */}
-      {step === 1 && (
+      {step === 1 && isPalos && (
         <>
-          {/* Tipo — siempre select, siempre visible */}
+          {/* Tipo — siempre visible */}
           <div className="az-field">
             <label className="az-label">Tipo de palo</label>
-            <select className="az-select" value={form.tipo} onChange={e => onTipo(e.target.value)}>
+            <select className="az-select" value={form.tipo} onChange={e => { onTipo(e.target.value); setManualEntry(false); }}>
               <option value="">Seleccionar…</option>
               {TIPOS.map(t => <option key={t} value={t}>{TIPO_LABELS[t]}</option>)}
             </select>
             {errors.tipo && <p className="az-error-msg">{errors.tipo}</p>}
           </div>
 
-          {/* Marca */}
+          {!manualEntry && form.tipo && (
+            <>
+              {/* Marca */}
+              <div className="az-field">
+                <label className="az-label">Marca</label>
+                {showMarcaSelect
+                  ? <select className="az-select" value={form.marca} onChange={e => onMarca(e.target.value)}>
+                      <option value="">Seleccionar…</option>
+                      {marcas.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                  : <div className="az-auto-val">{form.marca}</div>
+                }
+                {errors.marca && <p className="az-error-msg">{errors.marca}</p>}
+              </div>
+
+              {/* Modelo */}
+              {form.marca && (
+                <div className="az-field">
+                  <label className="az-label">Modelo</label>
+                  {showModeloSelect
+                    ? <select className="az-select" value={form.modelo} onChange={e => onModelo(e.target.value)}>
+                        <option value="">Seleccionar…</option>
+                        {modelos.map(m => <option key={m} value={m}>{m}</option>)}
+                      </select>
+                    : <div className="az-auto-val">{form.modelo}</div>
+                  }
+                  {errors.modelo && <p className="az-error-msg">{errors.modelo}</p>}
+                </div>
+              )}
+
+              {/* Versión */}
+              {form.modelo && showVersionSelect && (
+                <div className="az-field">
+                  <label className="az-label">Versión</label>
+                  <select className="az-select" value={form.version} onChange={e => onVersion(e.target.value)}>
+                    <option value="">Seleccionar…</option>
+                    {versiones.map(v => (
+                      <option key={v.version} value={v.version}>{v.version} ({v.anio})</option>
+                    ))}
+                  </select>
+                  {errors.version && <p className="az-error-msg">{errors.version}</p>}
+                </div>
+              )}
+
+              {/* Año */}
+              {form.version && (
+                <div className="az-field" style={{ maxWidth: 200 }}>
+                  <label className="az-label">Año</label>
+                  {showAnioSelect
+                    ? <select className="az-select" value={form.anio} onChange={e => setForm(f => ({ ...f, anio: e.target.value }))}>
+                        <option value="">Seleccionar…</option>
+                        {anios.map(y => <option key={y} value={String(y)}>{y}</option>)}
+                      </select>
+                    : <div className="az-auto-val">{form.anio}</div>
+                  }
+                  {errors.anio && <p className="az-error-msg">{errors.anio}</p>}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Entrada manual */}
+          {manualEntry && form.tipo && (
+            <>
+              <div className="az-form-row">
+                <div className="az-field">
+                  <label className="az-label">Marca</label>
+                  <input className="az-input" type="text" value={form.marca}
+                    onChange={e => set("marca", e.target.value)} placeholder="ej: Cobra, XXIO, Honma…" />
+                  {errors.marca && <p className="az-error-msg">{errors.marca}</p>}
+                </div>
+                <div className="az-field">
+                  <label className="az-label">Modelo <span className="opt">(opcional)</span></label>
+                  <input className="az-input" type="text" value={form.modelo}
+                    onChange={e => set("modelo", e.target.value)} placeholder="ej: Aerojet, EZone…" />
+                </div>
+              </div>
+              <div className="az-field" style={{ maxWidth: 160 }}>
+                <label className="az-label">Año <span className="opt">(opcional)</span></label>
+                <input className="az-input" type="number" value={form.anio} min="1990" max="2030"
+                  onChange={e => set("anio", e.target.value)} placeholder="ej: 2022" />
+              </div>
+            </>
+          )}
+
+          {/* Toggle manual / cascada */}
           {form.tipo && (
-            <div className="az-field">
-              <label className="az-label">Marca</label>
-              {showMarcaSelect
-                ? <select className="az-select" value={form.marca} onChange={e => onMarca(e.target.value)}>
-                    <option value="">Seleccionar…</option>
-                    {marcas.map(m => <option key={m} value={m}>{m}</option>)}
-                  </select>
-                : <div className="az-auto-val">{form.marca}</div>
-              }
-              {errors.marca && <p className="az-error-msg">{errors.marca}</p>}
-            </div>
-          )}
-
-          {/* Modelo */}
-          {form.marca && (
-            <div className="az-field">
-              <label className="az-label">Modelo</label>
-              {showModeloSelect
-                ? <select className="az-select" value={form.modelo} onChange={e => onModelo(e.target.value)}>
-                    <option value="">Seleccionar…</option>
-                    {modelos.map(m => <option key={m} value={m}>{m}</option>)}
-                  </select>
-                : <div className="az-auto-val">{form.modelo}</div>
-              }
-              {errors.modelo && <p className="az-error-msg">{errors.modelo}</p>}
-            </div>
-          )}
-
-          {/* Versión — solo si hay más de una opción */}
-          {form.modelo && showVersionSelect && (
-            <div className="az-field">
-              <label className="az-label">Versión</label>
-              <select className="az-select" value={form.version} onChange={e => onVersion(e.target.value)}>
-                <option value="">Seleccionar…</option>
-                {versiones.map(v => (
-                  <option key={v.version} value={v.version}>{v.version} ({v.anio})</option>
-                ))}
-              </select>
-              {errors.version && <p className="az-error-msg">{errors.version}</p>}
-            </div>
-          )}
-
-          {/* Año — select si hay múltiples, display readonly si es único */}
-          {form.version && (
-            <div className="az-field" style={{ maxWidth: 200 }}>
-              <label className="az-label">Año</label>
-              {showAnioSelect
-                ? <select className="az-select" value={form.anio}
-                    onChange={e => setForm(f => ({ ...f, anio: e.target.value }))}>
-                    <option value="">Seleccionar…</option>
-                    {anios.map(y => <option key={y} value={String(y)}>{y}</option>)}
-                  </select>
-                : <div className="az-auto-val">{form.anio}</div>
-              }
-              {errors.anio && <p className="az-error-msg">{errors.anio}</p>}
-            </div>
+            <button type="button" className="az-extra-toggle" style={{ marginTop: 16 }}
+              onClick={() => {
+                const next = !manualEntry;
+                setManualEntry(next);
+                setForm(f => ({ ...EMPTY_FORM, categoria: f.categoria, tipo: f.tipo }));
+              }}>
+              <span style={{ fontSize: 14 }}>{manualEntry ? "←" : "?"}</span>
+              {manualEntry ? "Buscar en la base de datos" : "Mi palo no está en la lista"}
+            </button>
           )}
         </>
       )}
 
-      {/* ── Step 2: Estado ── */}
-      {step === 2 && (
+      {/* ── Step 1: Identificar (Carros / Bolsas / Otros) ── */}
+      {step === 1 && !isPalos && (
         <>
+          <div className="az-field">
+            <label className="az-label">Marca</label>
+            <input className="az-input" type="text" value={form.marca}
+              onChange={e => set("marca", e.target.value)}
+              placeholder={form.categoria === "carros" ? "Clicgear, Motocaddy…" : form.categoria === "bolsas" ? "TaylorMade, Titleist…" : "Marca del producto"} />
+            {errors.marca && <p className="az-error-msg">{errors.marca}</p>}
+          </div>
+          <div className="az-field">
+            <label className="az-label">Modelo <span className="opt">(opcional)</span></label>
+            <input className="az-input" type="text" value={form.modelo}
+              onChange={e => set("modelo", e.target.value)}
+              placeholder="Nombre o referencia del modelo" />
+          </div>
+        </>
+      )}
+
+      {/* ── Step 2: Características (palos) ── */}
+      {step === 2 && isPalos && (
+        <>
+          {/* Condición + Mano — siempre */}
           <div className="az-form-row">
             <div className="az-field">
-              <label className="az-label">Estado</label>
+              <label className="az-label">Condición</label>
               <select className="az-select" value={form.estado} onChange={e => set("estado", e.target.value)}>
                 <option value="">Seleccionar…</option>
                 {ESTADO_OPTS.map(o => <option key={o}>{o}</option>)}
@@ -980,9 +1305,59 @@ function PublicarForm({ onSuccess }) {
             </div>
           </div>
 
+          {/* Putter: estilo y largo OBLIGATORIOS */}
+          {form.tipo === "putter" && (
+            <div className="az-form-row">
+              <div className="az-field">
+                <label className="az-label">Estilo</label>
+                <select className="az-select" value={form.estiloPutter} onChange={e => set("estiloPutter", e.target.value)}>
+                  <option value="">Seleccionar…</option>
+                  {PUTTER_ESTILO_OPTS.map(o => <option key={o}>{o}</option>)}
+                </select>
+                {errors.estiloPutter && <p className="az-error-msg">{errors.estiloPutter}</p>}
+              </div>
+              <div className="az-field">
+                <label className="az-label">Largo</label>
+                <select className="az-select" value={form.largo} onChange={e => set("largo", e.target.value)}>
+                  <option value="">Seleccionar…</option>
+                  {PUTTER_LARGO_OPTS.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+                {errors.largo && <p className="az-error-msg">{errors.largo}</p>}
+              </div>
+            </div>
+          )}
+
+          {/* Madera: número OBLIGATORIO */}
+          {form.tipo === "madera" && (
+            <div className="az-field" style={{ maxWidth: 220 }}>
+              <label className="az-label">Número de madera</label>
+              <select className="az-select" value={form.numPalo} onChange={e => set("numPalo", e.target.value)}>
+                <option value="">Seleccionar…</option>
+                {MADERA_NUM_OPTS.map(n => <option key={n} value={n}>Madera {n}</option>)}
+              </select>
+              {errors.numPalo && <p className="az-error-msg">{errors.numPalo}</p>}
+            </div>
+          )}
+
+          {/* Híbrido: número OBLIGATORIO */}
+          {form.tipo === "hibrido" && (
+            <div className="az-field" style={{ maxWidth: 220 }}>
+              <label className="az-label">Número del híbrido</label>
+              <select className="az-select" value={form.numPalo} onChange={e => set("numPalo", e.target.value)}>
+                <option value="">Seleccionar…</option>
+                {HIBRIDO_NUM_OPTS.map(n => <option key={n} value={n}>Híbrido {n}</option>)}
+              </select>
+              {errors.numPalo && <p className="az-error-msg">{errors.numPalo}</p>}
+            </div>
+          )}
+
+          {/* Flex — todos excepto putter (obligatorio solo para driver) */}
           {needsFlex && (
             <div className="az-field" style={{ maxWidth: 240 }}>
-              <label className="az-label">Flex del shaft</label>
+              <label className="az-label">
+                Flex del shaft
+                {form.tipo !== "driver" && <span className="opt"> (opcional)</span>}
+              </label>
               <select className="az-select" value={form.flex} onChange={e => set("flex", e.target.value)}>
                 <option value="">Seleccionar…</option>
                 {FLEX_OPTS.map(o => <option key={o}>{o}</option>)}
@@ -991,10 +1366,11 @@ function PublicarForm({ onSuccess }) {
             </div>
           )}
 
-          {/* Composición del set — obligatorio para hierros */}
+          {/* Hierros: composición del set */}
           {form.tipo === "hierros" && (
             <div className="az-field">
               <label className="az-label">Composición del set</label>
+              <p style={{ fontSize: 12, color: "#aaa", margin: "-4px 0 10px" }}>Seleccioná los hierros que incluye el set</p>
               <div className="az-iron-set">
                 {IRON_OPTS.map(iron => {
                   const sel = form.composicion.includes(iron);
@@ -1021,63 +1397,111 @@ function PublicarForm({ onSuccess }) {
             </div>
           )}
 
-          {needsLoft && (
+          {/* Hierros: material del shaft visible (grafito vs acero es dato clave) */}
+          {form.tipo === "hierros" && (
+            <div className="az-field" style={{ maxWidth: 240 }}>
+              <label className="az-label">Material del shaft <span className="opt">(opcional)</span></label>
+              <select className="az-select" value={form.material} onChange={e => set("material", e.target.value)}>
+                <option value="">No especificar</option>
+                {MATERIAL_OPTS.map(o => <option key={o}>{o}</option>)}
+              </select>
+            </div>
+          )}
+
+          {/* Driver y Wedge: loft OBLIGATORIO */}
+          {(form.tipo === "driver" || form.tipo === "wedge") && (
             <div className="az-field" style={{ maxWidth: 200 }}>
-              <label className="az-label">Loft (grados)</label>
-              <input className="az-input" type="number" step="0.5" min="1" max="70"
-                value={form.loft} onChange={e => set("loft", e.target.value)} placeholder="ej: 10.5" />
+              <label className="az-label">Loft</label>
+              <select className="az-select" value={form.loft} onChange={e => set("loft", e.target.value)}>
+                <option value="">Seleccionar…</option>
+                {(LOFT_OPTS[form.tipo] || []).map(v => (
+                  <option key={v} value={v}>{v}°</option>
+                ))}
+              </select>
               {errors.loft && <p className="az-error-msg">{errors.loft}</p>}
             </div>
           )}
 
-          {/* Opcionales */}
-          <div className="az-form-section" style={{ marginTop: 28 }}>
-            <div className="az-form-section-title">Datos opcionales</div>
+          {/* Wedge: bounce + grind */}
+          {form.tipo === "wedge" && (
             <div className="az-form-row">
               <div className="az-field">
-                <label className="az-label">Material del shaft <span className="opt">(opcional)</span></label>
-                <select className="az-select" value={form.material} onChange={e => set("material", e.target.value)}>
-                  <option value="">No especificar</option>
-                  {MATERIAL_OPTS.map(o => <option key={o}>{o}</option>)}
+                <label className="az-label">Bounce <span className="opt">(opcional)</span></label>
+                <select className="az-select" value={form.bounce} onChange={e => set("bounce", e.target.value)}>
+                  <option value="">No sé / No especificar</option>
+                  {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
                 </select>
               </div>
               <div className="az-field">
-                <label className="az-label">Largo del shaft <span className="opt">(opcional)</span></label>
-                <select className="az-select" value={form.largo} onChange={e => set("largo", e.target.value)}>
-                  <option value="">No especificar</option>
-                  {LARGO_OPTS.map(o => <option key={o} value={o}>{o}</option>)}
+                <label className="az-label">Grind <span className="opt">(opcional)</span></label>
+                <select className="az-select" value={form.grind} onChange={e => set("grind", e.target.value)}>
+                  <option value="">No sé / No especificar</option>
+                  {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
                 </select>
+                <p style={{ fontSize: 11, color: "#aaa", marginTop: 4 }}>Está marcado en la cara del wedge</p>
               </div>
             </div>
+          )}
 
-            {needsBounce && (
-              <div className="az-form-row">
-                <div className="az-field">
-                  <label className="az-label">Bounce <span className="opt">(opcional)</span></label>
-                  <input className="az-input" type="number" step="1" min="0" max="20"
-                    value={form.bounce} onChange={e => set("bounce", e.target.value)} placeholder="ej: 10" />
-                </div>
-                <div className="az-field">
-                  <label className="az-label">Grind <span className="opt">(opcional)</span></label>
-                  <input className="az-input" type="text" value={form.grind}
-                    onChange={e => set("grind", e.target.value)} placeholder="ej: S, M, C..." />
-                </div>
-              </div>
-            )}
+          {/* ── Sección colapsable: datos técnicos adicionales ── */}
+          <button type="button" className="az-extra-toggle" onClick={() => setShowExtra(s => !s)}>
+            <span style={{ fontSize: 16, lineHeight: 1 }}>{showExtra ? "−" : "+"}</span>
+            {showExtra ? "Ocultar datos adicionales" : "Agregar datos técnicos (opcional)"}
+          </button>
 
-            {needsHead && (
-              <div className="az-checkbox-row">
-                <input type="checkbox" id="headcover" checked={form.headcover}
-                  onChange={e => set("headcover", e.target.checked)} />
-                <label htmlFor="headcover">Incluye headcover</label>
-              </div>
-            )}
-          </div>
+          {showExtra && (
+            <div style={{ marginTop: 16 }}>
+              {/* Madera e Híbrido: loft opcional */}
+              {(form.tipo === "madera" || form.tipo === "hibrido") && (
+                <div className="az-field" style={{ maxWidth: 200 }}>
+                  <label className="az-label">Loft <span className="opt">(opcional)</span></label>
+                  <select className="az-select" value={form.loft} onChange={e => set("loft", e.target.value)}>
+                    <option value="">No especificar</option>
+                    {(LOFT_OPTS[form.tipo] || []).map(v => (
+                      <option key={v} value={v}>{v}°</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Shaft material + largo — no putter */}
+              {form.tipo !== "putter" && (
+                <div className="az-form-row">
+                  {form.tipo !== "hierros" && (
+                  <div className="az-field">
+                    <label className="az-label">Material del shaft <span className="opt">(opcional)</span></label>
+                    <select className="az-select" value={form.material} onChange={e => set("material", e.target.value)}>
+                      <option value="">No especificar</option>
+                      {MATERIAL_OPTS.map(o => <option key={o}>{o}</option>)}
+                    </select>
+                  </div>
+                  )}
+                  <div className="az-field">
+                    <label className="az-label">Largo del shaft <span className="opt">(opcional)</span></label>
+                    <select className="az-select" value={form.largo} onChange={e => set("largo", e.target.value)}>
+                      <option value="">Standard</option>
+                      {LARGO_OPTS.filter(o => o !== "Standard").map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Headcover */}
+              {needsHead && (
+                <div className="az-checkbox-row">
+                  <input type="checkbox" id="headcover" checked={form.headcover}
+                    onChange={e => set("headcover", e.target.checked)} />
+                  <label htmlFor="headcover">Incluye headcover</label>
+                </div>
+              )}
+
+            </div>
+          )}
         </>
       )}
 
-      {/* ── Step 3: Fotos ── */}
-      {step === 3 && (
+      {/* ── Step 3: Fotos (palos) / Step 2: Fotos (otros) ── */}
+      {((isPalos && step === 3) || (!isPalos && step === 2)) && (
         <>
           <div
             className={`az-drop-zone${dragOver ? " drag-over" : ""}`}
@@ -1108,8 +1532,103 @@ function PublicarForm({ onSuccess }) {
         </>
       )}
 
-      {/* ── Step 4: Publicar ── */}
-      {step === 4 && (
+      {/* ── Step 3: Publicar (Carros / Bolsas / Otros) ── */}
+      {!isPalos && step === 3 && (
+        <>
+          <div className="az-field">
+            <label className="az-label">Estado</label>
+            <select className="az-select" value={form.estado} onChange={e => set("estado", e.target.value)}>
+              <option value="">Seleccionar…</option>
+              {ESTADO_OPTS.map(o => <option key={o}>{o}</option>)}
+            </select>
+            {errors.estado && <p className="az-error-msg">{errors.estado}</p>}
+          </div>
+
+          <div className="az-field">
+            <label className="az-label">Descripción <span className="opt">(opcional)</span></label>
+            <textarea className="az-textarea" value={form.descripcion}
+              onChange={e => set("descripcion", e.target.value)}
+              placeholder="Estado, accesorios incluidos, motivo de venta…" />
+          </div>
+
+          <div className="az-field" style={{ maxWidth: 280 }}>
+            <label className="az-label">Departamento</label>
+            <select className="az-select" value={form.departamento} onChange={e => set("departamento", e.target.value)}>
+              <option value="">Seleccionar…</option>
+              {DEPARTAMENTOS.map(d => <option key={d}>{d}</option>)}
+            </select>
+            {errors.departamento && <p className="az-error-msg">{errors.departamento}</p>}
+          </div>
+
+          <div className="az-field">
+            <label className="az-label">Precio</label>
+            <div className="az-checkbox-row" style={{ padding: "0 0 12px" }}>
+              <input type="checkbox" id="aConsultar" checked={form.aConsultar}
+                onChange={e => set("aConsultar", e.target.checked)} />
+              <label htmlFor="aConsultar">A consultar</label>
+            </div>
+            {!form.aConsultar && (
+              <>
+                <div className="az-currency-row">
+                  {MONEDA_OPTS.map(m => (
+                    <button key={m} type="button"
+                      className={`az-currency-btn${form.moneda === m ? " active" : ""}`}
+                      onClick={() => set("moneda", m)}>{m}</button>
+                  ))}
+                </div>
+                <div className="az-price-input-wrap">
+                  <span className="az-price-prefix">{form.moneda === "UYU" ? "$" : "US$"}</span>
+                  <input className="az-input has-prefix" type="number" min="0"
+                    value={form.precio} onChange={e => set("precio", e.target.value)} placeholder="0" />
+                </div>
+              </>
+            )}
+            {errors.precio && <p className="az-error-msg">{errors.precio}</p>}
+          </div>
+
+          <div className="az-field" style={{ marginTop: 8 }}>
+            <div className="az-checkbox-row" style={{ padding: "8px 0" }}>
+              <input type="checkbox" id="enElLocal" checked={form.enElLocal}
+                onChange={e => set("enElLocal", e.target.checked)} />
+              <label htmlFor="enElLocal" style={{ fontWeight: 600 }}>
+                📍 Dejar disponible en el local de Azalea Golf
+              </label>
+            </div>
+            {form.enElLocal && (
+              <div className="az-commission-notice">
+                <strong>Comisión del 10%</strong> — Al dejar el artículo en el local de Azalea, en caso de venta Azalea cobra una comisión del <strong>10%</strong> sobre el precio final.
+                <div className="az-checkbox-row" style={{ marginTop: 10, padding: 0 }}>
+                  <input type="checkbox" id="aceptaComision" checked={form.aceptaComision}
+                    onChange={e => set("aceptaComision", e.target.checked)} />
+                  <label htmlFor="aceptaComision">Entendido, acepto la comisión del 10%</label>
+                </div>
+                {errors.aceptaComision && <p className="az-error-msg">{errors.aceptaComision}</p>}
+              </div>
+            )}
+          </div>
+
+          <div className="az-form-section" style={{ marginTop: 28 }}>
+            <div className="az-form-section-title">Datos de contacto</div>
+            <div className="az-form-row">
+              <div className="az-field">
+                <label className="az-label">Tu nombre</label>
+                <input className="az-input" type="text" value={form.nombre}
+                  onChange={e => set("nombre", e.target.value)} placeholder="Juan García" />
+                {errors.nombre && <p className="az-error-msg">{errors.nombre}</p>}
+              </div>
+              <div className="az-field">
+                <label className="az-label">WhatsApp o email</label>
+                <input className="az-input" type="text" value={form.contacto}
+                  onChange={e => set("contacto", e.target.value)} placeholder="099 123 456 o correo@mail.com" />
+                {errors.contacto && <p className="az-error-msg">{errors.contacto}</p>}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── Step 4: Publicar (palos) ── */}
+      {isPalos && step === 4 && (
         <>
           {/* Precio */}
           <div className="az-field">
@@ -1120,11 +1639,20 @@ function PublicarForm({ onSuccess }) {
               <label htmlFor="aConsultar">A consultar</label>
             </div>
             {!form.aConsultar && (
-              <div className="az-price-input-wrap">
-                <span className="az-price-prefix">US$</span>
-                <input className="az-input has-prefix" type="number" min="0"
-                  value={form.precio} onChange={e => set("precio", e.target.value)} placeholder="0" />
-              </div>
+              <>
+                <div className="az-currency-row">
+                  {MONEDA_OPTS.map(m => (
+                    <button key={m} type="button"
+                      className={`az-currency-btn${form.moneda === m ? " active" : ""}`}
+                      onClick={() => set("moneda", m)}>{m}</button>
+                  ))}
+                </div>
+                <div className="az-price-input-wrap">
+                  <span className="az-price-prefix">{form.moneda === "UYU" ? "$" : "US$"}</span>
+                  <input className="az-input has-prefix" type="number" min="0"
+                    value={form.precio} onChange={e => set("precio", e.target.value)} placeholder="0" />
+                </div>
+              </>
             )}
             {errors.precio && <p className="az-error-msg">{errors.precio}</p>}
           </div>
@@ -1188,18 +1716,17 @@ function PublicarForm({ onSuccess }) {
       )}
 
       {/* Nav buttons */}
-      <div className="az-form-nav">
-        {step > 1
-          ? <button className="az-btn-secondary" onClick={prev}>← Anterior</button>
-          : <span />
-        }
-        {step < 4
-          ? <button className="az-btn-primary" onClick={next}>Siguiente →</button>
-          : <button className="az-btn-primary" onClick={submit} disabled={submitting}>
-              {submitting ? "Enviando…" : "Publicar aviso"}
-            </button>
-        }
-      </div>
+      {step > 0 && (
+        <div className="az-form-nav">
+          <button className="az-btn-secondary" onClick={prev}>← Anterior</button>
+          {step < maxStep
+            ? <button className="az-btn-primary" onClick={next}>Siguiente →</button>
+            : <button className="az-btn-primary" onClick={submit} disabled={submitting}>
+                {submitting ? "Enviando…" : "Publicar aviso"}
+              </button>
+          }
+        </div>
+      )}
     </div>
   );
 }
@@ -1212,10 +1739,11 @@ const AZALEA_WA = "59892390042";
 function CardDetailModal({ listing, onClose }) {
   const [idx, setIdx] = useState(0);
   const fotos = listing.fotos || [];
+  const cat = listing.categoria || "palos";
 
-  const waMsg = encodeURIComponent(
-    `Hola! Me interesa el ${TIPO_LABELS[listing.tipo]} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)} (${listing.anio}) que vi en Palos Usados.`
-  );
+  const waMsg = cat === "palos"
+    ? encodeURIComponent(`Hola! Me interesa el ${TIPO_LABELS[listing.tipo]} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)} (${listing.anio}) que vi en Palos Usados.`)
+    : encodeURIComponent(`Hola! Me interesa ${listing.marca}${listing.modelo ? " " + listing.modelo : ""} (${CATEGORIA_LABELS[cat]}) que vi en Palos Usados.`);
   const contactHref = `https://wa.me/${AZALEA_WA}?text=${waMsg}`;
 
   const spec = (label, val) => val
@@ -1243,8 +1771,12 @@ function CardDetailModal({ listing, onClose }) {
         </div>
 
         <div className="az-modal-body">
-          <div className="az-modal-tipo">{tipoTag(listing.tipo)} · {listing.marca}</div>
-          <div className="az-modal-title">{listing.modelo}{labelVersion(listing.version)}</div>
+          <div className="az-modal-tipo">
+            {cat === "palos" ? `${tipoTag(listing.tipo)} · ${listing.marca}` : `${CATEGORIA_LABELS[cat]} · ${listing.marca}`}
+          </div>
+          <div className="az-modal-title">
+            {listing.modelo}{cat === "palos" ? labelVersion(listing.version) : ""}
+          </div>
           <div className={`az-modal-price${listing.aConsultar ? " consultar" : ""}`}>
             {formatPrecio(listing)}
           </div>
@@ -1253,18 +1785,32 @@ function CardDetailModal({ listing, onClose }) {
           )}
 
           <div className="az-modal-specs">
-            {spec("Año", listing.anio)}
-            {spec("Estado", listing.estado)}
-            {spec("Mano", listing.mano)}
-            {spec("Flex", listing.flex)}
-            {spec("Loft", listing.loft ? `${listing.loft}°` : null)}
-            {spec("Material", listing.material)}
-            {spec("Largo", listing.largo)}
-            {spec("Bounce", listing.bounce ? `${listing.bounce}°` : null)}
-            {spec("Grind", listing.grind)}
-            {spec("Headcover", listing.headcover === true ? "Incluido" : null)}
-            {listing.composicion?.length > 0 && spec("Set", formatComposicion(listing.composicion))}
-            {spec("Departamento", listing.departamento)}
+            {cat === "palos" ? (
+              <>
+                {spec("Año", listing.anio)}
+                {listing.numPalo && spec(listing.tipo === "madera" ? "Madera" : "Híbrido", `Nº ${listing.numPalo}`)}
+                {spec("Condición", listing.estado)}
+                {spec("Mano", listing.mano)}
+                {listing.tipo === "putter" && spec("Estilo", listing.estiloPutter)}
+                {spec("Flex", listing.flex)}
+                {spec("Loft", listing.loft ? `${listing.loft}°` : null)}
+                {spec("Material", listing.material)}
+                {spec("Largo", listing.largo)}
+                {spec("Bounce", listing.bounce ? `${listing.bounce}°` : null)}
+                {spec("Grind", listing.grind)}
+                {spec("Headcover", listing.headcover === true ? "Incluido" : null)}
+                {listing.composicion?.length > 0 && spec("Set", formatComposicion(listing.composicion))}
+                {spec("Departamento", listing.departamento)}
+              </>
+            ) : (
+              <>
+                {spec("Categoría", CATEGORIA_LABELS[cat])}
+                {spec("Marca", listing.marca)}
+                {listing.modelo && spec("Modelo", listing.modelo)}
+                {spec("Estado", listing.estado)}
+                {spec("Departamento", listing.departamento)}
+              </>
+            )}
           </div>
 
           {listing.descripcion && (
@@ -1274,7 +1820,10 @@ function CardDetailModal({ listing, onClose }) {
           <div className="az-modal-contact">
             <h4>¿Te interesa?</h4>
             <p style={{ fontSize: 13, color: "#767676", marginBottom: 12, lineHeight: 1.6 }}>
-              Contactá a Azalea Golf para consultar disponibilidad y coordinar.
+              {listing.enElLocal
+                ? <>Este palo está disponible en el local de Azalea Golf. Podés pasar a verlo y coordinamos una prueba en el simulador antes de decidir.</>
+                : <>Contactá a Azalea Golf para consultar disponibilidad y coordinar.</>
+              }
             </p>
             <a className="az-modal-contact-link" href={contactHref} target="_blank" rel="noreferrer">
               <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a4.56 4.56 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12 .057C5.495.057.16 5.392.157 11.949c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0012 .057"/></svg>
@@ -1302,16 +1851,17 @@ function LocalRegister({ listings, onSaveDatosBancarios, onEdit }) {
   const clients = Object.keys(byClient).sort();
 
   if (clients.length === 0)
-    return <div className="az-empty"><p>No hay palos en el local actualmente.</p></div>;
+    return <div className="az-empty"><p>No hay artículos en el local actualmente.</p></div>;
 
   return (
     <div className="az-local-wrap">
       {clients.map(name => {
         const palos = byClient[name];
-        const totalEstimado = palos.reduce((s, l) => s + (!l.aConsultar && l.precio ? l.precio : 0), 0);
+        const totalUSD = palos.reduce((s, l) => s + (!l.aConsultar && l.precio && l.moneda !== "UYU" ? l.precio : 0), 0);
+        const totalUYU = palos.reduce((s, l) => s + (!l.aConsultar && l.precio && l.moneda === "UYU"  ? l.precio : 0), 0);
         return (
           <ClientCard key={name} name={name} palos={palos}
-            totalEstimado={totalEstimado}
+            totalUSD={totalUSD} totalUYU={totalUYU}
             onSaveDatosBancarios={onSaveDatosBancarios}
             onEdit={onEdit}
           />
@@ -1321,7 +1871,7 @@ function LocalRegister({ listings, onSaveDatosBancarios, onEdit }) {
   );
 }
 
-function ClientCard({ name, palos, totalEstimado, onSaveDatosBancarios, onEdit }) {
+function ClientCard({ name, palos, totalUSD, totalUYU, onSaveDatosBancarios, onEdit }) {
   const [bancarios, setBancarios] = useState(palos[0]?.datosBancarios || "");
   const [saved, setSaved] = useState(false);
 
@@ -1338,12 +1888,14 @@ function ClientCard({ name, palos, totalEstimado, onSaveDatosBancarios, onEdit }
         <div>
           <div className="az-local-client-name">{name}</div>
           <div className="az-local-client-meta">
-            {palos[0]?.vendedor?.contacto} · {palos.length} palo{palos.length !== 1 ? "s" : ""}
+            {palos[0]?.vendedor?.contacto} · {palos.length} artículo{palos.length !== 1 ? "s" : ""}
           </div>
         </div>
-        {totalEstimado > 0 && (
+        {(totalUSD > 0 || totalUYU > 0) && (
           <div className="az-local-client-total">
-            Total estimado: US$ {totalEstimado.toLocaleString("es-UY")}
+            {totalUSD > 0 && <span>US$ {totalUSD.toLocaleString("es-UY")}</span>}
+            {totalUSD > 0 && totalUYU > 0 && <span style={{ margin: "0 4px" }}>+</span>}
+            {totalUYU > 0 && <span>$ {totalUYU.toLocaleString("es-UY")}</span>}
           </div>
         )}
       </div>
@@ -1369,11 +1921,131 @@ function ClientCard({ name, palos, totalEstimado, onSaveDatosBancarios, onEdit }
               : <div className="az-local-palo-ph">⛳</div>
             }
             <div className="az-local-palo-info">
-              <strong>{TIPO_LABELS[l.tipo]} {l.marca} {l.modelo}{labelVersion(l.version)}</strong>
-              <span>{l.estado} · {l.anio} · {formatPrecio(l)}</span>
+              <strong>
+                {(() => {
+                  const lCat = l.categoria || "palos";
+                  return lCat === "palos"
+                    ? `${TIPO_LABELS[l.tipo] ?? ""} ${l.marca} ${l.modelo}${labelVersion(l.version)}`
+                    : `${CATEGORIA_LABELS[lCat]} ${l.marca}${l.modelo ? " " + l.modelo : ""}`;
+                })()}
+              </strong>
+              <span>
+                {l.estado}
+                {(l.categoria === "palos" || !l.categoria) && l.anio ? ` · ${l.anio}` : ""}
+                {" · "}{formatPrecio(l)}
+              </span>
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SUBCOMPONENT: ListingDetail
+───────────────────────────────────────────────────────────── */
+function ListingDetail({ listing, onBack }) {
+  const [idx, setIdx] = useState(0);
+  const fotos = listing.fotos || [];
+  const cat = listing.categoria || "palos";
+
+  const waMsg = cat === "palos"
+    ? encodeURIComponent(`Hola! Me interesa el ${TIPO_LABELS[listing.tipo] ?? listing.tipo} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)} que vi en los artículos usados de Azalea.`)
+    : encodeURIComponent(`Hola! Me interesa ${listing.marca}${listing.modelo ? " " + listing.modelo : ""} (${CATEGORIA_LABELS[cat]}) que vi en los artículos usados de Azalea.`);
+  const contactHref = `https://wa.me/${AZALEA_WA}?text=${waMsg}`;
+
+  const spec = (label, val) => val ? (
+    <div className="az-detail-spec"><strong>{label}</strong>{val}</div>
+  ) : null;
+
+  const typeTag = cat === "palos"
+    ? (listing.tipo === "wedge" && listing.loft ? `Wedge ${listing.loft}°` : tipoTag(listing.tipo))
+    : CATEGORIA_LABELS[cat];
+
+  return (
+    <div className="az-detail-wrap">
+      <button className="az-detail-back" onClick={onBack}>← Volver a los artículos</button>
+
+      <div className="az-detail-layout">
+        {/* Galería */}
+        <div className="az-detail-gallery">
+          <div className="az-detail-main-img">
+            {fotos.length > 0
+              ? <img src={fotos[idx]} alt={`${listing.marca} ${listing.modelo}`} />
+              : <div className="az-detail-main-placeholder">⛳</div>
+            }
+          </div>
+          {fotos.length > 1 && (
+            <div className="az-detail-thumbs">
+              {fotos.map((url, i) => (
+                <img key={i} src={url} alt="" className={`az-detail-thumb${i === idx ? " active" : ""}`}
+                  onClick={() => setIdx(i)} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div>
+          <div className="az-detail-tipo">{typeTag} · {listing.marca}</div>
+          <h1 className="az-detail-title">
+            {listing.modelo}{cat === "palos" ? labelVersion(listing.version) : ""}
+          </h1>
+          <div className={`az-detail-price${listing.aConsultar ? " consultar" : ""}`}>
+            {formatPrecio(listing)}
+          </div>
+          {listing.enElLocal && (
+            <div className="az-detail-local">📍 En el local de Azalea</div>
+          )}
+
+          <div className="az-detail-specs">
+            {cat === "palos" ? (
+              <>
+                {spec("Año", listing.anio)}
+                {listing.numPalo && spec(listing.tipo === "madera" ? "Madera" : "Híbrido", `Nº ${listing.numPalo}`)}
+                {spec("Condición", listing.estado)}
+                {spec("Mano", listing.mano)}
+                {listing.tipo === "putter" && spec("Estilo", listing.estiloPutter)}
+                {spec("Flex", listing.flex)}
+                {spec("Loft", listing.loft ? `${listing.loft}°` : null)}
+                {spec("Material", listing.material)}
+                {spec("Largo", listing.largo)}
+                {spec("Bounce", listing.bounce ? `${listing.bounce}°` : null)}
+                {spec("Grind", listing.grind)}
+                {spec("Headcover", listing.headcover === true ? "Incluido" : null)}
+                {listing.composicion?.length > 0 && spec("Set", formatComposicion(listing.composicion))}
+                {spec("Departamento", listing.departamento)}
+              </>
+            ) : (
+              <>
+                {spec("Categoría", CATEGORIA_LABELS[cat])}
+                {spec("Marca", listing.marca)}
+                {listing.modelo && spec("Modelo", listing.modelo)}
+                {spec("Condición", listing.estado)}
+                {spec("Departamento", listing.departamento)}
+              </>
+            )}
+          </div>
+
+          {listing.descripcion && (
+            <div className="az-detail-desc">{listing.descripcion}</div>
+          )}
+
+          <div className="az-detail-contact">
+            <h4>¿Te interesa?</h4>
+            <p>
+              {listing.enElLocal
+                ? "Este artículo está disponible en el local de Azalea Golf. Podés pasar a verlo y coordinamos una prueba en el simulador antes de decidir."
+                : "Contactá a Azalea Golf para consultar disponibilidad y coordinar."
+              }
+            </p>
+            <a className="az-modal-contact-link" href={contactHref} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a4.56 4.56 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12 .057C5.495.057.16 5.392.157 11.949c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0012 .057"/></svg>
+              Consultar por WhatsApp
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1437,10 +2109,11 @@ function AdminPanel() {
     if (listing.enElLocal && listing.precio && !listing.aConsultar) {
       const comision = Math.round(listing.precio * 0.10);
       const neto     = listing.precio - comision;
+      const prefix   = listing.moneda === "UYU" ? "$" : "US$";
       msg = `¿Marcar "${listing.marca} ${listing.modelo}" como vendido?\n\n` +
-            `Precio de venta: US$ ${listing.precio.toLocaleString("es-UY")}\n` +
-            `Comisión Azalea (10%): US$ ${comision.toLocaleString("es-UY")}\n` +
-            `A transferir al vendedor: US$ ${neto.toLocaleString("es-UY")}`;
+            `Precio de venta: ${prefix} ${listing.precio.toLocaleString("es-UY")}\n` +
+            `Comisión Azalea (10%): ${prefix} ${comision.toLocaleString("es-UY")}\n` +
+            `A transferir al vendedor: ${prefix} ${neto.toLocaleString("es-UY")}`;
     }
     if (!window.confirm(msg)) return;
     await updateDoc(doc(db, "listings", listing.id), { status: "sold", soldAt: serverTimestamp() });
@@ -1583,6 +2256,7 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
   const fotos = listing.fotos || [];
   const [activeIdx, setActiveIdx] = useState(0);
   const showApprove = listing.status === "pending";
+  const cat = listing.categoria || "palos";
 
   return (
     <div className="az-admin-card">
@@ -1614,14 +2288,33 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
 
       {/* Info */}
       <div className="az-admin-card-info">
-        <strong>{TIPO_LABELS[listing.tipo]} {listing.marca} {listing.modelo}{labelVersion(listing.version)}</strong>
-        <span>{listing.estado} · {listing.mano} · {listing.anio}</span>
+        {cat !== "palos" && (
+          <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".5px", color: "#aaa", display: "block", marginBottom: 3 }}>
+            {CATEGORIA_LABELS[cat]}
+          </span>
+        )}
+        <strong>
+          {cat === "palos"
+            ? `${TIPO_LABELS[listing.tipo] ?? ""} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)}`
+            : `${listing.marca}${listing.modelo ? " " + listing.modelo : ""}`}
+        </strong>
+        <span>
+          {cat === "palos"
+            ? (listing.tipo === "madera" || listing.tipo === "hibrido") && listing.numPalo
+              ? `Nº${listing.numPalo} · ${listing.estado} · ${listing.mano}`
+              : listing.tipo === "putter" && listing.estiloPutter
+              ? `${listing.estiloPutter} · ${listing.estado} · ${listing.mano}`
+              : listing.tipo === "hierros" && listing.composicion?.length > 0
+              ? `${formatComposicion(listing.composicion)} · ${listing.estado}`
+              : `${listing.estado} · ${listing.mano} · ${listing.anio}`
+            : listing.estado}
+        </span>
         <div className="az-admin-card-price">{formatPrecio(listing)}</div>
       </div>
 
       <div className="az-admin-card-body">
-        {listing.flex && <span>Flex: {listing.flex} &nbsp;</span>}
-        {listing.loft && <span>Loft: {listing.loft}° &nbsp;</span>}
+        {cat === "palos" && listing.flex && <span>Flex: {listing.flex} &nbsp;</span>}
+        {cat === "palos" && listing.loft && <span>Loft: {listing.loft}° &nbsp;</span>}
         {listing.departamento && <span>📍 {listing.departamento}</span>}
         <br />
         <strong>Vendedor:</strong> {listing.vendedor?.nombre} — {listing.vendedor?.contacto}
@@ -1653,6 +2346,8 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
 }
 
 function AdminEditModal({ listing, onSave, onClose }) {
+  const cat = listing.categoria || "palos";
+  const isPalosEdit = cat === "palos";
   const [form, setForm] = useState({
     tipo: listing.tipo || "", marca: listing.marca || "", modelo: listing.modelo || "",
     version: listing.version || "", anio: listing.anio ? String(listing.anio) : "",
@@ -1660,7 +2355,11 @@ function AdminEditModal({ listing, onSave, onClose }) {
     loft: listing.loft ? String(listing.loft) : "", material: listing.material || "",
     largo: listing.largo || "", bounce: listing.bounce ? String(listing.bounce) : "",
     grind: listing.grind || "", headcover: listing.headcover || false,
+    estiloPutter: listing.estiloPutter || "",
+    numPalo: listing.numPalo || "",
+    composicion: listing.composicion || [],
     aConsultar: listing.aConsultar || false, precio: listing.precio ? String(listing.precio) : "",
+    moneda: listing.moneda || "USD",
     descripcion: listing.descripcion || "", departamento: listing.departamento || "",
   });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -1675,6 +2374,21 @@ function AdminEditModal({ listing, onSave, onClose }) {
 
   const removeExisting = (i) =>
     setExistingPhotos(p => p.filter((_, idx) => idx !== i));
+
+  const setMainExisting = (i) => {
+    if (i === 0) return;
+    setExistingPhotos(p => {
+      const next = [...p];
+      const [item] = next.splice(i, 1);
+      next.unshift(item);
+      return next;
+    });
+  };
+
+  const setMainNew = (i) => {
+    setNewFiles(p => { const n=[...p]; const [f]=n.splice(i,1); n.unshift(f); return n; });
+    setNewPreviews(p => { const n=[...p]; const [f]=n.splice(i,1); n.unshift(f); return n; });
+  };
 
   const addNewFiles = (files) => {
     const valid = [...files].filter(f => f.type.startsWith("image/"))
@@ -1699,16 +2413,25 @@ function AdminEditModal({ listing, onSave, onClose }) {
         uploadedUrls = await Promise.all(newFiles.map(f => uploadToCloudinary(f)));
       }
       const fotos = [...existingPhotos, ...uploadedUrls];
-      await onSave(listing.id, approve, {
-        tipo: form.tipo, marca: form.marca, modelo: form.modelo, version: form.version,
-        anio: Number(form.anio), estado: form.estado, mano: form.mano,
+      const base = {
+        marca: form.marca, modelo: form.modelo,
+        estado: form.estado, aConsultar: form.aConsultar,
+        precio: form.aConsultar ? null : Number(form.precio),
+        moneda: form.aConsultar ? null : (form.moneda || "USD"),
+        descripcion: form.descripcion || null, departamento: form.departamento, fotos,
+      };
+      const palosExtra = isPalosEdit ? {
+        tipo: form.tipo, version: form.version,
+        anio: Number(form.anio), mano: form.mano,
         flex: form.flex || null, loft: form.loft ? Number(form.loft) : null,
         material: form.material || null, largo: form.largo || null,
         bounce: form.bounce ? Number(form.bounce) : null, grind: form.grind || null,
-        headcover: form.headcover, aConsultar: form.aConsultar,
-        precio: form.aConsultar ? null : Number(form.precio),
-        descripcion: form.descripcion || null, departamento: form.departamento, fotos,
-      });
+        headcover: form.headcover,
+        estiloPutter: form.estiloPutter || null,
+        numPalo: form.numPalo || null,
+        composicion: form.composicion.length > 0 ? form.composicion : null,
+      } : {};
+      await onSave(listing.id, approve, { ...base, ...palosExtra });
     } finally {
       setSaving(false);
       setUploadProgress("");
@@ -1719,7 +2442,14 @@ function AdminEditModal({ listing, onSave, onClose }) {
     <div className="az-edit-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="az-edit-modal">
         <button className="az-edit-close" onClick={onClose}>✕</button>
-        <h3>Editar y aprobar</h3>
+        <h3 style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          Editar y aprobar
+          {cat !== "palos" && (
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".5px", background: "#f0f0f0", color: "#767676", padding: "2px 10px", borderRadius: 3 }}>
+              {CATEGORIA_LABELS[cat]}
+            </span>
+          )}
+        </h3>
 
         {/* ── Fotos ── */}
         <div className="az-edit-photos">
@@ -1728,15 +2458,22 @@ function AdminEditModal({ listing, onSave, onClose }) {
             {existingPhotos.map((url, i) => (
               <div key={url} className="az-edit-photo-thumb">
                 <img src={url} alt="" />
-                {i === 0 && (
-                  <span className="az-photo-main-badge">Principal</span>
-                )}
+                {i === 0
+                  ? <span className="az-photo-main-badge">Principal</span>
+                  : <button className="az-edit-photo-set-main" onClick={() => setMainExisting(i)}>★ Principal</button>
+                }
                 <button className="az-edit-photo-rm" onClick={() => removeExisting(i)}>✕</button>
               </div>
             ))}
             {newPreviews.map((url, i) => (
               <div key={`new-${i}`} className="az-edit-photo-thumb">
                 <img src={url} alt="" />
+                {existingPhotos.length === 0 && i !== 0 && (
+                  <button className="az-edit-photo-set-main" onClick={() => setMainNew(i)}>★ Principal</button>
+                )}
+                {existingPhotos.length === 0 && i === 0 && (
+                  <span className="az-photo-main-badge">Principal</span>
+                )}
                 <button className="az-edit-photo-rm" onClick={() => removeNew(i)}>✕</button>
               </div>
             ))}
@@ -1752,18 +2489,34 @@ function AdminEditModal({ listing, onSave, onClose }) {
           {uploadProgress && <p style={{ fontSize: 12, color: "#888", marginTop: 4 }}>{uploadProgress}</p>}
         </div>
 
-        <div className="az-form-row">
-          <div className="az-field">
-            <label className="az-label">Tipo</label>
-            <select className="az-select" value={form.tipo} onChange={e => set("tipo", e.target.value)}>
-              {TIPOS.map(t => <option key={t} value={t}>{TIPO_LABELS[t]}</option>)}
-            </select>
-          </div>
-          <div className="az-field">
-            <label className="az-label">Año</label>
-            <input className="az-input" type="number" value={form.anio} onChange={e => set("anio", e.target.value)} />
-          </div>
-        </div>
+        {isPalosEdit && (
+          <>
+            <div className="az-form-row">
+              <div className="az-field">
+                <label className="az-label">Tipo</label>
+                <select className="az-select" value={form.tipo} onChange={e => set("tipo", e.target.value)}>
+                  {TIPOS.map(t => <option key={t} value={t}>{TIPO_LABELS[t]}</option>)}
+                </select>
+              </div>
+              <div className="az-field">
+                <label className="az-label">Año</label>
+                <input className="az-input" type="number" value={form.anio} onChange={e => set("anio", e.target.value)} />
+              </div>
+            </div>
+            {/* Número de madera / híbrido */}
+            {(form.tipo === "madera" || form.tipo === "hibrido") && (
+              <div className="az-field" style={{ maxWidth: 220 }}>
+                <label className="az-label">Número {form.tipo === "madera" ? "de madera" : "del híbrido"}</label>
+                <select className="az-select" value={form.numPalo} onChange={e => set("numPalo", e.target.value)}>
+                  <option value="">—</option>
+                  {(form.tipo === "madera" ? MADERA_NUM_OPTS : HIBRIDO_NUM_OPTS).map(n => (
+                    <option key={n} value={n}>{form.tipo === "madera" ? "Madera" : "Híbrido"} {n}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </>
+        )}
         <div className="az-form-row">
           <div className="az-field">
             <label className="az-label">Marca</label>
@@ -1781,26 +2534,138 @@ function AdminEditModal({ listing, onSave, onClose }) {
               {ESTADO_OPTS.map(o => <option key={o}>{o}</option>)}
             </select>
           </div>
-          <div className="az-field">
-            <label className="az-label">Mano</label>
-            <select className="az-select" value={form.mano} onChange={e => set("mano", e.target.value)}>
-              {MANO_OPTS.map(o => <option key={o}>{o}</option>)}
-            </select>
-          </div>
+          {isPalosEdit && (
+            <div className="az-field">
+              <label className="az-label">Mano</label>
+              <select className="az-select" value={form.mano} onChange={e => set("mano", e.target.value)}>
+                {MANO_OPTS.map(o => <option key={o}>{o}</option>)}
+              </select>
+            </div>
+          )}
         </div>
-        <div className="az-form-row">
-          <div className="az-field">
-            <label className="az-label">Flex <span className="opt">(opcional)</span></label>
-            <select className="az-select" value={form.flex} onChange={e => set("flex", e.target.value)}>
-              <option value="">—</option>
-              {FLEX_OPTS.map(o => <option key={o}>{o}</option>)}
-            </select>
-          </div>
-          <div className="az-field">
-            <label className="az-label">Loft <span className="opt">(opcional)</span></label>
-            <input className="az-input" type="number" step="0.5" value={form.loft} onChange={e => set("loft", e.target.value)} />
-          </div>
-        </div>
+        {isPalosEdit && (
+          <>
+            {/* Hierros: composición */}
+            {form.tipo === "hierros" && (
+              <div className="az-field">
+                <label className="az-label">Composición del set</label>
+                <div className="az-iron-set">
+                  {IRON_OPTS.map(iron => {
+                    const sel = form.composicion.includes(iron);
+                    return (
+                      <label key={iron} className={`az-iron-chip${sel ? " sel" : ""}`}>
+                        <input type="checkbox" checked={sel} onChange={e => {
+                          const next = e.target.checked
+                            ? [...form.composicion, iron]
+                            : form.composicion.filter(i => i !== iron);
+                          set("composicion", next);
+                        }} />
+                        {iron}
+                      </label>
+                    );
+                  })}
+                </div>
+                {form.composicion.length >= 2 && (
+                  <p className="az-iron-summary">Set: <strong>{formatComposicion(form.composicion)}</strong> ({form.composicion.length} palos)</p>
+                )}
+              </div>
+            )}
+
+            {/* Flex + Loft (no hierros, no putter para loft) */}
+            <div className="az-form-row">
+              {form.tipo !== "putter" && (
+                <div className="az-field">
+                  <label className="az-label">Flex <span className="opt">(opcional)</span></label>
+                  <select className="az-select" value={form.flex} onChange={e => set("flex", e.target.value)}>
+                    <option value="">—</option>
+                    {FLEX_OPTS.map(o => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+              )}
+              {form.tipo !== "hierros" && form.tipo !== "putter" && (
+                <div className="az-field">
+                  <label className="az-label">Loft <span className="opt">(opcional)</span></label>
+                  {LOFT_OPTS[form.tipo]
+                    ? <select className="az-select" value={form.loft} onChange={e => set("loft", e.target.value)}>
+                        <option value="">—</option>
+                        {LOFT_OPTS[form.tipo].map(v => <option key={v} value={v}>{v}°</option>)}
+                      </select>
+                    : <input className="az-input" type="number" step="0.5" value={form.loft} onChange={e => set("loft", e.target.value)} placeholder="—" />
+                  }
+                </div>
+              )}
+              {form.tipo === "putter" && (
+                <div className="az-field">
+                  <label className="az-label">Estilo <span className="opt">(opcional)</span></label>
+                  <select className="az-select" value={form.estiloPutter} onChange={e => set("estiloPutter", e.target.value)}>
+                    <option value="">—</option>
+                    {PUTTER_ESTILO_OPTS.map(o => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Wedge: bounce + grind */}
+            {form.tipo === "wedge" && (
+              <div className="az-form-row">
+                <div className="az-field">
+                  <label className="az-label">Bounce <span className="opt">(opcional)</span></label>
+                  <select className="az-select" value={form.bounce} onChange={e => set("bounce", e.target.value)}>
+                    <option value="">—</option>
+                    {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
+                  </select>
+                </div>
+                <div className="az-field">
+                  <label className="az-label">Grind <span className="opt">(opcional)</span></label>
+                  <select className="az-select" value={form.grind} onChange={e => set("grind", e.target.value)}>
+                    <option value="">—</option>
+                    {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Material + largo shaft (no putter) */}
+            {form.tipo !== "putter" && (
+              <div className="az-form-row">
+                <div className="az-field">
+                  <label className="az-label">Material del shaft <span className="opt">(opcional)</span></label>
+                  <select className="az-select" value={form.material} onChange={e => set("material", e.target.value)}>
+                    <option value="">—</option>
+                    {MATERIAL_OPTS.map(o => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="az-field">
+                  <label className="az-label">Largo del shaft <span className="opt">(opcional)</span></label>
+                  <select className="az-select" value={form.largo} onChange={e => set("largo", e.target.value)}>
+                    <option value="">Standard</option>
+                    {LARGO_OPTS.filter(o => o !== "Standard").map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Putter: largo en pulgadas */}
+            {form.tipo === "putter" && (
+              <div className="az-field" style={{ maxWidth: 200 }}>
+                <label className="az-label">Largo del putter <span className="opt">(opcional)</span></label>
+                <select className="az-select" value={form.largo} onChange={e => set("largo", e.target.value)}>
+                  <option value="">—</option>
+                  {PUTTER_LARGO_OPTS.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+            )}
+
+            {/* Headcover */}
+            {["driver","madera","hibrido","putter"].includes(form.tipo) && (
+              <div className="az-checkbox-row">
+                <input type="checkbox" id="edit-headcover" checked={form.headcover}
+                  onChange={e => set("headcover", e.target.checked)} />
+                <label htmlFor="edit-headcover">Incluye headcover</label>
+              </div>
+            )}
+          </>
+        )}
         <div className="az-field">
           <label className="az-label">Descripción <span className="opt">(opcional)</span></label>
           <textarea className="az-textarea" value={form.descripcion} onChange={e => set("descripcion", e.target.value)} />
@@ -1819,10 +2684,19 @@ function AdminEditModal({ listing, onSave, onClose }) {
               <label htmlFor="edit-aConsultar">A consultar</label>
             </div>
             {!form.aConsultar && (
-              <div className="az-price-input-wrap" style={{ marginTop: 8 }}>
-                <span className="az-price-prefix">US$</span>
-                <input className="az-input has-prefix" type="number" value={form.precio} onChange={e => set("precio", e.target.value)} />
-              </div>
+              <>
+                <div className="az-currency-row" style={{ marginTop: 8 }}>
+                  {MONEDA_OPTS.map(m => (
+                    <button key={m} type="button"
+                      className={`az-currency-btn${form.moneda === m ? " active" : ""}`}
+                      onClick={() => set("moneda", m)}>{m}</button>
+                  ))}
+                </div>
+                <div className="az-price-input-wrap">
+                  <span className="az-price-prefix">{form.moneda === "UYU" ? "$" : "US$"}</span>
+                  <input className="az-input has-prefix" type="number" value={form.precio} onChange={e => set("precio", e.target.value)} />
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -1861,17 +2735,26 @@ export default function PalosUsados() {
     const hash = window.location.hash.replace("#", "");
     if (hash === "admin") return "admin";
     if (hash === "publicar") return "publicar";
+    if (hash.startsWith("listing/")) return "detalle";
     return "ver";
   };
   const [view, setView] = useState(getInitialView);
 
-  const navigateTo = (v) => {
+  const navigateTo = (v, listingId = null) => {
     setView(v);
-    window.location.hash = v === "ver" ? "" : v;
+    if (v === "detalle" && listingId) window.location.hash = `listing/${listingId}`;
+    else window.location.hash = v === "ver" ? "" : v;
   };
 
   useEffect(() => {
-    const handler = () => setView(getInitialView());
+    const handler = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash === "admin") { setView("admin"); return; }
+      if (hash === "publicar") { setView("publicar"); return; }
+      if (hash.startsWith("listing/")) { setView("detalle"); return; }
+      setSelectedListing(null);
+      setView("ver");
+    };
     window.addEventListener("hashchange", handler);
     return () => window.removeEventListener("hashchange", handler);
   }, []);
@@ -1883,8 +2766,11 @@ export default function PalosUsados() {
   const [selectedListing, setSelectedListing] = useState(null);
   const [activeTab, setActiveTab] = useState("todos");
   const [sort, setSort] = useState("reciente");
-  const [filters, setFilters] = useState({ tipo: [], marca: [], estado: [], flex: [], mano: "" });
+  const [filters, setFilters] = useState({ categoria: [], tipo: [], marca: [], estado: [], flex: [], mano: "", precio: [], enElLocal: false });
   const [published, setPublished] = useState(false);
+  const [page, setPage] = useState(1);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Footer accordion
   const [openSection, setOpenSection] = useState(null);
@@ -1903,19 +2789,64 @@ export default function PalosUsados() {
   }, [view]);
 
   // Filter helpers
-  const toggleFilter = (key, val) => setFilters(f => {
-    const arr = f[key];
-    return { ...f, [key]: arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val] };
-  });
-  const clearFilters = () => setFilters({ tipo: [], marca: [], estado: [], flex: [], mano: "" });
+  const clearFilters = () => { setFilters({ categoria: [], tipo: [], marca: [], estado: [], flex: [], mano: "", precio: [], enElLocal: false }); setPage(1); };
+
+  // Determine if we're showing palos-only or mixed
+  const showingOnlyNonPalos = filters.categoria.length > 0 && !filters.categoria.includes("palos");
+  const RECIENTES_DAYS = 15;
+
+  // Fetch listing from Firestore when arriving via direct URL
+  useEffect(() => {
+    if (view !== "detalle" || selectedListing) return;
+    const hash = window.location.hash.replace("#", "");
+    const id = hash.startsWith("listing/") ? hash.slice(8) : null;
+    if (!id) { navigateTo("ver"); return; }
+    getDoc(doc(db, "listings", id))
+      .then(snap => {
+        if (snap.exists() && snap.data().status === "approved")
+          setSelectedListing({ id: snap.id, ...snap.data() });
+        else navigateTo("ver");
+      })
+      .catch(() => navigateTo("ver"));
+  }, [view, selectedListing]);
+
+  const handleOpenListing = (l) => {
+    setSelectedListing(l);
+    navigateTo("detalle", l.id);
+  };
+  const handleCloseListing = () => {
+    setSelectedListing(null);
+    navigateTo("ver");
+  };
 
   // Compute filtered + sorted listings
   const filteredListings = listings.filter(l => {
-    if (filters.tipo.length && !filters.tipo.includes(l.tipo)) return false;
+    const lCat = l.categoria || "palos";
+    if (filters.categoria.length && !filters.categoria.includes(lCat)) return false;
     if (filters.marca.length && !filters.marca.includes(l.marca)) return false;
     if (filters.estado.length && !filters.estado.includes(l.estado)) return false;
-    if (filters.flex.length && !filters.flex.includes(l.flex)) return false;
-    if (filters.mano && l.mano !== filters.mano) return false;
+    if (filters.enElLocal && !l.enElLocal) return false;
+    if (filters.precio.length) {
+      const matches = filters.precio.some(label => {
+        const range = PRICE_RANGES.find(r => r.label === label);
+        if (!range) return false;
+        if (range.consultar) return l.aConsultar;
+        if (l.aConsultar) return false;
+        if (l.moneda === "UYU") return true;
+        return l.precio >= range.min && l.precio < range.max;
+      });
+      if (!matches) return false;
+    }
+    if (!showingOnlyNonPalos) {
+      if (filters.tipo.length && lCat === "palos" && !filters.tipo.includes(l.tipo)) return false;
+      if (filters.flex.length && lCat === "palos" && !filters.flex.includes(l.flex)) return false;
+      if (filters.mano && lCat === "palos" && l.mano !== filters.mano) return false;
+    }
+    if (activeTab === "recientes") {
+      const cutoff = Date.now() - RECIENTES_DAYS * 24 * 60 * 60 * 1000;
+      const ts = l.createdAt?.seconds ? l.createdAt.seconds * 1000 : 0;
+      if (ts < cutoff) return false;
+    }
     return true;
   });
 
@@ -1924,6 +2855,17 @@ export default function PalosUsados() {
     if (sort === "precio-desc") return (b.precio ?? Infinity) - (a.precio ?? Infinity);
     return (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
   });
+
+  const paginatedListings = sortedListings.slice(0, page * ITEMS_PER_PAGE);
+  const hasMore = sortedListings.length > page * ITEMS_PER_PAGE;
+
+  const toggleFilter = (key, val) => {
+    setFilters(f => {
+      const arr = f[key];
+      return { ...f, [key]: arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val] };
+    });
+    setPage(1);
+  };
 
   const availableMarcas = [...new Set(listings.map(l => l.marca))].sort();
   const estatusBadge = (e) => {
@@ -1942,7 +2884,7 @@ export default function PalosUsados() {
       {view !== "admin" && (
         <header className="az-header">
           <div className="az-header-inner">
-            <button className="az-burger" aria-label="Menú">
+            <button className="az-burger" aria-label="Menú" onClick={() => setMobileNavOpen(true)}>
               <span /><span /><span />
             </button>
             <a href={WP} className="az-logo">
@@ -1966,21 +2908,29 @@ export default function PalosUsados() {
         </header>
       )}
 
+      {/* ── MOBILE NAV ── */}
+      {mobileNavOpen && (
+        <>
+          <div className="az-mobile-overlay" onClick={() => setMobileNavOpen(false)} />
+          <nav className={`az-mobile-nav open`}>
+            <button className="az-mobile-nav-close" onClick={() => setMobileNavOpen(false)}>✕</button>
+            <ul>
+              {NAV.map(l => (
+                <li key={l.label} className={l.active ? "active" : ""}>
+                  <a href={l.href} onClick={() => setMobileNavOpen(false)}>{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </>
+      )}
+
       {/* ── ADMIN VIEW ── */}
       {view === "admin" && <AdminPanel />}
 
       {/* ── PUBLIC VIEWS ── */}
       {view !== "admin" && (
         <>
-          {/* Title bar */}
-          <div className="az-page-title">
-            <div className="az-page-title-inner">
-              <h1>Palos Usados</h1>
-              <div className="az-breadcrumb">
-                <a href={WP}>Home</a><span>›</span> Palos Usados
-              </div>
-            </div>
-          </div>
 
           {/* View toggle */}
           <div className="az-view-bar">
@@ -1989,13 +2939,13 @@ export default function PalosUsados() {
                 className={`az-view-tab${view === "ver" ? " active" : ""}`}
                 onClick={() => navigateTo("ver")}
               >
-                Ver palos usados
+                Ver artículos usados
               </button>
               <button
                 className={`az-view-tab${view === "publicar" ? " active" : ""}`}
                 onClick={() => { setPublished(false); navigateTo("publicar"); }}
               >
-                Publicar mis palos
+                Publicar un artículo
               </button>
             </div>
           </div>
@@ -2005,6 +2955,22 @@ export default function PalosUsados() {
             <div className="az-layout">
               {/* Sidebar */}
               <aside className="az-sidebar">
+                <div className="az-filter-section">
+                  <div className="az-filter-section-title">Categoría</div>
+                  <ul className="az-filter-list">
+                    {CATEGORIA_OPTS.map(cat => (
+                      <li key={cat} onClick={() => toggleFilter("categoria", cat)}>
+                        <input type="checkbox" checked={filters.categoria.includes(cat)} readOnly />
+                        <label>{CATEGORIA_LABELS[cat]}</label>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="az-filter-actions">
+                    <button className="az-filter-btn secondary" onClick={() => setFilters(f => ({ ...f, categoria: [] }))}>Limpiar</button>
+                  </div>
+                </div>
+
+                {!showingOnlyNonPalos && (
                 <div className="az-filter-section">
                   <div className="az-filter-section-title">Tipo</div>
                   <ul className="az-filter-list">
@@ -2019,6 +2985,7 @@ export default function PalosUsados() {
                     <button className="az-filter-btn secondary" onClick={() => setFilters(f => ({ ...f, tipo: [] }))}>Limpiar</button>
                   </div>
                 </div>
+                )}
 
                 <div className="az-filter-section">
                   <div className="az-filter-section-title">Marcas</div>
@@ -2047,6 +3014,8 @@ export default function PalosUsados() {
                   </ul>
                 </div>
 
+                {!showingOnlyNonPalos && (
+                <>
                 <div className="az-filter-section">
                   <div className="az-filter-section-title">Flex</div>
                   <ul className="az-filter-list">
@@ -2070,6 +3039,30 @@ export default function PalosUsados() {
                     ))}
                   </ul>
                 </div>
+                </>
+                )}
+
+                <div className="az-filter-section">
+                  <div className="az-filter-section-title">Precio</div>
+                  <ul className="az-filter-list">
+                    {PRICE_RANGES.map(r => (
+                      <li key={r.label} onClick={() => toggleFilter("precio", r.label)}>
+                        <input type="checkbox" checked={filters.precio.includes(r.label)} readOnly />
+                        <label>{r.label}</label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="az-filter-section">
+                  <div className="az-filter-section-title">Disponibilidad</div>
+                  <ul className="az-filter-list">
+                    <li onClick={() => setFilters(f => ({ ...f, enElLocal: !f.enElLocal }))}>
+                      <input type="checkbox" checked={filters.enElLocal} readOnly />
+                      <label>En el local de Azalea</label>
+                    </li>
+                  </ul>
+                </div>
 
                 <div className="az-filter-actions">
                   <button className="az-filter-btn secondary" style={{ flex: "none", width: "100%" }} onClick={clearFilters}>
@@ -2081,17 +3074,25 @@ export default function PalosUsados() {
               {/* Results */}
               <section className="az-results">
                 <div className="az-tabs">
-                  {[["todos", "Todos"], ["recientes", "Más Recientes"]].map(([val, lbl]) => (
-                    <div key={val} className={`az-tab${activeTab === val ? " active" : ""}`}
-                      onClick={() => setActiveTab(val)}>{lbl}</div>
-                  ))}
+                  <div className={`az-tab${activeTab === "todos" ? " active" : ""}`}
+                    onClick={() => { setActiveTab("todos"); setPage(1); }}>Todos</div>
+                  <div className={`az-tab${activeTab === "recientes" ? " active" : ""}`}
+                    onClick={() => { setActiveTab("recientes"); setPage(1); }}>
+                    Últimos {RECIENTES_DAYS} días
+                  </div>
                 </div>
 
                 <div className="az-results-bar">
-                  <span className="az-results-count">
-                    <strong>{sortedListings.length}</strong> resultado{sortedListings.length !== 1 ? "s" : ""}
-                  </span>
-                  <select className="az-sort" value={sort} onChange={e => setSort(e.target.value)}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span className="az-results-count">
+                      <strong>{sortedListings.length}</strong> resultado{sortedListings.length !== 1 ? "s" : ""}
+                    </span>
+                    <button className="az-mobile-filter-btn" onClick={() => setMobileFiltersOpen(true)}>
+                      <svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                      Filtros
+                    </button>
+                  </div>
+                  <select className="az-sort" value={sort} onChange={e => { setSort(e.target.value); setPage(1); }}>
                     <option value="reciente">Más reciente</option>
                     <option value="precio-asc">Precio: menor a mayor</option>
                     <option value="precio-desc">Precio: mayor a menor</option>
@@ -2104,35 +3105,66 @@ export default function PalosUsados() {
                 {!loadingListings && !listingsError && sortedListings.length === 0 && (
                   <div className="az-empty">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                    <p>No hay palos disponibles con estos filtros.</p>
+                    <p>No hay artículos disponibles con estos filtros.</p>
                   </div>
                 )}
 
                 {!loadingListings && !listingsError && sortedListings.length > 0 && (
+                  <>
                   <div className="az-grid">
-                    {sortedListings.map(l => (
-                      <div className="az-card" key={l.id} onClick={() => setSelectedListing(l)}>
-                        <div className="az-card-img">
-                          {l.fotos?.[0]
-                            ? <img src={l.fotos[0]} alt={`${l.marca} ${l.modelo}`} />
-                            : <span className="az-card-img-placeholder">⛳</span>
-                          }
+                    {paginatedListings.map(l => {
+                      const lCat = l.categoria || "palos";
+                      const cardTypeTag = lCat === "palos"
+                        ? (l.tipo === "wedge" && l.loft ? `Wedge ${l.loft}°` : tipoTag(l.tipo))
+                        : CATEGORIA_LABELS[lCat];
+                      return (
+                        <div className="az-card" key={l.id} onClick={() => handleOpenListing(l)}>
+                          <div className="az-card-img">
+                            {l.fotos?.[0]
+                              ? <img src={l.fotos[0]} alt={`${l.marca} ${l.modelo}`} />
+                              : <span className="az-card-img-placeholder">⛳</span>
+                            }
+                          </div>
+                          <div className="az-card-body">
+                            <div className="az-card-tipo-tag">{cardTypeTag}</div>
+                            <div className="az-card-brand">{l.marca}</div>
+                            <div className="az-card-title">
+                              {l.modelo}{lCat === "palos" ? labelVersion(l.version) : ""}
+                            </div>
+                            {lCat === "palos" ? (
+                              <div className="az-card-meta">
+                                {l.tipo === "hierros" && l.composicion?.length > 0
+                                  ? `${formatComposicion(l.composicion)} · ${l.mano}`
+                                  : l.tipo === "madera" || l.tipo === "hibrido"
+                                  ? [l.numPalo && `Nº${l.numPalo}`, l.mano].filter(Boolean).join(" · ")
+                                  : [l.anio, l.mano, l.flex].filter(Boolean).join(" · ")
+                                }
+                              </div>
+                            ) : l.estado ? <div className="az-card-meta">{l.estado}</div> : null}
+                            <div className={`az-card-price${l.aConsultar ? " consultar" : ""}`}>{formatPrecio(l)}</div>
+                            <div className={`az-card-estado ${estatusBadge(l.estado)}`}>{l.estado}</div>
+                            {l.enElLocal && <div className="az-card-local-badge">En el local</div>}
+                          </div>
                         </div>
-                        <div className="az-card-body">
-                          <div className="az-card-tipo-tag">{tipoTag(l.tipo)}</div>
-                          <div className="az-card-brand">{l.marca}</div>
-                          <div className="az-card-title">{l.modelo}{labelVersion(l.version)}</div>
-                          <div className="az-card-meta">{l.anio} · {l.mano}{l.flex ? ` · ${l.flex}` : ""}</div>
-                          <div className={`az-card-price${l.aConsultar ? " consultar" : ""}`}>{formatPrecio(l)}</div>
-                          <div className={`az-card-estado ${estatusBadge(l.estado)}`}>{l.estado}</div>
-                          {l.enElLocal && <div className="az-card-local-badge">En el local</div>}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
+                  {hasMore && (
+                    <button className="az-ver-mas" onClick={() => setPage(p => p + 1)}>
+                      Ver más ({sortedListings.length - page * ITEMS_PER_PAGE} restantes)
+                    </button>
+                  )}
+                  </>
                 )}
               </section>
             </div>
+          )}
+
+          {/* ── DETALLE ── */}
+          {view === "detalle" && (
+            selectedListing
+              ? <ListingDetail listing={selectedListing} onBack={handleCloseListing} />
+              : <div className="az-loading-wrap"><div className="az-spinner" /></div>
           )}
 
           {/* ── PUBLICAR ── */}
@@ -2142,9 +3174,20 @@ export default function PalosUsados() {
                 <div className="az-success-wrap" style={{ marginTop: 60 }}>
                   <div className="az-success-icon">✓</div>
                   <h2>¡Aviso enviado!</h2>
-                  <p>Tu palo fue enviado para revisión. El equipo de Azalea lo revisará y publicará en las próximas horas.</p>
+                  <p>Lo revisaremos y lo publicaremos en breve.</p>
+                  <p style={{ fontSize: 14, marginTop: -10 }}>
+                    ¿Necesitás modificar o dar de baja el aviso?{" "}
+                    <a
+                      href={`https://wa.me/${AZALEA_WA}?text=${encodeURIComponent("Hola, quisiera modificar/eliminar mi aviso en la sección de usados de Azalea.")}`}
+                      target="_blank" rel="noreferrer"
+                      className="az-success-wa"
+                      style={{ display: "inline-flex", marginLeft: 4 }}
+                    >
+                      Escribinos por WhatsApp
+                    </a>
+                  </p>
                   <button className="az-btn-primary" onClick={() => { setPublished(false); navigateTo("ver"); }}>
-                    Ver palos usados
+                    Ver artículos usados
                   </button>
                 </div>
               )
@@ -2215,7 +3258,7 @@ export default function PalosUsados() {
             </div>
 
             <div className="az-footer-bottom">
-              <p>©2024 Azalea Golf | Todos los derechos reservados</p>
+              <p>©2025 Azalea Golf | Todos los derechos reservados</p>
               <div className="az-footer-simbionte-logo">
                 <a href="https://www.simbiontecreativo.com" target="_blank" rel="noreferrer">
                   <img src="https://azaleasports.com.uy/wp-content/uploads/2024/03/simbionte-creativo-logo-monocolor.png" alt="Simbionte Creativo" />
@@ -2227,9 +3270,92 @@ export default function PalosUsados() {
         </>
       )}
 
-      {/* Card detail modal */}
-      {selectedListing && (
-        <CardDetailModal listing={selectedListing} onClose={() => setSelectedListing(null)} />
+      {/* Mobile filter drawer */}
+      {mobileFiltersOpen && (
+        <>
+          <div className="az-filter-drawer-overlay" onClick={() => setMobileFiltersOpen(false)} />
+          <div className="az-filter-drawer">
+            <div className="az-filter-drawer-header">
+              <h3>Filtros</h3>
+              <button className="az-filter-drawer-close" onClick={() => setMobileFiltersOpen(false)}>✕</button>
+            </div>
+
+            <div className="az-filter-section">
+              <div className="az-filter-section-title">Categoría</div>
+              <ul className="az-filter-list">
+                {CATEGORIA_OPTS.map(cat => (
+                  <li key={cat} onClick={() => toggleFilter("categoria", cat)}>
+                    <input type="checkbox" checked={filters.categoria.includes(cat)} readOnly />
+                    <label>{CATEGORIA_LABELS[cat]}</label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {!showingOnlyNonPalos && (
+              <div className="az-filter-section">
+                <div className="az-filter-section-title">Tipo</div>
+                <ul className="az-filter-list">
+                  {TIPO_FILTER.map(({ value, label }) => (
+                    <li key={value} onClick={() => toggleFilter("tipo", value)}>
+                      <input type="checkbox" checked={filters.tipo.includes(value)} readOnly />
+                      <label>{label}</label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="az-filter-section">
+              <div className="az-filter-section-title">Marcas</div>
+              <ul className="az-filter-list">
+                {availableMarcas.map(m => (
+                  <li key={m} onClick={() => toggleFilter("marca", m)}>
+                    <input type="checkbox" checked={filters.marca.includes(m)} readOnly />
+                    <label>{m}</label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="az-filter-section">
+              <div className="az-filter-section-title">Estado</div>
+              <ul className="az-filter-list">
+                {ESTADO_OPTS.map(e => (
+                  <li key={e} onClick={() => toggleFilter("estado", e)}>
+                    <input type="checkbox" checked={filters.estado.includes(e)} readOnly />
+                    <label>{e}</label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="az-filter-section">
+              <div className="az-filter-section-title">Precio</div>
+              <ul className="az-filter-list">
+                {PRICE_RANGES.map(r => (
+                  <li key={r.label} onClick={() => toggleFilter("precio", r.label)}>
+                    <input type="checkbox" checked={filters.precio.includes(r.label)} readOnly />
+                    <label>{r.label}</label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="az-filter-section">
+              <div className="az-filter-section-title">Disponibilidad</div>
+              <ul className="az-filter-list">
+                <li onClick={() => setFilters(f => ({ ...f, enElLocal: !f.enElLocal }))}>
+                  <input type="checkbox" checked={filters.enElLocal} readOnly />
+                  <label>En el local de Azalea</label>
+                </li>
+              </ul>
+            </div>
+            <button className="az-filter-btn primary" style={{ width: "100%", marginTop: 8 }}
+              onClick={() => setMobileFiltersOpen(false)}>
+              Ver resultados ({sortedListings.length})
+            </button>
+            <button className="az-filter-btn secondary" style={{ width: "100%", marginTop: 8 }}
+              onClick={() => { clearFilters(); setMobileFiltersOpen(false); }}>
+              Limpiar todos
+            </button>
+          </div>
+        </>
       )}
     </>
   );
