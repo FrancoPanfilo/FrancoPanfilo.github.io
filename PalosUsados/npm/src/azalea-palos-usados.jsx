@@ -88,8 +88,8 @@ const TIPO_LABELS = {
   putter:  "Putter",
 };
 const TIPOS        = Object.keys(TIPO_LABELS);
-const CATEGORIA_LABELS = { palos: "Palos", carros: "Carros", bolsas: "Bolsas", otros: "Otros" };
-const CATEGORIA_OPTS   = ["palos", "carros", "bolsas", "otros"];
+const CATEGORIA_LABELS = { palos: "Palos", set: "Set de palos", carros: "Carros", bolsas: "Bolsas", otros: "Otros" };
+const CATEGORIA_OPTS   = ["palos", "set", "carros", "bolsas", "otros"];
 const ESTADO_OPTS  = ["Como nuevo", "Muy bueno", "Bueno", "Regular", "Para reparar"];
 const FLEX_OPTS    = ["Ladies", "Senior", "Regular", "Stiff", "X-Stiff"];
 const IRON_OPTS    = ["2", "3", "4", "5", "6", "7", "8", "9", "PW", "GW", "SW", "LW"];
@@ -167,10 +167,22 @@ const cascadeFill = (tipo, marca, modelo, version) => {
    DISPLAY HELPERS
 ───────────────────────────────────────────────────────────── */
 const formatPrecio = (l) => {
+  // Sets: usar precioSet
+  if (l.tipo === "set" || l.categoria === "set") {
+    if (l.precioSet == null) return "A consultar";
+    const prefix = l.moneda === "UYU" ? "$" : "US$";
+    return `${prefix} ${Number(l.precioSet).toLocaleString("es-UY")}`;
+  }
   if (l.aConsultar) return "A consultar";
   const prefix = l.moneda === "UYU" ? "$" : "US$";
   return `${prefix} ${Number(l.precio).toLocaleString("es-UY")}`;
 };
+
+const isSetListing = (l) => l?.tipo === "set" || l?.categoria === "set";
+const isPartOfSet = (l) => Boolean(l?.setId);
+
+const countSetItems = (l) =>
+  l.ofertasSeparadas ? (l.itemIds?.length || 0) : (l.setItems?.length || 0);
 
 const formatComposicion = (arr) => {
   if (!arr || arr.length === 0) return "";
@@ -183,6 +195,14 @@ const labelVersion = (version) =>
   !version || version === "Standard" ? "" : ` (${version})`;
 
 const tipoTag = (tipo) => TIPO_LABELS[tipo] ?? tipo;
+
+const isWedgeMultiple = (l) =>
+  l?.tipo === "wedge" && Array.isArray(l.unidades) && l.unidades.length >= 2;
+
+const wedgeMultipleTitle = (l) => `${l.unidades.length} wedges`;
+
+const formatLoftsList = (unidades) =>
+  unidades.map(u => u.loft ? `${u.loft}°` : "?").join(" / ");
 
 /* ─────────────────────────────────────────────────────────────
    CSS
@@ -866,6 +886,105 @@ a { text-decoration: none; color: inherit; }
 }
 .az-ver-mas:hover { border-color: var(--rz-color-dark); color: var(--rz-color-dark); }
 
+/* ─── SET ITEM LIST (wizard) ──────────────────────────────── */
+.az-set-items-list { display: flex; flex-direction: column; gap: 10px; }
+.az-set-item-row {
+  display: flex; justify-content: space-between; align-items: center;
+  border: 1.5px solid var(--rz-border-color-light); border-radius: 6px;
+  padding: 12px; background: #fafafa; gap: 12px;
+}
+.az-set-item-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.az-set-item-info strong { font-size: 14px; color: var(--rz-color-dark); }
+.az-set-item-info span { font-size: 12px; color: var(--rz-text-color-gray); }
+.az-set-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* ─── SET CARD (catálogo) ─────────────────────────────────── */
+.az-card-set-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: var(--rz-color-dark); color: #fff;
+  padding: 4px 10px; border-radius: 3px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; z-index: 2;
+}
+.az-card-img { position: relative; }
+.az-card-part-of-set {
+  display: inline-block; background: #f0f0f0; color: var(--rz-text-color-gray);
+  padding: 2px 8px; border-radius: 3px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; margin-top: 4px;
+}
+
+/* ─── SET DETAIL ──────────────────────────────────────────── */
+.az-set-detail-items { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.az-set-detail-item {
+  display: flex; gap: 12px; padding: 12px;
+  border: 1.5px solid var(--rz-border-color-light); border-radius: 6px;
+}
+.az-set-detail-item img {
+  width: 100px; height: 100px; object-fit: cover; border-radius: 4px; flex-shrink: 0;
+}
+.az-set-detail-item-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.az-set-detail-item-info strong { font-size: 14px; color: var(--rz-color-dark); }
+.az-set-detail-item-info span { font-size: 12px; color: var(--rz-text-color-gray); }
+.az-set-detail-item-price {
+  font-size: 16px; font-weight: 700; color: var(--rz-color-dark); margin-top: 4px;
+}
+.az-set-detail-item-link {
+  display: inline-block; font-size: 12px; color: var(--rz-color-primary);
+  text-decoration: none; margin-top: 4px;
+}
+.az-set-detail-item-link:hover { text-decoration: underline; }
+
+/* ─── ADMIN CASCADE MODAL ─────────────────────────────────── */
+.az-cascade-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.az-cascade-modal {
+  background: #fff; border-radius: 8px; padding: 24px;
+  max-width: 480px; width: 100%;
+}
+.az-cascade-modal h3 { font-size: 18px; margin-bottom: 8px; color: var(--rz-color-dark); }
+.az-cascade-modal p { font-size: 14px; color: var(--rz-text-color); margin-bottom: 16px; }
+.az-cascade-opts { display: flex; flex-direction: column; gap: 10px; }
+.az-cascade-opt {
+  border: 1.5px solid var(--rz-border-color-light); border-radius: 6px;
+  padding: 14px; text-align: left; cursor: pointer; background: #fff;
+  font-family: inherit; transition: all .15s;
+}
+.az-cascade-opt:hover { border-color: var(--rz-color-dark); background: #fafafa; }
+.az-cascade-opt strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--rz-color-dark); }
+.az-cascade-opt span { font-size: 12px; color: var(--rz-text-color-gray); }
+
+/* ─── WEDGE UNITS (multi) ─────────────────────────────────── */
+.az-wedge-units { display: flex; flex-direction: column; gap: 10px; }
+.az-wedge-unit-card {
+  border: 1.5px solid var(--rz-border-color-light); border-radius: 6px;
+  padding: 12px; background: #fafafa;
+}
+.az-wedge-unit-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; font-size: 13px; color: var(--rz-text-color);
+}
+.az-wedge-unit-rm {
+  background: none; border: none; color: #c00; cursor: pointer;
+  font-size: 16px; padding: 0 6px; line-height: 1;
+}
+.az-wedge-unit-rm:hover { color: #800; }
+
+.az-wedge-table-wrap { margin: 16px 0; overflow-x: auto; }
+.az-wedge-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  background: #fff; border: 1px solid var(--rz-border-color-light);
+}
+.az-wedge-table th, .az-wedge-table td {
+  border: 1px solid var(--rz-border-color-light);
+  padding: 6px 10px; text-align: center;
+}
+.az-wedge-table th {
+  background: #f5f5f5; font-weight: 600; color: var(--rz-text-color);
+}
+
 /* ─── PRICE CURRENCY TOGGLE ──────────────────────────────── */
 .az-currency-row { display: flex; gap: 8px; margin-bottom: 10px; }
 .az-currency-btn {
@@ -920,11 +1039,913 @@ const EMPTY_FORM = {
   tipo: "", marca: "", modelo: "", version: "", anio: "",
   estado: "", mano: "", flex: "", loft: "", material: "", largo: "",
   bounce: "", grind: "", headcover: false, composicion: [], estiloPutter: "", numPalo: "",
+  wedgeMultiple: false, unidades: [],
   aConsultar: false, precio: "", moneda: "USD",
   descripcion: "", departamento: "",
   enElLocal: false, aceptaComision: false,
   nombre: "", contacto: "",
 };
+
+const EMPTY_WEDGE_UNIDAD = { loft: "", bounce: "", grind: "", flex: "", largo: "" };
+
+/* ─────────────────────────────────────────────────────────────
+   SUBCOMPONENT: SetWizard (publicar un set de palos)
+───────────────────────────────────────────────────────────── */
+const EMPTY_SET_ITEM = {
+  tempId: "",
+  tipo: "", marca: "", modelo: "", version: "", anio: "",
+  estado: "", mano: "", flex: "", loft: "", material: "", largo: "",
+  bounce: "", grind: "", headcover: false, composicion: [],
+  estiloPutter: "", numPalo: "",
+  wedgeMultiple: false, unidades: [],
+  precio: "",
+  fotos: [], previews: [],
+};
+
+const EMPTY_SET_COMMON = {
+  nombre: "", contacto: "",
+  departamento: "",
+  enElLocal: false, aceptaComision: false,
+  precioSet: "", moneda: "USD",
+  ofertasSeparadas: false,
+  descripcion: "",
+};
+
+const genTempId = () => `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const labelForSetItem = (it) => {
+  if (!it.tipo) return "Palo sin tipo";
+  if (it.tipo === "wedge" && it.wedgeMultiple)
+    return `${it.unidades.length} wedges ${it.marca || ""} ${it.modelo || ""}`.trim();
+  if (it.tipo === "hierros") {
+    const comp = it.composicion?.length ? ` (${formatComposicion(it.composicion)})` : "";
+    return `${it.composicion?.length === 1 ? "Hierro" : "Hierros"} ${it.marca || ""} ${it.modelo || ""}${comp}`.trim();
+  }
+  return `${TIPO_LABELS[it.tipo] || it.tipo} ${it.marca || ""} ${it.modelo || ""}`.trim();
+};
+
+function SetWizard({ onSuccess, onBack }) {
+  const [stage, setStage] = useState("common"); // "common" | "list" | "item"
+  const [common, setCommon] = useState(EMPTY_SET_COMMON);
+  const [items, setItems] = useState([]);
+  const [setFotos, setSetFotos] = useState([]);
+  const [setPreviews, setSetPreviews] = useState([]);
+  const [editingIdx, setEditingIdx] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef();
+
+  const setC = (k, v) => setCommon(c => ({ ...c, [k]: v }));
+
+  const addSetPhotos = (files) => {
+    const valid = [...files].filter(f => f.type.startsWith("image/")).slice(0, 8 - setFotos.length);
+    if (!valid.length) return;
+    setSetFotos(p => [...p, ...valid]);
+    setSetPreviews(p => [...p, ...valid.map(f => URL.createObjectURL(f))]);
+  };
+  const removeSetPhoto = (i) => {
+    URL.revokeObjectURL(setPreviews[i]);
+    setSetFotos(p => p.filter((_, idx) => idx !== i));
+    setSetPreviews(p => p.filter((_, idx) => idx !== i));
+  };
+
+  const validateCommon = () => {
+    const e = {};
+    if (!common.precioSet) e.precioSet = "Ingresá el precio del set";
+    if (!common.departamento) e.departamento = "Seleccioná un departamento";
+    if (!common.nombre.trim()) e.nombre = "Ingresá tu nombre";
+    if (!common.contacto.trim()) e.contacto = "Ingresá tu WhatsApp o email";
+    if (common.enElLocal && !common.aceptaComision) e.aceptaComision = "Debés aceptar la comisión";
+    if (setFotos.length === 0) e.fotosSet = "Subí al menos una foto del set";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const goToList = () => { if (validateCommon()) setStage("list"); };
+
+  const openNewItem = () => {
+    setEditingIdx(null);
+    setStage("item");
+  };
+  const openEditItem = (idx) => {
+    setEditingIdx(idx);
+    setStage("item");
+  };
+  const removeItem = (idx) => {
+    if (!window.confirm("¿Quitar este palo del set?")) return;
+    setItems(its => its.filter((_, i) => i !== idx));
+  };
+
+  const saveItem = (item) => {
+    setItems(its => {
+      if (editingIdx == null) return [...its, { ...item, tempId: item.tempId || genTempId() }];
+      return its.map((x, i) => i === editingIdx ? item : x);
+    });
+    setEditingIdx(null);
+    setStage("list");
+  };
+
+  const submitSet = async () => {
+    if (items.length < 2) {
+      setErrors({ submit: "Agregá al menos 2 palos al set" });
+      return;
+    }
+    if (common.ofertasSeparadas && items.some(it => !it.precio)) {
+      setErrors({ submit: "Cuando 'ofertas por separado' está activado, cada palo necesita su precio" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      // Subir fotos del set
+      const fotosSet = await Promise.all(setFotos.map(f => uploadToCloudinary(f)));
+      // Subir fotos de cada item
+      const itemsConFotos = await Promise.all(items.map(async (it) => {
+        const fotos = await Promise.all((it.fotos || []).map(f => uploadToCloudinary(f)));
+        return { ...it, fotos };
+      }));
+
+      const vendedor = { nombre: common.nombre, contacto: common.contacto };
+
+      if (!common.ofertasSeparadas) {
+        // Modo atómico: 1 solo doc con setItems embebidos
+        const setItems = itemsConFotos.map(it => buildItemPayload(it));
+        await addDoc(collection(db, "listings"), {
+          status: "pending",
+          categoria: "set",
+          tipo: "set",
+          ofertasSeparadas: false,
+          setItems,
+          precioSet: Number(common.precioSet),
+          moneda: common.moneda || "USD",
+          fotosSet,
+          vendedor,
+          descripcion: common.descripcion || null,
+          departamento: common.departamento,
+          enElLocal: common.enElLocal || false,
+          aceptaComision: common.aceptaComision || false,
+          estado: "Set agrupado",
+          fotos: fotosSet,
+          createdAt: serverTimestamp(),
+          approvedAt: null,
+        });
+      } else {
+        // Modo "ofertas separadas": 1 doc del set + N docs individuales con setId
+        // 1. Crear el doc del set primero (sin itemIds)
+        const setDocRef = await addDoc(collection(db, "listings"), {
+          status: "pending",
+          categoria: "set",
+          tipo: "set",
+          ofertasSeparadas: true,
+          itemIds: [],
+          precioSet: Number(common.precioSet),
+          moneda: common.moneda || "USD",
+          fotosSet,
+          vendedor,
+          descripcion: common.descripcion || null,
+          departamento: common.departamento,
+          enElLocal: common.enElLocal || false,
+          aceptaComision: common.aceptaComision || false,
+          estado: "Set agrupado",
+          fotos: fotosSet,
+          createdAt: serverTimestamp(),
+          approvedAt: null,
+        });
+        // 2. Crear los docs individuales referenciando el setId
+        const itemDocs = await Promise.all(itemsConFotos.map(it => {
+          const payload = buildItemPayload(it);
+          return addDoc(collection(db, "listings"), {
+            ...payload,
+            status: "pending",
+            categoria: "palos",
+            setId: setDocRef.id,
+            aConsultar: false,
+            precio: Number(it.precio),
+            moneda: common.moneda || "USD",
+            vendedor,
+            departamento: common.departamento,
+            enElLocal: common.enElLocal || false,
+            aceptaComision: common.aceptaComision || false,
+            createdAt: serverTimestamp(),
+            approvedAt: null,
+          });
+        }));
+        // 3. Actualizar el set con los itemIds
+        await updateDoc(doc(db, "listings", setDocRef.id), {
+          itemIds: itemDocs.map(d => d.id),
+        });
+      }
+      onSuccess();
+    } catch (err) {
+      console.error("Submit set error:", err);
+      setErrors({ submit: `Error: ${err?.code || err?.message || "desconocido"}` });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="az-publicar-wrap">
+      <p className="az-publicar-title">Publicar: Set de palos</p>
+      <button type="button" className="az-detail-back" style={{ marginBottom: 16 }}
+        onClick={onBack}>← Cambiar categoría</button>
+
+      {errors.submit && <div className="az-form-errors">{errors.submit}</div>}
+
+      {/* ── Stage: COMMON ── */}
+      {stage === "common" && (
+        <>
+          <div className="az-form-section-title" style={{ marginBottom: 12 }}>Datos del set</div>
+
+          <div className="az-field">
+            <label className="az-label">Fotos generales del set</label>
+            <p style={{ fontSize: 12, color: "#aaa", margin: "-4px 0 10px" }}>
+              Estas fotos muestran el set completo. Después de esto vas a poder agregar fotos específicas de cada palo.
+            </p>
+            <div
+              className={`az-drop-zone${dragOver ? " drag-over" : ""}`}
+              onClick={() => fileRef.current.click()}
+              onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={e => { e.preventDefault(); setDragOver(false); addSetPhotos(e.dataTransfer.files); }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p>Arrastrá las fotos acá o <strong>hacé click para elegir</strong></p>
+              <p style={{ fontSize: 11, marginTop: 4 }}>JPG / PNG · máximo 8 fotos</p>
+              <input ref={fileRef} type="file" accept="image/*" multiple hidden
+                onChange={e => addSetPhotos(e.target.files)} />
+            </div>
+            {errors.fotosSet && <p className="az-error-msg" style={{ marginTop: 8 }}>{errors.fotosSet}</p>}
+            {setPreviews.length > 0 && (
+              <div className="az-photos-grid" style={{ marginTop: 12 }}>
+                {setPreviews.map((url, i) => (
+                  <div key={i} className="az-photo-thumb">
+                    <img src={url} alt="" />
+                    {i === 0 && <span className="az-photo-main-badge">Principal</span>}
+                    <button className="az-photo-remove" onClick={() => removeSetPhoto(i)}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="az-field">
+            <label className="az-label">Precio del set completo</label>
+            <div className="az-currency-row">
+              {MONEDA_OPTS.map(m => (
+                <button key={m} type="button"
+                  className={`az-currency-btn${common.moneda === m ? " active" : ""}`}
+                  onClick={() => setC("moneda", m)}>{m}</button>
+              ))}
+            </div>
+            <div className="az-price-input-wrap">
+              <span className="az-price-prefix">{common.moneda === "UYU" ? "$" : "US$"}</span>
+              <input className="az-input has-prefix" type="number" min="0"
+                value={common.precioSet} onChange={e => setC("precioSet", e.target.value)} placeholder="0" />
+            </div>
+            {errors.precioSet && <p className="az-error-msg">{errors.precioSet}</p>}
+          </div>
+
+          <div className="az-field" style={{ marginTop: 8 }}>
+            <div className="az-checkbox-row" style={{ padding: "8px 0" }}>
+              <input type="checkbox" id="ofertasSeparadas" checked={common.ofertasSeparadas}
+                onChange={e => setC("ofertasSeparadas", e.target.checked)} />
+              <label htmlFor="ofertasSeparadas" style={{ fontWeight: 600 }}>
+                Aceptar ofertas por cada palo por separado
+              </label>
+            </div>
+            <p style={{ fontSize: 12, color: "#767676", marginLeft: 28 }}>
+              {common.ofertasSeparadas
+                ? "Cada palo del set se publicará también como aviso individual con su propio precio. Si alguien compra el set entero, todos se dan de baja."
+                : "El set se publica como un único aviso. Solo se vende completo, no por partes."}
+            </p>
+          </div>
+
+          <div className="az-field">
+            <label className="az-label">Descripción <span className="opt">(opcional)</span></label>
+            <textarea className="az-textarea" value={common.descripcion}
+              onChange={e => setC("descripcion", e.target.value)}
+              placeholder="¿Qué incluye el set? Año aproximado, condiciones generales, motivo de venta…" />
+          </div>
+
+          <div className="az-field" style={{ maxWidth: 280 }}>
+            <label className="az-label">Departamento</label>
+            <select className="az-select" value={common.departamento} onChange={e => setC("departamento", e.target.value)}>
+              <option value="">Seleccionar…</option>
+              {DEPARTAMENTOS.map(d => <option key={d}>{d}</option>)}
+            </select>
+            {errors.departamento && <p className="az-error-msg">{errors.departamento}</p>}
+          </div>
+
+          <div className="az-field" style={{ marginTop: 8 }}>
+            <div className="az-checkbox-row" style={{ padding: "8px 0" }}>
+              <input type="checkbox" id="enElLocalSet" checked={common.enElLocal}
+                onChange={e => setC("enElLocal", e.target.checked)} />
+              <label htmlFor="enElLocalSet" style={{ fontWeight: 600 }}>
+                📍 Dejar disponible en el local de Azalea Golf
+              </label>
+            </div>
+            {common.enElLocal && (
+              <div className="az-commission-notice">
+                <strong>Comisión del 10%</strong> — Al dejar el set en el local de Azalea, en caso de venta Azalea cobra una comisión del <strong>10%</strong> sobre el precio final.
+                <div className="az-checkbox-row" style={{ marginTop: 10, padding: 0 }}>
+                  <input type="checkbox" id="aceptaComisionSet" checked={common.aceptaComision}
+                    onChange={e => setC("aceptaComision", e.target.checked)} />
+                  <label htmlFor="aceptaComisionSet">Entendido, acepto la comisión del 10%</label>
+                </div>
+                {errors.aceptaComision && <p className="az-error-msg">{errors.aceptaComision}</p>}
+              </div>
+            )}
+          </div>
+
+          <div className="az-form-section" style={{ marginTop: 28 }}>
+            <div className="az-form-section-title">Datos de contacto</div>
+            <div className="az-form-row">
+              <div className="az-field">
+                <label className="az-label">Tu nombre</label>
+                <input className="az-input" type="text" value={common.nombre}
+                  onChange={e => setC("nombre", e.target.value)} placeholder="Juan García" />
+                {errors.nombre && <p className="az-error-msg">{errors.nombre}</p>}
+              </div>
+              <div className="az-field">
+                <label className="az-label">WhatsApp o email</label>
+                <input className="az-input" type="text" value={common.contacto}
+                  onChange={e => setC("contacto", e.target.value)} placeholder="099 123 456 o correo@mail.com" />
+                {errors.contacto && <p className="az-error-msg">{errors.contacto}</p>}
+              </div>
+            </div>
+          </div>
+
+          <div className="az-form-nav">
+            <button className="az-btn-secondary" onClick={onBack}>← Cancelar</button>
+            <button className="az-btn-primary" onClick={goToList}>Siguiente: agregar palos →</button>
+          </div>
+        </>
+      )}
+
+      {/* ── Stage: ITEM LIST ── */}
+      {stage === "list" && (
+        <>
+          <div className="az-form-section-title" style={{ marginBottom: 12 }}>Palos del set ({items.length})</div>
+          {items.length === 0 && (
+            <p style={{ color: "#767676", marginBottom: 12 }}>
+              Todavía no agregaste ningún palo. Mínimo 2 para publicar un set.
+            </p>
+          )}
+          {items.length > 0 && (
+            <div className="az-set-items-list">
+              {items.map((it, i) => (
+                <div key={it.tempId || i} className="az-set-item-row">
+                  <div className="az-set-item-info">
+                    <strong>{labelForSetItem(it)}</strong>
+                    <span>
+                      {it.estado}
+                      {common.ofertasSeparadas && it.precio
+                        ? ` · ${common.moneda === "UYU" ? "$" : "US$"} ${Number(it.precio).toLocaleString("es-UY")}`
+                        : ""}
+                      {" · "}{(it.fotos?.length || 0)} foto{(it.fotos?.length || 0) === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  <div className="az-set-item-actions">
+                    <button className="az-admin-btn edit" onClick={() => openEditItem(i)}>Editar</button>
+                    <button className="az-admin-btn del" onClick={() => removeItem(i)}>Quitar</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <button className="az-extra-toggle" style={{ marginTop: 16 }} onClick={openNewItem}>
+            <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
+            Agregar palo al set
+          </button>
+
+          <div className="az-form-nav">
+            <button className="az-btn-secondary" onClick={() => setStage("common")}>← Datos del set</button>
+            <button className="az-btn-primary" onClick={submitSet} disabled={submitting || items.length < 2}>
+              {submitting ? "Enviando…" : "Finalizar y publicar"}
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* ── Stage: ITEM EDITOR ── */}
+      {stage === "item" && (
+        <SetItemEditor
+          initial={editingIdx != null ? items[editingIdx] : null}
+          requirePrice={common.ofertasSeparadas}
+          moneda={common.moneda}
+          onCancel={() => setStage("list")}
+          onSave={saveItem}
+        />
+      )}
+    </div>
+  );
+}
+
+// Construye el payload de un palo a partir del estado del item del set
+function buildItemPayload(it) {
+  const isWedgeMulti = it.tipo === "wedge" && it.wedgeMultiple;
+  const unidadesNormalizadas = isWedgeMulti
+    ? it.unidades.map(u => ({
+        loft: u.loft ? Number(u.loft) : null,
+        bounce: u.bounce ? Number(u.bounce) : null,
+        grind: u.grind || null,
+        flex: u.flex || null,
+        largo: u.largo || null,
+      }))
+    : null;
+  return {
+    tipo: it.tipo, marca: it.marca, modelo: it.modelo,
+    version: it.version || "Standard",
+    anio: it.anio ? Number(it.anio) : null,
+    estado: it.estado, mano: it.mano,
+    flex: isWedgeMulti ? null : (it.flex || null),
+    loft: isWedgeMulti ? null : (it.loft ? Number(it.loft) : null),
+    material: it.material || null,
+    largo: isWedgeMulti ? null : (it.largo || null),
+    bounce: isWedgeMulti ? null : (it.bounce ? Number(it.bounce) : null),
+    grind: isWedgeMulti ? null : (it.grind || null),
+    headcover: it.headcover || null,
+    estiloPutter: it.estiloPutter || null,
+    numPalo: it.numPalo || null,
+    composicion: it.composicion?.length > 0 ? it.composicion : null,
+    wedgeMultiple: isWedgeMulti || null,
+    unidades: unidadesNormalizadas,
+    fotos: it.fotos || [],
+  };
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SUBCOMPONENT: SetItemEditor (mini-form de palo dentro del set)
+───────────────────────────────────────────────────────────── */
+function SetItemEditor({ initial, requirePrice, moneda, onCancel, onSave }) {
+  const [item, setItem] = useState(initial || { ...EMPTY_SET_ITEM, tempId: genTempId() });
+  const [previews, setPreviews] = useState(initial?.previews || []);
+  const [files, setFiles] = useState(initial?.fotos || []);
+  const [errors, setErrors] = useState({});
+  const [manualEntry, setManualEntry] = useState(false);
+  const [showExtra, setShowExtra] = useState(false);
+  const fileRef = useRef();
+
+  const set = (k, v) => setItem(it => ({ ...it, [k]: v }));
+
+  const marcas    = item.tipo ? getMarcas(item.tipo) : [];
+  const modelos   = item.tipo && item.marca ? getModelos(item.tipo, item.marca) : [];
+  const versiones = item.tipo && item.marca && item.modelo ? getVersiones(item.tipo, item.marca, item.modelo) : [];
+  const anios     = item.tipo && item.marca && item.modelo && item.version
+    ? getAnios(item.tipo, item.marca, item.modelo, item.version) : [];
+  const showMarcaSelect   = marcas.length > 1;
+  const showModeloSelect  = modelos.length > 1;
+  const showVersionSelect = versiones.length > 1;
+  const showAnioSelect    = anios.length > 1;
+
+  const onTipo = (v) => setItem(it => ({ ...EMPTY_SET_ITEM, tempId: it.tempId, ...cascadeFill(v, "", "", "") }));
+  const onMarca = (v) => setItem(it => ({ ...EMPTY_SET_ITEM, tempId: it.tempId, tipo: it.tipo, ...cascadeFill(it.tipo, v, "", "") }));
+  const onModelo = (v) => setItem(it => ({ ...EMPTY_SET_ITEM, tempId: it.tempId, tipo: it.tipo, marca: it.marca, ...cascadeFill(it.tipo, it.marca, v, "") }));
+  const onVersion = (v) => {
+    const years = getAnios(item.tipo, item.marca, item.modelo, v);
+    setItem(it => ({ ...it, version: v, anio: years.length === 1 ? String(years[0]) : "" }));
+  };
+
+  const addFiles = (newFiles) => {
+    const valid = [...newFiles].filter(f => f.type.startsWith("image/") || typeof f === "string").slice(0, 8 - files.length);
+    if (!valid.length) return;
+    setFiles(p => [...p, ...valid]);
+    setPreviews(p => [...p, ...valid.map(f => typeof f === "string" ? f : URL.createObjectURL(f))]);
+  };
+  const removePhoto = (i) => {
+    if (typeof files[i] !== "string") URL.revokeObjectURL(previews[i]);
+    setFiles(p => p.filter((_, idx) => idx !== i));
+    setPreviews(p => p.filter((_, idx) => idx !== i));
+  };
+
+  const validateAndSave = () => {
+    const e = {};
+    if (!item.tipo) e.tipo = "Seleccioná el tipo";
+    if (!item.marca) e.marca = "Marca";
+    if (!item.estado) e.estado = "Condición";
+    if (!item.mano) e.mano = "Mano";
+    if (item.tipo === "driver" && !item.flex) e.flex = "Flex";
+    if (item.tipo === "driver" && !item.loft) e.loft = "Loft";
+    if (item.tipo === "wedge" && !item.wedgeMultiple && !item.loft) e.loft = "Loft";
+    if (item.tipo === "wedge" && item.wedgeMultiple) {
+      if (item.unidades.length < 2) e.unidades = "Mínimo 2 wedges";
+      else if (item.unidades.some(u => !u.loft)) e.unidades = "Completá los lofts";
+    }
+    if ((item.tipo === "madera" || item.tipo === "hibrido") && !item.numPalo) e.numPalo = "Número";
+    if (item.tipo === "putter" && !item.estiloPutter) e.estiloPutter = "Estilo";
+    if (item.tipo === "putter" && !item.largo) e.largo = "Largo";
+    if (item.tipo === "hierros" && item.composicion.length < 1) e.composicion = "Seleccioná al menos 1 hierro";
+    if (files.length === 0) e.photos = "Subí al menos una foto del palo";
+    if (requirePrice && !item.precio) e.precio = "Precio";
+    setErrors(e);
+    if (Object.keys(e).length > 0) return;
+    onSave({ ...item, fotos: files, previews });
+  };
+
+  return (
+    <div>
+      <div className="az-form-section-title" style={{ marginBottom: 12 }}>
+        {initial ? "Editar palo del set" : "Agregar palo al set"}
+      </div>
+
+      {/* Tipo */}
+      <div className="az-field">
+        <label className="az-label">Tipo de palo</label>
+        <select className="az-select" value={item.tipo} onChange={e => { onTipo(e.target.value); setManualEntry(false); }}>
+          <option value="">Seleccionar…</option>
+          {TIPOS.map(t => <option key={t} value={t}>{TIPO_LABELS[t]}</option>)}
+        </select>
+        {errors.tipo && <p className="az-error-msg">{errors.tipo}</p>}
+      </div>
+
+      {!manualEntry && item.tipo && (
+        <>
+          <div className="az-field">
+            <label className="az-label">Marca</label>
+            {showMarcaSelect
+              ? <select className="az-select" value={item.marca} onChange={e => onMarca(e.target.value)}>
+                  <option value="">Seleccionar…</option>
+                  {marcas.map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+              : <div className="az-auto-val">{item.marca}</div>}
+            {errors.marca && <p className="az-error-msg">{errors.marca}</p>}
+          </div>
+          {item.marca && (
+            <div className="az-field">
+              <label className="az-label">Modelo</label>
+              {showModeloSelect
+                ? <select className="az-select" value={item.modelo} onChange={e => onModelo(e.target.value)}>
+                    <option value="">Seleccionar…</option>
+                    {modelos.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                : <div className="az-auto-val">{item.modelo}</div>}
+            </div>
+          )}
+          {item.modelo && showVersionSelect && (
+            <div className="az-field">
+              <label className="az-label">Versión</label>
+              <select className="az-select" value={item.version} onChange={e => onVersion(e.target.value)}>
+                <option value="">Seleccionar…</option>
+                {versiones.map(v => <option key={v.version} value={v.version}>{v.version} ({v.anio})</option>)}
+              </select>
+            </div>
+          )}
+          {item.version && showAnioSelect && (
+            <div className="az-field" style={{ maxWidth: 200 }}>
+              <label className="az-label">Año</label>
+              <select className="az-select" value={item.anio} onChange={e => set("anio", e.target.value)}>
+                <option value="">Seleccionar…</option>
+                {anios.map(y => <option key={y} value={String(y)}>{y}</option>)}
+              </select>
+            </div>
+          )}
+        </>
+      )}
+
+      {manualEntry && item.tipo && (
+        <>
+          <div className="az-form-row">
+            <div className="az-field">
+              <label className="az-label">Marca</label>
+              <input className="az-input" type="text" value={item.marca}
+                onChange={e => set("marca", e.target.value)} />
+              {errors.marca && <p className="az-error-msg">{errors.marca}</p>}
+            </div>
+            <div className="az-field">
+              <label className="az-label">Modelo <span className="opt">(opc.)</span></label>
+              <input className="az-input" type="text" value={item.modelo}
+                onChange={e => set("modelo", e.target.value)} />
+            </div>
+          </div>
+        </>
+      )}
+      {item.tipo && (
+        <button type="button" className="az-extra-toggle" style={{ marginTop: 10 }}
+          onClick={() => {
+            const next = !manualEntry;
+            setManualEntry(next);
+            setItem(it => ({ ...EMPTY_SET_ITEM, tempId: it.tempId, tipo: it.tipo }));
+          }}>
+          <span style={{ fontSize: 14 }}>{manualEntry ? "←" : "?"}</span>
+          {manualEntry ? "Buscar en la base de datos" : "Mi palo no está en la lista"}
+        </button>
+      )}
+
+      {/* Estado + Mano */}
+      {item.tipo && (
+        <div className="az-form-row" style={{ marginTop: 16 }}>
+          <div className="az-field">
+            <label className="az-label">Condición</label>
+            <select className="az-select" value={item.estado} onChange={e => set("estado", e.target.value)}>
+              <option value="">Seleccionar…</option>
+              {ESTADO_OPTS.map(o => <option key={o}>{o}</option>)}
+            </select>
+            {errors.estado && <p className="az-error-msg">{errors.estado}</p>}
+          </div>
+          <div className="az-field">
+            <label className="az-label">Mano</label>
+            <select className="az-select" value={item.mano} onChange={e => set("mano", e.target.value)}>
+              <option value="">Seleccionar…</option>
+              {MANO_OPTS.map(o => <option key={o}>{o}</option>)}
+            </select>
+            {errors.mano && <p className="az-error-msg">{errors.mano}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* Putter */}
+      {item.tipo === "putter" && (
+        <div className="az-form-row">
+          <div className="az-field">
+            <label className="az-label">Estilo</label>
+            <select className="az-select" value={item.estiloPutter} onChange={e => set("estiloPutter", e.target.value)}>
+              <option value="">Seleccionar…</option>
+              {PUTTER_ESTILO_OPTS.map(o => <option key={o}>{o}</option>)}
+            </select>
+            {errors.estiloPutter && <p className="az-error-msg">{errors.estiloPutter}</p>}
+          </div>
+          <div className="az-field">
+            <label className="az-label">Largo</label>
+            <select className="az-select" value={item.largo} onChange={e => set("largo", e.target.value)}>
+              <option value="">Seleccionar…</option>
+              {PUTTER_LARGO_OPTS.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+            {errors.largo && <p className="az-error-msg">{errors.largo}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* Madera / Hibrido */}
+      {(item.tipo === "madera" || item.tipo === "hibrido") && (
+        <div className="az-field" style={{ maxWidth: 220 }}>
+          <label className="az-label">Número {item.tipo === "madera" ? "de madera" : "del híbrido"}</label>
+          <select className="az-select" value={item.numPalo} onChange={e => set("numPalo", e.target.value)}>
+            <option value="">Seleccionar…</option>
+            {(item.tipo === "madera" ? MADERA_NUM_OPTS : HIBRIDO_NUM_OPTS).map(n => (
+              <option key={n} value={n}>{item.tipo === "madera" ? "Madera" : "Híbrido"} {n}</option>
+            ))}
+          </select>
+          {errors.numPalo && <p className="az-error-msg">{errors.numPalo}</p>}
+        </div>
+      )}
+
+      {/* Flex */}
+      {item.tipo && item.tipo !== "putter" && !(item.tipo === "wedge" && item.wedgeMultiple) && (
+        <div className="az-field" style={{ maxWidth: 240 }}>
+          <label className="az-label">Flex {item.tipo !== "driver" && <span className="opt">(opc.)</span>}</label>
+          <select className="az-select" value={item.flex} onChange={e => set("flex", e.target.value)}>
+            <option value="">Seleccionar…</option>
+            {FLEX_OPTS.map(o => <option key={o}>{o}</option>)}
+          </select>
+          {errors.flex && <p className="az-error-msg">{errors.flex}</p>}
+        </div>
+      )}
+
+      {/* Hierros: composición */}
+      {item.tipo === "hierros" && (
+        <div className="az-field">
+          <label className="az-label">{item.composicion.length === 1 ? "Hierro" : "Composición del set"}</label>
+          <div className="az-iron-set">
+            {IRON_OPTS.map(iron => {
+              const sel = item.composicion.includes(iron);
+              return (
+                <label key={iron} className={`az-iron-chip${sel ? " sel" : ""}`}>
+                  <input type="checkbox" checked={sel} onChange={e => {
+                    const next = e.target.checked
+                      ? [...item.composicion, iron]
+                      : item.composicion.filter(i => i !== iron);
+                    set("composicion", next);
+                  }} />
+                  {iron}
+                </label>
+              );
+            })}
+          </div>
+          {errors.composicion && <p className="az-error-msg">{errors.composicion}</p>}
+        </div>
+      )}
+
+      {/* Driver: loft */}
+      {item.tipo === "driver" && (
+        <div className="az-field" style={{ maxWidth: 200 }}>
+          <label className="az-label">Loft</label>
+          <select className="az-select" value={item.loft} onChange={e => set("loft", e.target.value)}>
+            <option value="">Seleccionar…</option>
+            {(LOFT_OPTS.driver || []).map(v => <option key={v} value={v}>{v}°</option>)}
+          </select>
+          {errors.loft && <p className="az-error-msg">{errors.loft}</p>}
+        </div>
+      )}
+
+      {/* Wedge */}
+      {item.tipo === "wedge" && (
+        <>
+          <div className="az-checkbox-row" style={{ padding: "4px 0 8px" }}>
+            <input type="checkbox" id="item-wedgeMultiple" checked={item.wedgeMultiple}
+              onChange={e => {
+                const next = e.target.checked;
+                setItem(it => ({
+                  ...it,
+                  wedgeMultiple: next,
+                  unidades: next && it.unidades.length === 0
+                    ? [{ ...EMPTY_WEDGE_UNIDAD }, { ...EMPTY_WEDGE_UNIDAD }]
+                    : it.unidades,
+                  loft: next ? "" : it.loft,
+                  bounce: next ? "" : it.bounce,
+                  grind: next ? "" : it.grind,
+                  flex: next ? "" : it.flex,
+                  largo: next ? "" : it.largo,
+                }));
+              }} />
+            <label htmlFor="item-wedgeMultiple" style={{ fontWeight: 600 }}>Son varios wedges del mismo modelo</label>
+          </div>
+          {!item.wedgeMultiple && (
+            <>
+              <div className="az-field" style={{ maxWidth: 200 }}>
+                <label className="az-label">Loft</label>
+                <select className="az-select" value={item.loft} onChange={e => set("loft", e.target.value)}>
+                  <option value="">Seleccionar…</option>
+                  {(LOFT_OPTS.wedge || []).map(v => <option key={v} value={v}>{v}°</option>)}
+                </select>
+                {errors.loft && <p className="az-error-msg">{errors.loft}</p>}
+              </div>
+              <div className="az-form-row">
+                <div className="az-field">
+                  <label className="az-label">Bounce <span className="opt">(opc.)</span></label>
+                  <select className="az-select" value={item.bounce} onChange={e => set("bounce", e.target.value)}>
+                    <option value="">—</option>
+                    {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
+                  </select>
+                </div>
+                <div className="az-field">
+                  <label className="az-label">Grind <span className="opt">(opc.)</span></label>
+                  <select className="az-select" value={item.grind} onChange={e => set("grind", e.target.value)}>
+                    <option value="">—</option>
+                    {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+              </div>
+            </>
+          )}
+          {item.wedgeMultiple && (
+            <div className="az-field">
+              <label className="az-label">Wedges incluidos</label>
+              <div className="az-wedge-units">
+                {item.unidades.map((u, idx) => (
+                  <div key={idx} className="az-wedge-unit-card">
+                    <div className="az-wedge-unit-header">
+                      <strong>Wedge {idx + 1}</strong>
+                      {item.unidades.length > 2 && (
+                        <button type="button" className="az-wedge-unit-rm"
+                          onClick={() => set("unidades", item.unidades.filter((_, i) => i !== idx))}>✕</button>
+                      )}
+                    </div>
+                    <div className="az-form-row">
+                      <div className="az-field">
+                        <label className="az-label">Loft</label>
+                        <select className="az-select" value={u.loft}
+                          onChange={e => set("unidades", item.unidades.map((x, i) => i === idx ? { ...x, loft: e.target.value } : x))}>
+                          <option value="">—</option>
+                          {(LOFT_OPTS.wedge || []).map(v => <option key={v} value={v}>{v}°</option>)}
+                        </select>
+                      </div>
+                      <div className="az-field">
+                        <label className="az-label">Bounce</label>
+                        <select className="az-select" value={u.bounce}
+                          onChange={e => set("unidades", item.unidades.map((x, i) => i === idx ? { ...x, bounce: e.target.value } : x))}>
+                          <option value="">—</option>
+                          {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="az-form-row">
+                      <div className="az-field">
+                        <label className="az-label">Grind</label>
+                        <select className="az-select" value={u.grind}
+                          onChange={e => set("unidades", item.unidades.map((x, i) => i === idx ? { ...x, grind: e.target.value } : x))}>
+                          <option value="">—</option>
+                          {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
+                        </select>
+                      </div>
+                      <div className="az-field">
+                        <label className="az-label">Flex</label>
+                        <select className="az-select" value={u.flex}
+                          onChange={e => set("unidades", item.unidades.map((x, i) => i === idx ? { ...x, flex: e.target.value } : x))}>
+                          <option value="">—</option>
+                          {FLEX_OPTS.map(o => <option key={o}>{o}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button type="button" className="az-extra-toggle" style={{ marginTop: 8 }}
+                onClick={() => set("unidades", [...item.unidades, { ...EMPTY_WEDGE_UNIDAD }])}>
+                <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
+                Agregar otro wedge
+              </button>
+              {errors.unidades && <p className="az-error-msg" style={{ marginTop: 8 }}>{errors.unidades}</p>}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Datos adicionales colapsable */}
+      {item.tipo && (
+        <button type="button" className="az-extra-toggle" style={{ marginTop: 16 }} onClick={() => setShowExtra(s => !s)}>
+          <span style={{ fontSize: 16, lineHeight: 1 }}>{showExtra ? "−" : "+"}</span>
+          {showExtra ? "Ocultar datos adicionales" : "Agregar datos técnicos (opcional)"}
+        </button>
+      )}
+      {showExtra && item.tipo && (
+        <div style={{ marginTop: 12 }}>
+          {(item.tipo === "madera" || item.tipo === "hibrido") && (
+            <div className="az-field" style={{ maxWidth: 200 }}>
+              <label className="az-label">Loft <span className="opt">(opc.)</span></label>
+              <select className="az-select" value={item.loft} onChange={e => set("loft", e.target.value)}>
+                <option value="">No especificar</option>
+                {(LOFT_OPTS[item.tipo] || []).map(v => <option key={v} value={v}>{v}°</option>)}
+              </select>
+            </div>
+          )}
+          {item.tipo !== "putter" && !(item.tipo === "wedge" && item.wedgeMultiple) && (
+            <div className="az-form-row">
+              {item.tipo !== "hierros" && (
+                <div className="az-field">
+                  <label className="az-label">Material del shaft <span className="opt">(opc.)</span></label>
+                  <select className="az-select" value={item.material} onChange={e => set("material", e.target.value)}>
+                    <option value="">No especificar</option>
+                    {MATERIAL_OPTS.map(o => <option key={o}>{o}</option>)}
+                  </select>
+                </div>
+              )}
+              <div className="az-field">
+                <label className="az-label">Largo del shaft <span className="opt">(opc.)</span></label>
+                <select className="az-select" value={item.largo} onChange={e => set("largo", e.target.value)}>
+                  <option value="">Standard</option>
+                  {LARGO_OPTS.filter(o => o !== "Standard").map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+            </div>
+          )}
+          {["driver","madera","hibrido","putter"].includes(item.tipo) && (
+            <div className="az-checkbox-row">
+              <input type="checkbox" id={`item-headcover-${item.tempId}`} checked={item.headcover}
+                onChange={e => set("headcover", e.target.checked)} />
+              <label htmlFor={`item-headcover-${item.tempId}`}>Incluye headcover</label>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Fotos del palo */}
+      {item.tipo && (
+        <div className="az-field" style={{ marginTop: 16 }}>
+          <label className="az-label">Fotos de este palo</label>
+          <div className="az-drop-zone" style={{ cursor: "pointer" }} onClick={() => fileRef.current.click()}>
+            <p>Hacé click para agregar fotos</p>
+            <p style={{ fontSize: 11, marginTop: 4 }}>JPG / PNG · máximo 8</p>
+            <input ref={fileRef} type="file" accept="image/*" multiple hidden
+              onChange={e => addFiles(e.target.files)} />
+          </div>
+          {errors.photos && <p className="az-error-msg" style={{ marginTop: 8 }}>{errors.photos}</p>}
+          {previews.length > 0 && (
+            <div className="az-photos-grid" style={{ marginTop: 12 }}>
+              {previews.map((url, i) => (
+                <div key={i} className="az-photo-thumb">
+                  <img src={url} alt="" />
+                  {i === 0 && <span className="az-photo-main-badge">Principal</span>}
+                  <button className="az-photo-remove" onClick={() => removePhoto(i)}>✕</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Precio (solo si ofertasSeparadas) */}
+      {item.tipo && requirePrice && (
+        <div className="az-field" style={{ marginTop: 16 }}>
+          <label className="az-label">Precio individual de este palo</label>
+          <div className="az-price-input-wrap">
+            <span className="az-price-prefix">{moneda === "UYU" ? "$" : "US$"}</span>
+            <input className="az-input has-prefix" type="number" min="0"
+              value={item.precio} onChange={e => set("precio", e.target.value)} placeholder="0" />
+          </div>
+          {errors.precio && <p className="az-error-msg">{errors.precio}</p>}
+        </div>
+      )}
+
+      <div className="az-form-nav">
+        <button className="az-btn-secondary" onClick={onCancel}>← Cancelar</button>
+        <button className="az-btn-primary" onClick={validateAndSave}>
+          {initial ? "Guardar cambios" : "Agregar al set"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /* ─────────────────────────────────────────────────────────────
    SUBCOMPONENT: PublicarForm
@@ -982,6 +2003,14 @@ function PublicarForm({ onSuccess }) {
     setPreviews(p => [...p, ...valid.map(f => URL.createObjectURL(f))]);
   }, [photos.length]);
 
+  // Intercept (post-hooks): si elige "set", delegar al wizard dedicado
+  if (form.categoria === "set") {
+    return <SetWizard
+      onSuccess={onSuccess}
+      onBack={() => setForm(EMPTY_FORM)}
+    />;
+  }
+
   const removePhoto = (i) => {
     URL.revokeObjectURL(previews[i]);
     setPhotos(p => p.filter((_, idx) => idx !== i));
@@ -1013,12 +2042,17 @@ function PublicarForm({ onSuccess }) {
         if (!form.estado) e.estado = "Seleccioná la condición";
         if (!form.mano) e.mano = "Seleccioná la mano";
         if (form.tipo === "driver" && !form.flex) e.flex = "Seleccioná el flex";
-        if ((form.tipo === "driver" || form.tipo === "wedge") && !form.loft) e.loft = "Seleccioná el loft";
+        if (form.tipo === "driver" && !form.loft) e.loft = "Seleccioná el loft";
+        if (form.tipo === "wedge" && !form.wedgeMultiple && !form.loft) e.loft = "Seleccioná el loft";
+        if (form.tipo === "wedge" && form.wedgeMultiple) {
+          if (form.unidades.length < 2) e.unidades = "Agregá al menos 2 wedges";
+          else if (form.unidades.some(u => !u.loft)) e.unidades = "Completá el loft de cada wedge";
+        }
         if ((form.tipo === "madera" || form.tipo === "hibrido") && !form.numPalo) e.numPalo = "Seleccioná el número";
         if (form.tipo === "putter" && !form.estiloPutter) e.estiloPutter = "Seleccioná el estilo";
         if (form.tipo === "putter" && !form.largo) e.largo = "Seleccioná el largo del putter";
-        if (form.tipo === "hierros" && form.composicion.length < 2)
-          e.composicion = "Seleccioná al menos 2 palos del set";
+        if (form.tipo === "hierros" && form.composicion.length < 1)
+          e.composicion = "Seleccioná al menos 1 palo";
       }
       if (step === 3) {
         if (photos.length === 0) e.photos = "Subí al menos una foto";
@@ -1058,19 +2092,34 @@ function PublicarForm({ onSuccess }) {
       notifyNewListing(form);
 
       if (isPalos) {
+        const isWedgeMulti = form.tipo === "wedge" && form.wedgeMultiple;
+        const unidadesNormalizadas = isWedgeMulti
+          ? form.unidades.map(u => ({
+              loft: u.loft ? Number(u.loft) : null,
+              bounce: u.bounce ? Number(u.bounce) : null,
+              grind: u.grind || null,
+              flex: u.flex || null,
+              largo: u.largo || null,
+            }))
+          : null;
         await addDoc(collection(db, "listings"), {
           status: "pending",
           categoria: "palos",
           tipo: form.tipo, marca: form.marca, modelo: form.modelo,
           version: form.version || "Standard", anio: Number(form.anio),
           estado: form.estado, mano: form.mano,
-          flex: form.flex || null, loft: form.loft ? Number(form.loft) : null,
-          material: form.material || null, largo: form.largo || null,
-          bounce: form.bounce ? Number(form.bounce) : null,
-          grind: form.grind || null, headcover: form.headcover || null,
+          flex: isWedgeMulti ? null : (form.flex || null),
+          loft: isWedgeMulti ? null : (form.loft ? Number(form.loft) : null),
+          material: form.material || null,
+          largo: isWedgeMulti ? null : (form.largo || null),
+          bounce: isWedgeMulti ? null : (form.bounce ? Number(form.bounce) : null),
+          grind: isWedgeMulti ? null : (form.grind || null),
+          headcover: form.headcover || null,
           estiloPutter: form.estiloPutter || null,
           numPalo: form.numPalo || null,
           composicion: form.composicion.length > 0 ? form.composicion : null,
+          wedgeMultiple: isWedgeMulti || null,
+          unidades: unidadesNormalizadas,
           aConsultar: form.aConsultar, precio: form.aConsultar ? null : Number(form.precio),
           moneda: form.aConsultar ? null : (form.moneda || "USD"),
           descripcion: form.descripcion || null, departamento: form.departamento,
@@ -1370,8 +2419,8 @@ function PublicarForm({ onSuccess }) {
           {/* Hierros: composición del set */}
           {form.tipo === "hierros" && (
             <div className="az-field">
-              <label className="az-label">Composición del set</label>
-              <p style={{ fontSize: 12, color: "#aaa", margin: "-4px 0 10px" }}>Seleccioná los hierros que incluye el set</p>
+              <label className="az-label">{form.composicion.length === 1 ? "Hierro" : "Composición del set"}</label>
+              <p style={{ fontSize: 12, color: "#aaa", margin: "-4px 0 10px" }}>Seleccioná los hierros que estás publicando (podés publicar uno solo)</p>
               <div className="az-iron-set">
                 {IRON_OPTS.map(iron => {
                   const sel = form.composicion.includes(iron);
@@ -1388,10 +2437,10 @@ function PublicarForm({ onSuccess }) {
                   );
                 })}
               </div>
-              {form.composicion.length >= 2 && (
+              {form.composicion.length >= 1 && (
                 <p className="az-iron-summary">
-                  Set: <strong>{formatComposicion(form.composicion)}</strong>
-                  {" "}({form.composicion.length} palos)
+                  {form.composicion.length === 1 ? "Hierro" : "Set"}: <strong>{formatComposicion(form.composicion)}</strong>
+                  {form.composicion.length >= 2 && <> ({form.composicion.length} palos)</>}
                 </p>
               )}
               {errors.composicion && <p className="az-error-msg">{errors.composicion}</p>}
@@ -1409,8 +2458,8 @@ function PublicarForm({ onSuccess }) {
             </div>
           )}
 
-          {/* Driver y Wedge: loft OBLIGATORIO */}
-          {(form.tipo === "driver" || form.tipo === "wedge") && (
+          {/* Driver: loft OBLIGATORIO */}
+          {form.tipo === "driver" && (
             <div className="az-field" style={{ maxWidth: 200 }}>
               <label className="az-label">Loft</label>
               <select className="az-select" value={form.loft} onChange={e => set("loft", e.target.value)}>
@@ -1423,25 +2472,138 @@ function PublicarForm({ onSuccess }) {
             </div>
           )}
 
-          {/* Wedge: bounce + grind */}
+          {/* Wedge: checkbox multi + single/multi UI */}
           {form.tipo === "wedge" && (
-            <div className="az-form-row">
-              <div className="az-field">
-                <label className="az-label">Bounce <span className="opt">(opcional)</span></label>
-                <select className="az-select" value={form.bounce} onChange={e => set("bounce", e.target.value)}>
-                  <option value="">No sé / No especificar</option>
-                  {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
-                </select>
+            <>
+              <div className="az-checkbox-row" style={{ padding: "4px 0 12px" }}>
+                <input type="checkbox" id="wedgeMultiple" checked={form.wedgeMultiple}
+                  onChange={e => {
+                    const next = e.target.checked;
+                    setForm(f => ({
+                      ...f,
+                      wedgeMultiple: next,
+                      unidades: next && f.unidades.length === 0
+                        ? [{ ...EMPTY_WEDGE_UNIDAD }, { ...EMPTY_WEDGE_UNIDAD }]
+                        : f.unidades,
+                      // si pasa a múltiple, limpio los campos sueltos para evitar confusión
+                      loft: next ? "" : f.loft,
+                      bounce: next ? "" : f.bounce,
+                      grind: next ? "" : f.grind,
+                      flex: next ? "" : f.flex,
+                      largo: next ? "" : f.largo,
+                    }));
+                  }} />
+                <label htmlFor="wedgeMultiple" style={{ fontWeight: 600 }}>
+                  Son varios wedges del mismo modelo
+                </label>
               </div>
-              <div className="az-field">
-                <label className="az-label">Grind <span className="opt">(opcional)</span></label>
-                <select className="az-select" value={form.grind} onChange={e => set("grind", e.target.value)}>
-                  <option value="">No sé / No especificar</option>
-                  {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
-                </select>
-                <p style={{ fontSize: 11, color: "#aaa", marginTop: 4 }}>Está marcado en la cara del wedge</p>
-              </div>
-            </div>
+
+              {!form.wedgeMultiple && (
+                <>
+                  <div className="az-field" style={{ maxWidth: 200 }}>
+                    <label className="az-label">Loft</label>
+                    <select className="az-select" value={form.loft} onChange={e => set("loft", e.target.value)}>
+                      <option value="">Seleccionar…</option>
+                      {(LOFT_OPTS.wedge || []).map(v => (
+                        <option key={v} value={v}>{v}°</option>
+                      ))}
+                    </select>
+                    {errors.loft && <p className="az-error-msg">{errors.loft}</p>}
+                  </div>
+                  <div className="az-form-row">
+                    <div className="az-field">
+                      <label className="az-label">Bounce <span className="opt">(opcional)</span></label>
+                      <select className="az-select" value={form.bounce} onChange={e => set("bounce", e.target.value)}>
+                        <option value="">No sé / No especificar</option>
+                        {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
+                      </select>
+                    </div>
+                    <div className="az-field">
+                      <label className="az-label">Grind <span className="opt">(opcional)</span></label>
+                      <select className="az-select" value={form.grind} onChange={e => set("grind", e.target.value)}>
+                        <option value="">No sé / No especificar</option>
+                        {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
+                      </select>
+                      <p style={{ fontSize: 11, color: "#aaa", marginTop: 4 }}>Está marcado en la cara del wedge</p>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {form.wedgeMultiple && (
+                <div className="az-field">
+                  <label className="az-label">Wedges incluidos</label>
+                  <p style={{ fontSize: 12, color: "#aaa", margin: "-4px 0 10px" }}>
+                    Agregá cada wedge del lote con sus specs. El precio será único para todo el lote.
+                  </p>
+                  <div className="az-wedge-units">
+                    {form.unidades.map((u, idx) => (
+                      <div key={idx} className="az-wedge-unit-card">
+                        <div className="az-wedge-unit-header">
+                          <strong>Wedge {idx + 1}</strong>
+                          {form.unidades.length > 2 && (
+                            <button type="button" className="az-wedge-unit-rm"
+                              onClick={() => set("unidades", form.unidades.filter((_, i) => i !== idx))}>
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                        <div className="az-form-row">
+                          <div className="az-field">
+                            <label className="az-label">Loft</label>
+                            <select className="az-select" value={u.loft}
+                              onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, loft: e.target.value } : x))}>
+                              <option value="">Seleccionar…</option>
+                              {(LOFT_OPTS.wedge || []).map(v => <option key={v} value={v}>{v}°</option>)}
+                            </select>
+                          </div>
+                          <div className="az-field">
+                            <label className="az-label">Bounce <span className="opt">(opc.)</span></label>
+                            <select className="az-select" value={u.bounce}
+                              onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, bounce: e.target.value } : x))}>
+                              <option value="">—</option>
+                              {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="az-form-row">
+                          <div className="az-field">
+                            <label className="az-label">Grind <span className="opt">(opc.)</span></label>
+                            <select className="az-select" value={u.grind}
+                              onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, grind: e.target.value } : x))}>
+                              <option value="">—</option>
+                              {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
+                            </select>
+                          </div>
+                          <div className="az-field">
+                            <label className="az-label">Flex <span className="opt">(opc.)</span></label>
+                            <select className="az-select" value={u.flex}
+                              onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, flex: e.target.value } : x))}>
+                              <option value="">—</option>
+                              {FLEX_OPTS.map(o => <option key={o}>{o}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="az-field">
+                          <label className="az-label">Largo <span className="opt">(opc.)</span></label>
+                          <select className="az-select" value={u.largo}
+                            onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, largo: e.target.value } : x))}>
+                            <option value="">Standard</option>
+                            {LARGO_OPTS.filter(o => o !== "Standard").map(o => <option key={o} value={o}>{o}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button type="button" className="az-extra-toggle" style={{ marginTop: 12 }}
+                    onClick={() => set("unidades", [...form.unidades, { ...EMPTY_WEDGE_UNIDAD }])}>
+                    <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
+                    Agregar otro wedge
+                  </button>
+                  {errors.unidades && <p className="az-error-msg" style={{ marginTop: 8 }}>{errors.unidades}</p>}
+                </div>
+              )}
+            </>
           )}
 
           {/* ── Sección colapsable: datos técnicos adicionales ── */}
@@ -1465,8 +2627,8 @@ function PublicarForm({ onSuccess }) {
                 </div>
               )}
 
-              {/* Shaft material + largo — no putter */}
-              {form.tipo !== "putter" && (
+              {/* Shaft material + largo — no putter, no wedge múltiple */}
+              {form.tipo !== "putter" && !(form.tipo === "wedge" && form.wedgeMultiple) && (
                 <div className="az-form-row">
                   {form.tipo !== "hierros" && (
                   <div className="az-field">
@@ -1733,6 +2895,41 @@ function PublicarForm({ onSuccess }) {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   SUBCOMPONENT: WedgeUnitsTable
+───────────────────────────────────────────────────────────── */
+function WedgeUnitsTable({ unidades }) {
+  if (!unidades?.length) return null;
+  return (
+    <div className="az-wedge-table-wrap">
+      <table className="az-wedge-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Loft</th>
+            <th>Bounce</th>
+            <th>Grind</th>
+            <th>Flex</th>
+            <th>Largo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {unidades.map((u, i) => (
+            <tr key={i}>
+              <td>{i + 1}</td>
+              <td>{u.loft ? `${u.loft}°` : "—"}</td>
+              <td>{u.bounce ? `${u.bounce}°` : "—"}</td>
+              <td>{u.grind || "—"}</td>
+              <td>{u.flex || "—"}</td>
+              <td>{u.largo || "Std"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
    SUBCOMPONENT: CardDetailModal
 ───────────────────────────────────────────────────────────── */
 const AZALEA_WA = "59892390042";
@@ -1742,8 +2939,12 @@ function CardDetailModal({ listing, onClose }) {
   const fotos = listing.fotos || [];
   const cat = listing.categoria || "palos";
 
+  const tituloPalo = isWedgeMultiple(listing)
+    ? `lote de ${listing.unidades.length} wedges`
+    : `${TIPO_LABELS[listing.tipo] ?? listing.tipo} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)}`;
+
   const waMsg = cat === "palos"
-    ? encodeURIComponent(`Hola! Me interesa el ${TIPO_LABELS[listing.tipo]} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)} (${listing.anio}) que vi en Palos Usados.`)
+    ? encodeURIComponent(`Hola! Me interesa el ${tituloPalo} ${isWedgeMultiple(listing) ? listing.marca + " " + listing.modelo : ""} (${listing.anio}) que vi en Palos Usados.`)
     : encodeURIComponent(`Hola! Me interesa ${listing.marca}${listing.modelo ? " " + listing.modelo : ""} (${CATEGORIA_LABELS[cat]}) que vi en Palos Usados.`);
   const contactHref = `https://wa.me/${AZALEA_WA}?text=${waMsg}`;
 
@@ -1773,7 +2974,9 @@ function CardDetailModal({ listing, onClose }) {
 
         <div className="az-modal-body">
           <div className="az-modal-tipo">
-            {cat === "palos" ? `${tipoTag(listing.tipo)} · ${listing.marca}` : `${CATEGORIA_LABELS[cat]} · ${listing.marca}`}
+            {cat === "palos"
+              ? `${isWedgeMultiple(listing) ? wedgeMultipleTitle(listing) : tipoTag(listing.tipo)} · ${listing.marca}`
+              : `${CATEGORIA_LABELS[cat]} · ${listing.marca}`}
           </div>
           <div className="az-modal-title">
             {listing.modelo}{cat === "palos" ? labelVersion(listing.version) : ""}
@@ -1793,14 +2996,14 @@ function CardDetailModal({ listing, onClose }) {
                 {spec("Condición", listing.estado)}
                 {spec("Mano", listing.mano)}
                 {listing.tipo === "putter" && spec("Estilo", listing.estiloPutter)}
-                {spec("Flex", listing.flex)}
-                {spec("Loft", listing.loft ? `${listing.loft}°` : null)}
+                {!isWedgeMultiple(listing) && spec("Flex", listing.flex)}
+                {!isWedgeMultiple(listing) && spec("Loft", listing.loft ? `${listing.loft}°` : null)}
                 {spec("Material", listing.material)}
-                {spec("Largo", listing.largo)}
-                {spec("Bounce", listing.bounce ? `${listing.bounce}°` : null)}
-                {spec("Grind", listing.grind)}
+                {!isWedgeMultiple(listing) && spec("Largo", listing.largo)}
+                {!isWedgeMultiple(listing) && spec("Bounce", listing.bounce ? `${listing.bounce}°` : null)}
+                {!isWedgeMultiple(listing) && spec("Grind", listing.grind)}
                 {spec("Headcover", listing.headcover === true ? "Incluido" : null)}
-                {listing.composicion?.length > 0 && spec("Set", formatComposicion(listing.composicion))}
+                {listing.composicion?.length > 0 && spec(listing.composicion.length === 1 ? "Hierro" : "Set", formatComposicion(listing.composicion))}
                 {spec("Departamento", listing.departamento)}
               </>
             ) : (
@@ -1813,6 +3016,8 @@ function CardDetailModal({ listing, onClose }) {
               </>
             )}
           </div>
+
+          {isWedgeMultiple(listing) && <WedgeUnitsTable unidades={listing.unidades} />}
 
           {listing.descripcion && (
             <div className="az-modal-desc">{listing.descripcion}</div>
@@ -1944,9 +3149,134 @@ function ClientCard({ name, palos, totalUSD, totalUYU, onSaveDatosBancarios, onE
 }
 
 /* ─────────────────────────────────────────────────────────────
+   SUBCOMPONENT: SetListingDetail
+───────────────────────────────────────────────────────────── */
+function SetListingDetail({ listing, onBack, onOpenItem }) {
+  const [idx, setIdx] = useState(0);
+  const [linkedItems, setLinkedItems] = useState(null);
+  const fotos = listing.fotosSet?.length ? listing.fotosSet : (listing.fotos || []);
+
+  // Cargar items vinculados si ofertasSeparadas
+  useEffect(() => {
+    if (!listing.ofertasSeparadas || !listing.itemIds?.length) {
+      setLinkedItems(null);
+      return;
+    }
+    Promise.all(listing.itemIds.map(id =>
+      getDoc(doc(db, "listings", id)).then(s => s.exists() ? { id: s.id, ...s.data() } : null)
+    )).then(res => setLinkedItems(res.filter(Boolean)));
+  }, [listing.id, listing.ofertasSeparadas, listing.itemIds]);
+
+  const waMsg = encodeURIComponent(
+    `Hola! Me interesa el set de palos que vi en los artículos usados de Azalea.`
+  );
+  const contactHref = `https://wa.me/${AZALEA_WA}?text=${waMsg}`;
+
+  const itemsParaListar = listing.ofertasSeparadas
+    ? (linkedItems || [])
+    : (listing.setItems || []);
+
+  return (
+    <div className="az-detail-wrap">
+      <button className="az-detail-back" onClick={onBack}>← Volver a los artículos</button>
+
+      <div className="az-detail-layout">
+        {/* Galería */}
+        <div className="az-detail-gallery">
+          <div className="az-detail-main-img">
+            {fotos.length > 0
+              ? <img src={fotos[idx]} alt="Set" />
+              : <div className="az-detail-main-placeholder">⛳</div>}
+          </div>
+          {fotos.length > 1 && (
+            <div className="az-detail-thumbs">
+              {fotos.map((url, i) => (
+                <img key={i} src={url} alt="" className={`az-detail-thumb${i === idx ? " active" : ""}`}
+                  onClick={() => setIdx(i)} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div>
+          <div className="az-detail-tipo">Set · {countSetItems(listing)} palos</div>
+          <h1 className="az-detail-title">Set de palos</h1>
+          <div className="az-detail-price">{formatPrecio(listing)}</div>
+          <p style={{ fontSize: 13, color: "#767676", marginTop: 8 }}>
+            {listing.ofertasSeparadas
+              ? "Podés comprar el set entero o hacer una oferta por palos individuales."
+              : "Este set se vende completo, no por palos sueltos."}
+          </p>
+          {listing.enElLocal && <div className="az-detail-local">📍 En el local de Azalea</div>}
+
+          <div className="az-detail-specs">
+            <div className="az-detail-spec"><strong>Departamento</strong>{listing.departamento}</div>
+          </div>
+
+          {listing.descripcion && (
+            <div className="az-detail-desc">{listing.descripcion}</div>
+          )}
+
+          <div className="az-detail-contact">
+            <h4>¿Te interesa el set completo?</h4>
+            <p>Contactá a Azalea Golf para consultar disponibilidad y coordinar.</p>
+            <a className="az-modal-contact-link" href={contactHref} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a4.56 4.56 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12 .057C5.495.057.16 5.392.157 11.949c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0012 .057"/></svg>
+              Consultar por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Palos del set */}
+      <div className="az-detail-tipo" style={{ marginTop: 32 }}>Palos incluidos en el set</div>
+      <div className="az-set-detail-items">
+        {itemsParaListar.length === 0 && listing.ofertasSeparadas && (
+          <p style={{ color: "#767676" }}>Cargando palos…</p>
+        )}
+        {itemsParaListar.map((it, i) => {
+          const titulo = isWedgeMultiple(it)
+            ? `${wedgeMultipleTitle(it)} ${it.marca || ""} ${it.modelo || ""}`
+            : it.tipo === "hierros" && it.composicion?.length
+            ? `${it.composicion.length === 1 ? "Hierro" : "Set hierros"} ${it.marca || ""} ${it.modelo || ""} (${formatComposicion(it.composicion)})`
+            : `${TIPO_LABELS[it.tipo] || it.tipo} ${it.marca || ""} ${it.modelo || ""}`;
+          return (
+            <div key={it.id || i} className="az-set-detail-item">
+              {it.fotos?.[0]
+                ? <img src={it.fotos[0]} alt="" />
+                : <div className="az-detail-main-placeholder" style={{ width: 100, height: 100, fontSize: 30 }}>⛳</div>}
+              <div className="az-set-detail-item-info">
+                <strong>{titulo}</strong>
+                <span>
+                  {it.estado}{it.mano ? ` · ${it.mano}` : ""}
+                  {it.anio ? ` · ${it.anio}` : ""}
+                </span>
+                {listing.ofertasSeparadas && it.precio && (
+                  <div className="az-set-detail-item-price">{formatPrecio(it)}</div>
+                )}
+                {listing.ofertasSeparadas && it.id && (
+                  <a className="az-set-detail-item-link"
+                    href={`#listing/${it.id}`}
+                    onClick={e => { e.preventDefault(); onOpenItem && onOpenItem(it); }}>
+                    Ver publicación individual →
+                  </a>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
    SUBCOMPONENT: ListingDetail
 ───────────────────────────────────────────────────────────── */
-function ListingDetail({ listing, onBack }) {
+function ListingDetail({ listing, onBack, onOpenItem }) {
+  if (isSetListing(listing))
+    return <SetListingDetail listing={listing} onBack={onBack} onOpenItem={onOpenItem} />;
   const [idx, setIdx] = useState(0);
   const fotos = listing.fotos || [];
   const cat = listing.categoria || "palos";
@@ -1961,7 +3291,9 @@ function ListingDetail({ listing, onBack }) {
   ) : null;
 
   const typeTag = cat === "palos"
-    ? (listing.tipo === "wedge" && listing.loft ? `Wedge ${listing.loft}°` : tipoTag(listing.tipo))
+    ? (isWedgeMultiple(listing) ? wedgeMultipleTitle(listing)
+        : listing.tipo === "wedge" && listing.loft ? `Wedge ${listing.loft}°`
+        : tipoTag(listing.tipo))
     : CATEGORIA_LABELS[cat];
 
   return (
@@ -2008,14 +3340,14 @@ function ListingDetail({ listing, onBack }) {
                 {spec("Condición", listing.estado)}
                 {spec("Mano", listing.mano)}
                 {listing.tipo === "putter" && spec("Estilo", listing.estiloPutter)}
-                {spec("Flex", listing.flex)}
-                {spec("Loft", listing.loft ? `${listing.loft}°` : null)}
+                {!isWedgeMultiple(listing) && spec("Flex", listing.flex)}
+                {!isWedgeMultiple(listing) && spec("Loft", listing.loft ? `${listing.loft}°` : null)}
                 {spec("Material", listing.material)}
-                {spec("Largo", listing.largo)}
-                {spec("Bounce", listing.bounce ? `${listing.bounce}°` : null)}
-                {spec("Grind", listing.grind)}
+                {!isWedgeMultiple(listing) && spec("Largo", listing.largo)}
+                {!isWedgeMultiple(listing) && spec("Bounce", listing.bounce ? `${listing.bounce}°` : null)}
+                {!isWedgeMultiple(listing) && spec("Grind", listing.grind)}
                 {spec("Headcover", listing.headcover === true ? "Incluido" : null)}
-                {listing.composicion?.length > 0 && spec("Set", formatComposicion(listing.composicion))}
+                {listing.composicion?.length > 0 && spec(listing.composicion.length === 1 ? "Hierro" : "Set", formatComposicion(listing.composicion))}
                 {spec("Departamento", listing.departamento)}
               </>
             ) : (
@@ -2028,6 +3360,8 @@ function ListingDetail({ listing, onBack }) {
               </>
             )}
           </div>
+
+          {isWedgeMultiple(listing) && <WedgeUnitsTable unidades={listing.unidades} />}
 
           {listing.descripcion && (
             <div className="az-detail-desc">{listing.descripcion}</div>
@@ -2062,6 +3396,7 @@ function AdminPanel() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingListing, setEditingListing] = useState(null);
+  const [cascadeModal, setCascadeModal] = useState(null); // { item, setDoc }
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, user => {
@@ -2084,19 +3419,37 @@ function AdminPanel() {
     if (adminUser) loadAllListings();
   }, [adminUser, loadAllListings]);
 
+  // Helper: dado un listing del set con ofertasSeparadas, retorna los ids cascada (set + items)
+  const cascadeIds = (l) => {
+    if (!isSetListing(l) || !l.ofertasSeparadas) return [l.id];
+    return [l.id, ...(l.itemIds || [])];
+  };
+
   const handleApprove = async (id) => {
-    await updateDoc(doc(db, "listings", id), { status: "approved", approvedAt: serverTimestamp() });
-    setListings(ls => ls.map(l => l.id === id ? { ...l, status: "approved" } : l));
+    const l = listings.find(x => x.id === id);
+    const ids = cascadeIds(l);
+    await Promise.all(ids.map(i =>
+      updateDoc(doc(db, "listings", i), { status: "approved", approvedAt: serverTimestamp() })
+    ));
+    setListings(ls => ls.map(x => ids.includes(x.id) ? { ...x, status: "approved" } : x));
   };
 
   const handleHide = async (id) => {
-    await updateDoc(doc(db, "listings", id), { status: "hidden" });
-    setListings(ls => ls.map(l => l.id === id ? { ...l, status: "hidden" } : l));
+    const l = listings.find(x => x.id === id);
+    const ids = cascadeIds(l);
+    await Promise.all(ids.map(i =>
+      updateDoc(doc(db, "listings", i), { status: "hidden" })
+    ));
+    setListings(ls => ls.map(x => ids.includes(x.id) ? { ...x, status: "hidden" } : x));
   };
 
   const handleUnhide = async (id) => {
-    await updateDoc(doc(db, "listings", id), { status: "approved" });
-    setListings(ls => ls.map(l => l.id === id ? { ...l, status: "approved" } : l));
+    const l = listings.find(x => x.id === id);
+    const ids = cascadeIds(l);
+    await Promise.all(ids.map(i =>
+      updateDoc(doc(db, "listings", i), { status: "approved" })
+    ));
+    setListings(ls => ls.map(x => ids.includes(x.id) ? { ...x, status: "approved" } : x));
   };
 
   const handleToggleLocal = async (listing) => {
@@ -2106,6 +3459,34 @@ function AdminPanel() {
   };
 
   const handleMarkSold = async (listing) => {
+    // Si es un item individual con setId: abrir modal para decidir
+    if (isPartOfSet(listing)) {
+      const setDoc = listings.find(l => l.id === listing.setId);
+      setCascadeModal({ item: listing, setDoc });
+      return;
+    }
+    // Si es un doc de set
+    if (isSetListing(listing)) {
+      const precio = listing.precioSet;
+      const prefix = listing.moneda === "UYU" ? "$" : "US$";
+      let msg = `¿Marcar el set completo como vendido?`;
+      if (listing.enElLocal && precio) {
+        const comision = Math.round(precio * 0.10);
+        const neto = precio - comision;
+        msg = `¿Marcar el set completo como vendido?\n\n` +
+              `Precio: ${prefix} ${precio.toLocaleString("es-UY")}\n` +
+              `Comisión Azalea (10%): ${prefix} ${comision.toLocaleString("es-UY")}\n` +
+              `A transferir al vendedor: ${prefix} ${neto.toLocaleString("es-UY")}`;
+      }
+      if (!window.confirm(msg)) return;
+      const ids = cascadeIds(listing);
+      await Promise.all(ids.map(i =>
+        updateDoc(doc(db, "listings", i), { status: "sold", soldAt: serverTimestamp() })
+      ));
+      setListings(ls => ls.map(x => ids.includes(x.id) ? { ...x, status: "sold" } : x));
+      return;
+    }
+    // Palo común
     let msg = `¿Marcar "${listing.marca} ${listing.modelo}" como vendido?`;
     if (listing.enElLocal && listing.precio && !listing.aConsultar) {
       const comision = Math.round(listing.precio * 0.10);
@@ -2121,6 +3502,49 @@ function AdminPanel() {
     setListings(ls => ls.map(l => l.id === listing.id ? { ...l, status: "sold" } : l));
   };
 
+  // Resoluciones del modal de cascada cuando se vende un item de un set
+  const resolveCascade = async (action) => {
+    const { item, setDoc } = cascadeModal;
+    if (action === "keep") {
+      // Marcar solo el item como sold; sacar el id del set
+      await updateDoc(doc(db, "listings", item.id), { status: "sold", soldAt: serverTimestamp() });
+      if (setDoc) {
+        const nextIds = (setDoc.itemIds || []).filter(i => i !== item.id);
+        await updateDoc(doc(db, "listings", setDoc.id), { itemIds: nextIds });
+        setListings(ls => ls.map(x =>
+          x.id === item.id ? { ...x, status: "sold" }
+          : x.id === setDoc.id ? { ...x, itemIds: nextIds }
+          : x
+        ));
+      } else {
+        setListings(ls => ls.map(x => x.id === item.id ? { ...x, status: "sold" } : x));
+      }
+    } else if (action === "disband") {
+      // Eliminar el doc del set; sacar setId de todos los items hermanos
+      const hermanos = listings.filter(l => l.setId === setDoc?.id);
+      await Promise.all([
+        updateDoc(doc(db, "listings", item.id), { status: "sold", soldAt: serverTimestamp() }),
+        ...(setDoc ? [deleteDoc(doc(db, "listings", setDoc.id))] : []),
+        ...hermanos.filter(h => h.id !== item.id).map(h =>
+          updateDoc(doc(db, "listings", h.id), { setId: null })
+        ),
+      ]);
+      setListings(ls => ls
+        .filter(x => x.id !== setDoc?.id)
+        .map(x => x.id === item.id ? { ...x, status: "sold" }
+              : x.setId === setDoc?.id ? { ...x, setId: null }
+              : x));
+    } else if (action === "sellAll") {
+      // Cascada sold a todos
+      const ids = setDoc ? cascadeIds(setDoc) : [item.id];
+      await Promise.all(ids.map(i =>
+        updateDoc(doc(db, "listings", i), { status: "sold", soldAt: serverTimestamp() })
+      ));
+      setListings(ls => ls.map(x => ids.includes(x.id) ? { ...x, status: "sold" } : x));
+    }
+    setCascadeModal(null);
+  };
+
   const handleSaveDatosBancarios = async (clientListings, value) => {
     await Promise.all(clientListings.map(l =>
       updateDoc(doc(db, "listings", l.id), { datosBancarios: value })
@@ -2131,6 +3555,28 @@ function AdminPanel() {
   };
 
   const handleDelete = async (listing) => {
+    if (isSetListing(listing)) {
+      const n = countSetItems(listing);
+      if (!window.confirm(`¿Eliminar el set completo${n > 0 ? ` y sus ${n} palos asociados` : ""}?`)) return;
+      const ids = cascadeIds(listing);
+      await Promise.all(ids.map(i => deleteDoc(doc(db, "listings", i))));
+      setListings(ls => ls.filter(l => !ids.includes(l.id)));
+      return;
+    }
+    if (isPartOfSet(listing)) {
+      if (!window.confirm(`Este palo pertenece a un set. ¿Eliminarlo igual? (el set quedará con un palo menos)`)) return;
+      const setDoc = listings.find(l => l.id === listing.setId);
+      await deleteDoc(doc(db, "listings", listing.id));
+      if (setDoc) {
+        const nextIds = (setDoc.itemIds || []).filter(i => i !== listing.id);
+        await updateDoc(doc(db, "listings", setDoc.id), { itemIds: nextIds });
+        setListings(ls => ls.filter(l => l.id !== listing.id).map(l =>
+          l.id === setDoc.id ? { ...l, itemIds: nextIds } : l));
+      } else {
+        setListings(ls => ls.filter(l => l.id !== listing.id));
+      }
+      return;
+    }
     if (!window.confirm(`¿Eliminar "${listing.marca} ${listing.modelo}"?`)) return;
     await deleteDoc(doc(db, "listings", listing.id));
     setListings(ls => ls.filter(l => l.id !== listing.id));
@@ -2212,6 +3658,47 @@ function AdminPanel() {
           onSave={handleSaveEdit}
           onClose={() => setEditingListing(null)} />
       )}
+
+      {cascadeModal && (
+        <SetCascadeModal
+          item={cascadeModal.item}
+          setDoc={cascadeModal.setDoc}
+          onResolve={resolveCascade}
+          onCancel={() => setCascadeModal(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function SetCascadeModal({ item, setDoc, onResolve, onCancel }) {
+  return (
+    <div className="az-cascade-overlay" onClick={e => e.target === e.currentTarget && onCancel()}>
+      <div className="az-cascade-modal">
+        <h3>Este palo pertenece a un set</h3>
+        <p>
+          Estás por marcar como vendido <strong>{item.marca} {item.modelo}</strong>,
+          que forma parte de un set publicado{setDoc?.precioSet ? ` (precio del set: ${setDoc.moneda === "UYU" ? "$" : "US$"} ${Number(setDoc.precioSet).toLocaleString("es-UY")})` : ""}.
+          ¿Cómo querés manejar el resto del set?
+        </p>
+        <div className="az-cascade-opts">
+          <button className="az-cascade-opt" onClick={() => onResolve("keep")}>
+            <strong>Mantener el set con los palos restantes</strong>
+            <span>El set sigue publicado con los demás palos. Vendés solo este palo.</span>
+          </button>
+          <button className="az-cascade-opt" onClick={() => onResolve("disband")}>
+            <strong>Desarmar el set</strong>
+            <span>Se baja la publicación del set. Los demás palos quedan como publicaciones individuales sueltas.</span>
+          </button>
+          <button className="az-cascade-opt" onClick={() => onResolve("sellAll")}>
+            <strong>Vender el set completo</strong>
+            <span>Marca todos los palos del set como vendidos (y la publicación del set también).</span>
+          </button>
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+          <button className="az-btn-secondary" onClick={onCancel}>Cancelar</button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -2254,10 +3741,14 @@ function AdminLogin() {
 }
 
 function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleLocal, onDelete, onEdit }) {
-  const fotos = listing.fotos || [];
+  const fotos = isSetListing(listing) && listing.fotosSet?.length
+    ? listing.fotosSet
+    : (listing.fotos || []);
   const [activeIdx, setActiveIdx] = useState(0);
   const showApprove = listing.status === "pending";
   const cat = listing.categoria || "palos";
+  const lIsSet = isSetListing(listing);
+  const lIsPart = isPartOfSet(listing);
 
   return (
     <div className="az-admin-card">
@@ -2291,17 +3782,28 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
       <div className="az-admin-card-info">
         {cat !== "palos" && (
           <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".5px", color: "#aaa", display: "block", marginBottom: 3 }}>
-            {CATEGORIA_LABELS[cat]}
+            {CATEGORIA_LABELS[cat] || cat}
+          </span>
+        )}
+        {lIsPart && (
+          <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".5px", color: "#aaa", display: "block", marginBottom: 3 }}>
+            Parte de un set
           </span>
         )}
         <strong>
-          {cat === "palos"
-            ? `${TIPO_LABELS[listing.tipo] ?? ""} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)}`
+          {lIsSet
+            ? `Set · ${countSetItems(listing)} palos`
+            : cat === "palos"
+            ? isWedgeMultiple(listing)
+              ? `${wedgeMultipleTitle(listing)} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)}`
+              : `${TIPO_LABELS[listing.tipo] ?? ""} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)}`
             : `${listing.marca}${listing.modelo ? " " + listing.modelo : ""}`}
         </strong>
         <span>
           {cat === "palos"
-            ? (listing.tipo === "madera" || listing.tipo === "hibrido") && listing.numPalo
+            ? isWedgeMultiple(listing)
+              ? `${formatLoftsList(listing.unidades)} · ${listing.estado}`
+              : (listing.tipo === "madera" || listing.tipo === "hibrido") && listing.numPalo
               ? `Nº${listing.numPalo} · ${listing.estado} · ${listing.mano}`
               : listing.tipo === "putter" && listing.estiloPutter
               ? `${listing.estiloPutter} · ${listing.estado} · ${listing.mano}`
@@ -2326,11 +3828,11 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
       </div>
 
       <div className="az-admin-actions">
-        {listing.status === "pending"  && <button className="az-admin-btn approve" onClick={() => onApprove(listing.id)}>Aprobar</button>}
+        {listing.status === "pending"  && <button className="az-admin-btn approve" onClick={() => onApprove(listing.id)}>Aprobar{lIsSet ? " set" : ""}</button>}
         {listing.status === "approved" && <button className="az-admin-btn sold"    onClick={() => onMarkSold(listing)}>Vendido</button>}
         {listing.status === "approved" && <button className="az-admin-btn hide"    onClick={() => onHide(listing.id)}>Ocultar</button>}
         {listing.status === "hidden"   && <button className="az-admin-btn unhide"  onClick={() => onUnhide(listing.id)}>Publicar</button>}
-        {(listing.status === "approved" || listing.status === "hidden") && (
+        {(listing.status === "approved" || listing.status === "hidden") && !lIsSet && (
           <button
             className={`az-admin-btn ${listing.enElLocal ? "local-on" : "local-off"}`}
             onClick={() => onToggleLocal(listing)}
@@ -2339,7 +3841,7 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
             📍 {listing.enElLocal ? "En local" : "Local"}
           </button>
         )}
-        <button className="az-admin-btn edit" onClick={() => onEdit(listing)}>Editar</button>
+        {!lIsSet && <button className="az-admin-btn edit" onClick={() => onEdit(listing)}>Editar</button>}
         <button className="az-admin-btn del"  onClick={() => onDelete(listing)}>Eliminar</button>
       </div>
     </div>
@@ -2359,6 +3861,14 @@ function AdminEditModal({ listing, onSave, onClose }) {
     estiloPutter: listing.estiloPutter || "",
     numPalo: listing.numPalo || "",
     composicion: listing.composicion || [],
+    wedgeMultiple: listing.wedgeMultiple || false,
+    unidades: (listing.unidades || []).map(u => ({
+      loft: u.loft != null ? String(u.loft) : "",
+      bounce: u.bounce != null ? String(u.bounce) : "",
+      grind: u.grind || "",
+      flex: u.flex || "",
+      largo: u.largo || "",
+    })),
     aConsultar: listing.aConsultar || false, precio: listing.precio ? String(listing.precio) : "",
     moneda: listing.moneda || "USD",
     descripcion: listing.descripcion || "", departamento: listing.departamento || "",
@@ -2421,16 +3931,31 @@ function AdminEditModal({ listing, onSave, onClose }) {
         moneda: form.aConsultar ? null : (form.moneda || "USD"),
         descripcion: form.descripcion || null, departamento: form.departamento, fotos,
       };
+      const isWedgeMulti = form.tipo === "wedge" && form.wedgeMultiple;
+      const unidadesNormalizadas = isWedgeMulti
+        ? form.unidades.map(u => ({
+            loft: u.loft ? Number(u.loft) : null,
+            bounce: u.bounce ? Number(u.bounce) : null,
+            grind: u.grind || null,
+            flex: u.flex || null,
+            largo: u.largo || null,
+          }))
+        : null;
       const palosExtra = isPalosEdit ? {
         tipo: form.tipo, version: form.version,
         anio: Number(form.anio), mano: form.mano,
-        flex: form.flex || null, loft: form.loft ? Number(form.loft) : null,
-        material: form.material || null, largo: form.largo || null,
-        bounce: form.bounce ? Number(form.bounce) : null, grind: form.grind || null,
+        flex: isWedgeMulti ? null : (form.flex || null),
+        loft: isWedgeMulti ? null : (form.loft ? Number(form.loft) : null),
+        material: form.material || null,
+        largo: isWedgeMulti ? null : (form.largo || null),
+        bounce: isWedgeMulti ? null : (form.bounce ? Number(form.bounce) : null),
+        grind: isWedgeMulti ? null : (form.grind || null),
         headcover: form.headcover,
         estiloPutter: form.estiloPutter || null,
         numPalo: form.numPalo || null,
         composicion: form.composicion.length > 0 ? form.composicion : null,
+        wedgeMultiple: isWedgeMulti || null,
+        unidades: unidadesNormalizadas,
       } : {};
       await onSave(listing.id, approve, { ...base, ...palosExtra });
     } finally {
@@ -2566,8 +4091,11 @@ function AdminEditModal({ listing, onSave, onClose }) {
                     );
                   })}
                 </div>
-                {form.composicion.length >= 2 && (
-                  <p className="az-iron-summary">Set: <strong>{formatComposicion(form.composicion)}</strong> ({form.composicion.length} palos)</p>
+                {form.composicion.length >= 1 && (
+                  <p className="az-iron-summary">
+                    {form.composicion.length === 1 ? "Hierro" : "Set"}: <strong>{formatComposicion(form.composicion)}</strong>
+                    {form.composicion.length >= 2 && <> ({form.composicion.length} palos)</>}
+                  </p>
                 )}
               </div>
             )}
@@ -2606,24 +4134,101 @@ function AdminEditModal({ listing, onSave, onClose }) {
               )}
             </div>
 
-            {/* Wedge: bounce + grind */}
+            {/* Wedge: checkbox multi + bounce/grind (solo si no es multi) */}
             {form.tipo === "wedge" && (
-              <div className="az-form-row">
-                <div className="az-field">
-                  <label className="az-label">Bounce <span className="opt">(opcional)</span></label>
-                  <select className="az-select" value={form.bounce} onChange={e => set("bounce", e.target.value)}>
-                    <option value="">—</option>
-                    {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
-                  </select>
+              <>
+                <div className="az-checkbox-row" style={{ padding: "4px 0 8px" }}>
+                  <input type="checkbox" id="edit-wedgeMultiple" checked={form.wedgeMultiple}
+                    onChange={e => {
+                      const next = e.target.checked;
+                      setForm(f => ({
+                        ...f,
+                        wedgeMultiple: next,
+                        unidades: next && f.unidades.length === 0
+                          ? [{ ...EMPTY_WEDGE_UNIDAD }, { ...EMPTY_WEDGE_UNIDAD }]
+                          : f.unidades,
+                      }));
+                    }} />
+                  <label htmlFor="edit-wedgeMultiple" style={{ fontWeight: 600 }}>Varios wedges del mismo modelo</label>
                 </div>
-                <div className="az-field">
-                  <label className="az-label">Grind <span className="opt">(opcional)</span></label>
-                  <select className="az-select" value={form.grind} onChange={e => set("grind", e.target.value)}>
-                    <option value="">—</option>
-                    {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
-                  </select>
-                </div>
-              </div>
+                {!form.wedgeMultiple && (
+                  <div className="az-form-row">
+                    <div className="az-field">
+                      <label className="az-label">Bounce <span className="opt">(opcional)</span></label>
+                      <select className="az-select" value={form.bounce} onChange={e => set("bounce", e.target.value)}>
+                        <option value="">—</option>
+                        {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
+                      </select>
+                    </div>
+                    <div className="az-field">
+                      <label className="az-label">Grind <span className="opt">(opcional)</span></label>
+                      <select className="az-select" value={form.grind} onChange={e => set("grind", e.target.value)}>
+                        <option value="">—</option>
+                        {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                )}
+                {form.wedgeMultiple && (
+                  <div className="az-field">
+                    <label className="az-label">Wedges incluidos</label>
+                    <div className="az-wedge-units">
+                      {form.unidades.map((u, idx) => (
+                        <div key={idx} className="az-wedge-unit-card">
+                          <div className="az-wedge-unit-header">
+                            <strong>Wedge {idx + 1}</strong>
+                            {form.unidades.length > 2 && (
+                              <button type="button" className="az-wedge-unit-rm"
+                                onClick={() => set("unidades", form.unidades.filter((_, i) => i !== idx))}>✕</button>
+                            )}
+                          </div>
+                          <div className="az-form-row">
+                            <div className="az-field">
+                              <label className="az-label">Loft</label>
+                              <select className="az-select" value={u.loft}
+                                onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, loft: e.target.value } : x))}>
+                                <option value="">—</option>
+                                {(LOFT_OPTS.wedge || []).map(v => <option key={v} value={v}>{v}°</option>)}
+                              </select>
+                            </div>
+                            <div className="az-field">
+                              <label className="az-label">Bounce</label>
+                              <select className="az-select" value={u.bounce}
+                                onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, bounce: e.target.value } : x))}>
+                                <option value="">—</option>
+                                {BOUNCE_OPTS.map(v => <option key={v} value={v}>{v}°</option>)}
+                              </select>
+                            </div>
+                          </div>
+                          <div className="az-form-row">
+                            <div className="az-field">
+                              <label className="az-label">Grind</label>
+                              <select className="az-select" value={u.grind}
+                                onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, grind: e.target.value } : x))}>
+                                <option value="">—</option>
+                                {GRIND_OPTS.map(o => <option key={o}>{o}</option>)}
+                              </select>
+                            </div>
+                            <div className="az-field">
+                              <label className="az-label">Flex</label>
+                              <select className="az-select" value={u.flex}
+                                onChange={e => set("unidades", form.unidades.map((x, i) => i === idx ? { ...x, flex: e.target.value } : x))}>
+                                <option value="">—</option>
+                                {FLEX_OPTS.map(o => <option key={o}>{o}</option>)}
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <button type="button" className="az-extra-toggle" style={{ marginTop: 8 }}
+                      onClick={() => set("unidades", [...form.unidades, { ...EMPTY_WEDGE_UNIDAD }])}>
+                      <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
+                      Agregar otro wedge
+                    </button>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Material + largo shaft (no putter) */}
@@ -2828,13 +4433,14 @@ export default function PalosUsados() {
     if (filters.estado.length && !filters.estado.includes(l.estado)) return false;
     if (filters.enElLocal && !l.enElLocal) return false;
     if (filters.precio.length) {
+      const precioVal = isSetListing(l) ? l.precioSet : l.precio;
       const matches = filters.precio.some(label => {
         const range = PRICE_RANGES.find(r => r.label === label);
         if (!range) return false;
         if (range.consultar) return l.aConsultar;
         if (l.aConsultar) return false;
         if (l.moneda === "UYU") return true;
-        return l.precio >= range.min && l.precio < range.max;
+        return precioVal != null && precioVal >= range.min && precioVal < range.max;
       });
       if (!matches) return false;
     }
@@ -2851,9 +4457,10 @@ export default function PalosUsados() {
     return true;
   });
 
+  const priceOf = (l) => (isSetListing(l) ? l.precioSet : l.precio) ?? Infinity;
   const sortedListings = [...filteredListings].sort((a, b) => {
-    if (sort === "precio-asc") return (a.precio ?? Infinity) - (b.precio ?? Infinity);
-    if (sort === "precio-desc") return (b.precio ?? Infinity) - (a.precio ?? Infinity);
+    if (sort === "precio-asc") return priceOf(a) - priceOf(b);
+    if (sort === "precio-desc") return priceOf(b) - priceOf(a);
     return (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0);
   });
 
@@ -3115,26 +4722,46 @@ export default function PalosUsados() {
                   <div className="az-grid">
                     {paginatedListings.map(l => {
                       const lCat = l.categoria || "palos";
-                      const cardTypeTag = lCat === "palos"
-                        ? (l.tipo === "wedge" && l.loft ? `Wedge ${l.loft}°` : tipoTag(l.tipo))
+                      const lIsSet = isSetListing(l);
+                      const lIsPart = isPartOfSet(l);
+                      const cardTypeTag = lIsSet
+                        ? `Set · ${countSetItems(l)} palos`
+                        : lCat === "palos"
+                        ? (isWedgeMultiple(l) ? wedgeMultipleTitle(l)
+                            : l.tipo === "wedge" && l.loft ? `Wedge ${l.loft}°`
+                            : tipoTag(l.tipo))
                         : CATEGORIA_LABELS[lCat];
+                      const cardImg = lIsSet
+                        ? (l.fotosSet?.[0] || l.fotos?.[0])
+                        : l.fotos?.[0];
                       return (
                         <div className="az-card" key={l.id} onClick={() => handleOpenListing(l)}>
                           <div className="az-card-img">
-                            {l.fotos?.[0]
-                              ? <img src={l.fotos[0]} alt={`${l.marca} ${l.modelo}`} />
+                            {lIsSet && <span className="az-card-set-badge">Set</span>}
+                            {cardImg
+                              ? <img src={cardImg} alt={`${l.marca || ""} ${l.modelo || ""}`} />
                               : <span className="az-card-img-placeholder">⛳</span>
                             }
                           </div>
                           <div className="az-card-body">
                             <div className="az-card-tipo-tag">{cardTypeTag}</div>
-                            <div className="az-card-brand">{l.marca}</div>
+                            {!lIsSet && <div className="az-card-brand">{l.marca}</div>}
                             <div className="az-card-title">
-                              {l.modelo}{lCat === "palos" ? labelVersion(l.version) : ""}
+                              {lIsSet
+                                ? `Set de ${countSetItems(l)} palos`
+                                : <>{l.modelo}{lCat === "palos" ? labelVersion(l.version) : ""}</>}
                             </div>
-                            {lCat === "palos" ? (
+                            {lIsSet ? (
                               <div className="az-card-meta">
-                                {l.tipo === "hierros" && l.composicion?.length > 0
+                                {l.ofertasSeparadas
+                                  ? "Ofertas por palo o por el set entero"
+                                  : "Solo se vende completo"}
+                              </div>
+                            ) : lCat === "palos" ? (
+                              <div className="az-card-meta">
+                                {isWedgeMultiple(l)
+                                  ? `${formatLoftsList(l.unidades)} · ${l.mano}`
+                                  : l.tipo === "hierros" && l.composicion?.length > 0
                                   ? `${formatComposicion(l.composicion)} · ${l.mano}`
                                   : l.tipo === "madera" || l.tipo === "hibrido"
                                   ? [l.numPalo && `Nº${l.numPalo}`, l.mano].filter(Boolean).join(" · ")
@@ -3143,8 +4770,9 @@ export default function PalosUsados() {
                               </div>
                             ) : l.estado ? <div className="az-card-meta">{l.estado}</div> : null}
                             <div className={`az-card-price${l.aConsultar ? " consultar" : ""}`}>{formatPrecio(l)}</div>
-                            <div className={`az-card-estado ${estatusBadge(l.estado)}`}>{l.estado}</div>
+                            {!lIsSet && <div className={`az-card-estado ${estatusBadge(l.estado)}`}>{l.estado}</div>}
                             {l.enElLocal && <div className="az-card-local-badge">En el local</div>}
+                            {lIsPart && <div className="az-card-part-of-set">Parte de un set</div>}
                           </div>
                         </div>
                       );
@@ -3164,7 +4792,7 @@ export default function PalosUsados() {
           {/* ── DETALLE ── */}
           {view === "detalle" && (
             selectedListing
-              ? <ListingDetail listing={selectedListing} onBack={handleCloseListing} />
+              ? <ListingDetail listing={selectedListing} onBack={handleCloseListing} onOpenItem={handleOpenListing} />
               : <div className="az-loading-wrap"><div className="az-spinner" /></div>
           )}
 
