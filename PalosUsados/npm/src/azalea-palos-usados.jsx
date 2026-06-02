@@ -426,11 +426,18 @@ a { text-decoration: none; color: inherit; }
 .az-card-estado.para-reparar  { background: #424242; color: #fff; }
 .az-card-local-badge {
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
-  padding: 3px 8px; border-radius: 2px; margin-top: 6px;
-  background: #111; color: #fff;
+  font-size: 10px; font-weight: 600; letter-spacing: .2px;
+  padding: 3px 9px; border-radius: 99px;
+  background: rgba(255,255,255,.88); color: #555;
+  border: 1px solid rgba(0,0,0,.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
 }
 .az-card-local-badge::before { content: "📍"; font-size: 9px; }
+/* Cuando está dentro del área de imagen: siempre anclado abajo-izquierda */
+.az-card-img .az-card-local-badge {
+  position: absolute; bottom: 8px; left: 8px; z-index: 2; margin: 0;
+}
 
 .az-commission-notice {
   background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px;
@@ -5016,7 +5023,7 @@ export default function PalosUsados() {
                       return (
                         <div className="az-card" key={l.id} onClick={() => handleOpenListing(l)}>
                           <div className="az-card-img">
-                            {lIsSet && <span className="az-card-set-badge">Set</span>}
+                            {l.enElLocal && <div className="az-card-local-badge">En el local</div>}
                             {cardImg
                               ? <img
                                   src={cldImg(cardImg, `${IMG_FILL},w_600`)}
@@ -5055,7 +5062,6 @@ export default function PalosUsados() {
                             ) : l.estado ? <div className="az-card-meta">{l.estado}</div> : null}
                             <div className={`az-card-price${l.aConsultar ? " consultar" : ""}`}>{formatPrecio(l)}</div>
                             {!lIsSet && <div className={`az-card-estado ${estatusBadge(l.estado)}`}>{l.estado}</div>}
-                            {l.enElLocal && <div className="az-card-local-badge">En el local</div>}
                             {lIsPart && <div className="az-card-part-of-set">Parte de un set</div>}
                           </div>
                         </div>
