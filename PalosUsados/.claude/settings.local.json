@@ -8,7 +8,12 @@
       "Bash(node screenshot.mjs)",
       "Bash(node -e ' *)",
       "Bash(node *)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm run *)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_evaluate"
     ]
   }
 }

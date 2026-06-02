@@ -1,0 +1,454 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Azalea Golf" [ref=e5] [cursor=pointer]:
+        - /url: https://azaleasports.com.uy
+        - img "Azalea Golf" [ref=e6]
+      - list [ref=e8]:
+        - listitem [ref=e9]:
+          - link "Home" [ref=e10] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/
+        - listitem [ref=e11]:
+          - link "Catálogo" [ref=e12] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/catalogo-articulos-golf/
+        - listitem [ref=e13]:
+          - link "Palos Usados" [ref=e14] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e15]:
+          - link "Simulador" [ref=e16] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/simulador-de-golf/
+        - listitem [ref=e17]:
+          - link "Acerca de" [ref=e18] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/acerca-azalea-tienda-golf/
+        - listitem [ref=e19]:
+          - link "Contacto" [ref=e20] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/contacto/
+      - button "Buscar" [ref=e21] [cursor=pointer]:
+        - img [ref=e22]
+  - generic [ref=e26]:
+    - button "Ver artículos usados" [ref=e27] [cursor=pointer]
+    - button "Publicar un artículo" [ref=e28] [cursor=pointer]
+  - generic [ref=e29]:
+    - complementary [ref=e30]:
+      - generic [ref=e31]:
+        - generic [ref=e32]: Categoría
+        - list [ref=e33]:
+          - listitem [ref=e34] [cursor=pointer]:
+            - checkbox [ref=e35]
+            - generic [ref=e36]: Palos
+          - listitem [ref=e37] [cursor=pointer]:
+            - checkbox [ref=e38]
+            - generic [ref=e39]: Set de palos
+          - listitem [ref=e40] [cursor=pointer]:
+            - checkbox [ref=e41]
+            - generic [ref=e42]: Carros
+          - listitem [ref=e43] [cursor=pointer]:
+            - checkbox [ref=e44]
+            - generic [ref=e45]: Bolsas
+          - listitem [ref=e46] [cursor=pointer]:
+            - checkbox [ref=e47]
+            - generic [ref=e48]: Otros
+        - button "Limpiar" [ref=e50] [cursor=pointer]
+      - generic [ref=e51]:
+        - generic [ref=e52]: Tipo
+        - list [ref=e53]:
+          - listitem [ref=e54] [cursor=pointer]:
+            - checkbox [ref=e55]
+            - generic [ref=e56]: Driver
+          - listitem [ref=e57] [cursor=pointer]:
+            - checkbox [ref=e58]
+            - generic [ref=e59]: Madera
+          - listitem [ref=e60] [cursor=pointer]:
+            - checkbox [ref=e61]
+            - generic [ref=e62]: Híbrido
+          - listitem [ref=e63] [cursor=pointer]:
+            - checkbox [ref=e64]
+            - generic [ref=e65]: Hierros
+          - listitem [ref=e66] [cursor=pointer]:
+            - checkbox [ref=e67]
+            - generic [ref=e68]: Wedge
+          - listitem [ref=e69] [cursor=pointer]:
+            - checkbox [ref=e70]
+            - generic [ref=e71]: Putter
+        - button "Limpiar" [ref=e73] [cursor=pointer]
+      - generic [ref=e74]:
+        - generic [ref=e75]: Marcas
+        - list [ref=e223]:
+          - listitem [ref=e224] [cursor=pointer]:
+            - checkbox [ref=e225]
+            - generic [ref=e226]: Callaway
+          - listitem [ref=e227] [cursor=pointer]:
+            - checkbox [ref=e228]
+            - generic [ref=e229]: Cobra
+          - listitem [ref=e230] [cursor=pointer]:
+            - checkbox [ref=e231]
+            - generic [ref=e232]: Ping
+          - listitem [ref=e233] [cursor=pointer]:
+            - checkbox [ref=e234]
+            - generic [ref=e235]: Srixon
+          - listitem [ref=e236] [cursor=pointer]:
+            - checkbox [ref=e237]
+            - generic [ref=e238]: TaylorMade
+          - listitem [ref=e239] [cursor=pointer]:
+            - checkbox [ref=e240]
+            - generic [ref=e241]: Taylormade
+          - listitem [ref=e242] [cursor=pointer]:
+            - checkbox [ref=e243]
+            - generic [ref=e244]: Titleist
+          - listitem [ref=e245] [cursor=pointer]:
+            - checkbox [ref=e246]
+        - button "Limpiar" [ref=e77] [cursor=pointer]
+      - generic [ref=e78]:
+        - generic [ref=e79]: Estado
+        - list [ref=e80]:
+          - listitem [ref=e81] [cursor=pointer]:
+            - checkbox [ref=e82]
+            - generic [ref=e83]: Como nuevo
+          - listitem [ref=e84] [cursor=pointer]:
+            - checkbox [ref=e85]
+            - generic [ref=e86]: Muy bueno
+          - listitem [ref=e87] [cursor=pointer]:
+            - checkbox [ref=e88]
+            - generic [ref=e89]: Bueno
+          - listitem [ref=e90] [cursor=pointer]:
+            - checkbox [ref=e91]
+            - generic [ref=e92]: Regular
+          - listitem [ref=e93] [cursor=pointer]:
+            - checkbox [ref=e94]
+            - generic [ref=e95]: Para reparar
+      - generic [ref=e96]:
+        - generic [ref=e97]: Flex
+        - list [ref=e98]:
+          - listitem [ref=e99] [cursor=pointer]:
+            - checkbox [ref=e100]
+            - generic [ref=e101]: Ladies
+          - listitem [ref=e102] [cursor=pointer]:
+            - checkbox [ref=e103]
+            - generic [ref=e104]: Senior
+          - listitem [ref=e105] [cursor=pointer]:
+            - checkbox [ref=e106]
+            - generic [ref=e107]: Regular
+          - listitem [ref=e108] [cursor=pointer]:
+            - checkbox [ref=e109]
+            - generic [ref=e110]: Stiff
+          - listitem [ref=e111] [cursor=pointer]:
+            - checkbox [ref=e112]
+            - generic [ref=e113]: X-Stiff
+      - generic [ref=e114]:
+        - generic [ref=e115]: Mano
+        - list [ref=e116]:
+          - listitem [ref=e117] [cursor=pointer]:
+            - checkbox [ref=e118]
+            - generic [ref=e119]: Diestro
+          - listitem [ref=e120] [cursor=pointer]:
+            - checkbox [ref=e121]
+            - generic [ref=e122]: Zurdo
+      - generic [ref=e123]:
+        - generic [ref=e124]: Precio
+        - list [ref=e125]:
+          - listitem [ref=e126] [cursor=pointer]:
+            - checkbox [ref=e127]
+            - generic [ref=e128]: Hasta US$100
+          - listitem [ref=e129] [cursor=pointer]:
+            - checkbox [ref=e130]
+            - generic [ref=e131]: US$100 – 300
+          - listitem [ref=e132] [cursor=pointer]:
+            - checkbox [ref=e133]
+            - generic [ref=e134]: US$300 – 600
+          - listitem [ref=e135] [cursor=pointer]:
+            - checkbox [ref=e136]
+            - generic [ref=e137]: Más de US$600
+          - listitem [ref=e138] [cursor=pointer]:
+            - checkbox [ref=e139]
+            - generic [ref=e140]: A consultar
+      - generic [ref=e141]:
+        - generic [ref=e142]: Disponibilidad
+        - list [ref=e143]:
+          - listitem [ref=e144] [cursor=pointer]:
+            - checkbox [ref=e145]
+            - generic [ref=e146]: En el local de Azalea
+      - button "Limpiar todos" [ref=e148] [cursor=pointer]
+    - generic [ref=e149]:
+      - generic [ref=e150]:
+        - generic [ref=e151] [cursor=pointer]: Todos
+        - generic [ref=e152] [cursor=pointer]: Últimos 15 días
+      - generic [ref=e153]:
+        - generic [ref=e155]:
+          - strong [ref=e156]: "25"
+          - text: resultados
+        - combobox [ref=e157] [cursor=pointer]:
+          - option "Más reciente" [selected]
+          - 'option "Precio: menor a mayor"'
+          - 'option "Precio: mayor a menor"'
+      - generic [ref=e247]:
+        - generic [ref=e248] [cursor=pointer]:
+          - img "Srixon ZX7 Mk II" [ref=e250]
+          - generic [ref=e251]:
+            - generic [ref=e252]: Hierros
+            - generic [ref=e253]: Srixon
+            - generic [ref=e254]: ZX7 Mk II (Mk II)
+            - generic [ref=e255]: 4–PW · Diestro
+            - generic [ref=e256]: US$ 850
+            - generic [ref=e257]: Muy bueno
+            - generic [ref=e258]: 📍 En el local
+        - generic [ref=e259] [cursor=pointer]:
+          - generic [ref=e260]:
+            - generic [ref=e261]: Set
+            - img [ref=e262]
+          - generic [ref=e263]:
+            - generic [ref=e264]: Set · 10 palos
+            - generic [ref=e265]: Set de 10 palos
+            - generic [ref=e266]: Solo se vende completo
+            - generic [ref=e267]: US$ 750
+            - generic [ref=e268]: 📍 En el local
+        - generic [ref=e269] [cursor=pointer]:
+          - img "Taylormade R7 Quad Mini" [ref=e271]
+          - generic [ref=e272]:
+            - generic [ref=e273]: Driver
+            - generic [ref=e274]: Taylormade
+            - generic [ref=e275]: R7 Quad Mini
+            - generic [ref=e276]: 2025 · Diestro · Stiff
+            - generic [ref=e277]: US$ 400
+            - generic [ref=e278]: Como nuevo
+            - generic [ref=e279]: 📍 En el local
+        - generic [ref=e280] [cursor=pointer]:
+          - img "Titleist T100" [ref=e282]
+          - generic [ref=e283]:
+            - generic [ref=e284]: Hierros
+            - generic [ref=e285]: Titleist
+            - generic [ref=e286]: T100
+            - generic [ref=e287]: 4 · Diestro
+            - generic [ref=e288]: US$ 170
+            - generic [ref=e289]: Como nuevo
+            - generic [ref=e290]: 📍 En el local
+        - generic [ref=e291] [cursor=pointer]:
+          - img "Titleist MB 718" [ref=e293]
+          - generic [ref=e294]:
+            - generic [ref=e295]: Hierros
+            - generic [ref=e296]: Titleist
+            - generic [ref=e297]: MB 718
+            - generic [ref=e298]: 3 · Diestro
+            - generic [ref=e299]: US$ 140
+            - generic [ref=e300]: Muy bueno
+            - generic [ref=e301]: 📍 En el local
+        - generic [ref=e302] [cursor=pointer]:
+          - img "Titleist T100S" [ref=e304]
+          - generic [ref=e305]:
+            - generic [ref=e306]: Hierros
+            - generic [ref=e307]: Titleist
+            - generic [ref=e308]: T100S (S)
+            - generic [ref=e309]: GW · Diestro
+            - generic [ref=e310]: US$ 110
+            - generic [ref=e311]: Bueno
+            - generic [ref=e312]: 📍 En el local
+        - generic [ref=e313] [cursor=pointer]:
+          - img "Titleist 712 U" [ref=e315]
+          - generic [ref=e316]:
+            - generic [ref=e317]: Hierros
+            - generic [ref=e318]: Titleist
+            - generic [ref=e319]: 712 U
+            - generic [ref=e320]: 3 · Diestro
+            - generic [ref=e321]: US$ 110
+            - generic [ref=e322]: Regular
+            - generic [ref=e323]: 📍 En el local
+        - generic [ref=e324] [cursor=pointer]:
+          - img "Titleist T350" [ref=e326]
+          - generic [ref=e327]:
+            - generic [ref=e328]: Hierros
+            - generic [ref=e329]: Titleist
+            - generic [ref=e330]: T350
+            - generic [ref=e331]: 4 · Diestro
+            - generic [ref=e332]: US$ 190
+            - generic [ref=e333]: Como nuevo
+            - generic [ref=e334]: 📍 En el local
+        - generic [ref=e335] [cursor=pointer]:
+          - img "TaylorMade Milled Grind 5" [ref=e337]
+          - generic [ref=e338]:
+            - generic [ref=e339]: 2 wedges
+            - generic [ref=e340]: TaylorMade
+            - generic [ref=e341]: Milled Grind 5 (MG5)
+            - generic [ref=e342]: 54° / 58° · Diestro
+            - generic [ref=e343]: US$ 320
+            - generic [ref=e344]: Como nuevo
+            - generic [ref=e345]: 📍 En el local
+        - generic [ref=e346] [cursor=pointer]:
+          - img "Srixon ZX5 Mk II" [ref=e348]
+          - generic [ref=e349]:
+            - generic [ref=e350]: Hierros
+            - generic [ref=e351]: Srixon
+            - generic [ref=e352]: ZX5 Mk II (Mk II)
+            - generic [ref=e353]: 4–PW · Diestro
+            - generic [ref=e354]: US$ 850
+            - generic [ref=e355]: Muy bueno
+            - generic [ref=e356]: 📍 En el local
+        - generic [ref=e357] [cursor=pointer]:
+          - img "Titleist GT2" [ref=e359]
+          - generic [ref=e360]:
+            - generic [ref=e361]: Driver
+            - generic [ref=e362]: Titleist
+            - generic [ref=e363]: GT2
+            - generic [ref=e364]: 2024 · Diestro · Stiff
+            - generic [ref=e365]: US$ 450
+            - generic [ref=e366]: Muy bueno
+            - generic [ref=e367]: 📍 En el local
+        - generic [ref=e368] [cursor=pointer]:
+          - img "Taylormade Spider FCG" [ref=e370]
+          - generic [ref=e371]:
+            - generic [ref=e372]: Putter
+            - generic [ref=e373]: Taylormade
+            - generic [ref=e374]: Spider FCG
+            - generic [ref=e375]: 2020 · Diestro
+            - generic [ref=e376]: US$ 300
+            - generic [ref=e377]: Como nuevo
+            - generic [ref=e378]: 📍 En el local
+        - generic [ref=e379] [cursor=pointer]:
+          - img "Titleist Scotty Cameron Phantom X" [ref=e381]
+          - generic [ref=e382]:
+            - generic [ref=e383]: Putter
+            - generic [ref=e384]: Titleist
+            - generic [ref=e385]: Scotty Cameron Phantom X (5)
+            - generic [ref=e386]: 2022 · Diestro
+            - generic [ref=e387]: US$ 360
+            - generic [ref=e388]: Como nuevo
+            - generic [ref=e389]: 📍 En el local
+        - generic [ref=e390] [cursor=pointer]:
+          - img "Titleist Scotty Cameron Studio Select" [ref=e392]
+          - generic [ref=e393]:
+            - generic [ref=e394]: Putter
+            - generic [ref=e395]: Titleist
+            - generic [ref=e396]: Scotty Cameron Studio Select (Newport 2)
+            - generic [ref=e397]: 2007 · Diestro
+            - generic [ref=e398]: US$ 400
+            - generic [ref=e399]: Bueno
+            - generic [ref=e400]: 📍 En el local
+        - generic [ref=e401] [cursor=pointer]:
+          - img "Cobra Radspeed" [ref=e403]
+          - generic [ref=e404]:
+            - generic [ref=e405]: Híbrido
+            - generic [ref=e406]: Cobra
+            - generic [ref=e407]: Radspeed
+            - generic [ref=e408]: Nº3 · Diestro
+            - generic [ref=e409]: US$ 220
+            - generic [ref=e410]: Como nuevo
+            - generic [ref=e411]: 📍 En el local
+        - generic [ref=e412] [cursor=pointer]:
+          - img "Callaway Odyssey Works" [ref=e414]
+          - generic [ref=e415]:
+            - generic [ref=e416]: Putter
+            - generic [ref=e417]: Callaway
+            - generic [ref=e418]: Odyssey Works
+            - generic [ref=e419]: 2014 · Zurdo
+            - generic [ref=e420]: US$ 110
+            - generic [ref=e421]: Bueno
+            - generic [ref=e422]: 📍 En el local
+        - generic [ref=e423] [cursor=pointer]:
+          - img "Ping S159" [ref=e425]
+          - generic [ref=e426]:
+            - generic [ref=e427]: Wedge 60°
+            - generic [ref=e428]: Ping
+            - generic [ref=e429]: S159
+            - generic [ref=e430]: 2024 · Diestro · Stiff
+            - generic [ref=e431]: US$ 150
+            - generic [ref=e432]: Muy bueno
+            - generic [ref=e433]: 📍 En el local
+        - generic [ref=e434] [cursor=pointer]:
+          - img "Ping S159" [ref=e436]
+          - generic [ref=e437]:
+            - generic [ref=e438]: Wedge 50°
+            - generic [ref=e439]: Ping
+            - generic [ref=e440]: S159
+            - generic [ref=e441]: 2024 · Diestro · Stiff
+            - generic [ref=e442]: US$ 150
+            - generic [ref=e443]: Muy bueno
+            - generic [ref=e444]: 📍 En el local
+        - generic [ref=e445] [cursor=pointer]:
+          - img "Cobra RadSpeed XB" [ref=e447]
+          - generic [ref=e448]:
+            - generic [ref=e449]: Driver
+            - generic [ref=e450]: Cobra
+            - generic [ref=e451]: RadSpeed XB (XB)
+            - generic [ref=e452]: 2021 · Diestro · Stiff
+            - generic [ref=e453]: US$ 280
+            - generic [ref=e454]: Como nuevo
+            - generic [ref=e455]: 📍 En el local
+        - generic [ref=e456] [cursor=pointer]:
+          - img "TaylorMade M5" [ref=e458]
+          - generic [ref=e459]:
+            - generic [ref=e460]: Driver
+            - generic [ref=e461]: TaylorMade
+            - generic [ref=e462]: M5 (Tour)
+            - generic [ref=e463]: 2019 · Diestro · Stiff
+            - generic [ref=e464]: US$ 150
+            - generic [ref=e465]: Regular
+            - generic [ref=e466]: 📍 En el local
+      - button "Ver más (5 restantes)" [ref=e467] [cursor=pointer]
+  - contentinfo [ref=e160]:
+    - generic [ref=e161]:
+      - img "Azalea Golf" [ref=e164]
+      - generic [ref=e165]:
+        - heading "Productos" [level=4] [ref=e167]
+        - list [ref=e169]:
+          - listitem [ref=e170]:
+            - link "Palos" [ref=e171] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/palos/
+          - listitem [ref=e172]:
+            - link "Pelotas" [ref=e173] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/pelotas/
+          - listitem [ref=e174]:
+            - link "Bolsas" [ref=e175] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/bolsas/
+          - listitem [ref=e176]:
+            - link "Carros" [ref=e177] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/carros/
+          - listitem [ref=e178]:
+            - link "Accesorios" [ref=e179] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/accesorios/
+          - listitem [ref=e180]:
+            - link "Indumentaria" [ref=e181] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/indumentaria/
+      - generic [ref=e182]:
+        - heading "Páginas" [level=4] [ref=e184]
+        - list [ref=e186]:
+          - listitem [ref=e187]:
+            - link "Home" [ref=e188] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/
+          - listitem [ref=e189]:
+            - link "Catálogo" [ref=e190] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/catalogo-articulos-golf/
+          - listitem [ref=e191]:
+            - link "Simulador" [ref=e192] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/simulador-de-golf/
+          - listitem [ref=e193]:
+            - link "Acerca de" [ref=e194] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/acerca-azalea-tienda-golf/
+          - listitem [ref=e195]:
+            - link "Contacto" [ref=e196] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/contacto/
+      - generic [ref=e197]:
+        - generic [ref=e198]:
+          - heading "Local y horario" [level=4] [ref=e200]
+          - paragraph [ref=e202]:
+            - text: Arocena 1572, Montevideo
+            - text: (lunes a viernes de 13hs a 20hs)
+        - generic [ref=e203]:
+          - heading "Contacto" [level=4] [ref=e205]
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - link "Instagram" [ref=e208] [cursor=pointer]:
+                - /url: https://www.instagram.com/azaleagolfuy
+                - img [ref=e209]
+              - link "WhatsApp" [ref=e211] [cursor=pointer]:
+                - /url: https://wa.me/59892390042
+                - img [ref=e212]
+            - paragraph [ref=e214]:
+              - link "contacto@azaleasports.com.uy" [ref=e215] [cursor=pointer]:
+                - /url: mailto:contacto@azaleasports.com.uy
+    - generic [ref=e216]:
+      - paragraph [ref=e217]: ©2025 Azalea Golf | Todos los derechos reservados
+      - link "Simbionte Creativo" [ref=e219] [cursor=pointer]:
+        - /url: https://www.simbiontecreativo.com
+        - img "Simbionte Creativo" [ref=e220]
+      - paragraph [ref=e221]:
+        - text: "Diseño y desarrollo:"
+        - link "Simbionte Creativo" [ref=e222] [cursor=pointer]:
+          - /url: https://www.simbiontecreativo.com

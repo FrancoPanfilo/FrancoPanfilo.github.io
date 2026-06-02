@@ -46,6 +46,29 @@ const uploadToCloudinary = async (file) => {
   const data = await res.json();
   return data.secure_url;
 };
+
+// Entrega de imágenes optimizada: inserta transformaciones de Cloudinary en la URL
+// (formato y calidad automáticos → WebP/AVIF, y un tamaño acorde al contexto) para
+// servir imágenes nítidas y livianas en vez del original a resolución completa.
+// Si la URL no es de Cloudinary (ej. preview local) se devuelve sin tocar.
+const cldImg = (url, transform) => {
+  if (!url || typeof url !== "string") return url;
+  const marker = "/image/upload/";
+  const at = url.indexOf(marker);
+  if (at === -1) return url;
+  const after = url.slice(at + marker.length);
+  if (/^(f_auto|q_auto)/.test(after)) return url; // ya optimizada
+  return url.slice(0, at + marker.length) + transform + "/" + after;
+};
+// srcset responsive: misma transformación a varios anchos para que el navegador
+// elija el adecuado según el tamaño real y el DPR de la pantalla.
+const cldSrcSet = (url, transform, widths) =>
+  cldImg(url, `${transform},w_${widths[0]}`) === url
+    ? undefined
+    : widths.map(w => `${cldImg(url, `${transform},w_${w}`)} ${w}w`).join(", ");
+
+const IMG_FILL = "f_auto,q_auto,c_fill,ar_1:1"; // cuadrado (tarjetas, miniaturas)
+const IMG_FIT  = "f_auto,q_auto,c_limit";        // sin recortar (detalle, lightbox)
 import CLUBS from "./clubsDB.json";
 
 /* ─────────────────────────────────────────────────────────────
@@ -181,9 +204,6 @@ const formatPrecio = (l) => {
 const isSetListing = (l) => l?.tipo === "set" || l?.categoria === "set";
 const isPartOfSet = (l) => Boolean(l?.setId);
 
-const countSetItems = (l) =>
-  l.ofertasSeparadas ? (l.itemIds?.length || 0) : (l.setItems?.length || 0);
-
 const formatComposicion = (arr) => {
   if (!arr || arr.length === 0) return "";
   const ordered = IRON_OPTS.filter(i => arr.includes(i));
@@ -203,6 +223,35 @@ const wedgeMultipleTitle = (l) => `${l.unidades.length} wedges`;
 
 const formatLoftsList = (unidades) =>
   unidades.map(u => u.loft ? `${u.loft}°` : "?").join(" / ");
+
+// Cantidad de palos reales que representa un item del set:
+// un set de hierros cuenta por su composición, un lote de wedges por sus unidades.
+const clubCountForItem = (it) =>
+  it?.tipo === "hierros" && it.composicion?.length ? it.composicion.length
+  : isWedgeMultiple(it) ? it.unidades.length
+  : 1;
+
+// Conteo real de palos de un set. loadedItems se pasa cuando los items ya están
+// cargados (ofertasSeparadas en el detalle); si no, cae a setItems o a itemIds.length.
+const countSetClubs = (l, loadedItems) => {
+  const items = loadedItems || l.setItems;
+  if (items?.length) return items.reduce((n, it) => n + clubCountForItem(it), 0);
+  return l.itemIds?.length || 0;
+};
+
+// Resumen legible de la composición de un set para el encabezado del detalle.
+const setComposicionResumen = (items) => {
+  if (!items?.length) return "";
+  return items.map(it => {
+    if (it.tipo === "hierros" && it.composicion?.length)
+      return `${it.composicion.length === 1 ? "Hierro" : "Hierros"} ${formatComposicion(it.composicion)}`;
+    if (isWedgeMultiple(it)) return `${it.unidades.length} wedges`;
+    if (it.tipo === "wedge" && it.loft) return `Wedge ${it.loft}°`;
+    if ((it.tipo === "madera" || it.tipo === "hibrido") && it.numPalo)
+      return `${TIPO_LABELS[it.tipo] || it.tipo} ${it.numPalo}`;
+    return TIPO_LABELS[it.tipo] || it.tipo;
+  }).join(" · ");
+};
 
 /* ─────────────────────────────────────────────────────────────
    CSS
@@ -348,7 +397,12 @@ a { text-decoration: none; color: inherit; }
 }
 .az-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
 .az-card-img { background: var(--rz-background-color-gray); aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.az-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.az-card-img img {
+  width: 100%; height: 100%; object-fit: cover;
+  /* Boost leve de contraste y saturación como capa de apoyo al e_improve de Cloudinary.
+     Ayuda a que el sujeto se distinga mejor en fotos con luz solar intensa o glare. */
+  filter: contrast(1.08) saturate(1.12);
+}
 .az-card-img-placeholder { font-size: 40px; opacity: .15; }
 .az-card-body { padding: 12px; }
 .az-card-tipo-tag {
@@ -915,25 +969,137 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ─── SET DETAIL ──────────────────────────────────────────── */
-.az-set-detail-items { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.az-set-items-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+.az-set-items-hint { font-size: 12px; color: var(--rz-color-primary); font-weight: 600; }
+.az-set-detail-items { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
 .az-set-detail-item {
-  display: flex; gap: 12px; padding: 12px;
-  border: 1.5px solid var(--rz-border-color-light); border-radius: 6px;
+  display: flex; gap: 14px; padding: 12px; align-items: center;
+  border: 1.5px solid var(--rz-border-color-light); border-radius: 8px;
+  cursor: pointer; background: #fff; position: relative; overflow: hidden;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
 }
-.az-set-detail-item img {
-  width: 100px; height: 100px; object-fit: cover; border-radius: 4px; flex-shrink: 0;
+.az-set-detail-item::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--rz-color-primary); transform: scaleY(0); transform-origin: top;
+  transition: transform .2s ease;
 }
-.az-set-detail-item-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.az-set-detail-item:hover {
+  border-color: var(--rz-color-primary);
+  box-shadow: 0 8px 24px -12px rgba(255,123,172,.5);
+  transform: translateY(-2px);
+}
+.az-set-detail-item:hover::before { transform: scaleY(1); }
+.az-set-detail-item:focus-visible {
+  outline: none; border-color: var(--rz-color-primary);
+  box-shadow: 0 0 0 3px rgba(255,123,172,.3);
+}
+.az-set-item-thumb {
+  width: 104px; height: 104px; border-radius: 6px; flex-shrink: 0;
+  overflow: hidden; background: var(--rz-background-color-gray); position: relative;
+}
+.az-set-item-thumb img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .35s ease;
+}
+.az-set-detail-item:hover .az-set-item-thumb img { transform: scale(1.07); }
+.az-set-item-photobadge {
+  position: absolute; left: 6px; bottom: 6px; font-size: 11px; font-weight: 600;
+  color: #fff; background: rgba(0,0,0,.6); padding: 2px 8px; border-radius: 99px;
+  backdrop-filter: blur(2px);
+}
+.az-set-detail-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .az-set-detail-item-info strong { font-size: 14px; color: var(--rz-color-dark); }
 .az-set-detail-item-info span { font-size: 12px; color: var(--rz-text-color-gray); }
 .az-set-detail-item-price {
   font-size: 16px; font-weight: 700; color: var(--rz-color-dark); margin-top: 4px;
 }
-.az-set-detail-item-link {
-  display: inline-block; font-size: 12px; color: var(--rz-color-primary);
-  text-decoration: none; margin-top: 4px;
+.az-set-item-go {
+  flex-shrink: 0; align-self: center; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px; color: var(--rz-color-primary);
+  opacity: 0; transform: translateX(-6px); transition: opacity .2s ease, transform .2s ease;
+  white-space: nowrap; padding-left: 8px;
 }
-.az-set-detail-item-link:hover { text-decoration: underline; }
+.az-set-detail-item:hover .az-set-item-go { opacity: 1; transform: translateX(0); }
+.az-set-item-specs { grid-template-columns: 1fr 1fr; gap: 2px 14px; margin: 6px 0 0; }
+.az-set-item-specs .az-modal-spec { font-size: 12px; }
+.az-set-resumen { font-size: 13px; color: var(--rz-text-color-gray); margin: 4px 0 2px; }
+
+/* ─── SET ITEM LIGHTBOX ───────────────────────────────────── */
+.az-lb-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(17,17,17,.72); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  animation: az-lb-fade .2s ease;
+}
+@keyframes az-lb-fade { from { opacity: 0; } to { opacity: 1; } }
+.az-lb-card {
+  background: #fff; border-radius: 10px; width: 100%; max-width: 920px;
+  max-height: 92vh; overflow: hidden; position: relative;
+  display: grid; grid-template-columns: 1.25fr 1fr;
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,.5);
+  animation: az-lb-pop .26s cubic-bezier(.2,.8,.25,1);
+}
+@keyframes az-lb-pop { from { opacity: 0; transform: scale(.94) translateY(10px); } to { opacity: 1; transform: none; } }
+.az-lb-close {
+  position: absolute; top: 12px; right: 12px; z-index: 10;
+  background: rgba(255,255,255,.92); color: var(--rz-color-dark); border: none;
+  width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18); transition: background .18s, transform .18s;
+}
+.az-lb-close:hover { background: var(--rz-color-primary); color: #fff; transform: rotate(90deg); }
+.az-lb-gallery { background: #fafafa; display: flex; flex-direction: column; min-width: 0; }
+.az-lb-stage { position: relative; flex: 1; min-height: 320px; background: #f0f0f0; }
+.az-lb-stage img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+  animation: az-lb-fade .25s ease;
+}
+.az-lb-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 80px; opacity: .12; }
+.az-lb-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,.9); color: var(--rz-color-dark); border: none;
+  width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,.2); transition: background .18s, color .18s;
+}
+.az-lb-nav:hover { background: var(--rz-color-primary); color: #fff; }
+.az-lb-nav.prev { left: 12px; } .az-lb-nav.next { right: 12px; }
+.az-lb-count {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  font-size: 12px; color: #fff; background: rgba(0,0,0,.55); padding: 3px 12px; border-radius: 99px;
+}
+.az-lb-thumbs {
+  display: flex; gap: 8px; padding: 12px; overflow-x: auto; background: #fff;
+  border-top: 1px solid var(--rz-border-color-light);
+}
+.az-lb-thumb {
+  width: 60px; height: 60px; object-fit: cover; border-radius: 5px; cursor: pointer;
+  border: 2px solid transparent; opacity: .55; flex-shrink: 0; transition: all .15s;
+}
+.az-lb-thumb:hover { opacity: 1; }
+.az-lb-thumb.active { opacity: 1; border-color: var(--rz-color-primary); }
+.az-lb-info { padding: 32px 30px; overflow-y: auto; }
+.az-lb-tipo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--rz-color-primary); margin-bottom: 6px; }
+.az-lb-title { font-size: 22px; font-weight: 700; color: var(--rz-color-dark); line-height: 1.25; margin-bottom: 8px; }
+.az-lb-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.az-lb-price { font-size: 24px; font-weight: 700; color: var(--rz-color-dark); }
+.az-lb-cta {
+  align-self: flex-start; padding: 11px 22px; background: var(--rz-color-dark); color: #fff;
+  border: none; border-radius: 4px; font-size: 13px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .4px; cursor: pointer; font-family: var(--rz-font-family); transition: background .2s;
+}
+.az-lb-cta:hover { background: var(--rz-color-primary); }
+.az-lb-chip {
+  margin-top: 20px; display: inline-block; font-size: 12px; font-weight: 600;
+  color: var(--rz-text-color-gray); background: var(--rz-background-color-gray);
+  padding: 8px 14px; border-radius: 99px;
+}
+@media (max-width: 760px) {
+  .az-lb-card { grid-template-columns: 1fr; max-height: 94vh; overflow-y: auto; }
+  .az-lb-stage { min-height: 260px; aspect-ratio: 4/3; }
+  .az-lb-info { padding: 22px 20px 28px; }
+  .az-set-item-go { display: none; }
+}
 
 /* ─── ADMIN CASCADE MODAL ─────────────────────────────────── */
 .az-cascade-overlay {
@@ -2930,6 +3096,36 @@ function WedgeUnitsTable({ unidades }) {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   SUBCOMPONENT: ItemSpecs (specs de un palo individual o de un palo del set)
+───────────────────────────────────────────────────────────── */
+function ItemSpecs({ item, className }) {
+  const spec = (label, val) => val
+    ? <div className="az-modal-spec"><strong>{label}:</strong> {val}</div>
+    : null;
+  return (
+    <>
+      <div className={`az-modal-specs${className ? " " + className : ""}`}>
+        {spec("Año", item.anio)}
+        {item.numPalo && spec(item.tipo === "madera" ? "Madera" : "Híbrido", `Nº ${item.numPalo}`)}
+        {spec("Condición", item.estado)}
+        {spec("Mano", item.mano)}
+        {item.tipo === "putter" && spec("Estilo", item.estiloPutter)}
+        {!isWedgeMultiple(item) && spec("Flex", item.flex)}
+        {!isWedgeMultiple(item) && spec("Loft", item.loft ? `${item.loft}°` : null)}
+        {spec("Material", item.material)}
+        {!isWedgeMultiple(item) && spec("Largo", item.largo)}
+        {!isWedgeMultiple(item) && spec("Bounce", item.bounce ? `${item.bounce}°` : null)}
+        {!isWedgeMultiple(item) && spec("Grind", item.grind)}
+        {spec("Headcover", item.headcover === true ? "Incluido" : null)}
+        {item.composicion?.length > 0 && spec(item.composicion.length === 1 ? "Hierro" : "Set", formatComposicion(item.composicion))}
+        {spec("Departamento", item.departamento)}
+      </div>
+      {isWedgeMultiple(item) && <WedgeUnitsTable unidades={item.unidades} />}
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
    SUBCOMPONENT: CardDetailModal
 ───────────────────────────────────────────────────────────── */
 const AZALEA_WA = "59892390042";
@@ -2960,7 +3156,7 @@ function CardDetailModal({ listing, onClose }) {
         {/* Gallery */}
         <div className="az-modal-gallery">
           {fotos.length > 0
-            ? <img src={fotos[idx]} alt="" />
+            ? <img src={cldImg(fotos[idx], `${IMG_FIT},w_900`)} loading="lazy" decoding="async" alt="" />
             : <div className="az-modal-gallery-placeholder">⛳</div>
           }
           {fotos.length > 1 && (
@@ -2988,36 +3184,17 @@ function CardDetailModal({ listing, onClose }) {
             <div className="az-card-local-badge" style={{ marginBottom: 8 }}>En el local</div>
           )}
 
-          <div className="az-modal-specs">
-            {cat === "palos" ? (
-              <>
-                {spec("Año", listing.anio)}
-                {listing.numPalo && spec(listing.tipo === "madera" ? "Madera" : "Híbrido", `Nº ${listing.numPalo}`)}
-                {spec("Condición", listing.estado)}
-                {spec("Mano", listing.mano)}
-                {listing.tipo === "putter" && spec("Estilo", listing.estiloPutter)}
-                {!isWedgeMultiple(listing) && spec("Flex", listing.flex)}
-                {!isWedgeMultiple(listing) && spec("Loft", listing.loft ? `${listing.loft}°` : null)}
-                {spec("Material", listing.material)}
-                {!isWedgeMultiple(listing) && spec("Largo", listing.largo)}
-                {!isWedgeMultiple(listing) && spec("Bounce", listing.bounce ? `${listing.bounce}°` : null)}
-                {!isWedgeMultiple(listing) && spec("Grind", listing.grind)}
-                {spec("Headcover", listing.headcover === true ? "Incluido" : null)}
-                {listing.composicion?.length > 0 && spec(listing.composicion.length === 1 ? "Hierro" : "Set", formatComposicion(listing.composicion))}
-                {spec("Departamento", listing.departamento)}
-              </>
-            ) : (
-              <>
-                {spec("Categoría", CATEGORIA_LABELS[cat])}
-                {spec("Marca", listing.marca)}
-                {listing.modelo && spec("Modelo", listing.modelo)}
-                {spec("Estado", listing.estado)}
-                {spec("Departamento", listing.departamento)}
-              </>
-            )}
-          </div>
-
-          {isWedgeMultiple(listing) && <WedgeUnitsTable unidades={listing.unidades} />}
+          {cat === "palos" ? (
+            <ItemSpecs item={listing} />
+          ) : (
+            <div className="az-modal-specs">
+              {spec("Categoría", CATEGORIA_LABELS[cat])}
+              {spec("Marca", listing.marca)}
+              {listing.modelo && spec("Modelo", listing.modelo)}
+              {spec("Estado", listing.estado)}
+              {spec("Departamento", listing.departamento)}
+            </div>
+          )}
 
           {listing.descripcion && (
             <div className="az-modal-desc">{listing.descripcion}</div>
@@ -3123,7 +3300,7 @@ function ClientCard({ name, palos, totalUSD, totalUYU, onSaveDatosBancarios, onE
         {palos.map(l => (
           <div key={l.id} className="az-local-palo" onClick={() => onEdit(l)} style={{ cursor: "pointer" }}>
             {l.fotos?.[0]
-              ? <img src={l.fotos[0]} alt="" />
+              ? <img src={cldImg(l.fotos[0], `${IMG_FILL},w_120`)} loading="lazy" decoding="async" alt="" />
               : <div className="az-local-palo-ph">⛳</div>
             }
             <div className="az-local-palo-info">
@@ -3149,11 +3326,92 @@ function ClientCard({ name, palos, totalUSD, totalUYU, onSaveDatosBancarios, onE
 }
 
 /* ─────────────────────────────────────────────────────────────
+   SUBCOMPONENT: SetItemLightbox (ver un palo del set con galería completa)
+───────────────────────────────────────────────────────────── */
+function setItemTitulo(it) {
+  if (isWedgeMultiple(it))
+    return `${wedgeMultipleTitle(it)} ${it.marca || ""} ${it.modelo || ""}`.trim();
+  if (it.tipo === "hierros" && it.composicion?.length)
+    return `${it.composicion.length === 1 ? "Hierro" : "Set hierros"} ${it.marca || ""} ${it.modelo || ""} (${formatComposicion(it.composicion)})`.trim();
+  return `${TIPO_LABELS[it.tipo] || it.tipo} ${it.marca || ""} ${it.modelo || ""}`.trim();
+}
+
+function SetItemLightbox({ item, ofertasSeparadas, onClose, onOpenItem }) {
+  const [idx, setIdx] = useState(0);
+  const fotos = item.fotos || [];
+  const total = fotos.length;
+  const go = (d) => setIdx(i => (i + d + Math.max(total, 1)) % Math.max(total, 1));
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft" && total > 1) go(-1);
+      else if (e.key === "ArrowRight" && total > 1) go(1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [total]);
+
+  return (
+    <div className="az-lb-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="az-lb-card" role="dialog" aria-modal="true" aria-label={setItemTitulo(item)}>
+        <button className="az-lb-close" onClick={onClose} aria-label="Cerrar">✕</button>
+
+        <div className="az-lb-gallery">
+          <div className="az-lb-stage">
+            {fotos.length > 0
+              ? <img key={idx} src={cldImg(fotos[idx], `${IMG_FIT},w_1400`)} decoding="async" alt={setItemTitulo(item)} />
+              : <div className="az-lb-placeholder">⛳</div>}
+            {total > 1 && (
+              <>
+                <button className="az-lb-nav prev" onClick={() => go(-1)} aria-label="Anterior">‹</button>
+                <button className="az-lb-nav next" onClick={() => go(1)} aria-label="Siguiente">›</button>
+                <span className="az-lb-count">{idx + 1} / {total}</span>
+              </>
+            )}
+          </div>
+          {total > 1 && (
+            <div className="az-lb-thumbs">
+              {fotos.map((url, i) => (
+                <img key={i} src={cldImg(url, `${IMG_FILL},w_160`)} alt="" loading="lazy" decoding="async"
+                  className={`az-lb-thumb${i === idx ? " active" : ""}`}
+                  onClick={() => setIdx(i)} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="az-lb-info">
+          <div className="az-lb-tipo">{TIPO_LABELS[item.tipo] || item.tipo}{item.marca ? ` · ${item.marca}` : ""}</div>
+          <h3 className="az-lb-title">{setItemTitulo(item)}</h3>
+
+          <ItemSpecs item={item} />
+
+          {ofertasSeparadas ? (
+            <div className="az-lb-actions">
+              {item.precio && <div className="az-lb-price">{formatPrecio(item)}</div>}
+              {item.id && (
+                <button className="az-lb-cta" onClick={() => { onOpenItem && onOpenItem(item); onClose(); }}>
+                  Ver publicación individual →
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="az-lb-chip">Incluido en el set · se vende completo</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
    SUBCOMPONENT: SetListingDetail
 ───────────────────────────────────────────────────────────── */
 function SetListingDetail({ listing, onBack, onOpenItem }) {
   const [idx, setIdx] = useState(0);
   const [linkedItems, setLinkedItems] = useState(null);
+  const [openItem, setOpenItem] = useState(null);
   const fotos = listing.fotosSet?.length ? listing.fotosSet : (listing.fotos || []);
 
   // Cargar items vinculados si ofertasSeparadas
@@ -3185,13 +3443,14 @@ function SetListingDetail({ listing, onBack, onOpenItem }) {
         <div className="az-detail-gallery">
           <div className="az-detail-main-img">
             {fotos.length > 0
-              ? <img src={fotos[idx]} alt="Set" />
+              ? <img src={cldImg(fotos[idx], `${IMG_FIT},w_1100`)} decoding="async" alt="Set" />
               : <div className="az-detail-main-placeholder">⛳</div>}
           </div>
           {fotos.length > 1 && (
             <div className="az-detail-thumbs">
               {fotos.map((url, i) => (
-                <img key={i} src={url} alt="" className={`az-detail-thumb${i === idx ? " active" : ""}`}
+                <img key={i} src={cldImg(url, `${IMG_FILL},w_200`)} alt="" loading="lazy" decoding="async"
+                  className={`az-detail-thumb${i === idx ? " active" : ""}`}
                   onClick={() => setIdx(i)} />
               ))}
             </div>
@@ -3200,8 +3459,11 @@ function SetListingDetail({ listing, onBack, onOpenItem }) {
 
         {/* Info */}
         <div>
-          <div className="az-detail-tipo">Set · {countSetItems(listing)} palos</div>
+          <div className="az-detail-tipo">Set · {countSetClubs(listing, itemsParaListar)} palos</div>
           <h1 className="az-detail-title">Set de palos</h1>
+          {itemsParaListar.length > 0 && (
+            <div className="az-set-resumen">{setComposicionResumen(itemsParaListar)}</div>
+          )}
           <div className="az-detail-price">{formatPrecio(listing)}</div>
           <p style={{ fontSize: 13, color: "#767676", marginTop: 8 }}>
             {listing.ofertasSeparadas
@@ -3230,43 +3492,51 @@ function SetListingDetail({ listing, onBack, onOpenItem }) {
       </div>
 
       {/* Palos del set */}
-      <div className="az-detail-tipo" style={{ marginTop: 32 }}>Palos incluidos en el set</div>
+      <div className="az-set-items-head">
+        <div className="az-detail-tipo" style={{ margin: 0 }}>Palos incluidos en el set</div>
+        {itemsParaListar.length > 0 && (
+          <span className="az-set-items-hint">Tocá un palo para ver sus fotos y detalle</span>
+        )}
+      </div>
       <div className="az-set-detail-items">
         {itemsParaListar.length === 0 && listing.ofertasSeparadas && (
           <p style={{ color: "#767676" }}>Cargando palos…</p>
         )}
         {itemsParaListar.map((it, i) => {
-          const titulo = isWedgeMultiple(it)
-            ? `${wedgeMultipleTitle(it)} ${it.marca || ""} ${it.modelo || ""}`
-            : it.tipo === "hierros" && it.composicion?.length
-            ? `${it.composicion.length === 1 ? "Hierro" : "Set hierros"} ${it.marca || ""} ${it.modelo || ""} (${formatComposicion(it.composicion)})`
-            : `${TIPO_LABELS[it.tipo] || it.tipo} ${it.marca || ""} ${it.modelo || ""}`;
+          const nFotos = it.fotos?.length || 0;
           return (
-            <div key={it.id || i} className="az-set-detail-item">
-              {it.fotos?.[0]
-                ? <img src={it.fotos[0]} alt="" />
-                : <div className="az-detail-main-placeholder" style={{ width: 100, height: 100, fontSize: 30 }}>⛳</div>}
+            <div key={it.id || i} className="az-set-detail-item" role="button" tabIndex={0}
+              onClick={() => setOpenItem(it)}
+              onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpenItem(it); } }}>
+              <div className="az-set-item-thumb">
+                {nFotos > 0
+                  ? <img src={cldImg(it.fotos[0], `${IMG_FILL},w_240`)} alt="" loading="lazy" decoding="async" />
+                  : <div className="az-detail-main-placeholder" style={{ height: "100%", fontSize: 30 }}>⛳</div>}
+                {nFotos > 1 && <span className="az-set-item-photobadge">📷 {nFotos}</span>}
+              </div>
               <div className="az-set-detail-item-info">
-                <strong>{titulo}</strong>
-                <span>
-                  {it.estado}{it.mano ? ` · ${it.mano}` : ""}
-                  {it.anio ? ` · ${it.anio}` : ""}
-                </span>
+                <strong>{setItemTitulo(it)}</strong>
+                <ItemSpecs item={it} className="az-set-item-specs" />
                 {listing.ofertasSeparadas && it.precio && (
                   <div className="az-set-detail-item-price">{formatPrecio(it)}</div>
                 )}
-                {listing.ofertasSeparadas && it.id && (
-                  <a className="az-set-detail-item-link"
-                    href={`#listing/${it.id}`}
-                    onClick={e => { e.preventDefault(); onOpenItem && onOpenItem(it); }}>
-                    Ver publicación individual →
-                  </a>
-                )}
               </div>
+              <span className="az-set-item-go" aria-hidden="true">
+                {nFotos > 1 ? "Ver fotos" : "Ver detalle"} →
+              </span>
             </div>
           );
         })}
       </div>
+
+      {openItem && (
+        <SetItemLightbox
+          item={openItem}
+          ofertasSeparadas={listing.ofertasSeparadas}
+          onClose={() => setOpenItem(null)}
+          onOpenItem={onOpenItem}
+        />
+      )}
     </div>
   );
 }
@@ -3305,14 +3575,15 @@ function ListingDetail({ listing, onBack, onOpenItem }) {
         <div className="az-detail-gallery">
           <div className="az-detail-main-img">
             {fotos.length > 0
-              ? <img src={fotos[idx]} alt={`${listing.marca} ${listing.modelo}`} />
+              ? <img src={cldImg(fotos[idx], `${IMG_FIT},w_1100`)} decoding="async" alt={`${listing.marca} ${listing.modelo}`} />
               : <div className="az-detail-main-placeholder">⛳</div>
             }
           </div>
           {fotos.length > 1 && (
             <div className="az-detail-thumbs">
               {fotos.map((url, i) => (
-                <img key={i} src={url} alt="" className={`az-detail-thumb${i === idx ? " active" : ""}`}
+                <img key={i} src={cldImg(url, `${IMG_FILL},w_200`)} alt="" loading="lazy" decoding="async"
+                  className={`az-detail-thumb${i === idx ? " active" : ""}`}
                   onClick={() => setIdx(i)} />
               ))}
             </div>
@@ -3556,7 +3827,7 @@ function AdminPanel() {
 
   const handleDelete = async (listing) => {
     if (isSetListing(listing)) {
-      const n = countSetItems(listing);
+      const n = countSetClubs(listing);
       if (!window.confirm(`¿Eliminar el set completo${n > 0 ? ` y sus ${n} palos asociados` : ""}?`)) return;
       const ids = cascadeIds(listing);
       await Promise.all(ids.map(i => deleteDoc(doc(db, "listings", i))));
@@ -3755,7 +4026,7 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
       {/* Banner principal */}
       <div className="az-admin-card-banner" onClick={() => onEdit(listing)}>
         {fotos.length > 0
-          ? <img src={fotos[activeIdx]} alt="" />
+          ? <img src={cldImg(fotos[activeIdx], `${IMG_FIT},w_700`)} loading="lazy" decoding="async" alt="" />
           : <div className="az-admin-card-banner-placeholder">⛳</div>
         }
         {fotos.length > 1 && (
@@ -3770,7 +4041,7 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
       {fotos.length > 1 && (
         <div className="az-admin-card-strip">
           {fotos.map((url, i) => (
-            <img key={i} src={url} alt=""
+            <img key={i} src={cldImg(url, `${IMG_FILL},w_160`)} alt="" loading="lazy" decoding="async"
               className={`az-admin-card-strip-thumb${activeIdx === i ? " active" : ""}`}
               onClick={() => setActiveIdx(i)}
             />
@@ -3792,7 +4063,7 @@ function AdminCard({ listing, onApprove, onMarkSold, onHide, onUnhide, onToggleL
         )}
         <strong>
           {lIsSet
-            ? `Set · ${countSetItems(listing)} palos`
+            ? `Set · ${countSetClubs(listing)} palos`
             : cat === "palos"
             ? isWedgeMultiple(listing)
               ? `${wedgeMultipleTitle(listing)} ${listing.marca} ${listing.modelo}${labelVersion(listing.version)}`
@@ -4425,9 +4696,17 @@ export default function PalosUsados() {
     navigateTo("ver");
   };
 
+  // Filtros que describen un palo individual (tipo, marca, flex, mano). No aplican
+  // a un set completo, así que si hay alguno activo ocultamos los sets —salvo que el
+  // usuario pida explícitamente la categoría "set".
+  const clubFilterActive =
+    filters.tipo.length > 0 || filters.marca.length > 0 ||
+    filters.flex.length > 0 || filters.mano !== "";
+
   // Compute filtered + sorted listings
   const filteredListings = listings.filter(l => {
     const lCat = l.categoria || "palos";
+    if (isSetListing(l) && clubFilterActive && !filters.categoria.includes("set")) return false;
     if (filters.categoria.length && !filters.categoria.includes(lCat)) return false;
     if (filters.marca.length && !filters.marca.includes(l.marca)) return false;
     if (filters.estado.length && !filters.estado.includes(l.estado)) return false;
@@ -4475,7 +4754,7 @@ export default function PalosUsados() {
     setPage(1);
   };
 
-  const availableMarcas = [...new Set(listings.map(l => l.marca))].sort();
+  const availableMarcas = [...new Set(listings.map(l => l.marca).filter(Boolean))].sort();
   const estatusBadge = (e) => {
     const map = {
       "Como nuevo": "como-nuevo", "Muy bueno": "muy-bueno",
@@ -4725,7 +5004,7 @@ export default function PalosUsados() {
                       const lIsSet = isSetListing(l);
                       const lIsPart = isPartOfSet(l);
                       const cardTypeTag = lIsSet
-                        ? `Set · ${countSetItems(l)} palos`
+                        ? `Set · ${countSetClubs(l)} palos`
                         : lCat === "palos"
                         ? (isWedgeMultiple(l) ? wedgeMultipleTitle(l)
                             : l.tipo === "wedge" && l.loft ? `Wedge ${l.loft}°`
@@ -4739,7 +5018,12 @@ export default function PalosUsados() {
                           <div className="az-card-img">
                             {lIsSet && <span className="az-card-set-badge">Set</span>}
                             {cardImg
-                              ? <img src={cardImg} alt={`${l.marca || ""} ${l.modelo || ""}`} />
+                              ? <img
+                                  src={cldImg(cardImg, `${IMG_FILL},w_600`)}
+                                  srcSet={cldSrcSet(cardImg, IMG_FILL, [300, 450, 600, 900])}
+                                  sizes="(max-width: 600px) 45vw, 240px"
+                                  loading="lazy" decoding="async"
+                                  alt={`${l.marca || ""} ${l.modelo || ""}`} />
                               : <span className="az-card-img-placeholder">⛳</span>
                             }
                           </div>
@@ -4748,7 +5032,7 @@ export default function PalosUsados() {
                             {!lIsSet && <div className="az-card-brand">{l.marca}</div>}
                             <div className="az-card-title">
                               {lIsSet
-                                ? `Set de ${countSetItems(l)} palos`
+                                ? `Set de ${countSetClubs(l)} palos`
                                 : <>{l.modelo}{lCat === "palos" ? labelVersion(l.version) : ""}</>}
                             </div>
                             {lIsSet ? (

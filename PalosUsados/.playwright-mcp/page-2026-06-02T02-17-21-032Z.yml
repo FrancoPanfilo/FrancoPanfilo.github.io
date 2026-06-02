@@ -1,0 +1,231 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Azalea Golf" [ref=e5] [cursor=pointer]:
+        - /url: https://azaleasports.com.uy
+        - img "Azalea Golf" [ref=e6]
+      - list [ref=e8]:
+        - listitem [ref=e9]:
+          - link "Home" [ref=e10] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/
+        - listitem [ref=e11]:
+          - link "Catálogo" [ref=e12] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/catalogo-articulos-golf/
+        - listitem [ref=e13]:
+          - link "Palos Usados" [ref=e14] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e15]:
+          - link "Simulador" [ref=e16] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/simulador-de-golf/
+        - listitem [ref=e17]:
+          - link "Acerca de" [ref=e18] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/acerca-azalea-tienda-golf/
+        - listitem [ref=e19]:
+          - link "Contacto" [ref=e20] [cursor=pointer]:
+            - /url: https://azaleasports.com.uy/contacto/
+      - button "Buscar" [ref=e21] [cursor=pointer]:
+        - img [ref=e22]
+  - generic [ref=e26]:
+    - button "Ver artículos usados" [ref=e27] [cursor=pointer]
+    - button "Publicar un artículo" [ref=e28] [cursor=pointer]
+  - generic [ref=e29]:
+    - complementary [ref=e30]:
+      - generic [ref=e31]:
+        - generic [ref=e32]: Categoría
+        - list [ref=e33]:
+          - listitem [ref=e34] [cursor=pointer]:
+            - checkbox [ref=e35]
+            - generic [ref=e36]: Palos
+          - listitem [ref=e37] [cursor=pointer]:
+            - checkbox [ref=e38]
+            - generic [ref=e39]: Set de palos
+          - listitem [ref=e40] [cursor=pointer]:
+            - checkbox [ref=e41]
+            - generic [ref=e42]: Carros
+          - listitem [ref=e43] [cursor=pointer]:
+            - checkbox [ref=e44]
+            - generic [ref=e45]: Bolsas
+          - listitem [ref=e46] [cursor=pointer]:
+            - checkbox [ref=e47]
+            - generic [ref=e48]: Otros
+        - button "Limpiar" [ref=e50] [cursor=pointer]
+      - generic [ref=e51]:
+        - generic [ref=e52]: Tipo
+        - list [ref=e53]:
+          - listitem [ref=e54] [cursor=pointer]:
+            - checkbox [ref=e55]
+            - generic [ref=e56]: Driver
+          - listitem [ref=e57] [cursor=pointer]:
+            - checkbox [ref=e58]
+            - generic [ref=e59]: Madera
+          - listitem [ref=e60] [cursor=pointer]:
+            - checkbox [ref=e61]
+            - generic [ref=e62]: Híbrido
+          - listitem [ref=e63] [cursor=pointer]:
+            - checkbox [ref=e64]
+            - generic [ref=e65]: Hierros
+          - listitem [ref=e66] [cursor=pointer]:
+            - checkbox [ref=e67]
+            - generic [ref=e68]: Wedge
+          - listitem [ref=e69] [cursor=pointer]:
+            - checkbox [ref=e70]
+            - generic [ref=e71]: Putter
+        - button "Limpiar" [ref=e73] [cursor=pointer]
+      - generic [ref=e74]:
+        - generic [ref=e75]: Marcas
+        - list
+        - button "Limpiar" [ref=e77] [cursor=pointer]
+      - generic [ref=e78]:
+        - generic [ref=e79]: Estado
+        - list [ref=e80]:
+          - listitem [ref=e81] [cursor=pointer]:
+            - checkbox [ref=e82]
+            - generic [ref=e83]: Como nuevo
+          - listitem [ref=e84] [cursor=pointer]:
+            - checkbox [ref=e85]
+            - generic [ref=e86]: Muy bueno
+          - listitem [ref=e87] [cursor=pointer]:
+            - checkbox [ref=e88]
+            - generic [ref=e89]: Bueno
+          - listitem [ref=e90] [cursor=pointer]:
+            - checkbox [ref=e91]
+            - generic [ref=e92]: Regular
+          - listitem [ref=e93] [cursor=pointer]:
+            - checkbox [ref=e94]
+            - generic [ref=e95]: Para reparar
+      - generic [ref=e96]:
+        - generic [ref=e97]: Flex
+        - list [ref=e98]:
+          - listitem [ref=e99] [cursor=pointer]:
+            - checkbox [ref=e100]
+            - generic [ref=e101]: Ladies
+          - listitem [ref=e102] [cursor=pointer]:
+            - checkbox [ref=e103]
+            - generic [ref=e104]: Senior
+          - listitem [ref=e105] [cursor=pointer]:
+            - checkbox [ref=e106]
+            - generic [ref=e107]: Regular
+          - listitem [ref=e108] [cursor=pointer]:
+            - checkbox [ref=e109]
+            - generic [ref=e110]: Stiff
+          - listitem [ref=e111] [cursor=pointer]:
+            - checkbox [ref=e112]
+            - generic [ref=e113]: X-Stiff
+      - generic [ref=e114]:
+        - generic [ref=e115]: Mano
+        - list [ref=e116]:
+          - listitem [ref=e117] [cursor=pointer]:
+            - checkbox [ref=e118]
+            - generic [ref=e119]: Diestro
+          - listitem [ref=e120] [cursor=pointer]:
+            - checkbox [ref=e121]
+            - generic [ref=e122]: Zurdo
+      - generic [ref=e123]:
+        - generic [ref=e124]: Precio
+        - list [ref=e125]:
+          - listitem [ref=e126] [cursor=pointer]:
+            - checkbox [ref=e127]
+            - generic [ref=e128]: Hasta US$100
+          - listitem [ref=e129] [cursor=pointer]:
+            - checkbox [ref=e130]
+            - generic [ref=e131]: US$100 – 300
+          - listitem [ref=e132] [cursor=pointer]:
+            - checkbox [ref=e133]
+            - generic [ref=e134]: US$300 – 600
+          - listitem [ref=e135] [cursor=pointer]:
+            - checkbox [ref=e136]
+            - generic [ref=e137]: Más de US$600
+          - listitem [ref=e138] [cursor=pointer]:
+            - checkbox [ref=e139]
+            - generic [ref=e140]: A consultar
+      - generic [ref=e141]:
+        - generic [ref=e142]: Disponibilidad
+        - list [ref=e143]:
+          - listitem [ref=e144] [cursor=pointer]:
+            - checkbox [ref=e145]
+            - generic [ref=e146]: En el local de Azalea
+      - button "Limpiar todos" [ref=e148] [cursor=pointer]
+    - generic [ref=e149]:
+      - generic [ref=e150]:
+        - generic [ref=e151] [cursor=pointer]: Todos
+        - generic [ref=e152] [cursor=pointer]: Últimos 15 días
+      - generic [ref=e153]:
+        - generic [ref=e155]:
+          - strong [ref=e156]: "0"
+          - text: resultados
+        - combobox [ref=e157] [cursor=pointer]:
+          - option "Más reciente" [selected]
+          - 'option "Precio: menor a mayor"'
+          - 'option "Precio: mayor a menor"'
+  - contentinfo [ref=e160]:
+    - generic [ref=e161]:
+      - generic [ref=e163]:
+        - img "Azalea Golf"
+      - generic [ref=e164]:
+        - heading "Productos" [level=4] [ref=e166]
+        - list [ref=e168]:
+          - listitem [ref=e169]:
+            - link "Palos" [ref=e170] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/palos/
+          - listitem [ref=e171]:
+            - link "Pelotas" [ref=e172] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/pelotas/
+          - listitem [ref=e173]:
+            - link "Bolsas" [ref=e174] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/bolsas/
+          - listitem [ref=e175]:
+            - link "Carros" [ref=e176] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/carros/
+          - listitem [ref=e177]:
+            - link "Accesorios" [ref=e178] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/accesorios/
+          - listitem [ref=e179]:
+            - link "Indumentaria" [ref=e180] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/product-category/indumentaria/
+      - generic [ref=e181]:
+        - heading "Páginas" [level=4] [ref=e183]
+        - list [ref=e185]:
+          - listitem [ref=e186]:
+            - link "Home" [ref=e187] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/
+          - listitem [ref=e188]:
+            - link "Catálogo" [ref=e189] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/catalogo-articulos-golf/
+          - listitem [ref=e190]:
+            - link "Simulador" [ref=e191] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/simulador-de-golf/
+          - listitem [ref=e192]:
+            - link "Acerca de" [ref=e193] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/acerca-azalea-tienda-golf/
+          - listitem [ref=e194]:
+            - link "Contacto" [ref=e195] [cursor=pointer]:
+              - /url: https://azaleasports.com.uy/contacto/
+      - generic [ref=e196]:
+        - generic [ref=e197]:
+          - heading "Local y horario" [level=4] [ref=e199]
+          - paragraph [ref=e201]:
+            - text: Arocena 1572, Montevideo
+            - text: (lunes a viernes de 13hs a 20hs)
+        - generic [ref=e202]:
+          - heading "Contacto" [level=4] [ref=e204]
+          - generic [ref=e205]:
+            - generic [ref=e206]:
+              - link "Instagram" [ref=e207] [cursor=pointer]:
+                - /url: https://www.instagram.com/azaleagolfuy
+                - img [ref=e208]
+              - link "WhatsApp" [ref=e210] [cursor=pointer]:
+                - /url: https://wa.me/59892390042
+                - img [ref=e211]
+            - paragraph [ref=e213]:
+              - link "contacto@azaleasports.com.uy" [ref=e214] [cursor=pointer]:
+                - /url: mailto:contacto@azaleasports.com.uy
+    - generic [ref=e215]:
+      - paragraph [ref=e216]: ©2025 Azalea Golf | Todos los derechos reservados
+      - generic:
+        - link "Simbionte Creativo":
+          - /url: https://www.simbiontecreativo.com
+          - img "Simbionte Creativo"
+      - paragraph [ref=e217]:
+        - text: "Diseño y desarrollo:"
+        - link "Simbionte Creativo" [ref=e218] [cursor=pointer]:
+          - /url: https://www.simbiontecreativo.com
