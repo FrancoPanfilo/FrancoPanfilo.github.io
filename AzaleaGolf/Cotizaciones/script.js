@@ -1026,54 +1026,68 @@ function generateCotizacionPDF(cot) {
 // PDF — PRESENTACIÓN DE PRODUCTOS
 // ══════════════════════════════════════════════════════════════════════════════
 
-function convertToJpeg(src) {
+// Rasteriza una imagen a JPEG con fondo BLANCO (evita que las transparencias
+// PNG/WebP se aplanen a negro y parezcan "recortadas" en el PDF).
+// useCors: cargar con crossOrigin para poder leer el canvas de hosts con CORS.
+function convertToJpeg(src, useCors = false) {
   return new Promise((resolve) => {
     const img = new Image();
+    if (useCors) img.crossOrigin = "anonymous";
     img.onload = () => {
-      const c = document.createElement("canvas");
-      c.width = img.naturalWidth; c.height = img.naturalHeight;
-      c.getContext("2d").drawImage(img, 0, 0);
-      resolve(c.toDataURL("image/jpeg", 0.88));
+      try {
+        const c = document.createElement("canvas");
+        c.width  = img.naturalWidth  || 1;
+        c.height = img.naturalHeight || 1;
+        const ctx = c.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0);
+        resolve(c.toDataURL("image/jpeg", 0.9));
+      } catch { resolve(null); } // canvas "tainted" (sin CORS) → no se puede leer
     };
     img.onerror = () => resolve(null);
     img.src = src;
   });
 }
 
+const isSupportedImg = (s) => /^data:image\/(png|jpe?g)/i.test(s || "");
+
 async function loadImageAsBase64(src) {
   if (!src) return null;
   if (src.startsWith("data:")) {
-    if (!src.includes("image/png") && !src.includes("image/jpeg") && !src.includes("image/jpg"))
-      return await convertToJpeg(src);
-    return src;
+    return isSupportedImg(src) ? src : await convertToJpeg(src);
   }
 
-  // Intenta fetch directo primero; si falla por CORS usa proxy
+  const blobToDataUrl = (blob) => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload  = (e) => resolve(e.target.result);
+    r.onerror = () => reject(new Error("reader failed"));
+    r.readAsDataURL(blob);
+  });
+
   const tryFetch = async (url) => {
     const res = await fetch(url);
-    if (!res.ok) throw new Error("fetch failed");
-    const blob = await res.blob();
-    const dataUrl = await new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onload  = (e) => resolve(e.target.result);
-      r.onerror = () => reject(new Error("reader failed"));
-      r.readAsDataURL(blob);
-    });
+    if (!res.ok) throw new Error("http " + res.status);
+    const dataUrl = await blobToDataUrl(await res.blob());
+    if (!dataUrl.startsWith("data:image/")) throw new Error("no es imagen");
     // Convierte formatos no soportados por jsPDF (AVIF, WebP, etc.) a JPEG
-    if (!dataUrl.includes("image/png") && !dataUrl.includes("image/jpeg") && !dataUrl.includes("image/jpg"))
-      return await convertToJpeg(dataUrl);
-    return dataUrl;
+    return isSupportedImg(dataUrl) ? dataUrl : await convertToJpeg(dataUrl);
   };
 
-  try {
-    return await tryFetch(src);
-  } catch {
-    try {
-      return await tryFetch(`https://corsproxy.io/?url=${encodeURIComponent(src)}`);
-    } catch {
-      return null;
-    }
+  // Orden: directo (mismo origen / hosts con CORS), luego proxies de imagen.
+  // images.weserv.nl es un proxy de imágenes confiable que agrega cabeceras
+  // CORS y normaliza el formato; corsproxy.io queda como último recurso.
+  const noProto = src.replace(/^https?:\/\//, "");
+  const candidates = [
+    src,
+    `https://images.weserv.nl/?url=${encodeURIComponent(noProto)}`,
+    `https://corsproxy.io/?url=${encodeURIComponent(src)}`,
+  ];
+  for (const url of candidates) {
+    try { const out = await tryFetch(url); if (out) return out; } catch { /* siguiente */ }
   }
+  // Último recurso: cargar con crossOrigin y leer del canvas.
+  return await convertToJpeg(src, true);
 }
 
 // Inserta una imagen manteniendo proporciones dentro de un box, centrada.
@@ -1344,8 +1358,8 @@ async function generatePresentacionPDF(pres) {
   // ══════════════════════════════════════════════════════════════════
   docPdf.addPage();
 
-  // Fondo rosa muy suave
-  docPdf.setFillColor(...PINK_LT);
+  // Fondo blanco (igual que la portada)
+  docPdf.setFillColor(255, 255, 255);
   docPdf.rect(0, 0, PW, PH, "F");
 
   // Banda superior rosa
